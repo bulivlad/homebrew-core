@@ -4,13 +4,13 @@ class Siril < Formula
   url "https://free-astro.org/download/siril-0.99.6.tar.bz2"
   sha256 "255dbffb72bb39b1d9d56ab948b4cad32d1458161b1d997cd84ada21f9a8499f"
   license "GPL-3.0-or-later"
-  revision 1
+  revision 4
   head "https://gitlab.com/free-astro/siril.git"
 
   bottle do
-    sha256 "46a778d0aff3f24d838ba4572c8875a7fb6ca1dbb28a0ae4a81e5074ec14d19e" => :catalina
-    sha256 "c9968a578ce015c0921cd3c655433d28922f2916cade09945729db3b3e3b9358" => :mojave
-    sha256 "8c9f792e64db64f7bff90d815b29e3c99c69188c67694be0ed5ac6064f055306" => :high_sierra
+    sha256 "203c9cc07bfd240147e388becdc8a98dd59f6f81e60574be4c8987c3fc223dfa" => :big_sur
+    sha256 "17801c27fad74c686f56759c6acd1481f89ba4a441f7a32a2ba226a3f5cb2d92" => :catalina
+    sha256 "73e2b5f9b0cf0f446710d634c099238f95f72a9bc598784856c45a76f3248479" => :mojave
   end
 
   depends_on "autoconf" => :build

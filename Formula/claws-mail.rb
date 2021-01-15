@@ -1,14 +1,16 @@
 class ClawsMail < Formula
   desc "User-friendly, lightweight, and fast email client"
   homepage "https://www.claws-mail.org/"
-  url "https://www.claws-mail.org/releases/claws-mail-3.17.7.tar.gz"
-  sha256 "47e634fcea55f08bd401849c7a3827f8a4a277fda15788961ff0aac5d59ecc38"
+  url "https://www.claws-mail.org/releases/claws-mail-3.17.8.tar.gz"
+  sha256 "50d40789d33063c16b38b4177be88ffb1d499e75007e8630670996fa2cb25f20"
   license "GPL-3.0-or-later"
+  revision 1
 
   bottle do
-    sha256 "7777390cfea96a30277ebb79738341f0944bae3dcfd18a7befd2748ea4671356" => :catalina
-    sha256 "6a7264ed191bcfdc7ae1b1c1020a09b3d9b224e61b45c876cc047db181a225cb" => :mojave
-    sha256 "3d5c69c7654a22c8b51d3a7bf18224a40fade38281bb4c4fb4287221b3ca19ee" => :high_sierra
+    sha256 "cc9a93ec8f3322edcd9c9be0a3c9b059d130008115e19276533675432cae1c67" => :big_sur
+    sha256 "bbd1c67af463fb0645306523ebe20d37833aa8e3d38c042e8ce60d378c53d1d0" => :arm64_big_sur
+    sha256 "5a559644851d9b007a6a500ae15558c5193c6e333cbe6c04f0294d03928d789e" => :catalina
+    sha256 "f94aacf80c700939dbd023899421a2bd961d78ce3a9f958cc9156234ba92b150" => :mojave
   end
 
   depends_on "pkg-config" => :build

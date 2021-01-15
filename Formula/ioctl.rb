@@ -1,15 +1,15 @@
 class Ioctl < Formula
   desc "Command-line interface for interacting with the IoTeX blockchain"
   homepage "https://docs.iotex.io/developer/get-started/ioctl-install.html"
-  url "https://github.com/iotexproject/iotex-core/archive/v1.1.1.tar.gz"
-  sha256 "fcff5ce4231253ebbe04e0405a36a7b89fb2d6c1b30ab0b5deac6ac6f84f9f8b"
+  url "https://github.com/iotexproject/iotex-core/archive/v1.1.3.tar.gz"
+  sha256 "1a9e50a5831d9543489187944b1fc73bdaf3ae87c9cbe8f46810f25a915d0e24"
   license "Apache-2.0"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "853cecf5618a240600402dfd7a96a7e6bea5a9accadbd29ae8d5ce2091b073b1" => :catalina
-    sha256 "16aff3f50f0a48870951cefd48ff9956ee0dd1abc5f80abde24db398ce501f06" => :mojave
-    sha256 "26165d126a282494e885d29608f1e231ca1ee669e2bac0283e02013a8b036446" => :high_sierra
+    sha256 "3a4ed6686010c057740b3034deac2213f2c3dd6531be061f3f723ce71d368d70" => :big_sur
+    sha256 "91ac4733539093413bf3d8bc3b4beac08589917ef84434bba5ddc61cc49a16ca" => :catalina
+    sha256 "02c80614399fc92d2425b34b00931acd20c689d93a588a1adcb137d8b60ba807" => :mojave
   end
 
   depends_on "go" => :build

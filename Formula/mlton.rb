@@ -13,6 +13,7 @@ class Mlton < Formula
 
   bottle do
     cellar :any
+    sha256 "6532f2264aeade862542d23116a004298b942b5da8e8c58b63d09f8cb370aca7" => :big_sur
     sha256 "74c855912e47a0ab45209380c066a307e98a801c43ceeb6f724984daeee2235f" => :catalina
     sha256 "339877740be650978b454a95cc37a4295cd6f2030c19914513463f73b5696986" => :mojave
     sha256 "c47f72b8ab349204f5b4ad00c5f1d2018a22be49e1eb39da3416648698dcce1b" => :high_sierra
@@ -27,7 +28,7 @@ class Mlton < Formula
     on_macos do
       # https://github.com/Homebrew/homebrew-core/pull/58438#issuecomment-665375929
       # new `mlton-20201002-1.amd64-darwin-17.7.gmp-static.tgz` artifact
-      # used here for bootraping all homebrew versions
+      # used here for bootstrapping all homebrew versions
       url "https://downloads.sourceforge.net/project/mlton/mlton/20201002/mlton-20201002-1.amd64-darwin-17.7.gmp-static.tgz"
       sha256 "737adc5590b9d010ba3654344103418bf6c70aebc66d98849f7e0f37ef386114"
     end

@@ -2,15 +2,16 @@ class AwsSdkCpp < Formula
   desc "AWS SDK for C++"
   homepage "https://github.com/aws/aws-sdk-cpp"
   # aws-sdk-cpp should only be updated every 10 releases on multiples of 10
-  url "https://github.com/aws/aws-sdk-cpp/archive/1.8.60.tar.gz"
-  sha256 "74046306e9fb299924dfa0a149554652f0b7a279df38a7da046e7d2e84513791"
+  url "https://github.com/aws/aws-sdk-cpp/archive/1.8.120.tar.gz"
+  sha256 "a155da9e6db3b804b09002bbee7b1a25f314c34e285ceed98f462d99ec23dd59"
   license "Apache-2.0"
   head "https://github.com/aws/aws-sdk-cpp.git"
 
   bottle do
-    sha256 "9f3a305d79d60c0ca4350b99303d62ee03bbad4ae6879caaf7aec64da715e99f" => :catalina
-    sha256 "091ba071b436ed6aa1b3f3d3dde78133930fd9ca105d2672508d27c2b9dcc34b" => :mojave
-    sha256 "ed49c6e7a6c7ecb9052fb3e5cc1c770dd5d7a6165b2b299a24c0c8860cc9ecc1" => :high_sierra
+    sha256 "d98285da26fd55808f07710eda4cb72bcd38fb30c5aff69a0ac0eca4af9ee815" => :big_sur
+    sha256 "02b978cfad1460bbbfb86be25c96d5607295b8c9be70fcd019b04c180a509599" => :arm64_big_sur
+    sha256 "150a1e02ec92257f0802ffc0d41ca6e1c92a3d01516eee927f5885964871b3d1" => :catalina
+    sha256 "5f0726c5265c2d0df15eabe33d3d3faddc2e51371031c55ed02f0a3fa4841a33" => :mojave
   end
 
   depends_on "cmake" => :build

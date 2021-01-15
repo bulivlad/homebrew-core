@@ -1,15 +1,16 @@
 class Act < Formula
   desc "Run your GitHub Actions locally 🚀"
   homepage "https://github.com/nektos/act"
-  url "https://github.com/nektos/act/archive/v0.2.16.tar.gz"
-  sha256 "e67812743a37cc50bbf80403eea9ac957b5a4a056b4f28b21e1aaabdd270ca22"
+  url "https://github.com/nektos/act/archive/v0.2.18.tar.gz"
+  sha256 "fda422fcd497f08777a4558d68d3124a78eb59a46ff0fd786fdb84ea06b0f08f"
   license "MIT"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "0f07dbc4d2b860661513a7e345179c95cf3d13dcf9061508885be2993ee35975" => :catalina
-    sha256 "63aa66b44617c85b5d4b2d9e6db8d2adf97909c85f312d40abe5fd8ad8ecb2ed" => :mojave
-    sha256 "8e5bcd4db6828643ca780f0e8e1a85f324cb7dfa57ea11965b5f882f74cb98f1" => :high_sierra
+    sha256 "129324772b70bddbac8bf5f05ad2c446a898287089d07c7590b0812efc66cf95" => :big_sur
+    sha256 "00d1cd0957e9bc4c316d331891cb490657f1203fda35f9d2ea7033edcb830065" => :arm64_big_sur
+    sha256 "63e4c98ff67ce6e8c39dc1cdc96e782328adfbe08c3ee6b420dd75f942dea242" => :catalina
+    sha256 "f44412d572c2ae10f1e547ff26f6c01b55609ebe34fdc4fe78be18e4ef7bb0b5" => :mojave
   end
 
   depends_on "go" => :build

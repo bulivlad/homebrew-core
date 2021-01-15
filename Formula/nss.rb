@@ -1,8 +1,8 @@
 class Nss < Formula
   desc "Libraries for security-enabled client and server applications"
-  homepage "https://developer.mozilla.org/docs/NSS"
-  url "https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_58_RTM/src/nss-3.58.tar.gz"
-  sha256 "9f73cf789b5f109b978e5239551b609b0cafa88d18f0bc8ce3f976cb629353c0"
+  homepage "https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS"
+  url "https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_60_1_RTM/src/nss-3.60.1.tar.gz"
+  sha256 "2051c20b61112df24bad533ac37f6c66c1bc0d6ea70bb9d9cad102d20324279d"
   license "MPL-2.0"
 
   livecheck do
@@ -12,9 +12,10 @@ class Nss < Formula
 
   bottle do
     cellar :any
-    sha256 "baec8fe237523b3d157c85b27557576fe6529783b7076d71ca3520c2115cadf1" => :catalina
-    sha256 "732bc60e7ee64e29022a492d5b36824ca41deec37d8506bdaf442b9d752cc435" => :mojave
-    sha256 "879b71bff4bbd61b334d1a6d61cb1faa2862f07e02b7d4c2f99e9d23311dcc9f" => :high_sierra
+    sha256 "12e021d10f98f0bf6df1975c98a23e79e050109c874acdca9ff246051e97cd9a" => :big_sur
+    sha256 "fc6d984dfc5495be9c16151e9b54a50575ba52c0ee2ab96526062be28d6672bb" => :arm64_big_sur
+    sha256 "6568b1349fce2795f4ea07506446df9949a59b9224dedbebd87aa2cbd5067d8b" => :catalina
+    sha256 "c45aab528147c56d4ab4ae50c9567fa41b2051111e1eea8070fe8b1594e7a2be" => :mojave
   end
 
   depends_on "nspr"
@@ -23,6 +24,7 @@ class Nss < Formula
   uses_from_macos "zlib"
 
   conflicts_with "resty", because: "both install `pp` binaries"
+  conflicts_with "googletest", because: "both install `libgtest.a`"
 
   def install
     ENV.deparallelize

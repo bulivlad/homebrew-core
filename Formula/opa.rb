@@ -1,16 +1,17 @@
 class Opa < Formula
   desc "Open source, general-purpose policy engine"
   homepage "https://www.openpolicyagent.org"
-  url "https://github.com/open-policy-agent/opa/archive/v0.24.0.tar.gz"
-  sha256 "6401f8ce1c99fe90fddd27e1fb54b04477faee8d6ce0a1e4565405df26e47383"
+  url "https://github.com/open-policy-agent/opa/archive/v0.25.2.tar.gz"
+  sha256 "014e7828b0530a18e23f6ff883502ae67070440707cb9c8bd9c0adf6d354caa2"
   license "Apache-2.0"
   head "https://github.com/open-policy-agent/opa.git"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "4f232fca4be0ec90905d33fb487cdbe872947e9ca1630bd81191c80946127642" => :catalina
-    sha256 "aeb1715b15a432775184cfc0d0dd17f45bdfcae4a6bda508d118e4bfa77e297a" => :mojave
-    sha256 "b4f3d4d9ca0c2032ac0488d5fd355b69b7bbe3446ff79dae1ec0bcf3eef2fa2b" => :high_sierra
+    sha256 "534ee9b3f0f351da7a3f43666b0c020d2e499c7bf831de6381e0668f39b7bbd3" => :big_sur
+    sha256 "42c1a3792eff3e5612a88be6f80b4a7d9ee6f441064ee3247df8bce58786cc22" => :arm64_big_sur
+    sha256 "9ff5370ed969a140bfbba7a6d0ddf48c130f3a630a6ab90cfe41fb78844711ba" => :catalina
+    sha256 "e23755f822f539989b592337f8807da97f0db336e8588d4317ceaa236a6dcb56" => :mojave
   end
 
   depends_on "go" => :build

@@ -1,15 +1,15 @@
 class Hadolint < Formula
   desc "Smarter Dockerfile linter to validate best practices"
   homepage "https://github.com/hadolint/hadolint"
-  url "https://github.com/hadolint/hadolint/archive/v1.18.1.tar.gz"
-  sha256 "4800d4a063ae86b3a7494c09a5de018a794307db8cfbdb9775bfa74bb6448d5b"
-  license "GPL-3.0"
+  url "https://github.com/hadolint/hadolint/archive/v1.19.0.tar.gz"
+  sha256 "bf5270f68b26a14197cd2f34490a2a3a696b07e2492bfef979adb096c77b0c1e"
+  license "GPL-3.0-only"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "c45ebcb4b182164ce214940b48cfbae73342280d3a6236c6b9b73e518d61d364" => :catalina
-    sha256 "1f7d707912486724b01bc011ca7c4b9249b1c4ea6cb8e009c69b3ce8006d25f2" => :mojave
-    sha256 "c9fd5ed57fbd001e04e8e8f26921d5943d864f3248a97dcd15f7a427575a9654" => :high_sierra
+    sha256 "d02e9b6a838b0054c4288beec7388c84350727334d0d63dedd6e9e33b7e57d2e" => :big_sur
+    sha256 "4261c178d1bc9066e8d645712207a665cf16650c5b22493c1dd9718dbc8a4ab3" => :catalina
+    sha256 "f9d485e36150f6f86b64c58d1670bac62c0808e803150515ce74335949f4e18b" => :mojave
   end
 
   depends_on "ghc" => :build

@@ -1,25 +1,25 @@
 class Mysql < Formula
   desc "Open source relational database management system"
   homepage "https://dev.mysql.com/doc/refman/8.0/en/"
-  url "https://cdn.mysql.com/Downloads/MySQL-8.0/mysql-boost-8.0.21.tar.gz"
-  sha256 "37231a123372a95f409857364dc1deb196b6f2c0b1fe60cc8382c7686b487f11"
-  license "GPL-2.0"
+  url "https://cdn.mysql.com/Downloads/MySQL-8.0/mysql-boost-8.0.22.tar.gz"
+  sha256 "ba765f74367c638d7cd1c546c05c14382fd997669bcd9680278e907f8d7eb484"
+  license "GPL-2.0-only"
   revision 1
 
   livecheck do
-    url "https://dev.mysql.com/downloads/mysql/"
-    regex(/href=.*?mysql[._-]v?(\d+.\d+.\d+)-/i)
+    url "https://dev.mysql.com/downloads/mysql/?tpl=files&os=src"
+    regex(/href=.*?mysql[._-](?:boost[._-])?v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 "81e92d0df39edaff415e7d52f8d24db15db4469e99a7fbc915c92671a77e1374" => :catalina
-    sha256 "2383f7243ac47f28be988c66253251d8a71b51c1583d3550e6a9e1ab2931e951" => :mojave
-    sha256 "92bde22c4e13a0c888e7b7b9e62003e227a72a331c13a35cac98d9e7936ae387" => :high_sierra
+    rebuild 1
+    sha256 "4032192bba2d0aa3433573019c8b4b6566e9c0aa2f69a493e141cc15f53de63b" => :big_sur
+    sha256 "2ec33bf3278faa988e8586c93a27aa87cb58fe7d4ed9a84a2e64d80b55c8d35f" => :arm64_big_sur
+    sha256 "42239a4ab5d73f7ba533cefd0065566e9a68ae8faf977966103b20f80c1fe9d5" => :catalina
+    sha256 "ba3267e7fad1b6e2c991a1dc40d2b4177c554a6ae7734fc7c33c3cc26f4d327e" => :mojave
   end
 
   depends_on "cmake" => :build
-  # GCC is not supported either, so exclude for El Capitan.
-  depends_on macos: :sierra if DevelopmentTools.clang_build_version == 800
   depends_on "openssl@1.1"
   depends_on "protobuf"
 
@@ -27,13 +27,6 @@ class Mysql < Formula
 
   conflicts_with "mariadb", "percona-server",
     because: "mysql, mariadb, and percona install the same binaries"
-
-  # https://bugs.mysql.com/bug.php?id=86711
-  # https://github.com/Homebrew/homebrew-core/pull/20538
-  fails_with :clang do
-    build 800
-    cause "Wrong inlining with Clang 8.0, see MySQL Bug #86711"
-  end
 
   def datadir
     var/"mysql"
@@ -102,6 +95,8 @@ class Mysql < Formula
   end
 
   def post_install
+    return if ENV["CI"]
+
     # Make sure the datadir exists
     datadir.mkpath
     unless (datadir/"mysql/general_log.CSM").exist?
@@ -158,22 +153,18 @@ class Mysql < Formula
   end
 
   test do
-    # Expects datadir to be a completely clean dir, which testpath isn't.
-    dir = Dir.mktmpdir
-    system bin/"mysqld", "--initialize-insecure", "--user=#{ENV["USER"]}",
-    "--basedir=#{prefix}", "--datadir=#{dir}", "--tmpdir=#{dir}"
-
+    (testpath/"mysql").mkpath
+    (testpath/"tmp").mkpath
+    system bin/"mysqld", "--no-defaults", "--initialize-insecure", "--user=#{ENV["USER"]}",
+      "--basedir=#{prefix}", "--datadir=#{testpath}/mysql", "--tmpdir=#{testpath}/tmp"
     port = free_port
-    pid = fork do
-      exec bin/"mysqld", "--bind-address=127.0.0.1", "--datadir=#{dir}", "--port=#{port}"
+    fork do
+      system "#{bin}/mysqld", "--no-defaults", "--user=#{ENV["USER"]}",
+        "--datadir=#{testpath}/mysql", "--port=#{port}", "--tmpdir=#{testpath}/tmp"
     end
-    sleep 2
-
-    output = shell_output("curl 127.0.0.1:#{port}")
-    output.force_encoding("ASCII-8BIT") if output.respond_to?(:force_encoding)
-    assert_match version.to_s, output
-  ensure
-    Process.kill(9, pid)
-    Process.wait(pid)
+    sleep 5
+    assert_match "information_schema",
+      shell_output("#{bin}/mysql --port=#{port} --user=root --password= --execute='show databases;'")
+    system "#{bin}/mysqladmin", "--port=#{port}", "--user=root", "--password=", "shutdown"
   end
 end

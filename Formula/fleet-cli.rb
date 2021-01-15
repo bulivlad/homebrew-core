@@ -2,20 +2,21 @@ class FleetCli < Formula
   desc "Manage large fleets of Kubernetes clusters"
   homepage "https://github.com/rancher/fleet"
   url "https://github.com/rancher/fleet.git",
-    tag:      "v0.3.0",
-    revision: "55cda24b980e8539f827af521ed59771ac681d86"
+      tag:      "v0.3.3",
+      revision: "c17a2f2cd69df7ac028ae9c0dd8ae3ea1e492f2b"
   license "Apache-2.0"
 
   livecheck do
-    url "https://github.com/rancher/fleet/releases/latest"
-    regex(%r{href=.*?/tag/v?(\d+(?:\.\d+)+)["' >]}i)
+    url :stable
+    strategy :github_latest
   end
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "f35d0d4376ac67b6c354c8bb7111ae261275d65b95cff65295dffcfddca778c8" => :catalina
-    sha256 "e1739f6e06c70942ceff7f1182e81076feb810314f04ae9d9ac2cd21c0df7626" => :mojave
-    sha256 "4eed32c7c3371071608b2a7f0a044fc61165c537ef637dde6cc79cc79b85c35b" => :high_sierra
+    sha256 "0c5dfccdfc07605a1bbefdc16882745a22201f18dca17806bf8e542719827459" => :big_sur
+    sha256 "6ea8c0ebbe4b2990e4c8bf29582c1aed50b4649513eb0e7e42ab4bad33cf6203" => :arm64_big_sur
+    sha256 "03b4414cb80b9bf95a4dacd9a432f04d240a21aa00a26a2df7ce47342df7ed47" => :catalina
+    sha256 "e8f8fadfaee6bc9d893454aa7035985ce652bcb25448ce5fd50e33ac45d09acc" => :mojave
   end
 
   depends_on "go" => :build

@@ -2,15 +2,16 @@ class Wownero < Formula
   desc "Official wallet and node software for the Wownero cryptocurrency"
   homepage "https://wownero.org"
   url "https://git.wownero.com/wownero/wownero.git",
-    tag:      "v0.9.0.2",
-    revision: "9a58ac48d2f1ebdc94f168e63fdc30604058a7ca"
+      tag:      "v0.9.2.0",
+      revision: "4b1d0f2340c4d21f0a7b3d520bd0acfd6eeb8192"
   license "BSD-3-Clause"
 
   bottle do
     cellar :any
-    sha256 "8ec66cfd025054b7acd06e119ef569b168900de18e8c7e4cf613149a64c983f7" => :catalina
-    sha256 "1270cbab4bf4b1615af99f61b9b74453fecd2c4227755bd43b154d10dc26dbaf" => :mojave
-    sha256 "3de1293cafd981fb69f6d4fb2c10e7402ddc09f0015caf19096f544ae3be9a6b" => :high_sierra
+    sha256 "46c35cb57aa75b3938782c992a20e21b2439c862e28940ebc6b08bf447bbe229" => :big_sur
+    sha256 "f2a79ca860b6c7f49ee7fdcc7bf83e37c1537884bfd2497f068f2666f43f383f" => :arm64_big_sur
+    sha256 "ff9c445d15fc95660c62a24b6eebf380cc165bc5ba8e28077cc1bebcd1a18736" => :catalina
+    sha256 "ca7c85dd4135286d897194108d268622910bc8a415226d1695ada95295515bcb" => :mojave
   end
 
   depends_on "cmake" => :build
@@ -25,6 +26,7 @@ class Wownero < Formula
   depends_on "zeromq"
 
   conflicts_with "miniupnpc", because: "wownero ships its own copy of miniupnpc"
+  conflicts_with "monero", because: "both install a wallet2_api.h header"
 
   def install
     system "cmake", ".", *std_cmake_args

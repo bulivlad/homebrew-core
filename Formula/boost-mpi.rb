@@ -1,25 +1,31 @@
 class BoostMpi < Formula
   desc "C++ library for C++/MPI interoperability"
   homepage "https://www.boost.org/"
-  url "https://dl.bintray.com/boostorg/release/1.73.0/source/boost_1_73_0.tar.bz2"
-  mirror "https://dl.bintray.com/homebrew/mirror/boost_1_73_0.tar.bz2"
-  sha256 "4eb3b8d442b426dc35346235c8733b5ae35ba431690e38c6a8263dce9fcbb402"
+  url "https://dl.bintray.com/boostorg/release/1.75.0/source/boost_1_75_0.tar.bz2"
+  mirror "https://dl.bintray.com/homebrew/mirror/boost_1_75_0.tar.bz2"
+  sha256 "953db31e016db7bb207f11432bef7df100516eeb746843fa0486a222e3fd49cb"
   license "BSL-1.0"
   head "https://github.com/boostorg/boost.git"
 
   bottle do
-    sha256 "c9f768e84953960f029ca0e4742169492ce7f78f63b70c9262efd6f483014006" => :catalina
-    sha256 "23ea2a6c362ba43697d1d583b90c56446030faadf5878cdd12a0a369a2cb872f" => :mojave
-    sha256 "2d02ebd7d916d416d0921b58b454e1f7e214450f0f61b1823bc49eafcbf98f38" => :high_sierra
+    rebuild 1
+    sha256 "94e6a5f93cb4c9f225e8efdeee54aec07f8a440d515cb49f4ebbfa836154b09d" => :big_sur
+    sha256 "1e3acbc5248b962a5d82eb8edb1e3ffef905cc52106a28d46c46f2b68d24e293" => :arm64_big_sur
+    sha256 "4b9073178ad5d46e4770e58bf12323b725dd3053a1afa1d872202120ce1dcd28" => :catalina
+    sha256 "c44780bc2bc1ee6c58717f2c4c20f01a00c027f6c035ddeb7ac90e5eaf122dc8" => :mojave
   end
 
+  # Test with cmake to avoid issues like:
+  # https://github.com/Homebrew/homebrew-core/issues/67285
+  depends_on "cmake" => :test
   depends_on "boost"
   depends_on "open-mpi"
 
-  # Fix build on Xcode 11.4
+  # Fix build system issues on Apple silicon. This change has aleady
+  # been merged upstream, remove this patch once it lands in a release.
   patch do
-    url "https://github.com/boostorg/build/commit/b3a59d265929a213f02a451bb63cea75d668a4d9.patch?full_index=1"
-    sha256 "04a4df38ed9c5a4346fbb50ae4ccc948a1440328beac03cb3586c8e2e241be08"
+    url "https://github.com/boostorg/build/commit/456be0b7ecca065fbccf380c2f51e0985e608ba0.patch?full_index=1"
+    sha256 "e7a78145452fc145ea5d6e5f61e72df7dcab3a6eebb2cade6b4cfae815687f3a"
     directory "tools/build"
   end
 
@@ -96,5 +102,8 @@ class BoostMpi < Formula
     boost = Formula["boost"]
     system "mpic++", "test.cpp", "-L#{lib}", "-L#{boost.lib}", "-lboost_mpi", "-lboost_serialization", "-o", "test"
     system "mpirun", "-np", "2", "./test"
+
+    (testpath/"CMakeLists.txt").write "find_package(Boost COMPONENTS mpi REQUIRED)"
+    system "cmake", ".", "-Wno-dev"
   end
 end

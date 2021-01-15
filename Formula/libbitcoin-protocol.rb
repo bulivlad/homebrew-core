@@ -4,13 +4,15 @@ class LibbitcoinProtocol < Formula
   url "https://github.com/libbitcoin/libbitcoin-protocol/archive/v3.6.0.tar.gz"
   sha256 "fc41c64f6d3ee78bcccb63fd0879775c62bba5326f38c90b4c6804e2b9e8686e"
   license "AGPL-3.0"
-  revision 4
+  revision 6
 
   bottle do
     cellar :any
-    sha256 "e4ace943dc279f2314805e724e18cfe8d7f1f5c4b6bc908dd714bcf2bfa150f9" => :catalina
-    sha256 "4ac63f7dfac4955b5682dd3342aaec9e28cd14f2f4e6271104aa76f48c32d6f2" => :mojave
-    sha256 "54c5ebea35a3140641a108856b66c2e09a0e7e8ac385af231cd9de8fd33255aa" => :high_sierra
+    rebuild 1
+    sha256 "1a9a04d1a5645f4f5820fb4fae0b4b03476a7554a070ac3495958525916fcffc" => :big_sur
+    sha256 "cad8c088fda88ee6a4618a1196ff5e49a63cea4e2fd32f6a402dfd4851fbdae3" => :arm64_big_sur
+    sha256 "b89dd7742e774bf80a8c2dcab61ffaa25b53bf26e7de720e7724f5b1034cbd87" => :catalina
+    sha256 "88406194bac447e36bdf8020f1a0899ac8206834996c48a38ee83d22c640e520" => :mojave
   end
 
   depends_on "autoconf" => :build
@@ -26,7 +28,8 @@ class LibbitcoinProtocol < Formula
     system "./autogen.sh"
     system "./configure", "--disable-dependency-tracking",
                           "--disable-silent-rules",
-                          "--prefix=#{prefix}"
+                          "--prefix=#{prefix}",
+                          "--with-boost-libdir=#{Formula["boost"].opt_lib}"
     system "make", "install"
   end
 

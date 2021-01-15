@@ -1,28 +1,41 @@
 class Rclone < Formula
   desc "Rsync for cloud storage"
   homepage "https://rclone.org/"
-  url "https://github.com/rclone/rclone/archive/v1.53.1.tar.gz"
-  sha256 "b606ebb82bf76cf7e050aaa7bfcc1a688783ec5a4c71a6c3df6aa2f73fe6c8c1"
+  url "https://github.com/rclone/rclone/archive/v1.53.3.tar.gz"
+  sha256 "46fb317057ada21add1fa683a004e1ad5b2a1523c381f59b40ed1b18f2856ad0"
   license "MIT"
+  revision 1
   head "https://github.com/rclone/rclone.git"
 
   bottle do
     cellar :any_skip_relocation
-    rebuild 1
-    sha256 "3c9040c1cb227bcd2c42681b51e08477a399fe012abf5721a9821d863bc722ac" => :catalina
-    sha256 "4a5c527e176a804b81ed291f3dec0ea43b03ffe14f86f4aff8f91d72c53c4c2d" => :mojave
-    sha256 "2aa23e60997424d9051c70c7f13ae83ed4b58d1d95eaf511323698b4b0add17f" => :high_sierra
+    sha256 "9893c01fd98887fdb8a3f0172aa9f1c0c45772ef66745a035b2d59ed783a5a48" => :big_sur
+    sha256 "892887ded85fbe69da902eb186bfd29d17d6fd5bd2645dfa9d2d9bee5bcd08f4" => :arm64_big_sur
+    sha256 "7e0ac710208b82b5c40da947adebc35a97159d5ef6dae9bb77d5f9e147888a68" => :catalina
+    sha256 "fb4f008464eeec2bc8351ae821109ab762bf67aa604952e5d362288af67d9b46" => :mojave
   end
 
   depends_on "go" => :build
 
   def install
-    system "go", "build", "-tags", "cmount", *std_go_args
+    args = *std_go_args
+    on_macos do
+      args += ["-tags", "brew"]
+    end
+    system "go", "build",
+      "-ldflags", "-s -X github.com/rclone/rclone/fs.Version=v#{version}",
+      *args
     man1.install "rclone.1"
     system bin/"rclone", "genautocomplete", "bash", "rclone.bash"
     system bin/"rclone", "genautocomplete", "zsh", "_rclone"
     bash_completion.install "rclone.bash" => "rclone"
     zsh_completion.install "_rclone"
+  end
+
+  def caveats
+    <<~EOS
+      Homebrew's installation does not include the `mount` subcommand on MacOS.
+    EOS
   end
 
   test do

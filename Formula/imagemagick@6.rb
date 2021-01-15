@@ -4,9 +4,9 @@ class ImagemagickAT6 < Formula
   # Please always keep the Homebrew mirror as the primary URL as the
   # ImageMagick site removes tarballs regularly which means we get issues
   # unnecessarily and older versions of the formula are broken.
-  url "https://dl.bintray.com/homebrew/mirror/imagemagick%406-6.9.11-34.tar.xz"
-  mirror "https://www.imagemagick.org/download/releases/ImageMagick-6.9.11-34.tar.xz"
-  sha256 "1a0de3fc2ab0cbaae4b06e3300755a2f6729b967f627982467ee3ef9e6948d29"
+  url "https://dl.bintray.com/homebrew/mirror/imagemagick%406-6.9.11-57.tar.xz"
+  mirror "https://www.imagemagick.org/download/releases/ImageMagick-6.9.11-57.tar.xz"
+  sha256 "1a1d35a6e702a498d34b4a4f9fbf5aab228ee233d18b83f742163071fc6b7e05"
   license "ImageMagick"
   head "https://github.com/imagemagick/imagemagick6.git"
 
@@ -16,9 +16,10 @@ class ImagemagickAT6 < Formula
   end
 
   bottle do
-    sha256 "e0f2a56a122f18f8aafc6c80f0593a0cbcd4de074c84266e616f70d100f96b81" => :catalina
-    sha256 "ab8878f003911d053889dfe438a9d63668c44c90e1f16b6128d0665857f25010" => :mojave
-    sha256 "cb97fa268f47ae3218d5cf283bfafc5bdcdc590fc4ec26b7746ccfb46c9a3693" => :high_sierra
+    sha256 "3eaa84f3f2a2e40efdec7bbd1ddd41609276958c06e2ea422419118865ab62a1" => :big_sur
+    sha256 "c301fcbeee267e5d21dbce75262eaa02d2eda7090e34d248f205e25eab84d2ed" => :arm64_big_sur
+    sha256 "c33250c46ef3b9f96ff14f8ab85abee824e1a576a7fb1234a735ee154d1378d2" => :catalina
+    sha256 "4111c2b6df65cf383a45afa18899f94fa371e5ed16a0df53ab428ef7ef76e5f8" => :mojave
   end
 
   keg_only :versioned_formula
@@ -26,6 +27,7 @@ class ImagemagickAT6 < Formula
   depends_on "pkg-config" => :build
 
   depends_on "freetype"
+  depends_on "ghostscript"
   depends_on "jpeg"
   depends_on "libpng"
   depends_on "libtiff"
@@ -54,7 +56,7 @@ class ImagemagickAT6 < Formula
       --with-modules
       --with-webp=yes
       --with-openjp2
-      --without-gslib
+      --with-gslib
       --with-gs-font-dir=#{HOMEBREW_PREFIX}/share/ghostscript/fonts
       --without-fftw
       --without-pango
@@ -63,7 +65,7 @@ class ImagemagickAT6 < Formula
     ]
 
     # versioned stuff in main tree is pointless for us
-    inreplace "configure", "${PACKAGE_NAME}-${PACKAGE_VERSION}", "${PACKAGE_NAME}"
+    inreplace "configure", "${PACKAGE_NAME}-${PACKAGE_BASE_VERSION}", "${PACKAGE_NAME}"
     system "./configure", *args
     system "make", "install"
   end

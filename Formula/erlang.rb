@@ -2,8 +2,8 @@ class Erlang < Formula
   desc "Programming language for highly scalable real-time systems"
   homepage "https://www.erlang.org/"
   # Download tarball from GitHub; it is served faster than the official tarball.
-  url "https://github.com/erlang/otp/archive/OTP-23.1.1.tar.gz"
-  sha256 "8094484d94bce21d76f3a6c6137098839e7bc121e170c08b472f980296684ac9"
+  url "https://github.com/erlang/otp/archive/OTP-23.2.1.tar.gz"
+  sha256 "e7034e2cfe50d7570ac8f70ea7ba69ea013f10863043e25132f0a5d3d0d8d3a7"
   license "Apache-2.0"
   head "https://github.com/erlang/otp.git"
 
@@ -14,14 +14,14 @@ class Erlang < Formula
 
   bottle do
     cellar :any
-    sha256 "578b2bcc53bce0ffa5a6fecb37666644786d0b4ecf6d07e30a927fb351721a09" => :catalina
-    sha256 "c1ed81e52f5543b3466036f32bf568f1ec445edb111c2feb17fcaa28ae874674" => :mojave
-    sha256 "7142c03170d417d454b53dc0fd14edb25753327f71000ba19c396b0f78e7609b" => :high_sierra
+    sha256 "e49148cb6434a84b44ff5bc063cb2afd8d9d4cc86a9fccadaf7ce793099753b2" => :big_sur
+    sha256 "57a1d638d0edbba44001086d64fdd7cbf23436a1e88829f4d9794d5679e56daf" => :arm64_big_sur
+    sha256 "419e50fdbfbedfe40e902929253f1000595e1af58c030cc483df2b53d704b558" => :catalina
+    sha256 "6a2b1b82f6e95307a01aa6c40813289b0d923a152bf30e921bff290ded7f7d4b" => :mojave
   end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
-  depends_on "fop" => :build
   depends_on "libtool" => :build
   depends_on "openssl@1.1"
   depends_on "wxmac" # for GUI apps like observer
@@ -29,14 +29,14 @@ class Erlang < Formula
   uses_from_macos "m4" => :build
 
   resource "html" do
-    url "https://www.erlang.org/download/otp_doc_html_23.1.tar.gz"
-    mirror "https://fossies.org/linux/misc/otp_doc_html_23.1.tar.gz"
-    sha256 "0e0075f174db2f9b5a0f861263062942e5a721c40ec747356e482e3be2fb8931"
+    url "https://www.erlang.org/download/otp_doc_html_23.2.tar.gz"
+    mirror "https://fossies.org/linux/misc/otp_doc_html_23.2.tar.gz"
+    sha256 "1f58e16826a8b9f86e10ca057f4e3e3e0304dcd3cf46fe2cef6f5c1d56196fc8"
   end
 
   def install
     # Unset these so that building wx, kernel, compiler and
-    # other modules doesn't fail with an unintelligable error.
+    # other modules doesn't fail with an unintelligible error.
     %w[LIBS FLAGS AFLAGS ZFLAGS].each { |k| ENV.delete("ERL_#{k}") }
 
     # Do this if building from a checkout to generate configure
@@ -55,11 +55,13 @@ class Erlang < Formula
       --enable-wx
       --with-ssl=#{Formula["openssl@1.1"].opt_prefix}
       --without-javac
-      --enable-darwin-64bit
     ]
 
-    args << "--enable-kernel-poll" if MacOS.version > :el_capitan
-    args << "--with-dynamic-trace=dtrace" if MacOS::CLT.installed?
+    on_macos do
+      args << "--enable-darwin-64bit"
+      args << "--enable-kernel-poll" if MacOS.version > :el_capitan
+      args << "--with-dynamic-trace=dtrace" if MacOS::CLT.installed?
+    end
 
     system "./configure", *args
     system "make"

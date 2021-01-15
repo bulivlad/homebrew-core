@@ -4,17 +4,17 @@ class Caffe < Formula
   url "https://github.com/BVLC/caffe/archive/1.0.tar.gz"
   sha256 "71d3c9eb8a183150f965a465824d01fe82826c22505f7aa314f700ace03fa77f"
   license "BSD-2-Clause"
-  revision 26
+  revision 30
 
   livecheck do
-    url "https://github.com/BVLC/caffe/releases/latest"
-    regex(%r{href=.*?/tag/v?(\d+(?:\.\d+)+)["' >]}i)
+    url :stable
+    strategy :github_latest
   end
 
   bottle do
-    sha256 "a768738e7222f44a7fd184e2e9c0375defc553032f1b8c37dc9321a9d783903e" => :catalina
-    sha256 "4595a6c77a663e268ad8d946e5bb210bc00de0ba6349f6c397b90f25edcd8c79" => :mojave
-    sha256 "01e9c298ccef4b9056868f1392873cfb46ef91bd637582f448f616657cd570f0" => :high_sierra
+    sha256 "77cac15d97693c487ff5801fe65f582ce4743473615fac2898ce911825b4884a" => :big_sur
+    sha256 "e4b558168ef2449d63356e5ac0cba1935a750784baa5fa28bea480b5b236fc0b" => :catalina
+    sha256 "b8248cea3d0bb1840d3df53439db7a8f08bc67dea7e1a1f00a7500ff57a68074" => :mojave
   end
 
   depends_on "cmake" => :build
@@ -37,8 +37,8 @@ class Caffe < Formula
   # Fix compilation with OpenCV 4
   # https://github.com/BVLC/caffe/issues/6652
   patch do
-    url "https://github.com/BVLC/caffe/commit/0a04cc2ccd37ba36843c18fea2d5cbae6e7dd2b5.diff?full_index=1"
-    sha256 "6a6368d715284fabfa96660b6d24d1f4f419f3e6cdddab9a7293954fee4ec2bc"
+    url "https://github.com/BVLC/caffe/commit/0a04cc2ccd37ba36843c18fea2d5cbae6e7dd2b5.patch?full_index=1"
+    sha256 "f79349200c46fc1228ab1e1c135a389a6d0c709024ab98700017f5f66b373b39"
   end
 
   def install

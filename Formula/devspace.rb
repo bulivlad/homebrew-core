@@ -2,15 +2,20 @@ class Devspace < Formula
   desc "CLI helps develop/deploy/debug apps with Docker and k8s"
   homepage "https://devspace.cloud/docs"
   url "https://github.com/devspace-cloud/devspace.git",
-    tag:      "v5.1.2",
-    revision: "95433b0ca0a5bfd1b44cc3e51c37e5ac29418174"
+      tag:      "v5.7.1",
+      revision: "7ba03fa139f02840cb7561f57e045709823dcc0d"
   license "Apache-2.0"
+
+  livecheck do
+    url :stable
+    strategy :github_latest
+  end
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "4e8d231b2d001327b34407333b87be1179433aadf8746a0b5ff6e2aa6501eee0" => :catalina
-    sha256 "cc0e4fd08606b5d55b9dbdd43d25f969b043752de4412200c1761b073829b4fc" => :mojave
-    sha256 "e2b35baa2d66a9fa8e8c92b45f2f0093c1a612a2687f570b8bebf60b3c1f3381" => :high_sierra
+    sha256 "5083e1dccf6d49bcc07e5e0afcc98f35e6f46584a300ffef6af3ecd0145e2ba4" => :big_sur
+    sha256 "6d87de3c078ad26ceec7a5052228391e54317b09ba89d16109981434aa5bea61" => :catalina
+    sha256 "aea427785b98630059d77139b5e0d4bb46ac4ce9542ce4e99db1f3da5ee97acf" => :mojave
   end
 
   depends_on "go" => :build

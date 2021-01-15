@@ -4,8 +4,8 @@ require "json"
 class Webpack < Formula
   desc "Bundler for JavaScript and friends"
   homepage "https://webpack.js.org/"
-  url "https://registry.npmjs.org/webpack/-/webpack-5.1.3.tgz"
-  sha256 "cfe19e27245e1c365ee517373d1c22f4dcf2f9ae6b6adcf81f33e58f0aee1f37"
+  url "https://registry.npmjs.org/webpack/-/webpack-5.14.0.tgz"
+  sha256 "8020f7e6c4266a8c4bd659625dbf1b2ff9e4af2c177f4c5b52b11990e420638e"
   license "MIT"
   head "https://github.com/webpack/webpack.git"
 
@@ -15,26 +15,31 @@ class Webpack < Formula
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "02340d06c7da315b6e10c265b6605b2dc7232abbfb5735935a52110c91f2ca67" => :catalina
-    sha256 "8cd1b9427f38f39cdc8ab541f15db1dc6c0ecc34cb5818665bb6e0a2c48c4e59" => :mojave
-    sha256 "8f209bf09f5c901df6bebbc2148fa57513d09e879df2c6c01af1e63327b4a9d7" => :high_sierra
+    sha256 "abfe6cebca24228c7e5a014e473261c72d9e2486d94c3ec9216b5d6c9b0cefcb" => :big_sur
+    sha256 "6c9e36beb8c38d6c1b9d8ee24a34d3f3d51e573209c5109e7b8417f3219771f0" => :arm64_big_sur
+    sha256 "cd850eb401ab51140aa3f7206d130fcf30a8a80144af3b7ef1b4a681b2f8c280" => :catalina
+    sha256 "d4e5345d0eae8fa70cd1d1d205c3229c40b9255d3dc8d5c96c979ce6cbe3447d" => :mojave
   end
 
   depends_on "node"
 
   resource "webpack-cli" do
-    url "https://registry.npmjs.org/webpack-cli/-/webpack-cli-4.0.0.tgz"
-    sha256 "ba846e71caddbf5a48b090f23f8ce91df6c771c72e324d1fb2b9eda6e2af1a7a"
+    url "https://registry.npmjs.org/webpack-cli/-/webpack-cli-4.3.1.tgz"
+    sha256 "9d12d225e965d5c7d7d7145b215d297b93f47dc621f61a3185e0c69f09a64d43"
   end
 
   def install
     (buildpath/"node_modules/webpack").install Dir["*"]
     buildpath.install resource("webpack-cli")
 
+    cd buildpath/"node_modules/webpack" do
+      system "npm", "install", *Language::Node.local_npm_install_args, "--production", "--legacy-peer-deps"
+    end
+
     # declare webpack as a bundledDependency of webpack-cli
     pkg_json = JSON.parse(IO.read("package.json"))
     pkg_json["dependencies"]["webpack"] = version
-    pkg_json["bundledDependencies"] = ["webpack"]
+    pkg_json["bundleDependencies"] = ["webpack"]
     IO.write("package.json", JSON.pretty_generate(pkg_json))
 
     system "npm", "install", *Language::Node.std_npm_install_args(libexec)
@@ -54,7 +59,7 @@ class Webpack < Formula
       document.body.appendChild(component());
     EOS
 
-    system bin/"webpack", testpath/"index.js"
+    system bin/"webpack", "bundle", "--mode", "production", "--entry", testpath/"index.js"
     assert_match "const e=document\.createElement(\"div\");", File.read(testpath/"dist/main.js")
   end
 end

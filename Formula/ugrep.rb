@@ -1,24 +1,21 @@
 class Ugrep < Formula
   desc "Ultra fast grep with query UI, fuzzy search, archive search, and more"
   homepage "https://github.com/Genivia/ugrep"
-  url "https://github.com/Genivia/ugrep/archive/v2.5.6.tar.gz"
-  sha256 "02fc3e3575a6d5482d19e748331c4e3a0e5c85d95c96dbceb06abbab5cbb8cdf"
+  url "https://github.com/Genivia/ugrep/archive/v3.1.2.tar.gz"
+  sha256 "81de520a6db437455e8ae9ee4abbdc9dc875328a359b8620ef296bb8d8364310"
   license "BSD-3-Clause"
 
   bottle do
-    sha256 "29473f43bba0f64a8b54fbbf3232857d417d1679c7b4e0db1e1047771c6acfa0" => :catalina
-    sha256 "43f5847d9df61e9243b291531749c074e6527bc25955e6ab9fb44e4d9d988e61" => :mojave
-    sha256 "c4442aefabaf5d41a5cf01ce1615257cd9ac7945083ff38158641ff8176c57ee" => :high_sierra
+    sha256 "7070dcf6482d7d8ca1e7623e6d6c2caca9272a32a6b32cc1c9d5d2533b04b8b6" => :big_sur
+    sha256 "1a2a4ea5dc79587a3cc4cba0321e55f142b28d8a1e57e000cbe10e75d828ef93" => :arm64_big_sur
+    sha256 "5028518652d9a6c42b27e90bc2b1e05b70c4eb7089abc025e2df71c7a1ff5440" => :catalina
+    sha256 "3fc22f39ae49ed83c1845dd5138d0c63e321109dcd148b3abac6539b129023ea" => :mojave
   end
 
   depends_on "pcre2"
   depends_on "xz"
 
   def install
-    ENV.O2
-    ENV.deparallelize
-    ENV.delete("CFLAGS")
-    ENV.delete("CXXFLAGS")
     system "./configure", "--enable-color",
                           "--disable-debug",
                           "--disable-dependency-tracking",

@@ -1,15 +1,16 @@
 class Yq < Formula
   desc "Process YAML documents from the CLI"
   homepage "https://github.com/mikefarah/yq"
-  url "https://github.com/mikefarah/yq/archive/3.4.0.tar.gz"
-  sha256 "76b96cd2ba503eef396d8773d874b4fdc56fc3aff3c61b0808afadff2a6daae7"
+  url "https://github.com/mikefarah/yq/archive/v4.3.2.tar.gz"
+  sha256 "7e739f3d96dfb508bf52f33741135121363cf1bf21e3a890e5d8a937877881dc"
   license "MIT"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "a4679c723a46faa9921951239e5ec7d97570c42e521eefd772c2dcb6999187b9" => :catalina
-    sha256 "c5d57a09d20dac8753fd41f1738e80594684e6a714d210483ba9f8d687ad0344" => :mojave
-    sha256 "b88ba305a70f8054611de1bdab8954c9864b456374e70d499bc1241895e3ee4d" => :high_sierra
+    sha256 "485e947621956f5efe9e1f929471ed7e95c0ec8faa0c5901070df833ce8bf504" => :big_sur
+    sha256 "cc349b12574f28b000ace4020cb56d2b8e94515ffd4036a46a9ff4b4bfdfd9a7" => :arm64_big_sur
+    sha256 "934d963bbfcba36a410e27ef937bd4ffbe666bbf3de6f852bbb094d1e61ac26c" => :catalina
+    sha256 "ef64f0bdb58087f4546b682979c72260ac6a4d51b5788ea0d6fa47462c8da15d" => :mojave
   end
 
   depends_on "go" => :build
@@ -17,17 +18,15 @@ class Yq < Formula
   conflicts_with "python-yq", because: "both install `yq` executables"
 
   def install
-    ENV["GOPATH"] = buildpath
-    (buildpath/"src/github.com/mikefarah/yq").install buildpath.children
+    system "go", "build", "-ldflags", "-s -w", *std_go_args
 
-    cd "src/github.com/mikefarah/yq" do
-      system "go", "build", "-o", bin/"yq"
-      prefix.install_metafiles
-    end
+    (bash_completion/"yq").write Utils.safe_popen_read("#{bin}/yq", "shell-completion", "bash")
+    (zsh_completion/"_yq").write Utils.safe_popen_read("#{bin}/yq", "shell-completion", "zsh")
+    (fish_completion/"yq.fish").write Utils.safe_popen_read("#{bin}/yq", "shell-completion", "fish")
   end
 
   test do
-    assert_equal "key: cat", shell_output("#{bin}/yq n key cat").chomp
-    assert_equal "cat", pipe_output("#{bin}/yq r - key", "key: cat", 0).chomp
+    assert_equal "key: cat", shell_output("#{bin}/yq eval --null-input --no-colors '.key = \"cat\"'").chomp
+    assert_equal "cat", pipe_output("#{bin}/yq eval \".key\" -", "key: cat", 0).chomp
   end
 end

@@ -6,10 +6,6 @@ class Luabind < Formula
   license "MIT"
   revision 2
 
-  livecheck do
-    url :stable
-  end
-
   bottle do
     cellar :any
     sha256 "aa095d38915e09287c86d11d65871b5a4e6604799a961f0e055c9bf526ba403b" => :mojave
@@ -18,6 +14,8 @@ class Luabind < Formula
     sha256 "914a79679264790d9ffb0726a1f303954d816da3dd23db3b8816873cf467677f" => :el_capitan
     sha256 "171123f48a6cf2431d6b143b84bf31dbb955f103195aa30597a61b7a61943982" => :yosemite
   end
+
+  disable! date: "2020-12-08", because: :unmaintained
 
   depends_on "boost-build" => :build
   depends_on "boost"
@@ -39,8 +37,8 @@ class Luabind < Formula
 
   # apply upstream commit to enable building with clang
   patch do
-    url "https://github.com/luabind/luabind/commit/3044a9053ac50977684a75c4af42b2bddb853fad.diff?full_index=1"
-    sha256 "d04cbe7e5ed732943b1caf547321ac81b1db49271a5956a5f218905016c8900e"
+    url "https://github.com/luabind/luabind/commit/3044a9053ac50977684a75c4af42b2bddb853fad.patch?full_index=1"
+    sha256 "0e213656165de17c2047e18ac451fa891355a7f58b2995b5b8e0d95c23acdb1c"
   end
 
   # include C header that is not pulled in automatically on OS X 10.9 anymore

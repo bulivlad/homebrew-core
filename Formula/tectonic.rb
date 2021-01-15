@@ -1,15 +1,24 @@
 class Tectonic < Formula
   desc "Modernized, complete, self-contained TeX/LaTeX engine"
   homepage "https://tectonic-typesetting.github.io/"
-  url "https://github.com/tectonic-typesetting/tectonic/archive/tectonic@0.1.17.tar.gz"
-  sha256 "cbe2dcc2fd5c87a2e01643bb1d7cb8eb8bb4236832aaa39eedd7d334400d5adb"
+  url "https://github.com/tectonic-typesetting/tectonic/archive/tectonic@0.4.1.tar.gz"
+  sha256 "5a2c910f822d59ddaf9d32a0e5f7f34ce30f44e4129513b3a0c50425cf48ac8f"
   license "MIT"
+
+  # As of writing, only the tags starting with `tectonic@` are release versions.
+  # NOTE: The `GithubLatest` strategy cannot be used here because the "latest"
+  # release on GitHub sometimes points to a tag that isn't a release version.
+  livecheck do
+    url :stable
+    regex(/^tectonic@v?(\d+(?:\.\d+)+)$/i)
+  end
 
   bottle do
     cellar :any
-    sha256 "ede72897154ae1fac3d057d96c2a1efcc43dce09ee57ae73ed009549e349a253" => :catalina
-    sha256 "42e7f93a00981e5f42de95487bf4f30913a6f8922984c5aa97525b55e07b2bb8" => :mojave
-    sha256 "951d93798bab9b7dc50a267c6a0dafe504dd51ee5777f175350cbb141eb4e838" => :high_sierra
+    sha256 "98a8197e79a15cbb27f29f871d78ef1ee3a5bff4292afd0aa030b12bc8d6e7bb" => :big_sur
+    sha256 "8af05e3deffb86e2f2893b40692d5299bb66e323dc24a52277f605bb48274261" => :arm64_big_sur
+    sha256 "ee982811abc9559c29b502bac4938342c7c8c6d707ca4d374b0d5cf39ee1d6a0" => :catalina
+    sha256 "573741924359aa5859b481faa45c18956f00b9c5e865877da40f2d71ccafb868" => :mojave
   end
 
   depends_on "pkg-config" => :build

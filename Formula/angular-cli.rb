@@ -3,8 +3,8 @@ require "language/node"
 class AngularCli < Formula
   desc "CLI tool for Angular"
   homepage "https://cli.angular.io/"
-  url "https://registry.npmjs.org/@angular/cli/-/cli-10.1.7.tgz"
-  sha256 "0214e1342489dbea9c2ddd740eb734c12d67a6f83c1fe9cb7da0dada7b95f52c"
+  url "https://registry.npmjs.org/@angular/cli/-/cli-11.0.6.tgz"
+  sha256 "ba9ef79db0ea510b17de0a7cd77c31f6971b6832da94d81f4102184988594755"
   license "MIT"
 
   livecheck do
@@ -13,9 +13,10 @@ class AngularCli < Formula
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "d7eb0f2b0e2b0f2ff18fef6726676cc318fb8afe807d574aa044eeb3f4ed0810" => :catalina
-    sha256 "e2bb7e3fa7ad544b9a3c9dbd64f2538c56f58fcd2a776349e990c3b3f0f697f8" => :mojave
-    sha256 "da7a1b6b2b0f06c150a0faa71890a619436cdfc89a5a1a9cccf4205501eab19f" => :high_sierra
+    sha256 "a6ffeb4a79fd66d377d23a1ee68fe9cb7d6214751c1ddab830071a60ef33534d" => :big_sur
+    sha256 "8de54c8d7fa6e8fcb5847f6fb96ae9bce296e69998c235c6bc7e6cf99045d4a5" => :arm64_big_sur
+    sha256 "7dc78f4269d43a85ae067f07483a3e0752514f42d67c677ea4c6d3b22ef36ad7" => :catalina
+    sha256 "033f92f56b43ce156e4dd5460682d2f1c5f84427ed864bfd625227e7d8e1eb4a" => :mojave
   end
 
   depends_on "node"

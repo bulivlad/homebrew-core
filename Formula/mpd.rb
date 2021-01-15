@@ -1,15 +1,19 @@
 class Mpd < Formula
   desc "Music Player Daemon"
   homepage "https://www.musicpd.org/"
-  url "https://www.musicpd.org/download/mpd/0.22/mpd-0.22.tar.xz"
-  sha256 "7de742d925d01bf52685cc6cbb31fdeb671e4992a448720897ef706e57e39076"
+  url "https://www.musicpd.org/download/mpd/0.22/mpd-0.22.3.tar.xz"
+  sha256 "338012037b5e67730529187c555a54cc567a85b15a7e8ddb3a807b1971566ccf"
   license "GPL-2.0-or-later"
+  revision 1
   head "https://github.com/MusicPlayerDaemon/MPD.git"
 
   bottle do
     cellar :any
-    sha256 "d357d1f78ddae648b2609afaa4199595c0e74c57a4567142a3696ae41a875015" => :catalina
-    sha256 "93a07c91613b8b2b6d29584f904205ae579964453a7da055a47f6d544f06dd24" => :mojave
+    rebuild 1
+    sha256 "2b9a24b8bdb3da4fb71e4b5aa1f5d6fb9a7a1a847671b88504388a07b81212dc" => :big_sur
+    sha256 "23df8397351a16961971569dad4ef3f77ed8e8f72dc28c49e07594565410ba53" => :arm64_big_sur
+    sha256 "dffbb2a8ef211800bcdfe6a61923b0451f67c5955a9f5b803f2b4d61733e8bf3" => :catalina
+    sha256 "d2b7b5007c8eee0164af24e48a01c80c2b9cb7620cde0e6ee814fb1f7afa9088" => :mojave
   end
 
   depends_on "boost" => :build
@@ -107,6 +111,8 @@ class Mpd < Formula
   end
 
   test do
+    require "expect"
+
     port = free_port
 
     (testpath/"mpd.conf").write <<~EOS
@@ -114,23 +120,16 @@ class Mpd < Formula
       port "#{port}"
     EOS
 
-    pid = fork do
-      exec "#{bin}/mpd --stdout --no-daemon #{testpath}/mpd.conf"
-    end
-    sleep 5
+    io = IO.popen("#{bin}/mpd --stdout --no-daemon #{testpath}/mpd.conf 2>&1", "r")
+    io.expect("output: Successfully detected a osx audio device", 30)
 
-    begin
-      ohai "Connect to MPD command (localhost:#{port})"
-      TCPSocket.open("localhost", port) do |sock|
-        assert_match "OK MPD", sock.gets
-        ohai "Ping server"
-        sock.puts("ping")
-        assert_match "OK", sock.gets
-        sock.close
-      end
-    ensure
-      Process.kill "SIGINT", pid
-      Process.wait pid
+    ohai "Connect to MPD command (localhost:#{port})"
+    TCPSocket.open("localhost", port) do |sock|
+      assert_match "OK MPD", sock.gets
+      ohai "Ping server"
+      sock.puts("ping")
+      assert_match "OK", sock.gets
+      sock.close
     end
   end
 end

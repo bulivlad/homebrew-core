@@ -3,16 +3,17 @@ require "language/node"
 class Lanraragi < Formula
   desc "Web application for archival and reading of manga/doujinshi"
   homepage "https://github.com/Difegue/LANraragi"
-  url "https://github.com/Difegue/LANraragi/archive/v.0.7.3.tar.gz"
-  sha256 "1a094d32c14aee98844bfe18c828dc894d1d896f489a1f8bb8b1547f72eed4ee"
+  url "https://github.com/Difegue/LANraragi/archive/v.0.7.5.tar.gz"
+  sha256 "6a0f4e54ee550256a2301024ffc3b9cd75559c5527d7e2b932c1e92cd21338e0"
   license "MIT"
   head "https://github.com/Difegue/LANraragi.git"
 
   bottle do
     cellar :any
-    sha256 "bf89ef8d01201a2c8c7f4b3f021e0b8a7f2fc0ce735dfcbdf27eb24cce83c8f2" => :catalina
-    sha256 "480c60d88cdb9ab9eaf4c029c1d3b8177cb1bc09dbaa82f5a6d7a3b084877511" => :mojave
-    sha256 "42582dedd46c0bc79b72e42a8f984319f6e0d6dc400ae12c67d41592601fd6d8" => :high_sierra
+    sha256 "405634a56f37d25819ac060ba28e8aed61a1264985cbecf158eafffd006304a8" => :big_sur
+    sha256 "63a19406daec9093c013b366e8ba4cc68a2d825f3f1b243e46e54c5e70b6f0f0" => :arm64_big_sur
+    sha256 "0c7f0f55f81f4929b1a3b7deffe6e26ddf0085aa4c03413dc017596200aab1cf" => :catalina
+    sha256 "6d9f9e5cf5bc065f2d3b1466b8c3a9a25577e7765493a24ae0bed4ef15b236e7" => :mojave
   end
 
   depends_on "pkg-config" => :build

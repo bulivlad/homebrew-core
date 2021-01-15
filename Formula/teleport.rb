@@ -1,31 +1,33 @@
 class Teleport < Formula
   desc "Modern SSH server for teams managing distributed infrastructure"
   homepage "https://gravitational.com/teleport"
-  url "https://github.com/gravitational/teleport/archive/v4.3.7.tar.gz"
-  sha256 "abc61aa9dfe9148e942712a909677d40687f5d8b2d5089cbad5042b740739f98"
+  url "https://github.com/gravitational/teleport/archive/v5.1.0.tar.gz"
+  sha256 "3b9a5625ba786c425aa34ecb153e1d1e6e1eca179e63dd1efbe6a5f1b009d9d9"
   license "Apache-2.0"
   head "https://github.com/gravitational/teleport.git"
 
+  # We check the Git tags instead of using the `GithubLatest` strategy, as the
+  # "latest" version can be incorrect. As of writing, two major versions of
+  # `teleport` are being maintained side by side and the "latest" tag can point
+  # to a release from the older major version.
   livecheck do
-    url "https://github.com/gravitational/teleport/releases/latest"
-    regex(%r{href=.*?/tag/v?(\d+(?:\.\d+)+)["' >]}i)
+    url :stable
+    strategy :git
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "20da7faa7b0a636fbce2e3a14d3bed03dcb3a40f831a44a9f7c5d771f0163173" => :catalina
-    sha256 "033750b7992b96cf501d83a1f9292c9ce4496b4ba7129b7289545199661579b0" => :mojave
-    sha256 "417e98a1891dc9c64165e431df37b1eb69a1d64eacde60a3b4ad01266c44f6f1" => :high_sierra
+    sha256 "35d3e932558d45b596456a470281693afeeaa61ffb5974255a16d79874e2aa81" => :big_sur
+    sha256 "4a5793602fbc72a2b99535f0203b24ee3e2ee8f8598216065d18c7a284a10caf" => :catalina
+    sha256 "89357a0db8c72641d2edd8866a5aa1afe62a49ab98404bf2c9b0a6c7cb0c7dba" => :mojave
   end
 
   depends_on "go" => :build
 
   uses_from_macos "curl" => :test
+  uses_from_macos "netcat" => :test
   uses_from_macos "zip"
-
-  on_linux do
-    depends_on "netcat" => :test
-  end
 
   conflicts_with "etsh", because: "both install `tsh` binaries"
 

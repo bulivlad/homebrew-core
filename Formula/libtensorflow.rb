@@ -3,20 +3,20 @@ class Libtensorflow < Formula
 
   desc "C interface for Google's OS library for Machine Intelligence"
   homepage "https://www.tensorflow.org/"
-  url "https://github.com/tensorflow/tensorflow/archive/v2.3.1.tar.gz"
-  sha256 "ee534dd31a811f7a759453567257d1e643f216d8d55a25c32d2fbfff8153a1ac"
+  url "https://github.com/tensorflow/tensorflow/archive/v2.4.0.tar.gz"
+  sha256 "26c833b7e1873936379e810a39d14700281125257ddda8cd822c89111db6f6ae"
   license "Apache-2.0"
 
   bottle do
     cellar :any
-    sha256 "00f8b36915bad9f75893a1196f8e4ddc728600e3b75e0047f681a78e61b4c34f" => :catalina
-    sha256 "88ad47031b69e2e0afcc9b9415beb4205ef8926c5cc7f80fa3c696f7f0a78c72" => :mojave
-    sha256 "8ac6570898cb37086b1072d64388d65c73fc899762541345de8bbb1f1b66efb1" => :high_sierra
+    sha256 "45b7357ed368a5a9496602f12811638188459313134097a8b601568f4ca1164a" => :big_sur
+    sha256 "3ebda3961055aafd377ab4ed1578d21c3dc0191eb6dbbc01aedbb256e848d9a3" => :catalina
+    sha256 "2d6f2fd224f97509fab9b98fe0e67b77f4af839332395b8a170b8e60b81d6cfe" => :mojave
   end
 
   depends_on "bazel" => :build
   depends_on "numpy" => :build
-  depends_on "python@3.8" => :build
+  depends_on "python@3.9" => :build
 
   resource "test-model" do
     url "https://github.com/tensorflow/models/raw/v1.13.0/samples/languages/java/training/model/graph.pb"
@@ -27,7 +27,7 @@ class Libtensorflow < Formula
     # Allow tensorflow to use current version of bazel
     (buildpath / ".bazelversion").atomic_write Formula["bazel"].version
 
-    ENV["PYTHON_BIN_PATH"] = Formula["python@3.8"].opt_bin/"python3"
+    ENV["PYTHON_BIN_PATH"] = Formula["python@3.9"].opt_bin/"python3"
     ENV["CC_OPT_FLAGS"] = "-march=native"
     ENV["TF_IGNORE_MAX_BAZEL_VERSION"] = "1"
     ENV["TF_NEED_JEMALLOC"] = "1"
@@ -57,6 +57,7 @@ class Libtensorflow < Formula
     ]
     targets = %w[
       tensorflow:libtensorflow.so
+      tensorflow:install_headers
       tensorflow/tools/benchmark:benchmark_model
       tensorflow/tools/graph_transforms:summarize_graph
       tensorflow/tools/graph_transforms:transform_graph
@@ -64,14 +65,7 @@ class Libtensorflow < Formula
     system "bazel", "build", *bazel_args, *targets
 
     lib.install Dir["bazel-bin/tensorflow/*.so*", "bazel-bin/tensorflow/*.dylib*"]
-    (include/"tensorflow/c").install %w[
-      tensorflow/c/c_api.h
-      tensorflow/c/c_api_experimental.h
-      tensorflow/c/tf_attrtype.h
-      tensorflow/c/tf_datatype.h
-      tensorflow/c/tf_status.h
-      tensorflow/c/tf_tensor.h
-    ]
+    include.install "bazel-bin/tensorflow/include/tensorflow"
     bin.install %w[
       bazel-bin/tensorflow/tools/benchmark/benchmark_model
       bazel-bin/tensorflow/tools/graph_transforms/summarize_graph
@@ -129,7 +123,7 @@ class Libtensorflow < Formula
     assert_not_nil benchmark_model_match,
       "Unexpected summarize_graph output for graph-new.pb (no benchmark_model example)"
 
-    benchmark_model_args = benchmark_model_match[1].split(" ")
+    benchmark_model_args = benchmark_model_match[1].split
     benchmark_model_args.delete("--show_flops")
 
     benchmark_model_command = [

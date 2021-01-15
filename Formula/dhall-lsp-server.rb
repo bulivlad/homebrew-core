@@ -1,8 +1,8 @@
 class DhallLspServer < Formula
   desc "Language Server Protocol (LSP) server for Dhall"
   homepage "https://github.com/dhall-lang/dhall-haskell/tree/master/dhall-lsp-server"
-  url "https://hackage.haskell.org/package/dhall-lsp-server-1.0.10/dhall-lsp-server-1.0.10.tar.gz"
-  sha256 "4b7341d9102734cfd5eb54aaeac454625192beb07865be14f35d4687b01fcb7c"
+  url "https://hackage.haskell.org/package/dhall-lsp-server-1.0.12/dhall-lsp-server-1.0.12.tar.gz"
+  sha256 "f77e9937704fd492adabbf86f0c587b175e697c42136ae8cf289d47687bae93e"
   license "BSD-3-Clause"
   head "https://github.com/dhall-lang/dhall-haskell.git"
 
@@ -12,9 +12,9 @@ class DhallLspServer < Formula
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "ebb726df36e8e41ead67f64249971c1e5a6890ad336dcf337377849fd08cc4dc" => :catalina
-    sha256 "7858fb6d18a2004a680fb69d9ee0716b0106ee403e65d0c7a0b6b55de78fddc3" => :mojave
-    sha256 "8136a1c1dd57bb53f9acc20f5a3fd948b7957073b520ff7dd15d773ccc6103f8" => :high_sierra
+    sha256 "835cceefb28c1ed72371e60e90f52866fe84e47528bf98d611aeed80c88da9a4" => :big_sur
+    sha256 "be5312ef2e58ac431110b2fc0a7612be888814910550a4b1731f424adcb77030" => :catalina
+    sha256 "f92d8f2b8c09f46fa4ef6307eeb016b7bdacd6d709b748248926bf738f4299b2" => :mojave
   end
 
   depends_on "cabal-install" => :build

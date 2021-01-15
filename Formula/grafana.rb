@@ -1,16 +1,17 @@
 class Grafana < Formula
   desc "Gorgeous metric visualizations and dashboards for timeseries databases"
   homepage "https://grafana.com"
-  url "https://github.com/grafana/grafana/archive/v7.2.1.tar.gz"
-  sha256 "12184dfcd317608c916386358a8f9defd1b2e1a77be3f648456fc618087d5732"
+  url "https://github.com/grafana/grafana/archive/v7.3.7.tar.gz"
+  sha256 "bba6900c9bbc221264d79852081596c3c8250470a5165e0b4be51cea419b3007"
   license "Apache-2.0"
   head "https://github.com/grafana/grafana.git"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "fefb5b2334c0cf792bd59468b71ef90a73fc2ba064603b66b0bee6c6ff3a4e56" => :catalina
-    sha256 "a52d2a92a6ba151dd729ef2072662e90652125a95de637475a1793bf47597a6d" => :mojave
-    sha256 "970d37156fb953872716810bb41283e8b4e3ac71a57a0dc5ce20221b8bc8024b" => :high_sierra
+    sha256 "1649e317e4ff245cc3306488cb41da8dd87e489ed3d8f1efa7f5dbd3c355848d" => :big_sur
+    sha256 "ab41fcd3ffb7ab5ddd7aa7e283496eba52f80540bdf3565154945b409952cd7f" => :arm64_big_sur
+    sha256 "541f108cc921ac95682b535f9395bd0f33c809e086492fb723553e0716292e6e" => :catalina
+    sha256 "0ccc7d76a40b40e9d18f38373b2bbbe926ba05dbfbe5048e60e0d847cbc8d6b1" => :mojave
   end
 
   depends_on "go" => :build
@@ -31,8 +32,14 @@ class Grafana < Formula
 
     system "node_modules/grunt-cli/bin/grunt", "build"
 
-    bin.install "bin/darwin-amd64/grafana-cli"
-    bin.install "bin/darwin-amd64/grafana-server"
+    on_macos do
+      bin.install Dir["bin/darwin-*/grafana-cli"]
+      bin.install Dir["bin/darwin-*/grafana-server"]
+    end
+    on_linux do
+      bin.install "bin/linux-amd64/grafana-cli"
+      bin.install "bin/linux-amd64/grafana-server"
+    end
     (etc/"grafana").mkpath
     cp("conf/sample.ini", "conf/grafana.ini.example")
     etc.install "conf/sample.ini" => "grafana/grafana.ini"

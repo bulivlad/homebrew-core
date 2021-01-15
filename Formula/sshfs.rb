@@ -6,11 +6,6 @@ class Sshfs < Formula
   license "GPL-2.0"
   revision 2
 
-  livecheck do
-    url :stable
-    regex(/^sshfs[._-]v?(\d+(?:\.\d+)+)$/i)
-  end
-
   bottle do
     cellar :any
     sha256 "aceff3131dd0b098bdef8b5dda54d117b5dd5269ca146f7a5032ecde3c99b6d2" => :catalina
@@ -24,16 +19,24 @@ class Sshfs < Formula
   depends_on "libtool" => :build
   depends_on "pkg-config" => :build
   depends_on "glib"
-  depends_on :osxfuse
+
+  on_macos do
+    deprecate! date: "2020-11-10", because: "requires FUSE"
+    depends_on :osxfuse
+  end
+
+  on_linux do
+    depends_on "libfuse"
+  end
 
   # Apply patch that clears one remaining roadblock that prevented setting
   # a custom I/O buffer size on macOS. With this patch in place, it's
   # recommended to use e.g. `-o iosize=1048576` (or other, reasonable value)
-  # when lauching `sshfs`, for improved performance.
+  # when launching `sshfs`, for improved performance.
   # See also: https://github.com/libfuse/sshfs/issues/11
   patch do
-    url "https://github.com/libfuse/sshfs/commit/667cf34622e2e873db776791df275c7a582d6295.diff?full_index=1"
-    sha256 "6a121d58a94cf0efebbfa217d62aa4d9915a8e6573ae2c086170ff9d9fc09456"
+    url "https://github.com/libfuse/sshfs/commit/667cf34622e2e873db776791df275c7a582d6295.patch?full_index=1"
+    sha256 "ab2aa697d66457bf8a3f469e89572165b58edb0771aa1e9c2070f54071fad5f6"
   end
 
   def install

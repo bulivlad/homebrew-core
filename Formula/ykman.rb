@@ -3,28 +3,28 @@ class Ykman < Formula
 
   desc "Tool for managing your YubiKey configuration"
   homepage "https://developers.yubico.com/yubikey-manager/"
-  url "https://developers.yubico.com/yubikey-manager/Releases/yubikey-manager-3.1.1.tar.gz"
+  url "https://files.pythonhosted.org/packages/9d/27/2f40f6b7ffc5f4e36da4d75780d818f3b74fb5394f2b043b04cd34bf1ecc/yubikey-manager-3.1.1.tar.gz"
   sha256 "68ef41ac3cd2e891019e755a492427ecdd63d8816525d05f2f32c37b8c440cfa"
   license "BSD-2-Clause"
-  revision 1
+  revision 3
   head "https://github.com/Yubico/yubikey-manager.git"
 
   livecheck do
-    url "https://developers.yubico.com/yubikey-manager/Releases/"
-    regex(/href=.*?yubikey-manager[._-]v?(\d+(?:\.\d+)+)\.t/i)
+    url :stable
   end
 
   bottle do
     cellar :any
-    sha256 "c06a8cb44d6cd76c638c88ef5812e4c2dcce922f30014f875eaf61bf63ae7404" => :catalina
-    sha256 "e1d502f836a9403fd191f8f7bab1cec7b09236de0f035d24385b0f55e82ea63a" => :mojave
-    sha256 "8c00a4aa2502ef29c8dc9c02f0ce0f6a04299aeeae00168536f55623c1c21b8a" => :high_sierra
+    sha256 "b2edeb6dfe27bccb30a6b81122d62256349cc5c3bfa8610b866676f323c83860" => :big_sur
+    sha256 "3252ef77a6950da3375e313dadfa393d86e2333744b890eadd07fd5f2a430584" => :arm64_big_sur
+    sha256 "e2489cb8fd92e2c7e772ef096a304d0e96c88f43b0cc1b66aee024ba7874e2ea" => :catalina
+    sha256 "e3e76ec1be8f6d44ccfad8d196ce9e02bb0f5eb16a86b7d75a238e1de997b1f1" => :mojave
   end
 
   depends_on "swig" => :build
   depends_on "libusb"
   depends_on "openssl@1.1"
-  depends_on "python@3.8"
+  depends_on "python@3.9"
   depends_on "ykpers"
 
   uses_from_macos "libffi"
@@ -35,8 +35,8 @@ class Ykman < Formula
   end
 
   resource "cffi" do
-    url "https://files.pythonhosted.org/packages/2d/bf/960e5a422db3ac1a5e612cb35ca436c3fc985ed4b7ed13a1b4879006f450/cffi-1.13.2.tar.gz"
-    sha256 "599a1e8ff057ac530c9ad1778293c665cb81a791421f46922d80a86473c13346"
+    url "https://files.pythonhosted.org/packages/66/6a/98e023b3d11537a5521902ac6b50db470c826c682be6a8c661549cb7717a/cffi-1.14.4.tar.gz"
+    sha256 "1a465cbe98a7fd391d47dce4b8f7e5b921e6cd805ef421d04f5f66ba8f06086c"
   end
 
   resource "click" do

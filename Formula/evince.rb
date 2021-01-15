@@ -4,16 +4,17 @@ class Evince < Formula
   url "https://download.gnome.org/sources/evince/3.38/evince-3.38.0.tar.xz"
   sha256 "26df897a417545b476d2606b14731122e84278ae994bd64ea535449c3cf01948"
   license "GPL-2.0-or-later"
-  revision 1
+  revision 3
 
   livecheck do
     url :stable
   end
 
   bottle do
-    sha256 "c478ef073510fbd09bfb5dfdec372786b1551466758f8040dfd9bb7da3af278e" => :catalina
-    sha256 "8c15ca0e3e33d14e7dbcc2d3bfbd42b6f928dcf2f8c7e87060d9b0f07cdb1153" => :mojave
-    sha256 "cc431bbeb099f242d052fc51cd169edf847e792b7e51e25905f89271910c3ad2" => :high_sierra
+    sha256 "fc4985043ed06d8d6fa6295798e358561bc4450f760eb16c85258d5251a89cad" => :big_sur
+    sha256 "afcbf0dc169fdd425f6eb3bd794e3501df4d20f984a773b60b0a5175a35b0526" => :arm64_big_sur
+    sha256 "cb2dd1b96c0ba421fba972447653c9df1b752ad700078fc18e8059f9dbd94789" => :catalina
+    sha256 "29a0b6cf9b844348efbb47fff9283f72a36d83b4fb7005de8358a22e2c4d3eb0" => :mojave
   end
 
   depends_on "gobject-introspection" => :build
@@ -31,7 +32,7 @@ class Evince < Formula
   depends_on "libsecret"
   depends_on "libspectre"
   depends_on "poppler"
-  depends_on "python@3.8"
+  depends_on "python@3.9"
 
   def install
     ENV["DESTDIR"] = "/"

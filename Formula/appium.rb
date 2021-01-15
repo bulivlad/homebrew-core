@@ -3,8 +3,8 @@ require "language/node"
 class Appium < Formula
   desc "Automation for Apps"
   homepage "https://appium.io/"
-  url "https://registry.npmjs.org/appium/-/appium-1.18.1.tgz"
-  sha256 "938783100df8be224cb85b5dbdcebeb91d164f003d4cdd2aa9c801480bd027b4"
+  url "https://registry.npmjs.org/appium/-/appium-1.20.1.tgz"
+  sha256 "fc8b14e7cba02a7fbb61aeead75fe2494a011917bdc118c9a31cb4a0d88ef58f"
   license "Apache-2.0"
   head "https://github.com/appium/appium.git"
 
@@ -14,9 +14,10 @@ class Appium < Formula
 
   bottle do
     cellar :any
-    sha256 "4ea1dbc255495f77ccd8b8eef8a8e0244ce0c4d5e302f39f0ca4ed07d4fb087c" => :catalina
-    sha256 "ed7587c1b90e17ace1d8882bb393e9af52fe85e35c2fcb944b906878e39ee243" => :mojave
-    sha256 "e16208f7f59caa4b0676051413e849556a6f9865b2da3f965eaac44d52f42bfe" => :high_sierra
+    sha256 "6b4d5aa2f937e6263046ac7f2923f649e14d532cbe3351e52f9f9fb57a122665" => :big_sur
+    sha256 "a5e4dd0acc061aef5be260833da11d911fde8d8892318cddba696f04430dd10b" => :arm64_big_sur
+    sha256 "7017a9ddd3be7a200fc57eba2827a57e0e4b8c33a68136c5ca282393020b2dfd" => :catalina
+    sha256 "b9bc4a7b8d2a4a7d997416eeafbb402b220f48694c891fcc863313321e59cc58" => :mojave
   end
 
   depends_on "node"
@@ -24,6 +25,40 @@ class Appium < Formula
   def install
     system "npm", "install", *Language::Node.std_npm_install_args(libexec)
     bin.install_symlink Dir["#{libexec}/bin/*"]
+  end
+
+  plist_options manual: "appium"
+
+  def plist
+    <<~EOS
+      <?xml version="1.0" encoding="UTF-8"?>
+      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+      <plist version="1.0">
+        <dict>
+          <key>KeepAlive</key>
+          <true/>
+          <key>RunAtLoad</key>
+          <true/>
+          <key>Label</key>
+          <string>#{plist_name}</string>
+          <key>ProgramArguments</key>
+          <array>
+            <string>#{bin}/appium</string>
+          </array>
+          <key>EnvironmentVariables</key>
+          <dict>
+            <key>PATH</key>
+            <string>#{HOMEBREW_PREFIX}/bin:#{HOMEBREW_PREFIX}/sbin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+          </dict>
+          <key>WorkingDirectory</key>
+          <string>#{var}</string>
+          <key>StandardErrorPath</key>
+          <string>#{var}/log/appium-error.log</string>
+          <key>StandardOutPath</key>
+          <string>#{var}/log/appium.log</string>
+        </dict>
+      </plist>
+    EOS
   end
 
   test do
@@ -37,7 +72,7 @@ class Appium < Formula
       end
       sleep 3
 
-      assert_match "The URL '/' did not map to a valid resource", shell_output("curl -s 127.0.0.1:#{port}")
+      assert_match "unknown command", shell_output("curl -s 127.0.0.1:#{port}")
     ensure
       Process.kill("TERM", pid)
       Process.wait(pid)

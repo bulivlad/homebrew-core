@@ -1,9 +1,9 @@
 class Imagemagick < Formula
   desc "Tools and libraries to manipulate images in many formats"
   homepage "https://www.imagemagick.org/"
-  url "https://dl.bintray.com/homebrew/mirror/ImageMagick-7.0.10-34.tar.xz"
-  mirror "https://www.imagemagick.org/download/releases/ImageMagick-7.0.10-34.tar.xz"
-  sha256 "d35e02bab707611fa28f13244a0d91e251a9a8d6a4a8de405738f5ead49a06aa"
+  url "https://dl.bintray.com/homebrew/mirror/ImageMagick-7.0.10-57.tar.xz"
+  mirror "https://www.imagemagick.org/download/releases/ImageMagick-7.0.10-57.tar.xz"
+  sha256 "5018d15f12963bd6d86c8a667fba2795ec818a71612b6064f84a0c29a545af21"
   license "ImageMagick"
   head "https://github.com/ImageMagick/ImageMagick.git"
 
@@ -13,9 +13,10 @@ class Imagemagick < Formula
   end
 
   bottle do
-    sha256 "d486b811e4a2e01b5d45f10f7372a5b00c543b4205fe6336a6cf108f1f2e27e9" => :catalina
-    sha256 "01616d61e598b4b5b86d0ff49cece04b98ef2e142ffb0f8d526acced5db22ec5" => :mojave
-    sha256 "aab7d3ea92bab1986c3a0f9ffd895d705aaeff3fa072f6c5dd9ae439bf68add8" => :high_sierra
+    sha256 "18e8a537a56c803a9de55cd4648c6ea494b0773023c0dee5c99ca613cd2556ca" => :big_sur
+    sha256 "42e3c057f9964915f36bb89a583a00afc5a7bc5c1ac858f989f66025348968eb" => :arm64_big_sur
+    sha256 "7936d7d8f54d6716f54b9b29dbe763a6513ff2225c8576e58a5ff3913946a1de" => :catalina
+    sha256 "bcf266ec77ef3081bc98145e82bcf5fa54422c24c275e47b2b66e5d7fa03b10e" => :mojave
   end
 
   depends_on "pkg-config" => :build
@@ -37,6 +38,10 @@ class Imagemagick < Formula
   uses_from_macos "bzip2"
   uses_from_macos "libxml2"
   uses_from_macos "zlib"
+
+  on_linux do
+    depends_on "libx11"
+  end
 
   skip_clean :la
 
@@ -63,7 +68,6 @@ class Imagemagick < Formula
       --with-lqr
       --without-fftw
       --without-pango
-      --without-x
       --without-wmf
       --enable-openmp
       ac_cv_prog_c_openmp=-Xpreprocessor\ -fopenmp
@@ -71,8 +75,12 @@ class Imagemagick < Formula
       LDFLAGS=-lomp\ -lz
     ]
 
+    on_macos do
+      args << "--without-x"
+    end
+
     # versioned stuff in main tree is pointless for us
-    inreplace "configure", "${PACKAGE_NAME}-${PACKAGE_VERSION}", "${PACKAGE_NAME}"
+    inreplace "configure", "${PACKAGE_NAME}-${PACKAGE_BASE_VERSION}", "${PACKAGE_NAME}"
     system "./configure", *args
     system "make", "install"
   end

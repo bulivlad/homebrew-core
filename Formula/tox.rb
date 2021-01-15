@@ -3,8 +3,8 @@ class Tox < Formula
 
   desc "Generic Python virtualenv management and test command-line tool"
   homepage "https://tox.readthedocs.io/"
-  url "https://files.pythonhosted.org/packages/fe/66/7206a6c69a5f717fb80cd3a532c0639bc183ad2aa1f23a943ca93b0814bd/tox-3.20.1.tar.gz"
-  sha256 "4321052bfe28f9d85082341ca8e233e3ea901fdd14dab8a5d3fbd810269fbaf6"
+  url "https://files.pythonhosted.org/packages/e7/a0/70463912e118e7ac9daa13fde5c0c73dac3ee4207daf85731ec9ecff15ba/tox-3.21.1.tar.gz"
+  sha256 "31379f2662393034203c5d6b2ebb7b86c67452cfc689784475c1c6e4a3cbc0cd"
   license "MIT"
 
   livecheck do
@@ -13,9 +13,10 @@ class Tox < Formula
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "f15a7f8c9e1dbf4bfe49a3a2f2db9ef343261d269fed4cfb65f950acd452e1a0" => :catalina
-    sha256 "0491b010128f6a0b73d3de8d56f8f6107867c7294e57407513c208f36cd5ea1c" => :mojave
-    sha256 "aef803b570ed827f6ee0707c3275503fc22b9d534b329b164a6493479acfed5c" => :high_sierra
+    sha256 "b83cf2f0c9c49a855c69e0e65651121fe79fbf6936c44cad3cec70036fcf22d4" => :big_sur
+    sha256 "95b4ba23b15eef97a8fda3948f9fb9cbba88d84f313fda3f6cde1e7ac5938ebc" => :arm64_big_sur
+    sha256 "eb71cffc44ac3051922eeb977cd606e6f75782399d9368dedc110910429901c4" => :catalina
+    sha256 "eda0dac7d9fec6fd4e0f3f37420cded5d541b8cf81cfc7130328ec4dc484b484" => :mojave
   end
 
   depends_on "python@3.9"
@@ -36,8 +37,8 @@ class Tox < Formula
   end
 
   resource "packaging" do
-    url "https://files.pythonhosted.org/packages/55/fd/fc1aca9cf51ed2f2c11748fa797370027babd82f87829c7a8e6dbe720145/packaging-20.4.tar.gz"
-    sha256 "4357f74f47b9c12db93624a82154e9b120fa8293699949152b22065d556079f8"
+    url "https://files.pythonhosted.org/packages/d7/c5/e81b9fb8033fe78a2355ea7b1774338e1dca2c9cbd2ee140211a9e6291ab/packaging-20.8.tar.gz"
+    sha256 "78598185a7008a470d64526a8059de9aaa449238f280fc9eb6b13ba6c4109093"
   end
 
   resource "pluggy" do
@@ -46,8 +47,8 @@ class Tox < Formula
   end
 
   resource "py" do
-    url "https://files.pythonhosted.org/packages/97/a6/ab9183fe08f69a53d06ac0ee8432bc0ffbb3989c575cc69b73a0229a9a99/py-1.9.0.tar.gz"
-    sha256 "9ca6883ce56b4e8da7e79ac18787889fa5206c79dcc67fb065376cd2fe03f342"
+    url "https://files.pythonhosted.org/packages/0d/8c/50e9f3999419bb7d9639c37e83fa9cdcf0f601a9d407162d6c37ad60be71/py-1.10.0.tar.gz"
+    sha256 "21b81bda15b66ef5e1a777a21c4dcd9c20ad3efd0b3f817e7a809035269e1bd3"
   end
 
   resource "pyparsing" do
@@ -61,13 +62,13 @@ class Tox < Formula
   end
 
   resource "toml" do
-    url "https://files.pythonhosted.org/packages/da/24/84d5c108e818ca294efe7c1ce237b42118643ce58a14d2462b3b2e3800d5/toml-0.10.1.tar.gz"
-    sha256 "926b612be1e5ce0634a2ca03470f95169cf16f939018233a670519cb4ac58b0f"
+    url "https://files.pythonhosted.org/packages/be/ba/1f744cdc819428fc6b5084ec34d9b30660f6f9daaf70eead706e3203ec3c/toml-0.10.2.tar.gz"
+    sha256 "b3bda1d108d5dd99f4a20d24d9c348e91c4db7ab1b749200bded2f839ccbe68f"
   end
 
   resource "virtualenv" do
-    url "https://files.pythonhosted.org/packages/85/3e/6c3abf78b2207f3565ebadd0b99d1945f4ff18abdc6879617a4f6d939e41/virtualenv-20.0.33.tar.gz"
-    sha256 "a5e0d253fe138097c6559c906c528647254f437d1019af9d5a477b09bfa7300f"
+    url "https://files.pythonhosted.org/packages/aa/08/2c6c5a295133bd8244d74ccd21e7b3008d0cc96bad29163b3fedbd7c3ffc/virtualenv-20.3.1.tar.gz"
+    sha256 "0c111a2236b191422b37fe8c28b8c828ced39aab4bf5627fa5c331aeffb570d9"
   end
 
   def install

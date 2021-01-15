@@ -5,15 +5,17 @@ class Httpd < Formula
   mirror "https://archive.apache.org/dist/httpd/httpd-2.4.46.tar.bz2"
   sha256 "740eddf6e1c641992b22359cabc66e6325868c3c5e2e3f98faf349b61ecf41ea"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url :stable
   end
 
   bottle do
-    sha256 "8c6b348427bd5c43d784dd5ae6261304e4218607cace3f264e016819c3118527" => :catalina
-    sha256 "e561f825dc044083a10d85d0faa4f785d95466e827d20264702078c58fd900ac" => :mojave
-    sha256 "aede7239a3d25119c493644cac072fc953f3b1d5a4c490558781ad9ac5000504" => :high_sierra
+    sha256 "58958f4f22c9e815f2590bd84dbae5f34d761836e45b625b001f71047d055660" => :big_sur
+    sha256 "2c9351c32678a6c266d066a54cc8d17ea2a660caf8390d6e32b37c0794199283" => :arm64_big_sur
+    sha256 "7351527d21a67d696ba732e43924a1b8f73f987098b45f96c366afbbaede03ef" => :catalina
+    sha256 "93a50743615ce0bef192e2d40c05255456016e4c5774a817f3f9a8ca3ef03375" => :mojave
   end
 
   depends_on "apr"
@@ -141,6 +143,11 @@ class Httpd < Formula
           <string>-D</string>
           <string>FOREGROUND</string>
         </array>
+        <key>EnvironmentVariables</key>
+        <dict>
+          <key>PATH</key>
+          <string>#{HOMEBREW_PREFIX}/bin:#{HOMEBREW_PREFIX}/sbin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+        </dict>
         <key>RunAtLoad</key>
         <true/>
       </dict>

@@ -1,10 +1,11 @@
 class Boost < Formula
   desc "Collection of portable C++ source libraries"
   homepage "https://www.boost.org/"
-  url "https://dl.bintray.com/boostorg/release/1.73.0/source/boost_1_73_0.tar.bz2"
-  mirror "https://dl.bintray.com/homebrew/mirror/boost_1_73_0.tar.bz2"
-  sha256 "4eb3b8d442b426dc35346235c8733b5ae35ba431690e38c6a8263dce9fcbb402"
+  url "https://dl.bintray.com/boostorg/release/1.75.0/source/boost_1_75_0.tar.bz2"
+  mirror "https://dl.bintray.com/homebrew/mirror/boost_1_75_0.tar.bz2"
+  sha256 "953db31e016db7bb207f11432bef7df100516eeb746843fa0486a222e3fd49cb"
   license "BSL-1.0"
+  revision 1
   head "https://github.com/boostorg/boost.git"
 
   livecheck do
@@ -14,10 +15,10 @@ class Boost < Formula
 
   bottle do
     cellar :any
-    rebuild 1
-    sha256 "21b7a8b746e98a39c299b5db595f97ff24cb498fee5c3c38be690bcc2510137b" => :catalina
-    sha256 "72159a6229ced562aa26100ce1c72f2ec3070cd6fe6e894e912abd9acc1b76bb" => :mojave
-    sha256 "f7e7f920d91f6b47a99f342a1414b992f012c49441e62b5587502d53cb31af7b" => :high_sierra
+    sha256 "a262002a81f7dc7b6fb23287713b35b51887b3126be72b2446d4f7dc0b587a9e" => :big_sur
+    sha256 "8a97e74aca8be001c4db5516abcb7fabdf244d6ed0620be9b5b634f78f2279df" => :arm64_big_sur
+    sha256 "2da721bd2fefaaea273ed92b801e682ee180100189c113a8c8f1e97f9dff0e55" => :catalina
+    sha256 "5257405fda53160eaf020dc974cad328d90d698181cd126e970cdc0d93bfcf73" => :mojave
   end
 
   depends_on "icu4c"
@@ -25,11 +26,11 @@ class Boost < Formula
   uses_from_macos "bzip2"
   uses_from_macos "zlib"
 
-  # Fix build on Xcode 11.4
+  # Reduce INTERFACE_LINK_LIBRARIES exposure for shared libraries. Remove with the next release.
   patch do
-    url "https://github.com/boostorg/build/commit/b3a59d265929a213f02a451bb63cea75d668a4d9.patch?full_index=1"
-    sha256 "04a4df38ed9c5a4346fbb50ae4ccc948a1440328beac03cb3586c8e2e241be08"
-    directory "tools/build"
+    url "https://github.com/boostorg/boost_install/commit/7b3fc734242eea9af734d6cd8ccb3d8f6b64c5b2.patch?full_index=1"
+    sha256 "cd96f5c51fa510fa6cd194eb011c0a6f9beb377fa2e78821133372f76a3be349"
+    directory "tools/boost_install"
   end
 
   # Fix build on 64-bit arm
@@ -85,19 +86,6 @@ class Boost < Formula
     system "./bootstrap.sh", *bootstrap_args
     system "./b2", "headers"
     system "./b2", *args
-  end
-
-  def caveats
-    s = ""
-    # ENV.compiler doesn't exist in caveats. Check library availability
-    # instead.
-    if Dir["#{lib}/libboost_log*"].empty?
-      s += <<~EOS
-        Building of Boost.Log is disabled because it requires newer GCC or Clang.
-      EOS
-    end
-
-    s
   end
 
   test do

@@ -1,21 +1,22 @@
 class Mpv < Formula
   desc "Media player based on MPlayer and mplayer2"
   homepage "https://mpv.io"
-  url "https://github.com/mpv-player/mpv/archive/v0.32.0.tar.gz"
-  sha256 "9163f64832226d22e24bbc4874ebd6ac02372cd717bef15c28a0aa858c5fe592"
-  license "GPL-2.0"
-  revision 5
+  url "https://github.com/mpv-player/mpv/archive/v0.33.0.tar.gz"
+  sha256 "f1b9baf5dc2eeaf376597c28a6281facf6ed98ff3d567e3955c95bf2459520b4"
+  license :cannot_represent
+  revision 2
   head "https://github.com/mpv-player/mpv.git"
 
   bottle do
-    sha256 "b5ee75305e024dda4255af1c113e22c9dcafa7d3c3979f90ddf99a042335a1f2" => :catalina
-    sha256 "10dc99da93819fb90252d5e28fc89cbefaa670274fec72f87f6c4d64876142b0" => :mojave
-    sha256 "59ed6368c7afcd763040459c00f0bc985ee1df86fcd0857279ff5fede14c30fc" => :high_sierra
+    sha256 "f455a0000b72c8503f056a407a02900649dca3f11b60812a1e57a70568854da1" => :big_sur
+    sha256 "1a1dc82ceaa274c82192088377d3fc40fa32330242296e54f6a686b79536bd6e" => :arm64_big_sur
+    sha256 "7efb79d88900d81c09419b529373d123b26d86c2971cbb44bfc85d7f62513a0e" => :catalina
+    sha256 "f0363897b147c2517468d98e76341d46f39cbaac43a6c6613820a9194ff8c754" => :mojave
   end
 
   depends_on "docutils" => :build
   depends_on "pkg-config" => :build
-  depends_on "python@3.8" => :build
+  depends_on "python@3.9" => :build
   depends_on xcode: :build
 
   depends_on "ffmpeg"
@@ -54,9 +55,9 @@ class Mpv < Formula
       --lua=51deb
     ]
 
-    system Formula["python@3.8"].opt_bin/"python3", "bootstrap.py"
-    system Formula["python@3.8"].opt_bin/"python3", "waf", "configure", *args
-    system Formula["python@3.8"].opt_bin/"python3", "waf", "install"
+    system Formula["python@3.9"].opt_bin/"python3", "bootstrap.py"
+    system Formula["python@3.9"].opt_bin/"python3", "waf", "configure", *args
+    system Formula["python@3.9"].opt_bin/"python3", "waf", "install"
   end
 
   test do

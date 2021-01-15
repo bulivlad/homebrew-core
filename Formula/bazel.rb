@@ -1,18 +1,18 @@
 class Bazel < Formula
   desc "Google's own build tool"
   homepage "https://bazel.build/"
-  url "https://github.com/bazelbuild/bazel/releases/download/3.6.0/bazel-3.6.0-dist.zip"
-  sha256 "3a18f24febb5203f11b0985b27e120ac623058d1d5ca79cd6df992e67d57240a"
+  url "https://github.com/bazelbuild/bazel/releases/download/3.7.2/bazel-3.7.2-dist.zip"
+  sha256 "de255bb42163a915312df9f4b86e5b874b46d9e8d4b72604b5123c3a845ed9b1"
   license "Apache-2.0"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "d96897574e4b1aa724ba78b507320b04b9947cb1c427b57e721b13cf681c108d" => :catalina
-    sha256 "22ca8fe43af89a440fff77fe4290bb04905d9ccbc702028ad6e034a3ca4affa7" => :mojave
-    sha256 "8981f2feae2fd31ddf92bf5092f1157beee3fb0542aecd2dc788f2b56ca16b00" => :high_sierra
+    sha256 "7ab24050548f7539419bbd310c00c718854e95b2e7d15a74b2c8246588d95480" => :big_sur
+    sha256 "d12919775ba3cde5a7f42582fd9cf10513145485ac4a60170e44a1dac70e04fe" => :catalina
+    sha256 "974514ef8eef4ca3d7d548a28c89335129781db6e65f5ab8795ba5096c4cfae6" => :mojave
   end
 
-  depends_on "python@3.8" => :build
+  depends_on "python@3.9" => :build
   depends_on "openjdk@11"
 
   uses_from_macos "zip"

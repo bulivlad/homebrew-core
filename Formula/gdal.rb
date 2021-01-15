@@ -1,10 +1,9 @@
 class Gdal < Formula
   desc "Geospatial Data Abstraction Library"
   homepage "https://www.gdal.org/"
-  url "https://download.osgeo.org/gdal/3.1.3/gdal-3.1.3.tar.xz"
-  sha256 "161cf55371a143826f1d76ce566db1f0a666496eeb4371aed78b1642f219d51d"
+  url "https://download.osgeo.org/gdal/3.2.1/gdal-3.2.1.tar.xz"
+  sha256 "6c588b58fcb63ff3f288eb9f02d76791c0955ba9210d98c3abd879c770ae28ea"
   license "MIT"
-  revision 3
 
   livecheck do
     url "https://download.osgeo.org/gdal/CURRENT/"
@@ -12,9 +11,10 @@ class Gdal < Formula
   end
 
   bottle do
-    sha256 "64a8b994f4caaa431c4bf2fa55737c205f7bbc4c8cabfa7868259a093fd82f81" => :catalina
-    sha256 "9d6ce11fcb8008f7df4e45ebdc5abff1e171f6f58bd975ef80fa94572fa4d92b" => :mojave
-    sha256 "f7bd35d249b4cd714726afe84e1dae7e93d782efe1c0192518e20791a1f34b06" => :high_sierra
+    sha256 "a6c89929f6a8b04e21536afcea60f574f9407d3d9cdb96e3ec6287a77768bd7c" => :big_sur
+    sha256 "82a98a4bf1a3cb49b8eadca15c26c6801daf67466d9650b4a48eb6aa8a93440e" => :arm64_big_sur
+    sha256 "b1c946acb57fbca8c67162da0550a153a3e81aa4d751503ff7e1226ab8963d45" => :catalina
+    sha256 "af4520bf4794d7cc5c67bcd67f04875583888f9f56cb04d43006d3de7c283e81" => :mojave
   end
 
   head do
@@ -25,6 +25,9 @@ class Gdal < Formula
   depends_on "pkg-config" => :build
 
   depends_on "cfitsio"
+  # Work around "Symbol not found: _curl_mime_addpart"
+  # due to mismatched SDK version in Mojave.
+  depends_on "curl" if MacOS.version == :mojave
   depends_on "epsilon"
   depends_on "expat"
   depends_on "freexl"
@@ -46,7 +49,7 @@ class Gdal < Formula
   depends_on "pcre"
   depends_on "poppler"
   depends_on "proj"
-  depends_on "python@3.8"
+  depends_on "python@3.9"
   depends_on "sqlite" # To ensure compatibility with SpatiaLite
   depends_on "unixodbc" # macOS version is not complete enough
   depends_on "webp"
@@ -77,7 +80,6 @@ class Gdal < Formula
       "--with-pcraster=internal",
 
       # Homebrew backends
-      "--with-curl=/usr/bin/curl-config",
       "--with-expat=#{Formula["expat"].prefix}",
       "--with-freexl=#{Formula["freexl"].opt_prefix}",
       "--with-geos=#{Formula["geos"].opt_prefix}/bin/geos-config",
@@ -138,11 +140,12 @@ class Gdal < Formula
       "--without-sosi",
     ]
 
-    # Work around "error: no member named 'signbit' in the global namespace"
-    # Remove once support for macOS 10.12 Sierra is dropped
-    if DevelopmentTools.clang_build_version >= 900
-      ENV.delete "SDKROOT"
-      ENV.delete "HOMEBREW_SDKROOT"
+    # Work around "Symbol not found: _curl_mime_addpart"
+    # due to mismatched SDK version in Mojave.
+    args << if MacOS.version == :mojave
+      "--with-curl=#{Formula["curl"].opt_prefix}/bin/curl-config"
+    else
+      "--with-curl=/usr/bin/curl-config"
     end
 
     system "./configure", *args
@@ -151,7 +154,7 @@ class Gdal < Formula
 
     # Build Python bindings
     cd "swig/python" do
-      system Formula["python@3.8"].opt_bin/"python3", *Language::Python.setup_install_args(prefix)
+      system Formula["python@3.9"].opt_bin/"python3", *Language::Python.setup_install_args(prefix)
     end
     bin.install Dir["swig/python/scripts/*.py"]
 
@@ -166,7 +169,7 @@ class Gdal < Formula
     # basic tests to see if third-party dylibs are loading OK
     system "#{bin}/gdalinfo", "--formats"
     system "#{bin}/ogrinfo", "--formats"
-
-    system Formula["python@3.8"].opt_bin/"python3", "-c", "import gdal"
+    # Changed Python package name from "gdal" to "osgeo.gdal" in 3.2.0.
+    system Formula["python@3.9"].opt_bin/"python3", "-c", "import osgeo.gdal"
   end
 end

@@ -1,9 +1,9 @@
 class Sbt < Formula
   desc "Build tool for Scala projects"
   homepage "https://www.scala-sbt.org/"
-  url "https://github.com/sbt/sbt/releases/download/v1.4.0/sbt-1.4.0.tgz"
-  mirror "https://sbt-downloads.cdnedge.bluemix.net/releases/v1.4.0/sbt-1.4.0.tgz"
-  sha256 "b4775b470920e03de7a5d81121b4dc741c00513f041e65dbb981052ec6d1eed5"
+  url "https://github.com/sbt/sbt/releases/download/v1.4.6/sbt-1.4.6.tgz"
+  mirror "https://sbt-downloads.cdnedge.bluemix.net/releases/v1.4.6/sbt-1.4.6.tgz"
+  sha256 "86a6f28e79966074101066ab1aa19267d0c8d44eae21daa93c9c6056ca6f9da4"
   license "Apache-2.0"
 
   bottle :unneeded
@@ -19,15 +19,8 @@ class Sbt < Formula
     libexec.install "bin"
     etc.install "conf/sbtopts"
 
-    (bin/"sbt").write <<~EOS
-      #!/bin/sh
-      if [ -f "$HOME/.sbtconfig" ]; then
-        echo "Use of ~/.sbtconfig is deprecated, please migrate global settings to #{etc}/sbtopts" >&2
-        . "$HOME/.sbtconfig"
-      fi
-      export JAVA_HOME="${JAVA_HOME:-#{Formula["openjdk"].opt_prefix}}"
-      exec "#{libexec}/bin/sbt" "$@"
-    EOS
+    (bin/"sbt").write_env_script libexec/"bin/sbt", Language::Java.overridable_java_home_env
+    (bin/"sbtn").write_env_script libexec/"bin/sbtn-x86_64-apple-darwin", Language::Java.overridable_java_home_env
   end
 
   def caveats
@@ -40,7 +33,9 @@ class Sbt < Formula
 
   test do
     ENV.append "_JAVA_OPTIONS", "-Dsbt.log.noformat=true"
-    system "#{bin}/sbt", "about"
-    assert_match "[info] #{version}", shell_output("#{bin}/sbt sbtVersion")
+    system("#{bin}/sbt", "--sbt-create", "about")
+    assert_match version.to_s, shell_output("#{bin}/sbt sbtVersion")
+    system "#{bin}/sbtn", "about"
+    system "#{bin}/sbtn", "shutdown"
   end
 end

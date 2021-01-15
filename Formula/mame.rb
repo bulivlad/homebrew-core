@@ -1,18 +1,28 @@
 class Mame < Formula
   desc "Multiple Arcade Machine Emulator"
   homepage "https://mamedev.org/"
-  url "https://github.com/mamedev/mame/archive/mame0225.tar.gz"
-  version "0.225"
-  sha256 "ca4d5a429d72b30fd2bdf60350e490c7de4ac64b1e0dafcf38450f8ba84a1a95"
+  url "https://github.com/mamedev/mame/archive/mame0226.tar.gz"
+  version "0.226"
+  sha256 "7c4c9ec232ba988e65fd29665c9b8e40b5ac3aa9f561eeb107cebbf08ba94baf"
   license "GPL-2.0-or-later"
-  revision 1
   head "https://github.com/mamedev/mame.git"
+
+  # MAME tags (and filenames) are formatted like `mame0226`, so livecheck will
+  # report the version like `0226`. We work around this by matching the link
+  # text for the release title, since it contains the properly formatted version
+  # (e.g., 0.226).
+  livecheck do
+    url :stable
+    strategy :github_latest
+    regex(%r{release-header.*?/releases/tag/mame[._-]?\d+(?:\.\d+)*["' >]>MAME v?(\d+(?:\.\d+)+)}im)
+  end
 
   bottle do
     cellar :any
-    sha256 "3680dd9e5f826552b289f521f11cb91c52fa037b215285f1e47f1a1319409eb4" => :catalina
-    sha256 "d5492c6df974c870714ce6cf4e23f84532e4a26887ae1e37eb9d798c65a185ea" => :mojave
-    sha256 "01a90fd0d0a5f88853aa10637bafb9fdafe67348ffa780e80fc9b606f6ab8e76" => :high_sierra
+    rebuild 1
+    sha256 "df514e97b41c36a65fb3d0729f8e927887cd9d1f7b3f23a189e4430a1e48bb76" => :big_sur
+    sha256 "9bc14fa247f653226bcdc771ad60ba70d2dc5e19b3386b547cf9b02c6f760615" => :catalina
+    sha256 "ca698bbefa83ddc6be99d0a471fe7f6303b35a6c757bb5b6b73a70acf8281c3f" => :mojave
   end
 
   depends_on "glm" => :build
@@ -34,12 +44,19 @@ class Mame < Formula
   uses_from_macos "expat"
   uses_from_macos "zlib"
 
+  # Disable BGFX threading. Remove in next version.
+  patch do
+    url "https://github.com/mamedev/mame/commit/48d1f0de37fc6c429051dd1bcd1a49dbef581b1a.patch?full_index=1"
+    sha256 "9f9aba588ab1e82d927d1c101780415672c54cb463e80d435be3cb1d0ec34217"
+  end
+
   def install
     # Cut sdl2-config's invalid option.
     inreplace "scripts/src/osd/sdl.lua", "--static", ""
 
     # Use bundled asio and lua instead of latest version.
-    # See: <https://github.com/mamedev/mame/issues/5721>
+    # https://github.com/mamedev/mame/issues/5721
+    # https://github.com/mamedev/mame/issues/5349
     system "make", "PYTHON_EXECUTABLE=#{Formula["python@3.9"].opt_bin}/python3",
                    "USE_LIBSDL=1",
                    "USE_SYSTEM_LIB_EXPAT=1",

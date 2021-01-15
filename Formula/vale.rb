@@ -1,22 +1,23 @@
 class Vale < Formula
   desc "Syntax-aware linter for prose"
   homepage "https://errata-ai.github.io/vale/"
-  url "https://github.com/errata-ai/vale/archive/v2.4.3.tar.gz"
-  sha256 "da6fa9224a6bec21dcea29d2b9b346d00c133c4864ea44c07ea222289ab98e70"
+  url "https://github.com/errata-ai/vale/archive/v2.8.0.tar.gz"
+  sha256 "b0ab637508aedbc11e5cd7fe225d45f9fd44e821720233dbbbbdc39f8b104250"
   license "MIT"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "02aa0bbde81a194cbc14bd2168d5d8bb1f1a8f80638b45f08b6cf02779abc527" => :catalina
-    sha256 "7a858abfd6fa4a84da7d561ba7db68bd0bc547f53eb7527dc8205a8f757ff58b" => :mojave
-    sha256 "c27d1bb595bdb508188e76718390cb58366279c9419e3123bd4371644c5e5838" => :high_sierra
+    sha256 "590b15b39285fd259261da8c17ecb6830ceb6bfa8655fdb9aa2ef96965026f39" => :big_sur
+    sha256 "1ff06ef916c211f9acfa78632545992740837bf5dcbf0678024530669a04118b" => :arm64_big_sur
+    sha256 "a692616e7343bcd13bb44057335373fb2b4072ec6af617a4f11c1df237c22b4e" => :catalina
+    sha256 "9c0daea18d09fec6bffda138e52a73acbe25de5805a2515dea53f869ab5f6973" => :mojave
   end
 
   depends_on "go" => :build
 
   def install
     ldflags = "-X main.version=#{version} -s -w"
-    system "go", "build", *std_go_args, "-ldflags=#{ldflags}"
+    system "go", "build", *std_go_args, "-ldflags=#{ldflags}", "./cmd/vale"
   end
 
   test do

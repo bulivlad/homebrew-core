@@ -3,8 +3,8 @@ class Diffoscope < Formula
 
   desc "In-depth comparison of files, archives, and directories"
   homepage "https://diffoscope.org"
-  url "https://files.pythonhosted.org/packages/47/19/c28e4ddd0ebf5601725939b74b6aa1463523ef65e8e0753c695ced871155/diffoscope-160.tar.gz"
-  sha256 "f164b5e74cc11f6238ad8d62c92d3a819fa4c8b618683fc0533e04f21acae6b2"
+  url "https://files.pythonhosted.org/packages/91/1a/f15768b9af208111eec34135f26e0993e0e3b33164b2742d684dc29fcc1c/diffoscope-164.tar.gz"
+  sha256 "bc269a39ec72261d9fead55bd951f6cbbe3d2ccce1481f974665999a5b141fff"
   license "GPL-3.0-or-later"
 
   livecheck do
@@ -13,20 +13,21 @@ class Diffoscope < Formula
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "69557b54a73292d32bc8a3fcb03699e6a7b8a4b39f34fe4e552b2f1ca78d6864" => :catalina
-    sha256 "dd1ae6de32c26ea68d6ea5fc5c3b47dd61c566151054549c99f6fa69713f2aba" => :mojave
-    sha256 "005775db01a419fa6576906e2325e5a90e9be89c44fd3da22c7fe325b53e05c1" => :high_sierra
+    sha256 "d6e3f6814e03ae94ece8aee3cea561fe352ffaba54e26d0f83e863b4102b9c2e" => :big_sur
+    sha256 "7f4516261a620f685012a5284b179d14a934ad0130f3379e3312ee80f5674be3" => :arm64_big_sur
+    sha256 "de7f317c11377d4ca92aee688c08eeee974fda4fe9680e30f818068fbe125bea" => :catalina
+    sha256 "0dc9c9e70d89f649e68966ac146ce8e03ddc01021af8b62323c8f4f77dd093f8" => :mojave
   end
 
   depends_on "gnu-tar"
   depends_on "libarchive"
   depends_on "libmagic"
-  depends_on "python@3.8"
+  depends_on "python@3.9"
 
   # Use resources from diffoscope[cmdline]
   resource "argcomplete" do
-    url "https://files.pythonhosted.org/packages/df/a0/3544d453e6b80792452d71fdf45aac532daf1c2b2d7fc6cb712e1c3daf11/argcomplete-1.12.0.tar.gz"
-    sha256 "2fbe5ed09fd2c1d727d4199feca96569a5b50d44c71b16da9c742201f7cc295c"
+    url "https://files.pythonhosted.org/packages/cb/53/d2e3d11726367351b00c8f078a96dacb7f57aef2aca0d3b6c437afc56b55/argcomplete-1.12.2.tar.gz"
+    sha256 "de0e1282330940d52ea92a80fea2e4b9e0da1932aaa570f84d268939d1897b04"
   end
 
   resource "libarchive-c" do
@@ -45,7 +46,7 @@ class Diffoscope < Formula
   end
 
   def install
-    venv = virtualenv_create(libexec, Formula["python@3.8"].opt_bin/"python3")
+    venv = virtualenv_create(libexec, Formula["python@3.9"].opt_bin/"python3")
     venv.pip_install resources
     venv.pip_install buildpath
 

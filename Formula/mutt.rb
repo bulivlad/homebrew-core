@@ -1,4 +1,4 @@
-# Note: Mutt has a large number of non-upstream patches available for
+# NOTE: Mutt has a large number of non-upstream patches available for
 # it, some of which conflict with each other. These patches are also
 # not kept up-to-date when new versions of mutt (occasionally) come
 # out.
@@ -10,8 +10,8 @@
 class Mutt < Formula
   desc "Mongrel of mail user agents (part elm, pine, mush, mh, etc.)"
   homepage "http://www.mutt.org/"
-  url "https://bitbucket.org/mutt/mutt/downloads/mutt-1.14.7.tar.gz"
-  sha256 "e4f507b133253cb5eef27996b8668956cdf9caac622cf8adad13f0f9a4eda864"
+  url "https://bitbucket.org/mutt/mutt/downloads/mutt-2.0.4.tar.gz"
+  sha256 "45087e78105e9abc7cc37827865d319081587cb53a94412aa4e3118e937991d4"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -19,10 +19,10 @@ class Mutt < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 "e20f2379b28260a7cd995dfc019e82c4cb72ef1d5a2e15c93328088994d556b9" => :catalina
-    sha256 "592e488746c4b7ff7f6d4c814baa2f14528c2563364503a34ba100a0bf74a2f7" => :mojave
-    sha256 "8916a5de4c7c6734e3039f3e5f1e880fc9624bce8f27fe8e0ef2e25c51f120e7" => :high_sierra
+    sha256 "f181150fcf0ff74b00b3d00cc39d355685ad90a5e8e065837f2d3bd3cb42d937" => :big_sur
+    sha256 "3733169f300075cfec18105ad60b125760540e61d7c0ca7151fb9d0bac0d735f" => :arm64_big_sur
+    sha256 "23f79a29d228e21cf3d93225c9b73517bd06c0fefefb258f7780e8e8bd17bb1d" => :catalina
+    sha256 "d0e7a3f48da84a0f718e36a3027874bfa8cf150ec1e637b7d8bc0746cd42c86c" => :mojave
   end
 
   head do
@@ -40,6 +40,7 @@ class Mutt < Formula
   depends_on "tokyo-cabinet"
 
   uses_from_macos "bzip2"
+  uses_from_macos "krb5"
   uses_from_macos "ncurses"
   uses_from_macos "zlib"
 
