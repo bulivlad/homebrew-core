@@ -6,7 +6,7 @@ class GradleAT563 < Formula
 
   bottle :unneeded
 
-  depends_on :openjdk
+  depends_on "openjdk"
 
   def install
     rm_f Dir["bin/*.bat"]
