@@ -1,16 +1,17 @@
 class So < Formula
   desc "Terminal interface for StackOverflow"
   homepage "https://github.com/samtay/so"
-  url "https://github.com/samtay/so/archive/v0.4.3.tar.gz"
-  sha256 "ea2aaacda8073bbfd0b22cbb978c18562fb2a82987f48803cf3d566f58fb37aa"
+  url "https://github.com/samtay/so/archive/v0.4.6.tar.gz"
+  sha256 "47a3cf5cef9d87dea223ef1c8fae3cf8c2ae0673d9eb4c8d73d733ce8ff45619"
   license "MIT"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "2c871ccb23c125efc71cd7fbd422a5c53ee0b66154a91fe28a2fb2a39f38c4c8" => :big_sur
-    sha256 "a1239eda940abb6aedef2fb2148e70ddad9ccf30e733ea1db043a1f3e35377ba" => :arm64_big_sur
-    sha256 "826d559e0fe079bbec1c8a43cbde4bd44a4d54d2d36d8a0c19e6ff43544d30b0" => :catalina
-    sha256 "061e084d661c9b1eddca4329492935a3ec1a1f3880399d7a21c63b58c8763be6" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "199e629ef6386f815a96b097540fdaa66e89a917a173d5f41c547e9b3b792444"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "91acaa4fdf4a518890230e765da744990ecdd9ecbf308dfbafe7cc26b5b654c8"
+    sha256 cellar: :any_skip_relocation, monterey:       "3efa45b62460e33061a77d58c040ae6ef6d235ae344a3dcfaca4e3e7f6ddd514"
+    sha256 cellar: :any_skip_relocation, big_sur:        "3dbacd10d72b7b5ec356081908444652a964c570f93a931dcbd5e039d5547c68"
+    sha256 cellar: :any_skip_relocation, catalina:       "7f52bc1fef4395083b6eaf27b25922a621785e5f5aab0cd6ca1776f3af4ddd68"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "cfbb7bf0c006fd09e463af561ee6d6e71c81d9684df445f636834ee64baa4214"
   end
 
   depends_on "rust" => :build
@@ -40,7 +41,7 @@ class So < Formula
     input.close
 
     # make sure it's the correct answer
-    assert_match /:wq/, File.read("output")
+    assert_match ":wq", File.read("output")
   ensure
     Process.kill("TERM", wait_thr.pid)
   end

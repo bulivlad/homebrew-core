@@ -2,50 +2,34 @@ class Auditbeat < Formula
   desc "Lightweight Shipper for Audit Data"
   homepage "https://www.elastic.co/products/beats/auditbeat"
   url "https://github.com/elastic/beats.git",
-      tag:      "v7.10.1",
-      revision: "1da173a9e716715a7a54bb3ff4db05b5c24fc8ce"
+      tag:      "v8.1.2",
+      revision: "6118f25235a52a7f0c4937a0a309e380c92d8119"
   license "Apache-2.0"
-  head "https://github.com/elastic/beats.git"
+  head "https://github.com/elastic/beats.git", branch: "main"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "63463ad61e9aedbcf5409ff9d4f735f27bd4d5e37c97dc9d87be9e242f9adcd9" => :big_sur
-    sha256 "14f705d02327947fcbb85932d9377a7064ac80a949f31b2b744bef22238335bd" => :catalina
-    sha256 "47953f639b1e9c46649d59840cc8890bbdee878aaced725468fd082921c1ff67" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "e57a1311eab08113bf9952dbb533ea1ae50b8cba5176be6c6f38fcbf388e0993"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "6d3742161f2bf227d5033de1bf4febc7f002e14fe432867b985ef84c0f51b23f"
+    sha256 cellar: :any_skip_relocation, monterey:       "92e8e1116f295a84e3b068a8131228d371dc73053da39c466d0051e2d2651ae3"
+    sha256 cellar: :any_skip_relocation, big_sur:        "0967d523a9fdb217d434d13d82bd623be9a54ab4c3c2849e7def481ee5ae0be5"
+    sha256 cellar: :any_skip_relocation, catalina:       "b560af0d60fbc2ef77e8ede4a6dcc1a095f625a242fc87b30ffa7d7ba8e3f0d9"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c9ef104e5b84c12750effd46ce51ce3d58f5b2a70266b1864f78a201b98ec563"
   end
 
   depends_on "go" => :build
-  depends_on "python@3.8" => :build
-
-  resource "virtualenv" do
-    url "https://files.pythonhosted.org/packages/d4/0c/9840c08189e030873387a73b90ada981885010dd9aea134d6de30cd24cb8/virtualenv-15.1.0.tar.gz"
-    sha256 "02f8102c2436bb03b3ee6dede1919d1dac8a427541652e5ec95171ec8adbc93a"
-  end
+  depends_on "mage" => :build
+  depends_on "python@3.10" => :build
 
   def install
     # remove non open source files
     rm_rf "x-pack"
 
-    ENV["GOPATH"] = buildpath
-    (buildpath/"src/github.com/elastic/beats").install buildpath.children
-
-    xy = Language::Python.major_minor_version "python3"
-    ENV.prepend_create_path "PYTHONPATH", buildpath/"vendor/lib/python#{xy}/site-packages"
-
-    resource("virtualenv").stage do
-      system Formula["python@3.8"].opt_bin/"python3", *Language::Python.setup_install_args(buildpath/"vendor")
-    end
-
-    ENV.prepend_path "PATH", buildpath/"vendor/bin" # for virtualenv
-    ENV.prepend_path "PATH", buildpath/"bin" # for mage (build tool)
-
-    cd "src/github.com/elastic/beats/auditbeat" do
+    cd "auditbeat" do
       # don't build docs because it would fail creating the combined OSS/x-pack
       # docs and we aren't installing them anyway
       inreplace "magefile.go", "devtools.GenerateModuleIncludeListGo, Docs)",
                                "devtools.GenerateModuleIncludeListGo)"
 
-      system "make", "mage"
       # prevent downloading binary wheels during python setup
       system "make", "PIP_INSTALL_PARAMS=--no-binary :all", "python-env"
       system "mage", "-v", "build"
@@ -55,8 +39,6 @@ class Auditbeat < Formula
       (libexec/"bin").install "auditbeat"
       prefix.install "build/kibana"
     end
-
-    prefix.install_metafiles buildpath/"src/github.com/elastic/beats"
 
     (bin/"auditbeat").write <<~EOS
       #!/bin/sh
@@ -74,24 +56,8 @@ class Auditbeat < Formula
     (var/"log/auditbeat").mkpath
   end
 
-  plist_options manual: "auditbeat"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN"
-      "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>Program</key>
-          <string>#{opt_bin}/auditbeat</string>
-          <key>RunAtLoad</key>
-          <true/>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run opt_bin/"auditbeat"
   end
 
   test do
@@ -110,10 +76,12 @@ class Auditbeat < Formula
     end
     sleep 5
     touch testpath/"files/touch"
+
     sleep 30
-    s = IO.readlines(testpath/"auditbeat/auditbeat").last(1)[0]
-    assert_match /"action":\["(initial_scan|created)"\]/, s
-    realdirpath = File.realdirpath(testpath)
-    assert_match "\"path\":\"#{realdirpath}/files/touch\"", s
+
+    assert_predicate testpath/"data/beat.db", :exist?
+
+    output = JSON.parse((testpath/"data/meta.json").read)
+    assert_includes output, "first_start"
   end
 end

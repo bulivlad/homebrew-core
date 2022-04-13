@@ -1,19 +1,17 @@
 class Baobab < Formula
   desc "Gnome disk usage analyzer"
   homepage "https://wiki.gnome.org/Apps/Baobab"
-  url "https://download.gnome.org/sources/baobab/3.38/baobab-3.38.0.tar.xz"
-  sha256 "048468147860816b97f15d50b3c84e9acf0539c1441cfeb63703d112e8728329"
-
-  livecheck do
-    url :stable
-  end
+  url "https://download.gnome.org/sources/baobab/42/baobab-42.0.tar.xz"
+  sha256 "4b1aabe6bab1582b3fea79a2829bce7f2415bb6e5062f25357aeedd5317a50dc"
+  license "GPL-2.0-or-later"
 
   bottle do
-    sha256 "4a9d7b940b8d32bea12f03e4dde9c834a1efd60bcae26bc8dfce82784dee1183" => :big_sur
-    sha256 "900fff026ec24002744ec2f9836c55614f5d9a775cb562d38fcd883871ea69b0" => :arm64_big_sur
-    sha256 "433a0bd533b88a32c6a860776c1979a9d4face3db73d7011cef2f444bcbc033b" => :catalina
-    sha256 "b1043ff9f9bd7edb169a955fe4eaccc521dcf95a448d3a52aed4b79a8eb982f9" => :mojave
-    sha256 "9768e9d8d1f4fdcc0a0fbb5936183c1f0bff547e34fc9814f38698e0e3da2f55" => :high_sierra
+    sha256 arm64_monterey: "9da5f3fa95fb0e71417f44a42e0639098af94a7d56637c31114428d4a48bf4aa"
+    sha256 arm64_big_sur:  "c28802a119235bce9421c2aa156d6108b988a81be44b646eb295b487d7776331"
+    sha256 monterey:       "8a5c2803956caadd4bc09c9ef37533cc8c36ca9726430d5072db312cdf91094f"
+    sha256 big_sur:        "ab0ba611653c5b25cbe54f1767f86aef64ff7d6c2f8dc8000c673767bbb416e4"
+    sha256 catalina:       "3c7bc920f3a4c416715a1eeabb4492eaccd545da6a416674c9801efa2f8415fd"
+    sha256 x86_64_linux:   "ce301f6aecb4c053e066ad25b44adfcd3bfe78952df198946b54ae8699643dfd"
   end
 
   depends_on "itstool" => :build
@@ -22,8 +20,9 @@ class Baobab < Formula
   depends_on "pkg-config" => :build
   depends_on "vala" => :build
   depends_on "adwaita-icon-theme"
-  depends_on "gtk+3"
+  depends_on "gtk4"
   depends_on "hicolor-icon-theme"
+  depends_on "libadwaita"
 
   def install
     # stop meson_post_install.py from doing what needs to be done in the post_install step
@@ -37,7 +36,7 @@ class Baobab < Formula
 
   def post_install
     system "#{Formula["glib"].opt_bin}/glib-compile-schemas", "#{HOMEBREW_PREFIX}/share/glib-2.0/schemas"
-    system "#{Formula["gtk+3"].opt_bin}/gtk3-update-icon-cache", "-f", "-t", "#{HOMEBREW_PREFIX}/share/icons/hicolor"
+    system "#{Formula["gtk4"].opt_bin}/gtk4-update-icon-cache", "-f", "-t", "#{HOMEBREW_PREFIX}/share/icons/hicolor"
   end
 
   test do

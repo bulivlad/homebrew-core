@@ -12,7 +12,10 @@ class Frege < Formula
     regex(/href=.*?frege[._-]?(\d+(?:\.\d+)+)\.jar/i)
   end
 
-  bottle :unneeded
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "28f3c0d702b145adb8d615507d492ce37bf7309fde2dcda48b47397c2a387ffa"
+  end
 
   depends_on "openjdk"
 

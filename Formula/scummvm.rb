@@ -1,22 +1,23 @@
 class Scummvm < Formula
   desc "Graphic adventure game interpreter"
   homepage "https://www.scummvm.org/"
-  url "https://downloads.scummvm.org/frs/scummvm/2.2.0/scummvm-2.2.0.tar.xz"
-  sha256 "1469657e593bd8acbcfac0b839b086f640ebf120633e93f116cab652b5b27387"
+  url "https://downloads.scummvm.org/frs/scummvm/2.5.1/scummvm-2.5.1.tar.xz"
+  sha256 "9fd8db38e4456144bf8c34dacdf7f204e75f18e8e448ec01ce08ce826a035f01"
   license "GPL-2.0-or-later"
-  head "https://github.com/scummvm/scummvm.git"
+  revision 1
+  head "https://github.com/scummvm/scummvm.git", branch: "master"
 
   livecheck do
-    url "https://www.scummvm.org/frs/scummvm/"
-    regex(%r{href=.*?v?(\d+(?:\.\d+)+)/?["']}i)
+    url "https://www.scummvm.org/downloads/"
+    regex(/href=.*?scummvm[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    rebuild 1
-    sha256 "d6d48c84e84ff5adbed86060489c707700f8bc1059196a522575bc1b1ce8b05c" => :big_sur
-    sha256 "9d0f4d95f666f1a9d2836c8f6c860de097edfe27c351614d644b75f54b862332" => :arm64_big_sur
-    sha256 "ee689cfa14ba1a822bba247b79b615beae697c568de135c844121e9d51818303" => :catalina
-    sha256 "184c5b6dc8caaa144d9cc5fb1b02e419afee2b70323a9908f0996d697de18a03" => :mojave
+    sha256 arm64_big_sur: "af380525ea154276ad0d373bf6118f3a6838113cbeb9968902ae338cd25cf3c4"
+    sha256 monterey:      "d05447bbd2eee2531f7adf1b37f52a70a839b306df931e2abddffb833918b534"
+    sha256 big_sur:       "64322552466bf84d7c908349c1d3b2a9033c0f296d654732fd23dc09e37ce556"
+    sha256 catalina:      "f4955d7d9be4be813bd81ae4e1895307f97f52cc8af5df8c99c61356cc42cb5a"
+    sha256 x86_64_linux:  "a84d8f59c66e8a3f8556909a6086e00a1afae1c1054b6b1bb7ede2e3b26189ce"
   end
 
   depends_on "a52dec"
@@ -38,11 +39,14 @@ class Scummvm < Formula
                           "--with-sdl-prefix=#{Formula["sdl2"].opt_prefix}"
     system "make"
     system "make", "install"
-    (share+"pixmaps").rmtree
-    (share+"icons").rmtree
+    (share/"pixmaps").rmtree
+    (share/"icons").rmtree
   end
 
   test do
+    # Test fails on headless CI: Could not initialize SDL: No available video device
+    return if OS.linux? && ENV["HOMEBREW_GITHUB_ACTIONS"]
+
     system "#{bin}/scummvm", "-v"
   end
 end

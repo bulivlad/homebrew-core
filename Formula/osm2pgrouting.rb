@@ -1,24 +1,24 @@
 class Osm2pgrouting < Formula
   desc "Import OSM data into pgRouting database"
   homepage "https://pgrouting.org/docs/tools/osm2pgrouting.html"
-  url "https://github.com/pgRouting/osm2pgrouting/archive/v2.3.6.tar.gz"
-  sha256 "c4b1f45ff7a9a184956182e40016fdd9455718821adb25822e2ef8182d2712a6"
-  license "GPL-2.0"
+  url "https://github.com/pgRouting/osm2pgrouting/archive/v2.3.8.tar.gz"
+  sha256 "e3a58bcacf0c8811e0dcf3cf3791a4a7cc5ea2a901276133eacf227b30fd8355"
+  license "GPL-2.0-or-later"
   revision 2
-  head "https://github.com/pgRouting/osm2pgrouting.git"
+  head "https://github.com/pgRouting/osm2pgrouting.git", branch: "main"
 
   bottle do
-    cellar :any
-    sha256 "5e935d46ae6532b2cd75b73ebaf13bcbf25472e29e0281236fdd002c3317f3bd" => :big_sur
-    sha256 "99b349358db3adfb8a52dfcd2cfde049cecd5cea0b46cc6fa2a4fb6e2e9b4523" => :catalina
-    sha256 "c99a46012e8a582678e3b28e73f8c570606477d2b76d125dee5070fde5516b5c" => :mojave
-    sha256 "1ec262b471c1dd25b7609b5c36b53798375fb5d1015eb0d968a8023a698ed113" => :high_sierra
+    sha256 cellar: :any, arm64_monterey: "7a16273c49d8a30b48460b6ec896d979d06c06e46bfb38b655633190827779cb"
+    sha256 cellar: :any, arm64_big_sur:  "eae9b9f7b4fc4229bc85a8e484c3c85b6fdf10bb4eadf334efd3bc9d5a46cde4"
+    sha256 cellar: :any, monterey:       "8ad1a0713c06714fb3aa63f6ddbf4c73985cd71b74cec74d3b89c2f881c222c4"
+    sha256 cellar: :any, big_sur:        "e9c0bcc9363b8291d5e3e729b0ac32c14036dfcf7c4eb4920e46b5c8bec924e8"
+    sha256 cellar: :any, catalina:       "fca50921c8c7058ee70868858e3581cbd90606db8617a057a6af6f9b95393c3e"
   end
 
   depends_on "cmake" => :build
   depends_on "boost"
   depends_on "expat"
-  depends_on "libpqxx@6"
+  depends_on "libpqxx"
   depends_on "pgrouting"
   depends_on "postgis"
   depends_on "postgresql"

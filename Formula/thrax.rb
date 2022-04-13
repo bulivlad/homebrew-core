@@ -1,24 +1,46 @@
 class Thrax < Formula
+  include Language::Python::Shebang
+
   desc "Tools for compiling grammars into finite state transducers"
-  homepage "http://www.openfst.org/twiki/bin/view/GRM/Thrax"
-  url "http://www.openfst.org/twiki/pub/GRM/ThraxDownload/thrax-1.3.5.tar.gz"
-  sha256 "823182c9bca7f866437c0d8db9fc4c90688766f4492239bfbd73be20687c622e"
+  homepage "https://www.openfst.org/twiki/bin/view/GRM/Thrax"
+  url "https://www.openfst.org/twiki/pub/GRM/ThraxDownload/thrax-1.3.8.tar.gz"
+  sha256 "e21c449798854f7270bb5ac723f6a8d292e149fc6bbe24fd9f345c85aabc7cd4"
   license "Apache-2.0"
 
-  bottle do
-    cellar :any
-    sha256 "a072e3d04f88b542f3b52bc87c2e759c7bab28ae275a82f56f9cb289c5d35361" => :big_sur
-    sha256 "df4c441ebe13c259e7ca96811eaa6df1d77aa6da679c1d168a6a783bc156f5d1" => :arm64_big_sur
-    sha256 "d78aa60f3cd29ac49ef887d6534a93cfbb605e133514e75681041d0b5744e0ac" => :catalina
-    sha256 "6047f5e9d277a6987f580803d7e7220f6eceb76f84805f91aafb5c729bb39f0a" => :mojave
+  livecheck do
+    url "https://www.openfst.org/twiki/bin/view/GRM/ThraxDownload"
+    regex(/href=.*?thrax[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
+
+  bottle do
+    sha256 cellar: :any,                 arm64_monterey: "c13867026b97d86192e436f4da236b7dce271a44b21c1b0388cd4aec700adc99"
+    sha256 cellar: :any,                 arm64_big_sur:  "fb098c0a6832a09efacef7252d8f472dddfc280c540b8190de18b1ae45b30fe6"
+    sha256 cellar: :any,                 monterey:       "653c405ae61061f57f17457657da161ded1ddc39056712dbb7d7dd9643509824"
+    sha256 cellar: :any,                 big_sur:        "4a09f5dcaccb60db82d0e034a8ab66b32e01756aa99f72c08531e0d5d3a98154"
+    sha256 cellar: :any,                 catalina:       "722203944df85f4144814246f34a3eeaabdfe110b4fa80584ca28b76e4334596"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "17300c144318201c1ebeafe8cf01bf50ce47ded3a71b98096ae5a94ab98e585e"
+  end
+
+  # Regenerate `configure` to avoid `-flat_namespace` bug.
+  # None of our usual patches apply.
+  depends_on "autoconf" => :build
+  depends_on "automake" => :build
+  depends_on "libtool" => :build
 
   depends_on "openfst"
 
+  on_linux do
+    depends_on "gcc"
+    depends_on "python@3.10"
+  end
+
+  fails_with gcc: "5"
+
   def install
-    system "./configure", "--prefix=#{prefix}",
-                          "--disable-dependency-tracking"
+    system "autoreconf", "--force", "--install", "--verbose"
+    system "./configure", *std_configure_args
     system "make", "install"
+    rewrite_shebang detected_python_shebang, bin/"thraxmakedep" if OS.linux?
   end
 
   test do
@@ -27,8 +49,7 @@ class Thrax < Formula
     cd "grammars" do
       system "#{bin}/thraxmakedep", "example.grm"
       system "make"
-      system "#{bin}/thraxrandom-generator", "--far=example.far",
-                                      "--rule=TOKENIZER"
+      system "#{bin}/thraxrandom-generator", "--far=example.far", "--rule=TOKENIZER"
     end
   end
 end

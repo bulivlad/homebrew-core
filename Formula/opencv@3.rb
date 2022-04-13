@@ -1,16 +1,18 @@
 class OpencvAT3 < Formula
   desc "Open source computer vision library"
   homepage "https://opencv.org/"
-  url "https://github.com/opencv/opencv/archive/3.4.13.tar.gz"
-  sha256 "70230049194ae03ed8bfaab6cd1388569aa1b5c482d8b50d3af1cd2ae5a0b95d"
+  url "https://github.com/opencv/opencv/archive/3.4.16.tar.gz"
+  sha256 "5e37b791b2fe42ed39b52d9955920b951ee42d5da95f79fbc9765a08ef733399"
   license "BSD-3-Clause"
   revision 2
 
   bottle do
-    sha256 "2ea165b4cd7d978e974cbc8fb744244fcbd268ac662a537c59ea73680f0afc54" => :big_sur
-    sha256 "7dd060aad31743521ecf989ede57662ea41be3c6b7f6ac0895a5464bc5972615" => :arm64_big_sur
-    sha256 "0495c3d542d2dceaa17bf4cb0333446e41593b824f12f38fdba1ca2e586e907a" => :catalina
-    sha256 "c254a86ae7e18312c4a036c4ca105c19a2e39ce437303a234fe057d519f22639" => :mojave
+    sha256                               arm64_monterey: "c17d7f6cfef90d973d047faf3f6b73c1bd624834870f4dfd9a17f4aef06aa815"
+    sha256                               arm64_big_sur:  "41aaf47fe8cf33d7908ac80534311345c16397e1fc39112e2e94533e20fc4fc9"
+    sha256                               monterey:       "c866cb72bbb08a3f9d6b4db8d954212d0e8cedab7d98c767b29eb7d6a5e741c3"
+    sha256                               big_sur:        "47da8b20aa0bfc6575f1e517be809277b34ecfd4e29e3587ea1065cd46203aff"
+    sha256                               catalina:       "0cbda7587cde467f3ed7eccd6351b39d4a13a66a546d66ec12dffc27f3af660d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3278891223ac2981352a3a262a9aca9e019bdc54141f88cbd51619a914717404"
   end
 
   keg_only :versioned_formula
@@ -19,7 +21,7 @@ class OpencvAT3 < Formula
   depends_on "pkg-config" => :build
   depends_on "ceres-solver"
   depends_on "eigen"
-  depends_on "ffmpeg"
+  depends_on "ffmpeg@4"
   depends_on "gflags"
   depends_on "glog"
   depends_on "jpeg"
@@ -30,9 +32,18 @@ class OpencvAT3 < Formula
   depends_on "python@3.9"
   depends_on "tbb"
 
+  fails_with gcc: "5" # ffmpeg is compiled with GCC
+
   resource "contrib" do
-    url "https://github.com/opencv/opencv_contrib/archive/3.4.13.tar.gz"
-    sha256 "2ba1052eb52e5ad90ed32d2046504345a6bf3ab8ed57d101a492877c3bfae357"
+    url "https://github.com/opencv/opencv_contrib/archive/3.4.16.tar.gz"
+    sha256 "92b4f6ab8107e9de387bafc3c7658263e5c6be68554d6086b37a2cb168e332c5"
+  end
+
+  # tbb 2021 support. Backport of
+  # https://github.com/opencv/opencv/pull/19384
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/ec823c01d3275b13b527e4860ae542fac11da24c/opencv%403/tbb2021.patch"
+    sha256 "a125f962ea07f0656869cbd97433f0e465013effc13c97a414752e0d25ed9a7d"
   end
 
   def install
@@ -82,12 +93,12 @@ class OpencvAT3 < Formula
 
     mkdir "build" do
       system "cmake", "..", *args
-      inreplace "modules/core/version_string.inc", "#{HOMEBREW_SHIMS_PATH}/mac/super/", ""
+      inreplace "modules/core/version_string.inc", Superenv.shims_path, ""
       system "make"
       system "make", "install"
       system "make", "clean"
       system "cmake", "..", "-DBUILD_SHARED_LIBS=OFF", *args
-      inreplace "modules/core/version_string.inc", "#{HOMEBREW_SHIMS_PATH}/mac/super/", ""
+      inreplace "modules/core/version_string.inc", Superenv.shims_path, ""
       system "make"
       lib.install Dir["lib/*.a"]
       lib.install Dir["3rdparty/**/*.a"]

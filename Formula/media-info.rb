@@ -1,22 +1,22 @@
 class MediaInfo < Formula
   desc "Unified display of technical and tag data for audio/video"
   homepage "https://mediaarea.net/"
-  url "https://mediaarea.net/download/binary/mediainfo/20.09/MediaInfo_CLI_20.09_GNU_FromSource.tar.bz2"
-  sha256 "a252aa61dc1f4caeb9dc76d82292cadc993fb112a402dffd9e442e7fdf76e88e"
+  url "https://mediaarea.net/download/binary/mediainfo/22.03/MediaInfo_CLI_22.03_GNU_FromSource.tar.bz2"
+  sha256 "79c00eac81d213fb59ba4f73afdb310669795a41c47e3fbd5114d2c7d9f7f33d"
   license "BSD-2-Clause"
 
   livecheck do
-    url "https://mediaarea.net/download/binary/mediainfo/"
-    regex(%r{href=.*?v?(\d+(?:\.\d+)+)/?["' >]}i)
+    url "https://mediaarea.net/en/MediaInfo/Download/Source"
+    regex(/href=.*?mediainfo[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    cellar :any
-    sha256 "b46a602b99c9c288fc9877d2cc1b058126e89e216122fc74a038bd774476742d" => :big_sur
-    sha256 "112ef7ebfe369ee8d56c91beecbea805750f82a71c5bb3db858d80e9105219fc" => :arm64_big_sur
-    sha256 "1474fc89021c1bd0a097034aea8aef77678f02b8e22c5a5fdf0cb7d1f5685acb" => :catalina
-    sha256 "dec0e6371975e56bc28b50d02fc965e37424f920e8a7cf99fb173bb2d707d2be" => :mojave
-    sha256 "01f4906a106702475bb330c4e51560da1ef0a4da42fe0531289bdff6960104d5" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "b7c9d8a2ddf925e9e9406aa0e81c07c60d84dd719ad563802166173d4f5071eb"
+    sha256 cellar: :any,                 arm64_big_sur:  "96a36b6b6707367fba727e961f8e2d7310995bfff65ace9e3f79474ebb61cbe3"
+    sha256 cellar: :any,                 monterey:       "e8ec18336c7d4a64e5f6c418aeaeb6b83eb7ed874d7767abe30d8ba46eb28387"
+    sha256 cellar: :any,                 big_sur:        "366cd30756a0340ada5a54cda9c8bdae069a84ae37ec42927d28b30d13e62c36"
+    sha256 cellar: :any,                 catalina:       "e45e7e78c840065b379fa414a46005f9f3a886c41556d982ff21f1fb8310ed27"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "028dfa7da2d594df6219f7c9beb371e687bfe8675c2b24fce948281901bbddd2"
   end
 
   depends_on "pkg-config" => :build

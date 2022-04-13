@@ -3,20 +3,17 @@ require "language/node"
 class AwsCdk < Formula
   desc "AWS Cloud Development Kit - framework for defining AWS infra as code"
   homepage "https://github.com/aws/aws-cdk"
-  url "https://registry.npmjs.org/aws-cdk/-/aws-cdk-1.85.0.tgz"
-  sha256 "5d693718d2d491d0c9f4071c956cfc87ecf53a7f308bfdbd9aaacef224d1c4d8"
+  url "https://registry.npmjs.org/aws-cdk/-/aws-cdk-2.20.0.tgz"
+  sha256 "793b49f0a0f138ae2ed0d40254ded92ebe651014c9c7c29583bb9c8d55a2eb5c"
   license "Apache-2.0"
 
-  livecheck do
-    url :stable
-  end
-
   bottle do
-    cellar :any_skip_relocation
-    sha256 "3e2b9653b5395879af4b5e3cb3889b2c96d08bc399b1cb4964cd2c886b620766" => :big_sur
-    sha256 "7004fd78e12ffa5a427c01c6b39f563c7c987bc5bb2d47c2c426cf9d2831cba0" => :arm64_big_sur
-    sha256 "4c0ab57754166d1486be293779045fd658b20d3206d23a693df06397d20e178d" => :catalina
-    sha256 "4703db78db2c3b34651da3ed2a9a84b5ac8a8c9c47be089ee227d1d898260dfc" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "4706190b601789cced76e8af635fb2c90f650c4599456cc2e6a68879ef9fb3d4"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "4706190b601789cced76e8af635fb2c90f650c4599456cc2e6a68879ef9fb3d4"
+    sha256 cellar: :any_skip_relocation, monterey:       "11d9da05aa80a52bee02ca7ceb3981642b4b07d8e2600aafff95abb686e891d9"
+    sha256 cellar: :any_skip_relocation, big_sur:        "11d9da05aa80a52bee02ca7ceb3981642b4b07d8e2600aafff95abb686e891d9"
+    sha256 cellar: :any_skip_relocation, catalina:       "11d9da05aa80a52bee02ca7ceb3981642b4b07d8e2600aafff95abb686e891d9"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "42ca1c9a1d7ac65666f2ee5e37b9e49c0bb23fb1f589cce3c5d5f2e771ae7217"
   end
 
   depends_on "node"
@@ -24,6 +21,9 @@ class AwsCdk < Formula
   def install
     system "npm", "install", *Language::Node.std_npm_install_args(libexec)
     bin.install_symlink Dir["#{libexec}/bin/*"]
+
+    # Replace universal binaries with native slices.
+    deuniversalize_machos
   end
 
   test do

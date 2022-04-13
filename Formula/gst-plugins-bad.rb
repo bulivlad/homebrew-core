@@ -1,10 +1,10 @@
 class GstPluginsBad < Formula
   desc "GStreamer plugins less supported, not fully tested"
   homepage "https://gstreamer.freedesktop.org/"
-  url "https://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-1.18.3.tar.xz"
-  sha256 "b7e34b6b86272588fbd8b314dadfa6ceff895198cfb59e2950378e9e31ff22e0"
+  url "https://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-1.20.1.tar.xz"
+  sha256 "09d3c2cf5911f0bc7da6bf557a55251779243d3de216b6a26cc90c445b423848"
   license "LGPL-2.0-or-later"
-  head "https://gitlab.freedesktop.org/gstreamer/gst-plugins-bad.git"
+  head "https://gitlab.freedesktop.org/gstreamer/gst-plugins-bad.git", branch: "master"
 
   livecheck do
     url "https://gstreamer.freedesktop.org/src/gst-plugins-bad/"
@@ -12,10 +12,12 @@ class GstPluginsBad < Formula
   end
 
   bottle do
-    sha256 "9b048da6ad514372eae4666162531568a220fb1f1bb5d8f2d6059ffe68c61aec" => :big_sur
-    sha256 "b3951a8d9abd3071641d858de2e0c4c561f054b2127ac0d9b91ef4e1bc7c58b2" => :arm64_big_sur
-    sha256 "ffe6a9b602bf2d81ca8e84f1f3f1631633905edee1e7285da5ca8f418366811d" => :catalina
-    sha256 "6b27d94add3cd30dc376019974738dff6547a22d668d53213c3b43c4167ed0ee" => :mojave
+    sha256 arm64_monterey: "ef4d873d1b65c869a9a8e5f05e9aad67649ae723e7c92a603320b52de6d1a716"
+    sha256 arm64_big_sur:  "a2999c158fd3e700426a328fd25991238a356828cffd956cb750715468985fe5"
+    sha256 monterey:       "07e4e7b82bf4d1bde54ceb936c868c1e6d0e5e8bb1c8b5d03f5070a383b2bdf7"
+    sha256 big_sur:        "befb557a42506d1a1278c3d069f42bda21da6d97825a9077443d7820ee7118f2"
+    sha256 catalina:       "cf358fc19131d6b1ddca74d79fc2c777d034e6d7062547d9594ca8d5d5a78d61"
+    sha256 x86_64_linux:   "f8258055d1c17aeb617e6e8d9167a298022ad51f3702f2bc08e7c2aa8441d678"
   end
 
   depends_on "gobject-introspection" => :build
@@ -27,18 +29,24 @@ class GstPluginsBad < Formula
   depends_on "gettext"
   depends_on "gst-plugins-base"
   depends_on "jpeg"
-  depends_on "libmms"
   depends_on "libnice"
   depends_on "libusrsctp"
-  depends_on "musepack"
   depends_on "openssl@1.1"
   depends_on "opus"
   depends_on "orc"
   depends_on "rtmpdump"
   depends_on "srtp"
 
+  on_macos do
+    # musepack is not bottled on Linux
+    # https://github.com/Homebrew/homebrew-core/pull/92041
+    depends_on "musepack"
+  end
+
   def install
+    # Plugins with GPL-licensed dependencies: faad
     args = std_meson_args + %w[
+      -Dgpl=enabled
       -Dintrospection=enabled
       -Dexamples=disabled
     ]

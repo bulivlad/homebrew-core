@@ -3,7 +3,7 @@ class Libflowmanager < Formula
   homepage "https://research.wand.net.nz/software/libflowmanager.php"
   url "https://research.wand.net.nz/software/libflowmanager/libflowmanager-3.0.0.tar.gz"
   sha256 "0866adfcdc223426ba17d6133a657d94928b4f8e12392533a27387b982178373"
-  revision 1
+  revision 2
 
   livecheck do
     url :homepage
@@ -11,15 +11,22 @@ class Libflowmanager < Formula
   end
 
   bottle do
-    cellar :any
-    sha256 "b5b2cf44362d857c11161d326e6b0a1721e9f2e2123351f06b242a3e3c7c0b9d" => :big_sur
-    sha256 "dca4907014f0df07603f8c1bd3e6239377cd9df7fcbdccd4ffe58dbbcf3ca037" => :arm64_big_sur
-    sha256 "41c5f69289236b3362062b471654f0cc9446f93d90066c001a1bda56d9b9b4f3" => :catalina
-    sha256 "64843e32762b175f497e00e332bee33dbe2c5e77384ccb64a0957e9a6c2bd40b" => :mojave
-    sha256 "156b302b5feade664f79f10358bc7888f9db14da53bd3549f90864b1bd9056f5" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "d73a9c5834f5cceceefda2547bebb79ab267df8244af23525a0b9347127c6ce1"
+    sha256 cellar: :any,                 arm64_big_sur:  "0ee5ac027b4b6147a242372d436af6c842a715d8eda53a12520412bbbe68a833"
+    sha256 cellar: :any,                 monterey:       "3ba52841763b302ad36c51d5e1f48bd54491ad1c735ab08ab1f1fc010b6b7807"
+    sha256 cellar: :any,                 big_sur:        "a72f919e29358d8c3698ba0b4677b4c46effef119591dc38b6e99c244731329e"
+    sha256 cellar: :any,                 catalina:       "3062037389000f22d292506d3129dd99575bbc9cb73d6a1e65483c2935e35329"
+    sha256 cellar: :any,                 mojave:         "5358da08e9444be464325d1b2745b808a26916b79a3eec2810a52068fc2ad7fc"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5ee9bff7bfd92e6794746f74634273457b92fbb7c94934cea4c07d3f0d9c08e7"
   end
 
   depends_on "libtrace"
+
+  # Fix -flat_namespace being used on Big Sur and later.
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+    sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
+  end
 
   def install
     system "./configure", "--disable-debug", "--disable-dependency-tracking",

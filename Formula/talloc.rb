@@ -1,9 +1,9 @@
 class Talloc < Formula
   desc "Hierarchical, reference-counted memory pool with destructors"
   homepage "https://talloc.samba.org/"
-  url "https://www.samba.org/ftp/talloc/talloc-2.3.1.tar.gz"
-  sha256 "ef4822d2fdafd2be8e0cabc3ec3c806ae29b8268e932c5e9a4cd5585f37f9f77"
-  revision 2
+  url "https://www.samba.org/ftp/talloc/talloc-2.3.3.tar.gz"
+  sha256 "6be95b2368bd0af1c4cd7a88146eb6ceea18e46c3ffc9330bf6262b40d1d8aaa"
+  license "GPL-3.0-or-later"
 
   livecheck do
     url "https://www.samba.org/ftp/talloc/"
@@ -11,15 +11,16 @@ class Talloc < Formula
   end
 
   bottle do
-    cellar :any
-    sha256 "1ec1b32b844e7c4b8c00d67f400b9140a1d79637924e4cf198b306672c0130fa" => :big_sur
-    sha256 "6060c8dc16c3a4947f12d8b41d03a164128f9475b7c5c93fda879797dc92be00" => :arm64_big_sur
-    sha256 "f9b77cca02b56ffa431f45d49d090c21f1a762a47149d6e92d57884772dd0875" => :catalina
-    sha256 "e0a573fbcce5380f8a31be002f14651f8f9e0cf43b254fe50100ae9134ff319a" => :mojave
-    sha256 "c4c4ebb7d3e92b05abe832134c3f6745e8279a0585963e5a9967471b6c3a753a" => :high_sierra
+    rebuild 1
+    sha256 cellar: :any,                 arm64_monterey: "a0b8936aab48e933fe8152fbcf62aaae8fe275eaf633da10d8a3cc8850427ab8"
+    sha256 cellar: :any,                 arm64_big_sur:  "416d686e27607c6cd1341da3ee1db0263bcea028b4644a7051c0acd6d2533b9c"
+    sha256 cellar: :any,                 monterey:       "548b62389799fbc33f2457d242149d49e0347d13241591e370f753458eb4a746"
+    sha256 cellar: :any,                 big_sur:        "72693abba030813551e05e682996bea4b9bcd6d9524faab3ab6a6ede826b482a"
+    sha256 cellar: :any,                 catalina:       "1b69ab0589f68b580776015ad297dfdd12b734fdbe062884e9b5b8cb2ebb31b8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5f3f4cfdd6c4cad9505ef2cdf8522bb2ea0951d09119b78932d638fbd6aa176c"
   end
 
-  depends_on "python@3.9" => :build
+  depends_on "python@3.10" => :build
 
   def install
     system "./configure", "--prefix=#{prefix}",
@@ -46,7 +47,7 @@ class Talloc < Formula
         return ret;
       }
     EOS
-    system ENV.cc, "-I#{include}", "-L#{lib}", "-ltalloc", "test.c", "-o", "test"
+    system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-ltalloc", "-o", "test"
     system testpath/"test"
   end
 end

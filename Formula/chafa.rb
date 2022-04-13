@@ -1,10 +1,9 @@
 class Chafa < Formula
   desc "Versatile and fast Unicode/ASCII/ANSI graphics renderer"
   homepage "https://hpjansson.org/chafa/"
-  url "https://hpjansson.org/chafa/releases/chafa-1.4.1.tar.xz"
-  sha256 "46d34034f4c96d120e0639f87a26590427cc29e95fe5489e903a48ec96402ba3"
-  license "GPL-3.0"
-  revision 1
+  url "https://hpjansson.org/chafa/releases/chafa-1.10.1.tar.xz"
+  sha256 "5791b726a02a449d7c4d6306ed97b711d7df22c51c891d8c64a60015b8e448ec"
+  license "LGPL-3.0-or-later"
 
   livecheck do
     url "https://hpjansson.org/chafa/releases/?C=M&O=D"
@@ -12,17 +11,23 @@ class Chafa < Formula
   end
 
   bottle do
-    cellar :any
-    sha256 "6786313633e6b08f00a5f79c6391505f670d30e52d5836c2b1ae2eede5186816" => :big_sur
-    sha256 "6fe6e0fdec64f42b17c5754154caeb5c352389d2d26c23d8a21910a727c54841" => :arm64_big_sur
-    sha256 "040dab4ba89bdd45f5fc1429fd40f4952b0b1b1365e7143f0a8f2fab9f14d60f" => :catalina
-    sha256 "d102685671b1816d8c7b79e530d960778dc58655593721e0fdcd69a99b29fed1" => :mojave
-    sha256 "f75d4bbd7bfe8caaec6b386b8217c70ee432c17d7dd9ebf42ae04c0c58a88ca2" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "001cfbdd291c9d24f066ac7994bbe65cc3ad56c2ca3201c0b36a98eaf091d8ef"
+    sha256 cellar: :any,                 arm64_big_sur:  "abccbc69d009205118dd7c7dedbd0cd8cfefaf315ab79b2b1ae2ff714cb79ee3"
+    sha256 cellar: :any,                 monterey:       "ad572bb07bae23e05f35bda8692eccaff559d42a244d53c0ced8784d044881ab"
+    sha256 cellar: :any,                 big_sur:        "308a7c8621f1b2ee94004861b980e59d22444266f297061a2fb7dc691c50fc2a"
+    sha256 cellar: :any,                 catalina:       "a0a68df960c9d5a9b78e65b3217298c3c0faca0f42c173c17c1535b35629b880"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "05831d8b3fcef5792bb92162538e664e205afe5ab189f2e5179f8f66ad0d8780"
   end
 
   depends_on "pkg-config" => :build
   depends_on "glib"
   depends_on "imagemagick"
+
+  # Fix -flat_namespace being used on Big Sur and later.
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+    sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
+  end
 
   def install
     system "./configure", "--disable-debug",
@@ -30,6 +35,7 @@ class Chafa < Formula
                           "--disable-silent-rules",
                           "--prefix=#{prefix}"
     system "make", "install"
+    man1.install "docs/chafa.1"
   end
 
   test do

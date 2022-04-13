@@ -1,16 +1,17 @@
 class Topgrade < Formula
   desc "Upgrade all the things"
   homepage "https://github.com/r-darwish/topgrade"
-  url "https://github.com/r-darwish/topgrade/archive/v6.3.1.tar.gz"
-  sha256 "4527a6e0763e8a9f30bddb83c2ad696a5e13c8c5510e2696c54243c83bbc3f15"
+  url "https://github.com/r-darwish/topgrade/archive/v8.3.1.tar.gz"
+  sha256 "f90f25b1701e544ca1eb935b552065c0eca584eaff659920148f278aa36ee10b"
   license "GPL-3.0-or-later"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "7ba3769b11ec41cd6f0b2cc9e62c280d62a64b2d05ef1897ad1cde756eacfad7" => :big_sur
-    sha256 "e5c10e18a23f59481c9cadcb9821fc7794aed86335e9ab639b5ad2aae83d130e" => :arm64_big_sur
-    sha256 "ad6b11caa9b33bffa41af8c9b96779f1d70657068a52ba1fa290be6671bd24d1" => :catalina
-    sha256 "fba4f48248368c1de106a2d0f21ee80a9dffc6e51d2c7dec6237e24fe6f8356e" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "3f6563b3c082a921179b30af0e59b2df3a86d7fedcf2fb64945166b5f0691c76"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "7831e9589ef7360c8a34e1300b89b8aec7be73109d55e93f92ad328bde066cb6"
+    sha256 cellar: :any_skip_relocation, monterey:       "a7f55084bc043d824ce30011ce617ccd6f3ce96f366ffdce413642138c40adbf"
+    sha256 cellar: :any_skip_relocation, big_sur:        "9c429848a1b5ea1d67c23078b24de00a2df7a745a583f426557a2141d26fba32"
+    sha256 cellar: :any_skip_relocation, catalina:       "eeb60ffc1bcdcc0fc581354ae6a3c046a4f55c545a8f0a5439af7536709b9f8a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c3191f48d6ec0db5bdb91a62f67a749e762daa5bd4e4d7f2be5e1fddb1c97c7c"
   end
 
   depends_on "rust" => :build
@@ -34,7 +35,7 @@ class Topgrade < Formula
     assert_match version.to_s, shell_output("#{bin}/topgrade --version")
 
     output = shell_output("#{bin}/topgrade -n --only brew_formula")
-    assert_match "Dry running: #{HOMEBREW_PREFIX}/bin/brew upgrade", output
-    assert_not_match /\sSelf update\s/, output
+    assert_match %r{Dry running: (?:#{HOMEBREW_PREFIX}/bin/)?brew upgrade}o, output
+    refute_match(/\sSelf update\s/, output)
   end
 end

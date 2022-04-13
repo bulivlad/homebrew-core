@@ -1,10 +1,10 @@
 class MidnightCommander < Formula
   desc "Terminal-based visual file manager"
   homepage "https://www.midnight-commander.org/"
-  url "https://www.midnight-commander.org/downloads/mc-4.8.25.tar.xz"
-  mirror "https://ftp.osuosl.org/pub/midnightcommander/mc-4.8.25.tar.xz"
-  sha256 "ffc19617f20ebb23330acd3998b7fd559a042d172fa55746d53d246697b2548a"
-  license "GPL-3.0"
+  url "https://www.midnight-commander.org/downloads/mc-4.8.28.tar.xz"
+  mirror "https://ftp.osuosl.org/pub/midnightcommander/mc-4.8.28.tar.xz"
+  sha256 "e994d9be9a7172e9ac4a4ad62107921f6aa312e668b056dfe5b8bcebbaf53803"
+  license "GPL-3.0-or-later"
 
   livecheck do
     url "https://ftp.osuosl.org/pub/midnightcommander/"
@@ -12,11 +12,12 @@ class MidnightCommander < Formula
   end
 
   bottle do
-    sha256 "1cf10d6382ee603a2b15735029d31b7bea7bb65f29a50dbbc1c61a828d3cf433" => :big_sur
-    sha256 "5abcb40119f47df346dd0b2c3a4c101422b594b3c0db2225ee38a3ebb2b7caa0" => :arm64_big_sur
-    sha256 "2c36f252c47b8ecff2fa4afb4191a963af7c3d30a8aeb267a40f967873a01643" => :catalina
-    sha256 "224d6aa6577e51952833ee65888bb99eacb89508dc9ac2f82a0e679b4635d7e3" => :mojave
-    sha256 "79c2208b2097941cf3a792f47ad1f280ddbc3add7bd631084484163b7ba14ae9" => :high_sierra
+    sha256 arm64_monterey: "feee2456db02de756ee8d624dbf2170d67e61e9f2c57cc6fd2c7c19fc0ff2a41"
+    sha256 arm64_big_sur:  "30d7ec30f929bab59cb60fa0265abf41f5afc696851be7c0c80ce0756cb05ccc"
+    sha256 monterey:       "e421f892bd35e97be008972a38c3cf3e80f87009d8c9cbe03fc976b4e2792b95"
+    sha256 big_sur:        "feaa7ababc4fa2b2ed201d222e4e6a24c055b3962f2661a9a930aa37922fec3b"
+    sha256 catalina:       "51c915284413c26f18f27ed47a6bee028a6c0e8d9a4debd25ec4550f95e0fdf3"
+    sha256 x86_64_linux:   "8b8d63b9bc38ad634047402e4cb57ee048c74f29e5dd4db95d75b0b2b45cd289"
   end
 
   head do
@@ -52,6 +53,8 @@ class MidnightCommander < Formula
     system "./autogen.sh" if build.head?
     system "./configure", *args
     system "make", "install"
+
+    inreplace share/"mc/syntax/Syntax", Superenv.shims_path, "/usr/bin" if OS.mac?
   end
 
   test do

@@ -1,22 +1,26 @@
 class Md4c < Formula
   desc "C Markdown parser. Fast. SAX-like interface"
   homepage "https://github.com/mity/md4c"
-  url "https://github.com/mity/md4c/archive/release-0.4.7.tar.gz"
-  sha256 "f1b12d7aeb64fcbc7092c832e1a8b137102fec168961c87222fa599aedc19035"
+  url "https://github.com/mity/md4c/archive/release-0.4.8.tar.gz"
+  sha256 "4a457df853425b6bb6e3457aa1d1a13bccec587a04c38c622b1013a0da41439f"
   license "MIT"
 
   bottle do
-    cellar :any
-    sha256 "5253c9afbcee9804cd582fd860b4d5f8b9805d9a30ea97da59f4c8332738e5db" => :big_sur
-    sha256 "51a8a4e90c02e9f1431252de17ea0a6af8b520659c87b8c6e4f68fc48c231085" => :catalina
-    sha256 "de32cd227ac8eb3e44c7f5d1763959f2ac26200444f8023de9a343f40bdb341b" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "154f5f1eb77492727a5475922c642db680724a1b5abbd221b6ac65cb0d4c7c52"
+    sha256 cellar: :any,                 arm64_big_sur:  "1873e516760235dba2670bb63a612b99b51714baf657b99c2c411da40c3162ec"
+    sha256 cellar: :any,                 monterey:       "29d7e311c2821193496c531b4f8bec1d3857d5bd949da3578ee1abc6e9d2d20c"
+    sha256 cellar: :any,                 big_sur:        "8b4ae9a5232e84db3d0ab6793a8dd5bd56071fb32832fd94d16fa8162ec08a16"
+    sha256 cellar: :any,                 catalina:       "8368b905e33301b5019e8520f7d010e3a57f74855ebd5cbbbf87aa1d8ded50a7"
+    sha256 cellar: :any,                 mojave:         "ad888318dd048fc87594ff6a67321b9f9711bafb835f121f46f8f3e31de1931a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "53d6b4590104e353ecbc591400815db823603d960894dc5a5fb1a84306290580"
   end
 
   depends_on "cmake" => :build
 
   def install
-    system "cmake", ".", *std_cmake_args
-    system "make", "install"
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args, "-DCMAKE_INSTALL_RPATH=#{rpath}"
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do

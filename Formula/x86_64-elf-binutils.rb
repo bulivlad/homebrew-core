@@ -1,26 +1,33 @@
 class X8664ElfBinutils < Formula
   desc "GNU Binutils for x86_64-elf cross development"
   homepage "https://www.gnu.org/software/binutils/"
-  url "https://ftp.gnu.org/gnu/binutils/binutils-2.35.1.tar.xz"
-  mirror "https://ftpmirror.gnu.org/binutils/binutils-2.35.1.tar.xz"
-  sha256 "3ced91db9bf01182b7e420eab68039f2083aed0a214c0424e257eae3ddee8607"
+  url "https://ftp.gnu.org/gnu/binutils/binutils-2.38.tar.xz"
+  mirror "https://ftpmirror.gnu.org/binutils/binutils-2.38.tar.xz"
+  sha256 "e316477a914f567eccc34d5d29785b8b0f5a10208d36bbacedcc39048ecfe024"
+  license "GPL-3.0-or-later"
 
   livecheck do
-    url :stable
+    formula "binutils"
   end
 
   bottle do
-    sha256 "818e23ee2c82412584960a62bd921fc14b15266632089ef4427c1d8e66c65258" => :big_sur
-    sha256 "a693bc568042d1f74f900428e99a716fe3192ae3c6bc4352601baef6c0ce0005" => :arm64_big_sur
-    sha256 "8ca33c467a19a068f0e92c75d00f87115283072d5054672449d9abd2fa96036e" => :catalina
-    sha256 "59d35da02f1387ae5fd0b0c13f1647a0ae7b88dcff3e662bb3eaa502990937c4" => :mojave
-    sha256 "df62f4e6bf30c75023ebad89244e0a71d86f03966ba46892a5c1046332af2a73" => :high_sierra
+    sha256 arm64_monterey: "864342c720566a79bd30617e74365c206ebcc9ff1b20c2582ad647711a066b2d"
+    sha256 arm64_big_sur:  "830cd093f6b42aca05346d933bcbb64a93a9eead2a5ec13920f6d313516ef730"
+    sha256 monterey:       "42afd81a158f1fe611fb8ffb8e91b3436d706ff4ad78752a6b4b16d4a69c0cd5"
+    sha256 big_sur:        "a43738a9cb6aca9e002aa843c0eef8f28c1e1ece2221d0009a4611b536676ab1"
+    sha256 catalina:       "aa3cb73baeda44aae190cd7b8c3160dbabd42164aaf852f49fa65a7641b647ef"
+    sha256 x86_64_linux:   "598e0d52a3eb37d1284e4f7ace39e6cdbb6d620db54252e25e895cbd230a3ec9"
   end
 
+  uses_from_macos "texinfo"
+
   def install
-    system "./configure", "--target=x86_64-elf",
+    target = "x86_64-elf"
+    system "./configure", "--target=#{target}",
+                          "--enable-targets=x86_64-pep",
                           "--prefix=#{prefix}",
-                          "--infodir=#{info}/x86_64-elf-binutils",
+                          "--libdir=#{lib}/#{target}",
+                          "--infodir=#{info}/#{target}",
                           "--disable-nls"
     system "make"
     system "make", "install"

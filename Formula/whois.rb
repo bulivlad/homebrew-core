@@ -1,18 +1,18 @@
 class Whois < Formula
   desc "Lookup tool for domain names and other internet resources"
   homepage "https://packages.debian.org/sid/whois"
-  url "https://deb.debian.org/debian/pool/main/w/whois/whois_5.5.7.tar.xz"
-  sha256 "3efa700dbf38d127c31b21af3176cd6e5a69f96a056be60ac1dcd13df7717393"
+  url "https://deb.debian.org/debian/pool/main/w/whois/whois_5.5.13.tar.xz"
+  sha256 "62e613f116d5635aea6684238db00b030a6602ffc79462e4a0a8e62cb184b5d7"
   license "GPL-2.0-or-later"
-  head "https://github.com/rfc1036/whois.git"
+  head "https://github.com/rfc1036/whois.git", branch: "next"
 
   bottle do
-    cellar :any
-    sha256 "0b44a4d20bab1067fa7ab7f5a2b92ea825441d47364514f8c8ae0cb17d4ca634" => :big_sur
-    sha256 "d5f532432a789a96d22e574985ff5baaf1a4cc9fee8fc0fd32d650236e0a8d34" => :arm64_big_sur
-    sha256 "a28a38ff0a0e72621d91670dc5c441fede025ded8a1c7d8e8fc3d62a47ba420b" => :catalina
-    sha256 "a0c9ec3dc30cf88a3e420dfdaf35645bc085a02630b6ab0b5647c7ce765f821d" => :mojave
-    sha256 "a56121e6ac9bc5acb92fe4e007e0d0f1e76f710263a163f020e92ab02d0d7d04" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "3b8a8d276e28ba2565cde46aede77fcfdbe014693aa336d50e17002324c9461f"
+    sha256 cellar: :any,                 arm64_big_sur:  "1f6cde04177d329370ef24f19f61f30da1f8a618da92b2184432a72da57a7e4c"
+    sha256 cellar: :any,                 monterey:       "033954b7cc2e31dafcbae6cb07913037247b9cbf21be439889fdd2cfdd2ee437"
+    sha256 cellar: :any,                 big_sur:        "05f047c3e6808289fcd5061fb0c3a96f267b3287fdd282e953ea179e20e60902"
+    sha256 cellar: :any,                 catalina:       "656da1332e3434bcdb20c1a18fab72ea96002433281b0bc8060544e98764c5bc"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ac4e1d3fe13d6e208d613c446820f3838b91e30f04735a5951830c58454e7146"
   end
 
   keg_only :provided_by_macos
@@ -21,9 +21,15 @@ class Whois < Formula
   depends_on "libidn2"
 
   def install
-    ENV.append "LDFLAGS", "-L/usr/lib -liconv"
+    ENV.append "LDFLAGS", "-L/usr/lib -liconv" if OS.mac?
 
-    system "make", "whois", "HAVE_ICONV=1"
+    have_iconv = if OS.mac?
+      "HAVE_ICONV=1"
+    else
+      "HAVE_ICONV=0"
+    end
+
+    system "make", "whois", have_iconv
     bin.install "whois"
     man1.install "whois.1"
     man5.install "whois.conf.5"

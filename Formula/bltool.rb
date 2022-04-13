@@ -5,12 +5,17 @@ class Bltool < Formula
   sha256 "5bef751aac7140f8a705b29edd35a7bfa9f87c36039d84d4001f16a307b64ef6"
   license "Apache-2.0"
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "9680f304971522be9ac9736b4678299bc88141866d987a25aeb66530574d1324"
+  end
+
   head do
     url "https://github.com/ToxicFrog/bltool.git"
     depends_on "leiningen" => :build
   end
 
-  bottle :unneeded
+  depends_on "openjdk"
 
   def install
     if build.head?
@@ -37,6 +42,6 @@ class Bltool < Formula
                          "--input", "test.edn",
                          "--output", "test.txt"
 
-    assert_match /12527736\s+360\s+unfinished\s+Assassin/, File.read("test.txt")
+    assert_match(/12527736\s+360\s+unfinished\s+Assassin/, File.read("test.txt"))
   end
 end

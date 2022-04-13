@@ -1,18 +1,18 @@
 class Subnetcalc < Formula
   desc "IPv4/IPv6 subnet calculator"
   homepage "https://www.uni-due.de/~be0001/subnetcalc/"
-  url "https://www.uni-due.de/~be0001/subnetcalc/download/subnetcalc-2.4.17.tar.xz"
-  sha256 "90f1a1a82f6e6fd4308511dfdabc3ed86bf75a11635645647f75ef4e2a6319ff"
-  license "GPL-3.0"
-  head "https://github.com/dreibh/subnetcalc.git"
+  url "https://www.uni-due.de/~be0001/subnetcalc/download/subnetcalc-2.4.19.tar.xz"
+  sha256 "13f35abc0782c7453da22602128eb93fa645039d92cd5ab3c528ae9e6032cd67"
+  license "GPL-3.0-or-later"
+  head "https://github.com/dreibh/subnetcalc.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "2e0914221773eb6805b107278fe488525c655afe891d8575bf6123c8716824bf" => :big_sur
-    sha256 "a0bcbd1fecfa6b7e53f87179db7b40d2e1a9103e54897c619b492a7c8af38022" => :arm64_big_sur
-    sha256 "a75a2bd86939439d349617d4f9bcebfd2cd06fd8521259ae528618de3498ea13" => :catalina
-    sha256 "4f04ffbceed2e9f1d9a5f8d04e92303ec8d8cc677d1931670fea0ee7d0c84259" => :mojave
-    sha256 "a08ec739f53261955b4d4478be8347adb76d7061e0e61b776e2ff42539747159" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "530958e6e65c9ef4de865013c1cd937862d816ed87edfb888aa8bba38405f957"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "11b113fcb125a8da85e6c3e14866c06b0d7e09e83b439b200ec4721469248694"
+    sha256 cellar: :any_skip_relocation, monterey:       "a7663859c98118741370fedede62527215c11a2967dddc4235d059dc27082c09"
+    sha256 cellar: :any_skip_relocation, big_sur:        "2d81c3cb134879270acfc762ae17aa653acbba88cfc258bb8c1ec574952f28f7"
+    sha256 cellar: :any_skip_relocation, catalina:       "6becfcc6f881532d19dd0aa6b865fbbb9f88fc63329effa7e8e7bca8503c8f6c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e9583e8d925ec45ae6edece69a4154b30efd7a22ad69bb9d7aca0177442b86af"
   end
 
   depends_on "cmake" => :build

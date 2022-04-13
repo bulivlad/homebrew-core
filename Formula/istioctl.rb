@@ -2,20 +2,24 @@ class Istioctl < Formula
   desc "Istio configuration command-line utility"
   homepage "https://istio.io/"
   url "https://github.com/istio/istio.git",
-      tag:      "1.8.2",
-      revision: "bfa8bcbc116a8736c301a5dfedc4ed2673e2bfa3"
+      tag:      "1.13.2",
+      revision: "91533d04e894ff86b80acd6d7a4517b144f9e19a"
   license "Apache-2.0"
-  head "https://github.com/istio/istio.git"
+  head "https://github.com/istio/istio.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "f4a6d8c7ad5a03221dace54af14e763254c055e1d91961893d275fd45ae1f725" => :big_sur
-    sha256 "f47a6971199e9d4801bf15f6949529a2b27538c63250e626381843af157e8e83" => :catalina
-    sha256 "183792238113f53f08c08f42c7fb5857941ee93ce884ee5bfbb6bf6166cb1491" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "cce2eb92bfe080812fe08ac0fc81c603ed59d622a70ffad40c5fd28e855ae362"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "cce2eb92bfe080812fe08ac0fc81c603ed59d622a70ffad40c5fd28e855ae362"
+    sha256 cellar: :any_skip_relocation, monterey:       "916147387e88be3f4dc1e4a783d1becc717a0c6d2f345a7b5a9096adfa933da8"
+    sha256 cellar: :any_skip_relocation, big_sur:        "916147387e88be3f4dc1e4a783d1becc717a0c6d2f345a7b5a9096adfa933da8"
+    sha256 cellar: :any_skip_relocation, catalina:       "916147387e88be3f4dc1e4a783d1becc717a0c6d2f345a7b5a9096adfa933da8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a54d4949398540a678972bd6aef26704976b55379dc0ee25631845253e0b3435"
   end
 
   depends_on "go" => :build
   depends_on "go-bindata" => :build
+
+  uses_from_macos "curl" => :build
 
   def install
     ENV["VERSION"] = version.to_s
@@ -24,12 +28,23 @@ class Istioctl < Formula
     ENV["HUB"] = "docker.io/istio"
     ENV["BUILD_WITH_CONTAINER"] = "0"
 
-    system "make", "gen-charts", "istioctl", "istioctl.completion"
-    cd "out/darwin_amd64" do
-      bin.install "istioctl"
-      bash_completion.install "release/istioctl.bash"
-      zsh_completion.install "release/_istioctl"
-    end
+    os = OS.kernel_name.downcase
+    arch = Hardware::CPU.intel? ? "amd64" : Hardware::CPU.arch.to_s
+
+    system "make", "istioctl"
+    bin.install "out/#{os}_#{arch}/istioctl"
+
+    # Install bash completion
+    output = Utils.safe_popen_read(bin/"istioctl", "completion", "bash")
+    (bash_completion/"istioctl").write output
+
+    # Install zsh completion
+    output = Utils.safe_popen_read(bin/"istioctl", "completion", "zsh")
+    (zsh_completion/"_istioctl").write output
+
+    # Install fish completion
+    output = Utils.safe_popen_read(bin/"istioctl", "completion", "fish")
+    (fish_completion/"istioctl.fish").write output
   end
 
   test do

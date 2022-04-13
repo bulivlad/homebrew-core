@@ -1,23 +1,38 @@
 class Pcre < Formula
   desc "Perl compatible regular expressions library"
   homepage "https://www.pcre.org/"
-  url "https://ftp.pcre.org/pub/pcre/pcre-8.44.tar.bz2"
-  mirror "https://www.mirrorservice.org/sites/ftp.exim.org/pub/pcre/pcre-8.44.tar.bz2"
-  sha256 "19108658b23b3ec5058edc9f66ac545ea19f9537234be1ec62b714c84399366d"
   license "BSD-3-Clause"
 
+  stable do
+    url "https://downloads.sourceforge.net/project/pcre/pcre/8.45/pcre-8.45.tar.bz2"
+    mirror "https://www.mirrorservice.org/sites/ftp.exim.org/pub/pcre/pcre-8.45.tar.bz2"
+    sha256 "4dae6fdcd2bb0bb6c37b5f97c33c2be954da743985369cddac3546e3218bffb8"
+
+    # Fix -flat_namespace being used on Big Sur and later.
+    patch do
+      url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+      sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
+    end
+  end
+
+  # From the PCRE homepage:
+  # "The older, but still widely deployed PCRE library, originally released in
+  # 1997, is at version 8.45. This version of PCRE is now at end of life, and
+  # is no longer being actively maintained. Version 8.45 is expected to be the
+  # final release of the older PCRE library, and new projects should use PCRE2
+  # instead."
   livecheck do
-    url "https://ftp.pcre.org/pub/pcre/"
-    regex(/href=.*?pcre[._-]v?(\d+(?:\.\d+)+)\.t/i)
+    skip "PCRE was declared end of life in 2021-06"
   end
 
   bottle do
-    cellar :any
-    sha256 "a67dd6141e117f849bbb7d3bde92ffb6485921939c1d64e39a3f7fd0dac3f523" => :big_sur
-    sha256 "e70ba0f6ae7f9ef638f4564d6b75b8d1e9db9f427057e9029e1686471e9174c6" => :arm64_big_sur
-    sha256 "f8ac266e04f984fa55091a43f0fdc39a40d57c2489d289a186c88ccedaba7eeb" => :catalina
-    sha256 "ed9b483538da7bc6559d2e63dd36659736fab9510681661d970d707a18731de4" => :mojave
-    sha256 "aeea1351e1439847d00c3cee54bd28639493e686f809568cf42fea7bb28da2a5" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "11193fd0a113c0bb330b1c2c21ab6f40d225c1893a451bba85e8a1562b914a1c"
+    sha256 cellar: :any,                 arm64_big_sur:  "2d6bfcafce9da9739e32ee433087e69a78cda3f18291350953e6ad260fefc50b"
+    sha256 cellar: :any,                 monterey:       "5e5cc7a5bf8bb6488ec57d4263bf6b0bc89e93252a0a2460f846de29373162d8"
+    sha256 cellar: :any,                 big_sur:        "fb2fefbe1232706a603a6b385fc37253e5aafaf3536cb68b828ad1940b95e601"
+    sha256 cellar: :any,                 catalina:       "180d88dc2230e98162685b86d00436903db4349aac701f9769997d61adb78418"
+    sha256 cellar: :any,                 mojave:         "a42b79956773d18c4ac337868cfc15fadadf5e779d65c12ffd6f8fd379b5514c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "296026b6d5430399e40fb4f8074045a9a27d5374d83f2f6d4659c2647959f36d"
   end
 
   head do
@@ -44,8 +59,8 @@ class Pcre < Formula
       --enable-pcregrep-libbz2
     ]
 
-    # JIT not currently supported for Apple Silicon
-    args << "--enable-jit" unless Hardware::CPU.arm?
+    # JIT not currently supported for Apple Silicon or OS older than sierra
+    args << "--enable-jit" if MacOS.version >= :sierra && !Hardware::CPU.arm?
 
     system "./autogen.sh" if build.head?
     system "./configure", *args

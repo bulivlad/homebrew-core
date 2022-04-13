@@ -1,19 +1,21 @@
 class P11Kit < Formula
   desc "Library to load and enumerate PKCS#11 modules"
   homepage "https://p11-glue.freedesktop.org"
-  url "https://github.com/p11-glue/p11-kit/releases/download/0.23.22/p11-kit-0.23.22.tar.xz"
-  sha256 "8a8f40153dd5a3f8e7c03e641f8db400133fb2a6a9ab2aee1b6d0cb0495ec6b6"
+  url "https://github.com/p11-glue/p11-kit/releases/download/0.24.1/p11-kit-0.24.1.tar.xz"
+  sha256 "d8be783efd5cd4ae534cee4132338e3f40f182c3205d23b200094ec85faaaef8"
   license "BSD-3-Clause"
 
   bottle do
-    sha256 "9474fe6483bbc394d9069f79528ecfe9ba1af00db4aca23c26857b6b66736d73" => :big_sur
-    sha256 "0cd22f169cd684116fdeb4e52cf551950d1a0c2cced55ee903bf694a0d9d6866" => :arm64_big_sur
-    sha256 "d02045826811eeb8475b535be7331c0770fdc930d1ac1be86796af81141e8592" => :catalina
-    sha256 "4d35cd8fd37b06687b5025354f3a579ab2e36e8ab8bd9bab75102eee14bd86f4" => :mojave
+    sha256 arm64_monterey: "a1c85ddc587d4b0e6ad38f7b58420ed0fc4a1ccdb038bee1451d9d81fc3fb434"
+    sha256 arm64_big_sur:  "c8610976401ff3745b737973335cd2ec7a3113737aadc9e2a1243adf404f41a3"
+    sha256 monterey:       "46805ec48a06585f71e5acaa4e099c32696a2dd7700817882211abab75fa3f1d"
+    sha256 big_sur:        "6db6726e6ba1314792648413bc991bd717380eb3ae325895750eab515ce5fa75"
+    sha256 catalina:       "dc5592e236946f8a3e57998214d13f1c0db7dab5bdd9602bb0c4a84dacf2d17a"
+    sha256 x86_64_linux:   "41dd8094535e5cb03c1c4e94290cee3047e79c07183cdccbb0f4f3cbe89d29db"
   end
 
   head do
-    url "https://github.com/p11-glue/p11-kit.git"
+    url "https://github.com/p11-glue/p11-kit.git", branch: "master"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
@@ -22,7 +24,9 @@ class P11Kit < Formula
   end
 
   depends_on "pkg-config" => :build
+  depends_on "ca-certificates"
   depends_on "libffi"
+  depends_on "libtasn1"
 
   def install
     # https://bugs.freedesktop.org/show_bug.cgi?id=91602#c1
@@ -35,12 +39,13 @@ class P11Kit < Formula
 
     system "./configure", "--disable-dependency-tracking",
                           "--disable-silent-rules",
-                          "--disable-trust-module",
                           "--prefix=#{prefix}",
                           "--sysconfdir=#{etc}",
                           "--with-module-config=#{etc}/pkcs11/modules",
-                          "--without-libtasn1"
+                          "--with-trust-paths=#{etc}/ca-certificates/cert.pem"
     system "make"
+    # This formula is used with crypto libraries, so let's run the test suite.
+    system "make", "check"
     system "make", "install"
   end
 

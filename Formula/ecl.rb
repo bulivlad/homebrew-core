@@ -1,15 +1,25 @@
 class Ecl < Formula
   desc "Embeddable Common Lisp"
-  homepage "https://common-lisp.net/project/ecl/"
-  url "https://common-lisp.net/project/ecl/static/files/release/ecl-20.4.24.tgz"
-  sha256 "670838edf258a936b522fdb620da336de7e575aa0d27e34841727252726d0f07"
+  homepage "https://ecl.common-lisp.dev"
+  url "https://ecl.common-lisp.dev/static/files/release/ecl-21.2.1.tgz"
+  sha256 "b15a75dcf84b8f62e68720ccab1393f9611c078fcd3afdd639a1086cad010900"
+  license "LGPL-2.1-or-later"
+  revision 1
   head "https://gitlab.com/embeddable-common-lisp/ecl.git", branch: "develop"
 
+  livecheck do
+    url "https://ecl.common-lisp.dev/static/files/release/"
+    regex(/href=.*?ecl[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
+
   bottle do
-    rebuild 1
-    sha256 "23de8394468aa1682fdfaa00544b0316798eaf726b674f5003c6451dbecbb6f8" => :big_sur
-    sha256 "612d10e1c4c34d9fcb5ec731e683210634f12111c30862ae890d225a604343ce" => :catalina
-    sha256 "a29d90c9343ff63a28c6442caccf1161724804b0632624a531546db9ea63ce45" => :mojave
+    sha256 arm64_monterey: "c5bbe46b56fdf28377e30063a6cd05d4281bb9a4ecbfd7783a412efcb01bbd66"
+    sha256 arm64_big_sur:  "f22e7b333050fe84c8a5e277c87666c16f42655ebf3c1bf76815db67c9520e7f"
+    sha256 monterey:       "be308892de7bfb5b9dea08dadc264363698ead8f2ae6f7b253c541f0feae8019"
+    sha256 big_sur:        "6881f61f6abc60969a668260a05ee06c2f7420b201b9ed4c2fb4b78b3ca4ae3c"
+    sha256 catalina:       "81e01b8b899eaa0d835f6c303ad9346251c3f234c60ff34e2d70e59adefb21c6"
+    sha256 mojave:         "fa6ce6c90d52cb11ec897693d18485fbcb7e2b066ea46fb3f588ff2cad3e1cc1"
+    sha256 x86_64_linux:   "25bb43cb6297d30bbd4d8045ba179f8e17c431b723fb7d9d3768e77fe3d348b8"
   end
 
   depends_on "texinfo" => :build # Apple's is too old
@@ -19,15 +29,17 @@ class Ecl < Formula
 
   def install
     ENV.deparallelize
-    # Work around configure issues with Xcode 12
-    # https://gitlab.com/embeddable-common-lisp/ecl/-/merge_requests/231
-    # Remove once the commit is released
-    ENV.append "CFLAGS", "-Wno-implicit-function-declaration"
+
+    # Avoid -flat_namespace usage on macOS
+    inreplace "src/configure", "-flat_namespace -undefined suppress ", "" if OS.mac?
 
     system "./configure", "--prefix=#{prefix}",
                           "--enable-threads=yes",
                           "--enable-boehm=system",
-                          "--enable-gmp=system"
+                          "--enable-gmp=system",
+                          "--with-gmp-prefix=#{Formula["gmp"].opt_prefix}",
+                          "--with-libffi-prefix=#{Formula["libffi"].opt_prefix}",
+                          "--with-libgc-prefix=#{Formula["bdw-gc"].opt_prefix}"
     system "make"
     system "make", "install"
   end

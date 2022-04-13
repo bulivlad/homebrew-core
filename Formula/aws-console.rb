@@ -1,16 +1,22 @@
 class AwsConsole < Formula
   desc "Command-line to use AWS CLI credentials to launch the AWS console in a browser"
   homepage "https://github.com/aws-cloudformation/rain"
-  url "https://github.com/aws-cloudformation/rain/archive/v1.1.1.tar.gz"
-  sha256 "5faf25a87a6fc0fde19edcf2fe6f26c81990da91d13fbf3858b1eb33711b0ebd"
+  url "https://github.com/aws-cloudformation/rain/archive/v1.2.0.tar.gz"
+  sha256 "064bc2b563c9b759d16147f33fe5c64bf0af3640cb4ae543e49615ae17b22e01"
   license "Apache-2.0"
 
+  livecheck do
+    formula "rain"
+  end
+
   bottle do
-    cellar :any_skip_relocation
-    sha256 "0558c07748aa61fada24326aa0e8f06a5699f66cf1b47be9606e7a042a2e36fe" => :big_sur
-    sha256 "14a391d0c3305d0de61ccdf4b4744d4f9d1beaf825e29742c8fa3c0fa95b18b9" => :arm64_big_sur
-    sha256 "2aa67b0cb10ae529bd38baa85813a66f8463d9b13c0e9848c604aeae213ec0a5" => :catalina
-    sha256 "7c4b25aff982c5e21dd8e0f10fbdd5107a936c0466de4c68e13ee6f23d9d4e31" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "43a5d8ececf9b15da91d81d6218a9c137c1a4372d726888025437cf757d2cb18"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "cad10ed651e199a6ca16f3aed1a4ba7b78e29f7924af2e3b7fef9b88a3429ee8"
+    sha256 cellar: :any_skip_relocation, monterey:       "8f81d0733650c747c3a8c2b45e6f520897bd204a11887d32248195a89eab6bfc"
+    sha256 cellar: :any_skip_relocation, big_sur:        "2268358c33a9f5bc64a9e0dade281df98a6a9b0b9669f8d84ec41da7a0731a10"
+    sha256 cellar: :any_skip_relocation, catalina:       "33f94ef8581875ef09f33d6b9fdd619cf46be7d9fa90c62e3b9f4be73122715d"
+    sha256 cellar: :any_skip_relocation, mojave:         "62a9e705d060804542509742dc907ec59359c5e6c45ce24b33f1ba3851150270"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "36be49f58eb70578a6f54fda757ea420a84e96bc6d82c9c2d9ca2b185a474078"
   end
 
   depends_on "go" => :build

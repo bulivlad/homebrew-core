@@ -3,24 +3,21 @@ class YouGet < Formula
 
   desc "Dumb downloader that scrapes the web"
   homepage "https://you-get.org/"
-  url "https://files.pythonhosted.org/packages/b3/eb/e24fa3352fa27e1be3b7f8b3d158a3b12f6ee294c09614eb61b5d85fa054/you-get-0.4.1500.tar.gz"
-  sha256 "5a6cc0d661fe0cd4210bf467d6c89afd8611609e402690254722c1415736da92"
+  url "https://files.pythonhosted.org/packages/f1/e9/3b6f38f800602f9724b3e5b1bf0350e397a0092a3f1fa698e0aeb173122f/you-get-0.4.1555.tar.gz"
+  sha256 "99282aca720c7ee1d9ef4b63bbbd226e906ea170b789a459fafd5b0627b0b15f"
   license "MIT"
   head "https://github.com/soimort/you-get.git", branch: "develop"
 
-  livecheck do
-    url :stable
-  end
-
   bottle do
-    cellar :any_skip_relocation
-    sha256 "6264f3509de8eed9b86952c9e29ad83c701f829af203e6cf15ce7fe5a783309c" => :big_sur
-    sha256 "2238c1f593a3d1e05642f550d5fd8b95bc871efc8fbbf8ca84c62b7838c8fb9f" => :arm64_big_sur
-    sha256 "0ac325b9b2db370b23fd3c402cae58ae94c4df8ab590612af316c35c2ffb9f2c" => :catalina
-    sha256 "42900e74c53614573349195e1761f60e7e9fa696de56ee79acc17d148c4de93f" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "e6b44337d222234585e6e3997f6d1660550893171979c3974db98f5ea5754abb"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "e6b44337d222234585e6e3997f6d1660550893171979c3974db98f5ea5754abb"
+    sha256 cellar: :any_skip_relocation, monterey:       "df0dc12c7442eba996568ba4308f522f1850d75a7434fdc891bcea339e9b65e6"
+    sha256 cellar: :any_skip_relocation, big_sur:        "df0dc12c7442eba996568ba4308f522f1850d75a7434fdc891bcea339e9b65e6"
+    sha256 cellar: :any_skip_relocation, catalina:       "df0dc12c7442eba996568ba4308f522f1850d75a7434fdc891bcea339e9b65e6"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "12c1736ef7aa5fd5450201f8640946d21eae71ca0eff2ea903c6ab38f4043784"
   end
 
-  depends_on "python@3.9"
+  depends_on "python@3.10"
   depends_on "rtmpdump"
 
   def install

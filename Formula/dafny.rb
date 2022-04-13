@@ -1,53 +1,46 @@
 class Dafny < Formula
   desc "Verification-aware programming language"
   homepage "https://github.com/dafny-lang/dafny/blob/master/README.md"
-  url "https://github.com/dafny-lang/dafny/archive/v2.3.0.tar.gz"
-  sha256 "ea7ae310282c922772a46a9a85e2b4213043283038b74d012047b5294687d168"
+  url "https://github.com/dafny-lang/dafny/archive/v3.5.0.tar.gz"
+  sha256 "c1e3b2be851ee1d869d11f177ee8fe23eed3d5ff6fba18001d9816a4cab1d47b"
   license "MIT"
-  revision 3
 
   livecheck do
     url :stable
-    regex(/^v?(\d+(?:\.\d+)+)$/i)
+    strategy :github_latest
   end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "67bef401bfee4518789c1a12e72beeaeb7359d8c4d388dc89ab7427b4136e9ef" => :big_sur
-    sha256 "3c73b8c0c0f1b204f1118ef40c857418e112f6c5aac3c299d1be3abefce1704f" => :catalina
-    sha256 "3a21de05e53a0276a2aaaf3e82f2f8062b02ae9e31ba2a7bd0b2631691d10eca" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "6903dde12fdaa5349d1a0891fafb00084708ef1e5793ddb2aae3ee472e09a21b"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "444f6e7a25204f59ec0056157bd6d90dc72645ef2127515c355e651a11ecfcb8"
+    sha256 cellar: :any_skip_relocation, monterey:       "167514a459027dd4cee61d3b0991b0e52c12a49f00491fbabe9fd1d9b2c22ff1"
+    sha256 cellar: :any_skip_relocation, big_sur:        "e7ed030a0d86aedc2f821ffb9c71619966c3e4f026f5fe3581d0a662265864b5"
+    sha256 cellar: :any_skip_relocation, catalina:       "06f01d6e64589b27aa57c32faada283773245388c73741aec2874f2c44c63acc"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e3dcf85f9eb5e69e10b98015138c4c252802bef4e61ebd4329db80a334437219"
   end
 
-  depends_on "mono-libgdiplus" => :build
-  depends_on "nuget" => :build
-  depends_on "mono"
-
-  resource "boogie" do
-    url "https://github.com/boogie-org/boogie.git",
-        revision: "9e74c3271f430adb958908400c6f6fce5b59000a"
-  end
+  depends_on "gradle" => :build
+  depends_on "python@3.10" => :build # for z3
+  depends_on "dotnet"
+  depends_on "openjdk@11"
 
   # Use the following along with the z3 build below, as long as dafny
   # cannot build with latest z3 (https://github.com/dafny-lang/dafny/issues/810)
   resource "z3" do
-    url "https://github.com/Z3Prover/z3/archive/z3-4.8.4.tar.gz"
-    sha256 "5a18fe616c2a30b56e5b2f5b9f03f405cdf2435711517ff70b076a01396ef601"
+    url "https://github.com/Z3Prover/z3/archive/Z3-4.8.5.tar.gz"
+    sha256 "4e8e232887ddfa643adb6a30dcd3743cb2fa6591735fbd302b49f7028cdc0363"
   end
 
   def install
-    (buildpath/"../boogie").install resource("boogie")
-    cd buildpath/"../boogie" do
-      system "nuget", "restore", "Source/Boogie.sln"
-      system "msbuild", "Source/Boogie.sln"
-    end
-    system "msbuild", "Source/Dafny.sln"
+    system "make", "exe"
 
-    libexec.install Dir["Binaries/*"]
+    libexec.install Dir["Binaries/*", "Scripts/quicktest.sh"]
 
     dst_z3_bin = libexec/"z3/bin"
     dst_z3_bin.mkpath
 
     resource("z3").stage do
+      ENV["PYTHON"] = which("python3")
       system "./configure"
       system "make", "-C", "build"
       mv("build/z3", dst_z3_bin/"z3")
@@ -55,7 +48,7 @@ class Dafny < Formula
 
     (bin/"dafny").write <<~EOS
       #!/bin/bash
-      mono #{libexec}/dafny.exe "$@"
+      dotnet #{libexec}/Dafny.dll "$@"
     EOS
   end
 
@@ -68,10 +61,10 @@ class Dafny < Formula
       }
     EOS
     assert_equal "\nDafny program verifier finished with 1 verified, 0 errors\n",
-                  shell_output("#{bin}/dafny /nologo /compile:0 #{testpath}/test.dfy")
+                  shell_output("#{bin}/dafny /compile:0 #{testpath}/test.dfy")
     assert_equal "\nDafny program verifier finished with 1 verified, 0 errors\nRunning...\n\nhello, Dafny\n",
-                  shell_output("#{bin}/dafny /nologo /compile:3 #{testpath}/test.dfy")
-    assert_equal "Z3 version 4.8.4 - 64 bit\n",
+                  shell_output("#{bin}/dafny /compile:3 #{testpath}/test.dfy")
+    assert_equal "Z3 version 4.8.5 - 64 bit\n",
                  shell_output("#{libexec}/z3/bin/z3 -version")
   end
 end

@@ -1,12 +1,8 @@
 class GnuProlog < Formula
   desc "Prolog compiler with constraint solving"
   homepage "http://www.gprolog.org/"
-  # Normal download page is from the http://www.gprolog.org/, however in October 2020
-  # a slightly updated "1.4.5" version was posted there which broke the sha256 sum
-  # In the next release we can go back to using this as our official source, but
-  # for now download from GNU which still has the original 1.4.5 available:
-  url "https://ftp.gnu.org/gnu/gprolog/gprolog-1.4.5.tar.gz"
-  sha256 "bfdcf00e051e0628b4f9af9d6638d4fde6ad793401e58a5619d1cc6105618c7c"
+  url "http://www.gprolog.org/gprolog-1.5.0.tar.gz"
+  sha256 "670642b43c0faa27ebd68961efb17ebe707688f91b6809566ddd606139512c01"
   license any_of: ["LGPL-3.0-or-later", "GPL-2.0-or-later"]
 
   livecheck do
@@ -15,11 +11,13 @@ class GnuProlog < Formula
   end
 
   bottle do
-    cellar :any_skip_relocation
-    rebuild 1
-    sha256 "e3825d38dac91ef3dbb9d7b67a6e3352dcc27fb1f897332ba39e5a0b97caad25" => :big_sur
-    sha256 "25b07a365e6907466222e64d10458a9006830b3061698eaf6af101f3355d43f9" => :catalina
-    sha256 "76ed18b57bf7719b1212adc6fd323b184a9ed496c0ebc7f588ee8e172e887696" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "2743f08c397b6ae19c11270477b61afd7f5dc598aaaaab5146b4d5a08fd9289b"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "417bfc3b0df319fa7b0b4ec3f262a5cdb3cbf8a10750c0850d9427afc3c408ac"
+    sha256 cellar: :any_skip_relocation, monterey:       "5e2d325ed9824cdf9283341f009ac01655616d8d61fe9c4b08b21f190a445611"
+    sha256 cellar: :any_skip_relocation, big_sur:        "d0a8099131295fb00e49b1921a544e5cf0564593f52a35cccdae8fe239785c2c"
+    sha256 cellar: :any_skip_relocation, catalina:       "7d5b67ea483e7b80e2a2d1ff30874d53afe0d5f416ef6d7e4480beaa3be6153a"
+    sha256 cellar: :any_skip_relocation, mojave:         "b89f575f9b32a43180b7ad527e2ac9f71b9de4440285cccb1a326752a12ef7c3"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "fdf61462c5418578e9d629fa743b527b462e6f767fbb64af23db63115a8d39c4"
   end
 
   def install
@@ -37,6 +35,6 @@ class GnuProlog < Formula
       main :- write('Hello World!'), nl, halt.
     EOS
     system "#{bin}/gplc", "test.pl"
-    assert_match /Hello World!/, shell_output("./test")
+    assert_match "Hello World!", shell_output("./test")
   end
 end

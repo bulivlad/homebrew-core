@@ -1,21 +1,17 @@
 class Libpeas < Formula
   desc "GObject plugin library"
-  homepage "https://developer.gnome.org/libpeas/stable/"
-  url "https://download.gnome.org/sources/libpeas/1.28/libpeas-1.28.0.tar.xz"
-  sha256 "42d91993b46ed50f16add6d9577ecc22beb8e2dffa7101e2232c2b63733b8b15"
+  homepage "https://wiki.gnome.org/Projects/Libpeas"
+  url "https://download.gnome.org/sources/libpeas/1.32/libpeas-1.32.0.tar.xz"
+  sha256 "d625520fa02e8977029b246ae439bc218968965f1e82d612208b713f1dcc3d0e"
   license "LGPL-2.1-or-later"
-  revision 1
-
-  livecheck do
-    url :stable
-  end
 
   bottle do
-    sha256 "e16499f8ca12b73b560186938cc435ebb57b9ad5b212f402bfef5fb1817d086f" => :big_sur
-    sha256 "665cf2215ffd3be1079233e2f825790dd0a000b3171deafd4547c76f8e900830" => :arm64_big_sur
-    sha256 "32809467a203d5da8fe2168c50a773c950ea906ab06a3010fc4287de0b8f407d" => :catalina
-    sha256 "a9e812e0fb512c3a6716deca92a1c58fd4a1f4ee5f6af3e0fa255c97dd08d294" => :mojave
-    sha256 "bfe333e7b1268b37d498a15087e07a6f09e736ed338dc4f694d40475ab736f40" => :high_sierra
+    sha256 arm64_monterey: "95e58fd14df242b90173b9ba0d5d40b8234e84f87cc6ebc30b3824928cbf205e"
+    sha256 arm64_big_sur:  "bc72e8a73ee764c86763198b676002e6a1edd724572920e30a4757048a8c0388"
+    sha256 monterey:       "ec9eeb3cdf1f4272b23e0a34c32eb26b4438ae07f4800c7981fdf9fc35e124a7"
+    sha256 big_sur:        "23f1cf3fdadc9f3586e442a7bafbe3ddc781063578bc1728ddcb818646f304d3"
+    sha256 catalina:       "57cba039daf7d11664e656f8fd3d02fe1083fd3ab11c7e45ba025b621fa325a5"
+    sha256 x86_64_linux:   "f994ca714e319d0cdff07e30f37fc0794887fee5389fff0dfb818e104e65621d"
   end
 
   depends_on "meson" => :build
@@ -74,9 +70,9 @@ class Libpeas < Formula
       -lglib-2.0
       -lgmodule-2.0
       -lgobject-2.0
-      -lintl
       -lpeas-1.0
     ]
+    flags << "-lintl" if OS.mac?
     system ENV.cc, "test.c", "-o", "test", *flags
     system "./test"
   end

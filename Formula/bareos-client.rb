@@ -11,9 +11,9 @@ class BareosClient < Formula
   end
 
   bottle do
-    sha256 "bff8a75230cdc455bacd679e173d373d7ff11f10c57ed54ede298b7e7cb96816" => :big_sur
-    sha256 "40e1558c583639b7788c4a5fb30a984abaa00a3a552f00b30466ac0bf8ce4e73" => :catalina
-    sha256 "c1f6aa579b9a1923592818b041a165bc029d66bc88745895f6662ce2a3c83f8e" => :mojave
+    sha256 big_sur:  "bff8a75230cdc455bacd679e173d373d7ff11f10c57ed54ede298b7e7cb96816"
+    sha256 catalina: "40e1558c583639b7788c4a5fb30a984abaa00a3a552f00b30466ac0bf8ce4e73"
+    sha256 mojave:   "c1f6aa579b9a1923592818b041a165bc029d66bc88745895f6662ce2a3c83f8e"
   end
 
   depends_on "cmake" => :build
@@ -55,29 +55,10 @@ class BareosClient < Formula
   end
 
   plist_options startup: true
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>ProgramArguments</key>
-          <array>
-            <string>#{opt_sbin}/bareos-fd</string>
-            <string>-f</string>
-          </array>
-          <key>StandardOutPath</key>
-          <string>#{var}/run/bareos-fd.log</string>
-          <key>StandardErrorPath</key>
-          <string>#{var}/run/bareos.log</string>
-          <key>RunAtLoad</key>
-          <true/>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run [opt_sbin/"bareos-fd", "-f"]
+    log_path var/"run/bareos-fd.log"
+    error_log_path var/"run/bareos-fd.log"
   end
 
   test do

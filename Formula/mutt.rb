@@ -10,19 +10,17 @@
 class Mutt < Formula
   desc "Mongrel of mail user agents (part elm, pine, mush, mh, etc.)"
   homepage "http://www.mutt.org/"
-  url "https://bitbucket.org/mutt/mutt/downloads/mutt-2.0.4.tar.gz"
-  sha256 "45087e78105e9abc7cc37827865d319081587cb53a94412aa4e3118e937991d4"
+  url "https://bitbucket.org/mutt/mutt/downloads/mutt-2.2.2.tar.gz"
+  sha256 "10de870cf37646c0b3f5bcf579c3cc2fd9285bda1d04be9ad7c33ec2ee820fcc"
   license "GPL-2.0-or-later"
 
-  livecheck do
-    url :stable
-  end
-
   bottle do
-    sha256 "f181150fcf0ff74b00b3d00cc39d355685ad90a5e8e065837f2d3bd3cb42d937" => :big_sur
-    sha256 "3733169f300075cfec18105ad60b125760540e61d7c0ca7151fb9d0bac0d735f" => :arm64_big_sur
-    sha256 "23f79a29d228e21cf3d93225c9b73517bd06c0fefefb258f7780e8e8bd17bb1d" => :catalina
-    sha256 "d0e7a3f48da84a0f718e36a3027874bfa8cf150ec1e637b7d8bc0746cd42c86c" => :mojave
+    sha256 arm64_monterey: "142b37fb95246ece48bca4f81c55ef0c027f9bbe773f2efbc201eaa2a2ffde08"
+    sha256 arm64_big_sur:  "018735e8e84bcf42aa62c90f6f361ea86c3cfe562cbadd6ab93415ca3b28a9e7"
+    sha256 monterey:       "005d0c69e5861cf69bb7d255a1222bb614aa91d72638185ae36c87ca3756d52b"
+    sha256 big_sur:        "51aaa67fe0d0fb3ad29ac7872b96a3ecba7dd3b31417cf743b16eef6e47357db"
+    sha256 catalina:       "bf216b191418d61a596823edf21ce0d0e2a4ef2228d4b725c3260b7e3270a825"
+    sha256 x86_64_linux:   "d11ddadb18d790337fe84f854d497637c1c483ac046e223b26de63e157bc6cad"
   end
 
   head do
@@ -40,12 +38,12 @@ class Mutt < Formula
   depends_on "tokyo-cabinet"
 
   uses_from_macos "bzip2"
+  uses_from_macos "cyrus-sasl"
   uses_from_macos "krb5"
   uses_from_macos "ncurses"
   uses_from_macos "zlib"
 
-  conflicts_with "tin",
-    because: "both install mmdf.5 and mbox.5 man pages"
+  conflicts_with "tin", because: "both install mmdf.5 and mbox.5 man pages"
 
   def install
     user_in_mail_group = Etc.getgrnam("mail").mem.include?(ENV["USER"])

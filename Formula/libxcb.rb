@@ -4,18 +4,19 @@ class Libxcb < Formula
   url "https://xcb.freedesktop.org/dist/libxcb-1.14.tar.gz"
   sha256 "2c7fcddd1da34d9b238c9caeda20d3bd7486456fc50b3cc6567185dbd5b0ad02"
   license "MIT"
+  revision 2
 
   bottle do
-    cellar :any
-    sha256 "7d5c969ae5d67cba138c36d0ec758ef383763d58a615e1f0d9d8cc86c1c6d16d" => :big_sur
-    sha256 "7c30db7602fd32f2e5234a9faf9c28d9b27fa3d78afccf5a81a3e4eaaa660642" => :arm64_big_sur
-    sha256 "8775b3a19f927b57ca4077211b25898c6481318ff1cddb3098c61903ae832b1f" => :catalina
-    sha256 "8a13efa25000a0695280f5465186f7511e9083685a49560d0dc5d7cc837a1cfa" => :mojave
-    sha256 "e56b657f223ac78f4f600fe057dd8ab12303be5f4f0f5b61eb94443d10fb4cf4" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "6c7154002b268eb74f36215a5d0b6496dacb3ff786bb40c29a2151359c219476"
+    sha256 cellar: :any,                 arm64_big_sur:  "e473ad5c0877fa07f64037bcf12df7396f5aed59a2ff89a1b5eaa1a6e2885fcd"
+    sha256 cellar: :any,                 monterey:       "aa439c61a2c0174f7d9f505fed55798a2dd4309221f3c51535c4fba5caa5162e"
+    sha256 cellar: :any,                 big_sur:        "c499695d4451922107256515154334e89fbafb3825b68f9c9f5d957f1398968e"
+    sha256 cellar: :any,                 catalina:       "118d9fa08edc88e58530f3920ddccba38e3eae0d08b280ff61e5eed9b5a87e9a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "105c626775006b99f03f67dd80a0ec5ef84e9163353cd33a8b39193fdf231936"
   end
 
   depends_on "pkg-config" => :build
-  depends_on "python@3.9" => :build
+  depends_on "python@3.10" => :build
   depends_on "xcb-proto" => :build
   depends_on "libpthread-stubs"
   depends_on "libxau"

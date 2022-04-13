@@ -1,24 +1,28 @@
 class Sispmctl < Formula
   desc "Control Gembird SIS-PM programmable power outlet strips"
   homepage "https://sispmctl.sourceforge.io/"
-  url "https://downloads.sourceforge.net/project/sispmctl/sispmctl/sispmctl-4.8/sispmctl-4.8.tar.gz"
-  sha256 "0f8391f7e95cbf1fb96a68686a1dcf1e16747b050ae1b8ff90653c99976068db"
+  url "https://downloads.sourceforge.net/project/sispmctl/sispmctl/sispmctl-4.9/sispmctl-4.9.tar.gz"
+  sha256 "6a9ec7125e8c01bb45d4a3b56f07fb41fc437020c8dcd8c0f29ebb98dc55a647"
   license "GPL-2.0-or-later"
 
-  livecheck do
-    url :stable
-  end
-
   bottle do
-    sha256 "363a600681cb459b5c55ccf6217d5444b09cf163a095e11b6cde646c5f2d2206" => :big_sur
-    sha256 "b4676b0505143fc7473c62b8ff019dc9c374d8134c4e4ca6767fb23b9a315783" => :arm64_big_sur
-    sha256 "2c4a8a22528a34de494a7e5f93873f80cf4bc47646e725baddd86bb2d242ade8" => :catalina
-    sha256 "ec93867cb3b46835c74d640fdb329735b15cb4b273b722cb5855808a764e27c9" => :mojave
-    sha256 "1d7c6d1b3e44399b748f6e47d08e8b381ac9685cacd2d0993fbdac140760cc4b" => :high_sierra
+    sha256 arm64_monterey: "ed26829f844e176487911032144bdcefffac53d528b6613387060cdf804c3ce5"
+    sha256 arm64_big_sur:  "4e6492d30b2625b3c117b12ddf23d0e12e9cce5c9e0d7f2ae4806a0b9227154d"
+    sha256 monterey:       "14bd73d5af83b488d1d629e61b30c5356b4a61cf60af92673af41d3269d1c9b0"
+    sha256 big_sur:        "3c5776d579886dae1c1c79dfbd00e0f62009b5b36b369ef5cb17866eeb48e54a"
+    sha256 catalina:       "ca5277017192e749e693430127f13263e8eb78bb37c462dc613ffaac8fd036c8"
+    sha256 mojave:         "751addc56782d7d36eabc1b244413c7e30db2674117ca4bdfa501a23882ff84d"
+    sha256 x86_64_linux:   "77b95926b04f52d79e6f11d5ba03276dac6eb74de675150341161b22709bfd64"
   end
 
   depends_on "pkg-config" => :build
   depends_on "libusb-compat"
+
+  # Fix -flat_namespace being used on Big Sur and later.
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+    sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
+  end
 
   def install
     system "./configure", "--disable-dependency-tracking",

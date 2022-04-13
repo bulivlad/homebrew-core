@@ -1,15 +1,22 @@
 class Omega < Formula
   desc "Packaged search engine for websites, built on top of Xapian"
   homepage "https://xapian.org/"
-  url "https://oligarchy.co.uk/xapian/1.4.17/xapian-omega-1.4.17.tar.xz"
-  sha256 "d52eea4cd1bbf334e84af6d41ea3424466ab75e3dadd4a736e4eb0c976392d16"
-  license "GPL-2.0"
+  url "https://oligarchy.co.uk/xapian/1.4.19/xapian-omega-1.4.19.tar.xz"
+  sha256 "e4b2ef287e55df6754a1cb13b7677231bfda6df22567d28944046f6994d5cd8c"
+  license "GPL-2.0-or-later"
+
+  livecheck do
+    url "https://xapian.org/download"
+    regex(/href=.*?xapian-omega[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
 
   bottle do
-    sha256 "d80c1433e808dd54461927f53d63699045848f998833f6a677ca618371ee6a06" => :big_sur
-    sha256 "ceca2f89cf750438ff3d3e58b5167bf4013ae7a42eb51627653acf23bfbe8e47" => :arm64_big_sur
-    sha256 "17a298c14fbbf86f3b3e8914ae2e9cf36c1404cc92d53f41b73cd7fb02cb9a6a" => :catalina
-    sha256 "fce0483526b6996f89bcfe7374446b9cccdfcf4c32a4a4b2bdbe172d45035a63" => :mojave
+    sha256 arm64_monterey: "def2dad644651a029f624fdfcc049eb2c38615ac3abdd83dca5b16cc91dc6d1c"
+    sha256 arm64_big_sur:  "4888077491e9231306b5af3b504e84fd01c20a0d13fcb10140c1d1ead55ae279"
+    sha256 monterey:       "507ed2fb6350f5c59a50c8bb0da7e14d0aacb6651d29ff8ec921bbf01bd20612"
+    sha256 big_sur:        "75f151d449786a9b7dc439aa276a06c4df89aeb00cec7b58fb09241795b7b281"
+    sha256 catalina:       "f8712f187e62c9a7414f82c5eab0aefb7752372ece97e2ba9ba6ed1a70f5952d"
+    sha256 x86_64_linux:   "3135531c3195dd0190d48e2e8d4f29743d63ea9a9abbe9b22edb0c100cc4e542"
   end
 
   depends_on "pkg-config" => :build

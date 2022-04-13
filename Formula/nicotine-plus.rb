@@ -3,26 +3,23 @@ class NicotinePlus < Formula
 
   desc "Graphical client for the Soulseek file sharing network"
   homepage "https://nicotine-plus.github.io/nicotine-plus/"
-  url "https://files.pythonhosted.org/packages/1e/d5/35536e21b33b881d2cd13c79f6404691a23268eafad00300214788b3ca2c/nicotine-plus-2.2.2.tar.gz"
-  sha256 "6913aabd98cb841d6c05213f8004300c2e90d9afdaf5aa081269b272494762f5"
+  url "https://files.pythonhosted.org/packages/8d/60/a0a7b9d9066a4edcc4b9965d71e31794fc5faf2f8624619d46a8c484d272/nicotine-plus-3.2.2.tar.gz"
+  sha256 "32bb50559bb67b0b6d1760d4a11eec0660f841d00607a1f165292c967b6001c9"
   license "GPL-3.0-or-later"
-  head "https://github.com/Nicotine-Plus/nicotine-plus.git"
-
-  livecheck do
-    url :stable
-  end
+  head "https://github.com/Nicotine-Plus/nicotine-plus.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    rebuild 2
-    sha256 "c6b26f5e472d343bd5f6190af50d15326df5d4b249c973bb997de195d7af26fa" => :big_sur
-    sha256 "284ab0e4d1fdfc9bab0c6478ed2c354c1f047f39d0658f1b073dd2a9a37b84ce" => :arm64_big_sur
-    sha256 "f03e6e761f7a8062d506738b544762e89a020f626d8ba154b7c838a44dbd5af4" => :catalina
-    sha256 "52431db05bd1e9c96594a8e1168c9e3645c53f582df85841d5e04ddf5b8bc1dd" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "818ac9f1abfabc01664014a9adb46cbbc461574f367b19304a3ce6d632db3d1f"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "818ac9f1abfabc01664014a9adb46cbbc461574f367b19304a3ce6d632db3d1f"
+    sha256 cellar: :any_skip_relocation, monterey:       "635b98a5568c1ff49fd0b4e9bf741b363f35a96252fc246bb445e7ca2ccfb698"
+    sha256 cellar: :any_skip_relocation, big_sur:        "635b98a5568c1ff49fd0b4e9bf741b363f35a96252fc246bb445e7ca2ccfb698"
+    sha256 cellar: :any_skip_relocation, catalina:       "635b98a5568c1ff49fd0b4e9bf741b363f35a96252fc246bb445e7ca2ccfb698"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8ee4773eb5fbbbd4284ce16a7fcffc7396bc917ca3b92c21d626277f9c11624b"
   end
 
   depends_on "adwaita-icon-theme"
   depends_on "gtk+3"
+  depends_on "py3cairo"
   depends_on "pygobject3"
   depends_on "python@3.9"
 

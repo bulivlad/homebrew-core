@@ -1,31 +1,26 @@
 class Bitrise < Formula
   desc "Command-line automation tool"
   homepage "https://github.com/bitrise-io/bitrise"
-  url "https://github.com/bitrise-io/bitrise/archive/1.44.1.tar.gz"
-  sha256 "979bbbbd20b90695acb6bb82a94400b2e485c4406a5e0a7be43419bf223dee91"
+  url "https://github.com/bitrise-io/bitrise/archive/1.48.0.tar.gz"
+  sha256 "0800d63eaca091f6570e227dec26560483ed6c74ea43558781fb717b5dfbdb42"
   license "MIT"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "fb6c9356eb5e2943c6b69510abf39a6f76a8b0df4a129683913960e1624c5284" => :big_sur
-    sha256 "690a5b3322c47bed6730e1853d19f7a258e73ed8cfa192461be43bc3c5f68489" => :catalina
-    sha256 "ebe928f97d9533607d1a8d70b9dc9e35a0c77af1200962cbafcbfca59e9cfee9" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "21b4b70f7fc7787108da2671dd4f579260970ea5d8cb691054c55ee5d2117558"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "973602302d6b4270875e82c41709f8cfe4171a3bd53c271ce69a199d524f3aa6"
+    sha256 cellar: :any_skip_relocation, monterey:       "e68b5c2af567d68dbadce954b4be9e11f64a867f4087fd397b33796a4eb95437"
+    sha256 cellar: :any_skip_relocation, big_sur:        "7b200d18f14e18e611c3fc9a98a6c1ef656f85d2f8d4df75f9d98c8a77067762"
+    sha256 cellar: :any_skip_relocation, catalina:       "5f7902cce52a17241873c3a172e018bd874dfb28f9159a838aa6f48cc3100704"
+    sha256 cellar: :any_skip_relocation, mojave:         "746b543d056b120d00af803f2170be17b3648c5fc7f8e100aa1d367817b3cf50"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1609e537cca0ea8a5452b30eeeae470d8663f7942e2fc28b7e72c518d7bee9df"
   end
 
   depends_on "go" => :build
 
+  uses_from_macos "rsync"
+
   def install
-    ENV["GOPATH"] = buildpath
-
-    # Install bitrise
-    bitrise_go_path = buildpath/"src/github.com/bitrise-io/bitrise"
-    bitrise_go_path.install Dir["*"]
-
-    cd bitrise_go_path do
-      prefix.install_metafiles
-
-      system "go", "build", "-o", bin/"bitrise"
-    end
+    system "go", "build", *std_go_args(ldflags: "-s -w")
   end
 
   test do

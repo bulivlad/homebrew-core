@@ -1,20 +1,17 @@
 class Pangomm < Formula
   desc "C++ interface to Pango"
   homepage "https://www.pango.org/"
-  url "https://download.gnome.org/sources/pangomm/2.48/pangomm-2.48.0.tar.xz"
-  sha256 "9e0ed474c33f8c2002ca9e2b61ca0d1f3d8e409e09e99f4d8c19eeafccf55b78"
+  url "https://download.gnome.org/sources/pangomm/2.50/pangomm-2.50.0.tar.xz"
+  sha256 "a27aa77e017b9afce9e751d85bd1cf890abbb3a58bf59d0fac917eef82db3b5b"
   license "LGPL-2.1-only"
 
-  livecheck do
-    url :stable
-  end
-
   bottle do
-    cellar :any
-    sha256 "eb27b7d518bd474bf2fd5a63abba60e1a14c995a858b16ec0dbb4bc51068d1c8" => :big_sur
-    sha256 "64e96cdf092ebfaf872dbe2764208492e3e5a16e08a76c7c251335c72b949812" => :arm64_big_sur
-    sha256 "5ad6d772ae04e2dd5553367d92052180088798ebb1de6438f0f242aec80dc138" => :catalina
-    sha256 "e71d9e1eee7e3e9c4846af03f6a45cb4a28cd0afc3cb64bde31ac5610dc1b230" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "a21f7c630199d45ac1b8cf9878cf82aaaac75561407e0d239f4308a7ce8b64c5"
+    sha256 cellar: :any,                 arm64_big_sur:  "e7103018de987f68f1760f9e63784ba4ec048efa0f125e488e21bd0a604a40f9"
+    sha256 cellar: :any,                 monterey:       "eb0528f025413ada3a409fbc9bf893062fc37af65d1071a414ca319fe9cdd3d5"
+    sha256 cellar: :any,                 big_sur:        "01d08e7417d287fa932a966c4f6c763c699f33dbb416529ff9f12229e14a182c"
+    sha256 cellar: :any,                 catalina:       "006118a2224607e8bcacc9118a92d82625f8d9f4edcfd502e1b6278fff29a852"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9411ad0f8933a13794ca70d8b4f4e6fde004e627f49e67190203d9fa1c22828c"
   end
 
   depends_on "meson" => :build
@@ -23,6 +20,12 @@ class Pangomm < Formula
   depends_on "cairomm"
   depends_on "glibmm"
   depends_on "pango"
+
+  on_linux do
+    depends_on "gcc" => :build
+  end
+
+  fails_with gcc: "5"
 
   def install
     ENV.cxx11
@@ -33,6 +36,7 @@ class Pangomm < Formula
       system "ninja", "install"
     end
   end
+
   test do
     (testpath/"test.cpp").write <<~EOS
       #include <pangomm.h>
@@ -93,9 +97,7 @@ class Pangomm < Formula
       -lpangomm-2.48
       -lsigc-3.0
     ]
-    on_macos do
-      flags << "-lintl"
-    end
+    flags << "-lintl" if OS.mac?
     system ENV.cxx, "-std=c++17", "test.cpp", "-o", "test", *flags
     system "./test"
   end

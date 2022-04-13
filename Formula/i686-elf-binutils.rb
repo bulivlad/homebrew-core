@@ -1,27 +1,32 @@
 class I686ElfBinutils < Formula
   desc "GNU Binutils for i686-elf cross development"
   homepage "https://www.gnu.org/software/binutils/"
-  url "https://ftp.gnu.org/gnu/binutils/binutils-2.35.1.tar.xz"
-  mirror "https://ftpmirror.gnu.org/binutils/binutils-2.35.1.tar.xz"
-  sha256 "3ced91db9bf01182b7e420eab68039f2083aed0a214c0424e257eae3ddee8607"
-  license "GPL-2.0"
+  url "https://ftp.gnu.org/gnu/binutils/binutils-2.38.tar.xz"
+  mirror "https://ftpmirror.gnu.org/binutils/binutils-2.38.tar.xz"
+  sha256 "e316477a914f567eccc34d5d29785b8b0f5a10208d36bbacedcc39048ecfe024"
+  license "GPL-3.0-or-later"
 
   livecheck do
-    url :stable
+    formula "binutils"
   end
 
   bottle do
-    sha256 "0f5e842acd46e0d467ee349c39ea1816b659acd229e1c9144245b6fa49a59753" => :big_sur
-    sha256 "fa7d301ef277a6a77e0cc1c2d49e5638af4e5015d8ef39232c772867d7e3552e" => :arm64_big_sur
-    sha256 "a71d3f952d1a1d9a59c3759dc7b87fdd4ec0036fb77d0156ff3f84627bbc1a1c" => :catalina
-    sha256 "845a38bb82fdcd66d2b7464e21d228b8db5e34551671056079c488e6c714f818" => :mojave
-    sha256 "f591e9b3514229690865b05a66d12e1418cbdd217d88a2bf4e7006375e594de0" => :high_sierra
+    sha256 arm64_monterey: "544e3b442d215df6062f4309e3bdfc4ec4e9ec18853dc86b8f2bb2126083998b"
+    sha256 arm64_big_sur:  "5a1e42c4f7deaff68b779e342e844aaea0591577931be516ae58138121385061"
+    sha256 monterey:       "10962de855a9beee6abc8dd56d06194380133438cced597a8fe8c8711d8d03a8"
+    sha256 big_sur:        "30e6f1dc367905d6cc5199203d68339b05cef66e7a709236d5729026df6ac531"
+    sha256 catalina:       "39e98e8b3753e036c1a20c3b5e4d897902f961e5dbbfb035d6315dd7b5174350"
+    sha256 x86_64_linux:   "bbf9154fc1e03c82229bbc98ca1e913268f511d7e1f61d60453002a7cd6bc264"
   end
 
+  uses_from_macos "texinfo"
+
   def install
-    system "./configure", "--target=i686-elf",
+    target = "i686-elf"
+    system "./configure", "--target=#{target}",
                           "--prefix=#{prefix}",
-                          "--infodir=#{info}/i686-elf-binutils",
+                          "--libdir=#{lib}/#{target}",
+                          "--infodir=#{info}/#{target}",
                           "--disable-nls"
     system "make"
     system "make", "install"

@@ -1,17 +1,18 @@
 class Fd < Formula
   desc "Simple, fast and user-friendly alternative to find"
   homepage "https://github.com/sharkdp/fd"
-  url "https://github.com/sharkdp/fd/archive/v8.2.1.tar.gz"
-  sha256 "429de7f04a41c5ee6579e07a251c72342cd9cf5b11e6355e861bb3fffa794157"
-  license "Apache-2.0"
-  head "https://github.com/sharkdp/fd.git"
+  url "https://github.com/sharkdp/fd/archive/v8.3.2.tar.gz"
+  sha256 "9cc2354c652ee38369a4ce865404f284e94fa9daf043bb31d36297e7a2d7cd45"
+  license any_of: ["Apache-2.0", "MIT"]
+  head "https://github.com/sharkdp/fd.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "378bf3b71edf7c09a80cd8815bd068f6c2b8abaf2df149fc23f33f52acecc817" => :big_sur
-    sha256 "b50a503fc0bddc9c82d6ebc42198071160426ee6247c122f8fb81b1f9ecc4aeb" => :arm64_big_sur
-    sha256 "1fef32a7cd0c80f62343b4caf6a0979f89bacfa7434ed54ffede6adb85ace329" => :catalina
-    sha256 "160cdfc22b5d0ac9694ce8dd95f7e22a7bdc95f6d376344d15f924f9ef67149b" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "0a9b6670e3898d06da79c8da5405d4409141c4df1b9db3fbf2ffa56ecacdee2b"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "dd2878985b2f4100c897283744826acdca627a57692ba11d3472e203015df3d8"
+    sha256 cellar: :any_skip_relocation, monterey:       "544bd266bd9d4689aeea459d5edd822db269647074bd28c682c58ab097dcd13d"
+    sha256 cellar: :any_skip_relocation, big_sur:        "fda49ccd4fb859c6b040695f69e25dd2571e631c7fb203465702c85f924ff755"
+    sha256 cellar: :any_skip_relocation, catalina:       "492097b85cf2fe8b79700048510c90e4da55fee307552e143e84fcefd3bf552a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "22528c35f36907d807a44daf4dcd5c8d4c3598a55e3d73df68059ebe228e0b10"
   end
 
   depends_on "rust" => :build
@@ -28,6 +29,6 @@ class Fd < Formula
   test do
     touch "foo_file"
     touch "test_file"
-    assert_equal "test_file", shell_output("#{bin}/fd test").chomp
+    assert_equal "./test_file", shell_output("#{bin}/fd test").chomp
   end
 end

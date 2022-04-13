@@ -1,32 +1,40 @@
 class Calicoctl < Formula
   desc "Calico CLI tool"
   homepage "https://www.projectcalico.org"
-  url "https://github.com/projectcalico/calicoctl.git",
-      tag:      "v3.17.1",
-      revision: "8871aca3dc0b30d6143031e46498b648e153da2a"
+  url "https://github.com/projectcalico/calico.git",
+      tag:      "v3.22.1",
+      revision: "82e7ce5201629d55f67afae27f519f4afc680392"
   license "Apache-2.0"
-  head "https://github.com/projectcalico/calicoctl.git"
+  head "https://github.com/projectcalico/calico.git", branch: "master"
+
+  livecheck do
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
+  end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "6ab5678c0037e96ba8efca1d2fad58a4051e6d9bb1b8cd48f7b149f8c12380b4" => :big_sur
-    sha256 "46dcad8fbdb7468ff86e47af5382dcb33a0c581d8e2521b13568f7d28cfd6376" => :arm64_big_sur
-    sha256 "bcc50b0b86619b2ac9a459d86f726e3595e9afd37e175d2d63edee8b402a2139" => :catalina
-    sha256 "b01d4c3fd2b8a6cf486dc98fbd9a7cca41ee2843a1f07ffdbfc1a24d73e0a6f8" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "782ec16444f4376094729779772f29e30fb7900b13736e30c5a4a3814cd8140f"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "5093f71e67827a71dae31f963a44a4765259affc1c14a54bdaaec38251aed780"
+    sha256 cellar: :any_skip_relocation, monterey:       "dd82c411170cea69ecb2c381da2caa01672dc0126cf0f8732b50f3ff6d511322"
+    sha256 cellar: :any_skip_relocation, big_sur:        "3f3393d94c1d65f74157063ebf45be5428feaeb389d40d285a6e2ca22435ee60"
+    sha256 cellar: :any_skip_relocation, catalina:       "823aecf02877405103699aaeb00ec3a0dfb9d0b1d590694f803a9a093dc08d02"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ca0261a747fe3b0fbadb51158106532983306a8a1f60299d962aadd62c0f06dc"
   end
 
   depends_on "go" => :build
 
   def install
-    commands = "github.com/projectcalico/calicoctl/calicoctl/commands"
-    system "go", "build", *std_go_args,
-                          "-ldflags", "-X #{commands}.VERSION=#{version} " \
-                                      "-X #{commands}.GIT_REVISION=#{Utils.git_short_head} " \
-                                      "-s -w",
-                          "calicoctl/calicoctl.go"
+    commands = "github.com/projectcalico/calico/calicoctl/calicoctl/commands"
+    ldflags = "-X #{commands}.VERSION=#{version} " \
+              "-X #{commands}.GIT_REVISION=#{Utils.git_short_head} " \
+              "-s -w"
+    system "go", "build", *std_go_args(ldflags: ldflags), "calicoctl/calicoctl/calicoctl.go"
   end
 
   test do
-    assert_match version.to_s, shell_output("#{bin}/calicoctl version", 1)
+    assert_match version.to_s, shell_output("#{bin}/calicoctl version")
+
+    assert_match "invalid configuration: no configuration has been provided",
+      shell_output("#{bin}/calicoctl datastore migrate lock 2>&1", 1)
   end
 end

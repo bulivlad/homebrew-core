@@ -1,23 +1,19 @@
 class ProcyonDecompiler < Formula
   desc "Modern decompiler for Java 5 and beyond"
-  homepage "https://bitbucket.org/mstrobel/procyon/wiki/Java%20Decompiler"
-  url "https://bitbucket.org/mstrobel/procyon/downloads/procyon-decompiler-0.5.36.jar"
-  sha256 "74f9f1537113207521a075fafe64bd8265c47a9c73574bbf9fa8854bbf7126bc"
-  revision 1
+  homepage "https://github.com/mstrobel/procyon"
+  url "https://github.com/mstrobel/procyon/releases/download/v0.6.0/procyon-decompiler-0.6.0.jar"
+  sha256 "821da96012fc69244fa1ea298c90455ee4e021434bc796d3b9546ab24601b779"
+  license "Apache-2.0"
 
-  bottle :unneeded
-
-  disable! date: "2020-08-22", because: :repo_removed
+  bottle do
+    sha256 cellar: :any_skip_relocation, all: "ee55d23c048aa221e0f2c76eaa0ac264f83b0ac6ebf7388479878cc387fad122"
+  end
 
   depends_on "openjdk"
 
   def install
     libexec.install "procyon-decompiler-#{version}.jar"
-    (bin/"procyon-decompiler").write <<~EOS
-      #!/bin/bash
-      export JAVA_HOME="${JAVA_HOME:-#{Formula["openjdk"].opt_prefix}}"
-      exec "${JAVA_HOME}/bin/java" -jar "#{libexec}/procyon-decompiler-#{version}.jar" "$@"
-    EOS
+    bin.write_jar_script libexec/"procyon-decompiler-#{version}.jar", "procyon-decompiler"
   end
 
   test do
@@ -31,6 +27,6 @@ class ProcyonDecompiler < Formula
     EOS
     (testpath/"T.java").write fixture
     system "#{Formula["openjdk"].bin}/javac", "T.java"
-    fixture.match pipe_output("#{bin}/procyon-decompiler", "T.class")
+    assert_match fixture, pipe_output([bin/"procyon-decompiler", "T.class"])
   end
 end

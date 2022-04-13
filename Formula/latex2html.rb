@@ -1,8 +1,8 @@
 class Latex2html < Formula
   desc "LaTeX-to-HTML translator"
   homepage "https://www.latex2html.org"
-  url "https://github.com/latex2html/latex2html/archive/v2021.tar.gz"
-  sha256 "872fe7a53f91ababaafc964847639e3644f2b9fab3282ea059788e4e18cbba47"
+  url "https://github.com/latex2html/latex2html/archive/v2022.tar.gz"
+  sha256 "9b3ba484226a2e39fb20695729370372b355f71bd65eeb4dd14f2c78699ed59a"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -11,11 +11,12 @@ class Latex2html < Formula
   end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "6872bf6979572c46b6440b7e3a54caa49661fb98348b4eb3be91022f133dede7" => :big_sur
-    sha256 "0b92290fc7fb156b76df56ee8992b272fca29ccbe1ec50e7637df550939fcf0d" => :arm64_big_sur
-    sha256 "fed2600e8edb14f29596c2b89720a1e21d19ae27c0c39bdf565c2320b147f553" => :catalina
-    sha256 "02ffab1491227b84d0accbf77265ae229ac104f5a3b62a51c8c69371d7f976d5" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "6641561f400242f33c0aa593dafdca76d2c1914bdfa37338907969d1e21c0b16"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "16c4b37f5a8ed8ba3535b4dd6f310763e75423079793ed18653bff59fa9ddfdd"
+    sha256 cellar: :any_skip_relocation, monterey:       "d7fe8a4deeccc36569dc7635a651364055b5dbb8aa0f1fa38141c3fcf6a83657"
+    sha256 cellar: :any_skip_relocation, big_sur:        "70f14cb4a800970e48f2bdccb22162793bd650a308617fd83a90011542c4f2e6"
+    sha256 cellar: :any_skip_relocation, catalina:       "09624775c9cfa2fd114e9a32915a5330e2d55102076e1bdd2e7eebefa6f89600"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a7d37099d9ed061779a20ff667cc71229ae8f52cadf737bda0af1b7da9b7cbd5"
   end
 
   depends_on "ghostscript"
@@ -39,6 +40,6 @@ class Latex2html < Formula
       \\end{document}
     EOS
     system "#{bin}/latex2html", "test.tex"
-    assert_match /Experimental Setup/, File.read("test/test.html")
+    assert_match "Experimental Setup", File.read("test/test.html")
   end
 end

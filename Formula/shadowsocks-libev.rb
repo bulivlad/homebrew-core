@@ -3,15 +3,16 @@ class ShadowsocksLibev < Formula
   homepage "https://github.com/shadowsocks/shadowsocks-libev"
   url "https://github.com/shadowsocks/shadowsocks-libev/releases/download/v3.3.5/shadowsocks-libev-3.3.5.tar.gz"
   sha256 "cfc8eded35360f4b67e18dc447b0c00cddb29cc57a3cec48b135e5fb87433488"
-  license "GPL-3.0"
-  revision 1
+  license "GPL-3.0-or-later"
+  revision 4
 
   bottle do
-    cellar :any
-    sha256 "1a2381a03550ecdef8c098747e96707aa99317bbcc7b8595f1b26a27a9267fb8" => :big_sur
-    sha256 "4fb1d6c97502780f2d6462e630f8bbfa0b56e3974954353ea9a14dad3ac783a6" => :arm64_big_sur
-    sha256 "7e2e484607287b95e8572fd902da733cb9ec93b3f6ebe7de365d5b729e133fa0" => :catalina
-    sha256 "711ae7d8be8df5607abcf7e04090d272184dae68e3771db15973e92cc1712382" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "bcdae7a01e62e6af170c92174da04167b501787e7b041afa652f8f267c21a080"
+    sha256 cellar: :any,                 arm64_big_sur:  "0974cdce9f0a548d04d0798d9b878013075206938ebf8b68273aa57f02df3ef4"
+    sha256 cellar: :any,                 monterey:       "27acec0ff096021b2a7fb186451522a74699bbd0c185e66bb460425a768bdb40"
+    sha256 cellar: :any,                 big_sur:        "88117a8122f9724516e77265546624b6581b6ff3b9980bb6caf3a49fa5fd1aec"
+    sha256 cellar: :any,                 catalina:       "99b4f3a61adefcca75290f2957f22bc1506779119789e0a81fe4c635fe5045e9"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5d275effb2feb43f639da0ee1f5dfb91dce384b1815232f852386cd61f3ae010"
   end
 
   head do
@@ -27,8 +28,7 @@ class ShadowsocksLibev < Formula
   depends_on "c-ares"
   depends_on "libev"
   depends_on "libsodium"
-  depends_on :macos # Due to Python 2
-  depends_on "mbedtls"
+  depends_on "mbedtls@2"
   depends_on "pcre"
 
   def install
@@ -53,29 +53,9 @@ class ShadowsocksLibev < Formula
     system "make", "install"
   end
 
-  plist_options manual: "#{HOMEBREW_PREFIX}/opt/shadowsocks-libev/bin/ss-local -c #{HOMEBREW_PREFIX}/etc/shadowsocks-libev.json"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>ProgramArguments</key>
-          <array>
-            <string>#{opt_bin}/ss-local</string>
-            <string>-c</string>
-            <string>#{etc}/shadowsocks-libev.json</string>
-          </array>
-          <key>RunAtLoad</key>
-          <true/>
-          <key>KeepAlive</key>
-          <true/>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run [opt_bin/"ss-local", "-c", etc/"shadowsocks-libev.json"]
+    keep_alive true
   end
 
   test do

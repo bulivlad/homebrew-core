@@ -1,22 +1,61 @@
 class Seal < Formula
   desc "Easy-to-use homomorphic encryption library"
   homepage "https://github.com/microsoft/SEAL"
-  url "https://github.com/microsoft/SEAL/archive/v3.6.1.tar.gz"
-  sha256 "e399c0df7fb60ad450a0ccfdc81b99d19308d0fc1f730d4cad4748dfb2fdb516"
+  url "https://github.com/microsoft/SEAL/archive/v4.0.0.tar.gz"
+  sha256 "616653498ba8f3e0cd23abef1d451c6e161a63bd88922f43de4b3595348b5c7e"
   license "MIT"
 
   bottle do
-    cellar :any
-    sha256 "fa0987fdcf86b96cf972ff894bbdd8d24afc3e72c41cb9be25278b851ddb7986" => :big_sur
-    sha256 "24878952d071677bb9822e46cef024ddbc7d382ecbef9531eecf663dc9335323" => :arm64_big_sur
-    sha256 "59fb7528d124443c8443c1f9ccb8f12ab357e005f1755b9eb8a230a3426fb9dc" => :catalina
-    sha256 "73257c6d562b234a97e320bbb1555fff03ce3bd3b2a8ce0530ba4ebbce883fe3" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "ea53dd611311c919f58c7808143addd1998d7f2a3d28f58eed756ecb19ee98d4"
+    sha256 cellar: :any,                 arm64_big_sur:  "a0bf775b0bc6b873a92eb9dc52856c7119d4ea78b99acf4a08a1973dc5ebbd8f"
+    sha256 cellar: :any,                 monterey:       "992afd0a163c2aada6f229a5c8afb556d5a427f25b4561c793f3955a8460956f"
+    sha256 cellar: :any,                 big_sur:        "322c2cf9c05b472e0fb6622f0476d5f53ff17a3cfd09ae5c4b9988386cba2bfb"
+    sha256 cellar: :any,                 catalina:       "f3a21a40b17452fedb54680b5214faaafd1ef26f2e7c06d859a53985e83c771b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "409aab1c8e31f433ba23c9f08d4ae28ec858467043eedff6201b143beb9e8b63"
   end
 
   depends_on "cmake" => [:build, :test]
+  depends_on "cpp-gsl"
+  depends_on "zstd"
+
+  uses_from_macos "zlib"
+
+  on_linux do
+    depends_on "gcc"
+  end
+
+  fails_with gcc: "5"
+
+  resource "hexl" do
+    url "https://github.com/intel/hexl/archive/v1.2.3.tar.gz"
+    sha256 "f2cf33ee2035d12996d10b69d2f41a586b9954a29b99c70a852495cf5758878c"
+  end
 
   def install
-    system "cmake", "-DBUILD_SHARED_LIBS=ON", ".", *std_cmake_args
+    if Hardware::CPU.intel?
+      resource("hexl").stage do
+        hexl_args = std_cmake_args + %w[
+          -DHEXL_BENCHMARK=OFF
+          -DHEXL_TESTING=OFF
+          -DHEXL_EXPORT=ON
+        ]
+        system "cmake", "-S", ".", "-B", "build", *hexl_args
+        system "cmake", "--build", "build"
+        system "cmake", "--install", "build"
+      end
+      ENV.append "LDFLAGS", "-L#{lib}"
+    end
+
+    args = std_cmake_args + %W[
+      -DBUILD_SHARED_LIBS=ON
+      -DSEAL_BUILD_DEPS=OFF
+      -DSEAL_USE_ALIGNED_ALLOC=#{(MacOS.version > :mojave) ? "ON" : "OFF"}
+      -DSEAL_USE_INTEL_HEXL=#{Hardware::CPU.intel? ? "ON" : "OFF"}
+      -DHEXL_DIR=#{lib}/cmake
+      -DCMAKE_CXX_FLAGS=-I#{include}
+    ]
+
+    system "cmake", ".", *args
     system "make"
     system "make", "install"
     pkgshare.install "native/examples"
@@ -41,10 +80,11 @@ class Seal < Formula
               1_bfv_basics.cpp
               2_encoders.cpp
               3_levels.cpp
-              4_ckks_basics.cpp
-              5_rotation.cpp
-              6_serialization.cpp
-              7_performance.cpp
+              4_bgv_basics.cpp
+              5_ckks_basics.cpp
+              6_rotation.cpp
+              7_serialization.cpp
+              8_performance.cpp
       )
 
       # Import Microsoft SEAL
@@ -57,7 +97,7 @@ class Seal < Formula
       target_link_libraries(sealexamples SEAL::seal_shared)
     EOS
 
-    system "cmake", "examples"
+    system "cmake", "examples", "-DHEXL_DIR=#{lib}/cmake"
     system "make"
     # test examples 1-5 and exit
     input = "1\n2\n3\n4\n5\n0\n"

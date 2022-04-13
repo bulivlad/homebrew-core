@@ -1,24 +1,21 @@
 class Ocrad < Formula
   desc "Optical character recognition (OCR) program"
   homepage "https://www.gnu.org/software/ocrad/"
-  url "https://ftp.gnu.org/gnu/ocrad/ocrad-0.27.tar.lz"
-  mirror "https://ftpmirror.gnu.org/ocrad/ocrad-0.27.tar.lz"
-  sha256 "a9bfe67e9a040907aff5640dca56392476b6a89e48e37dc94ba846c5b6733b36"
-  license "GPL-2.0"
-
-  livecheck do
-    url :stable
-  end
+  url "https://ftp.gnu.org/gnu/ocrad/ocrad-0.28.tar.lz"
+  mirror "https://ftpmirror.gnu.org/ocrad/ocrad-0.28.tar.lz"
+  sha256 "34ccea576dbdadaa5979e6202344c3ff68737d829ca7b66f71c8497d36bbbf2e"
+  license "GPL-2.0-or-later"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "59bfd9714c393b8910fdd9cbc337dfeaf431f78215820ffe47fe59841231e7f4" => :big_sur
-    sha256 "bfbe36f994bcbba6286b9bec6206e314d405a42ca222821648a6962b17a2aecb" => :arm64_big_sur
-    sha256 "6533cd452587714531d20b4aa74ea7fc1e323ff893c8a7c9729655ede1ec9df7" => :catalina
-    sha256 "3d1c85bb36faedf5ab12f78e8c3511dcc4164561ba8bc09924b48f6aa3fa0b37" => :mojave
-    sha256 "ba9b30eeabc11634502e30fd9a730d5727668550f9708d46fbefc03bcb3917de" => :high_sierra
-    sha256 "903ce6530395c0973418020561ddd60da739f3a36e865500776922e18975460b" => :sierra
+    sha256 cellar: :any,                 arm64_monterey: "443fa5aa2aba1104b638287c43df241736769328d32f234ec3af8da24bccc2ea"
+    sha256 cellar: :any,                 arm64_big_sur:  "ca07488430da95c3c7c59fc8658a8009942ddd05ce4ebb5986b3530d95551366"
+    sha256 cellar: :any,                 monterey:       "ec671c1d8ea4e8fb12bc40fc502e1c462e9f6ffb320fd8d9fedc1698267a92e5"
+    sha256 cellar: :any,                 big_sur:        "f942c1124e0e1061808f6981e0dd9ddbf2bed352e4f325a38a0514ffcd6f24d8"
+    sha256 cellar: :any,                 catalina:       "5abeb11db2bc2f220afbc610ddbc59ca04352dd2318b6dfd8ae289e357b2661e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5d8d1bdfa4d338a02ba6293b7527b81d3093a07dbbc9943461c4fe7c3291a3a1"
   end
+
+  depends_on "libpng"
 
   def install
     system "./configure", "--prefix=#{prefix}"

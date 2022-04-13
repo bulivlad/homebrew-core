@@ -1,27 +1,23 @@
 class Wolfmqtt < Formula
   desc "Small, fast, portable MQTT client C implementation"
   homepage "https://github.com/wolfSSL/wolfMQTT"
-  url "https://github.com/wolfSSL/wolfMQTT/releases/download/v1.7/wolfmqtt-1.7.0.tar.gz"
-  sha256 "fd9aa74e4c7ad4fec8f2d4c40ce32785b5bb55d7c013c5acc846062583f09a9c"
+  url "https://github.com/wolfSSL/wolfMQTT/archive/refs/tags/v1.12.0.tar.gz"
+  sha256 "38ded5114614a3514ac8bc5839b39b3cd6125088d04c324de9c9f33c1c13b526"
   license "GPL-2.0-or-later"
+  head "https://github.com/wolfSSL/wolfMQTT.git", branch: "master"
 
   bottle do
-    cellar :any
-    sha256 "e07f57c741c69ef671c74c08a2dc9207235c9f31392a147570f27c17bfe532a9" => :big_sur
-    sha256 "671d2455c56297175e060a87686e45d9a8343e360f99cb94030adf0679aa6f73" => :arm64_big_sur
-    sha256 "073807b984df8fb86ffde192cb3c0ace7c7f139d81da937e71874fcaa02e820b" => :catalina
-    sha256 "32e32e9f2d87974550fdc18e054f639d0a138e74aace8a2ceb639b992cdd54f1" => :mojave
-    sha256 "3e2a29fd675291511f203d094e235461483a7a0d8135b286c94900dd9e25f963" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "2657e71276bef863e848ba4adeacc81fc3a2a4e0536eeb6d9ce66ac5196a0aa0"
+    sha256 cellar: :any,                 arm64_big_sur:  "b2de13c0ba6b6bd82cb1939ce8b3441ef50fbb1dd9c1fdff47d759ecd7600d0d"
+    sha256 cellar: :any,                 monterey:       "02ad5aab4a1f524379cfc46991be2bf9457cacd27a20042863946a6a9ebdf89e"
+    sha256 cellar: :any,                 big_sur:        "20506def8569a687ff99782c9834996cffff2ee19bf3c1d498b430c71578557b"
+    sha256 cellar: :any,                 catalina:       "eb0afa9a69b790aa252ca7082b29c989bb50c795f5e6aa26782f5cc2ffdc0752"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4b4de029ff45036f2a7ca2cba99c74a26986b5228eed8283403b49985106b2e6"
   end
 
-  head do
-    url "https://github.com/wolfSSL/wolfMQTT.git"
-
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
-    depends_on "libtool" => :build
-  end
-
+  depends_on "autoconf" => :build
+  depends_on "automake" => :build
+  depends_on "libtool" => :build
   depends_on "wolfssl"
 
   def install
@@ -39,7 +35,7 @@ class Wolfmqtt < Formula
       --enable-sn
     ]
 
-    system "./autogen.sh" if build.head?
+    system "./autogen.sh"
     system "./configure", *args
     system "make"
     system "make", "install"

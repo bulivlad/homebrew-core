@@ -1,60 +1,39 @@
 class CassandraReaper < Formula
   desc "Management interface for Cassandra"
   homepage "https://cassandra-reaper.io/"
-  url "https://github.com/thelastpickle/cassandra-reaper/releases/download/2.1.3/cassandra-reaper-2.1.3-release.tar.gz"
-  sha256 "ba9a925c512996f55481914f6c02832c96d3c334722f7d611a76d30c1a9c16ee"
+  url "https://github.com/thelastpickle/cassandra-reaper/releases/download/3.1.1/cassandra-reaper-3.1.1-release.tar.gz"
+  sha256 "8d71f6e74306f4ef33cc1af6822d7a3702f347355589d66cd899ce546df12d1e"
   license "Apache-2.0"
+  revision 1
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "760c1fa6584111c867b28479f60eec50e362a531fa066fb29bd0d3082009c040" => :big_sur
-    sha256 "7368f52e8a3992a67a077442fcb3a2e4168cfd9607b873b55d4871302742002a" => :catalina
-    sha256 "29bf7a8f41b59dccf1466612a9b7a123e7e3183a5e5bd154bf47c42d44632482" => :mojave
+    sha256 cellar: :any_skip_relocation, all: "808c52e9c2375318ba1d94a6bcfdfa7f5c51d37b0e05d0e065ca74cb46f8379e"
   end
 
-  depends_on "openjdk@8"
+  depends_on "openjdk@11"
 
   def install
+    inreplace Dir["resource/*.yaml"], " /var/log", " #{var}/log"
+    inreplace "bin/cassandra-reaper", "/usr/local/share", share
+    inreplace "bin/cassandra-reaper", "/usr/local/etc", etc
+
+    libexec.install "bin/cassandra-reaper"
     prefix.install "bin"
     etc.install "resource" => "cassandra-reaper"
     share.install "server/target" => "cassandra-reaper"
-    inreplace Dir[etc/"cassandra-reaper/*.yaml"], " /var/log", " #{var}/log"
+
+    (bin/"cassandra-reaper").write_env_script libexec/"cassandra-reaper",
+      Language::Java.overridable_java_home_env("11")
   end
 
-  plist_options manual: "cassandra-reaper"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>ProgramArguments</key>
-          <array>
-            <string>#{opt_bin}/cassandra-reaper</string>
-          </array>
-          <key>RunAtLoad</key>
-          <true/>
-          <key>KeepAlive</key>
-          <true/>
-          <key>StandardErrorPath</key>
-          <string>#{var}/log/cassandra-reaper/service.log</string>
-          <key>StandardOutPath</key>
-          <string>#{var}/log/cassandra-reaper/service.err</string>
-          <key>EnvironmentVariables</key>
-          <dict>
-            <key>JAVA_HOME</key>
-            <string>#{Formula["openjdk@8"].opt_prefix}</string>
-          </dict>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run opt_bin/"cassandra-reaper"
+    keep_alive true
+    error_log_path var/"log/cassandra-reaper/service.err"
+    log_path var/"log/cassandra-reaper/service.log"
   end
 
   test do
-    ENV["JAVA_HOME"] = Formula["openjdk@8"].opt_prefix
     cp etc/"cassandra-reaper/cassandra-reaper.yaml", testpath
     port = free_port
     inreplace "cassandra-reaper.yaml" do |s|
@@ -64,7 +43,7 @@ class CassandraReaper < Formula
     fork do
       exec "#{bin}/cassandra-reaper", "#{testpath}/cassandra-reaper.yaml"
     end
-    sleep 10
+    sleep 30
     assert_match "200 OK", shell_output("curl -Im3 -o- http://localhost:#{port}/webui/login.html")
   end
 end

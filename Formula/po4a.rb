@@ -5,22 +5,25 @@ class Po4a < Formula
 
   desc "Documentation translation maintenance tool"
   homepage "https://po4a.org"
-  url "https://github.com/mquinson/po4a/releases/download/v0.62/po4a-0.62.tar.gz"
-  sha256 "0eb510a66f59de68cf7a205342036cc9fc08b39334b91f1456421a5f3359e68b"
+  url "https://github.com/mquinson/po4a/releases/download/v0.66/po4a-0.66.tar.gz"
+  sha256 "854a75b91b2b39f4c2a4ed244dba22c9b01be675e2bd1448dce68c8e90d2f2ff"
   license "GPL-2.0-or-later"
-  head "https://github.com/mquinson/po4a.git"
+  head "https://github.com/mquinson/po4a.git", branch: "master"
 
   bottle do
-    cellar :any
-    sha256 "be07a4aa6a8aa9a7af23395b0147145bd6657d35d9893aa721fd147b95894812" => :big_sur
-    sha256 "8a72e398989f8092295c86e17cf6b83bc7c17b59db65dd3f1c7c1da735cd4e9a" => :catalina
-    sha256 "789846cb0a70c89373554db39fb5bc710e0c2d5207becf96edde186e2e8ba606" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "b7dfd568f731a09e3da3ac0032e87fbbc591d67382156fc84a48ef5932504e78"
+    sha256 cellar: :any,                 arm64_big_sur:  "5b9b2e358d4d5fe41c553a1f4643f412c9ba7dad56c49df234be1d7d6c6aa8d6"
+    sha256 cellar: :any,                 monterey:       "fe7df5df2385cb52c14b3976c061af33a030d6e28c5b6d5df0b94642d45f8c50"
+    sha256 cellar: :any,                 big_sur:        "5b07035f584ee757311fd08f82bef27efe4511627e36d14535ebe46846382fa4"
+    sha256 cellar: :any,                 catalina:       "3dfc1f4cde97217205752346004841e0f7c95af44ef3d56806c061c059ba6dad"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b9d248005fdc21a472cc730b4af982078a2e2d0164c579153b3841df1e7e860b"
   end
 
   depends_on "docbook-xsl" => :build
   depends_on "gettext"
+  depends_on "perl"
 
-  uses_from_macos "perl"
+  uses_from_macos "libxslt"
 
   resource "Locale::gettext" do
     url "https://cpan.metacpan.org/authors/id/P/PV/PVANDRY/gettext-1.07.tar.gz"
@@ -28,8 +31,6 @@ class Po4a < Formula
   end
 
   resource "Module::Build" do
-    # po4a requires Module::Build v0.4200 and above, while standard
-    # MacOS Perl installation has 0.4003
     url "https://cpan.metacpan.org/authors/id/L/LE/LEONT/Module-Build-0.4231.tar.gz"
     sha256 "7e0f4c692c1740c1ac84ea14d7ea3d8bc798b2fb26c09877229e04f430b2b717"
   end
@@ -71,13 +72,6 @@ class Po4a < Formula
     resources.each do |r|
       r.stage do
         system "perl", "Makefile.PL", "INSTALL_BASE=#{libexec}", "NO_MYMETA=1"
-
-        # Work around restriction on 10.15+ where .bundle files cannot be loaded
-        # from a relative path -- while in the middle of our build we need to
-        # refer to them by their full path.  Workaround adapted from:
-        #   https://github.com/fink/fink-distributions/issues/461#issuecomment-563331868
-        inreplace "Makefile", "blib/", "$(shell pwd)/blib/" if r.name == "TermReadKey"
-
         system "make", "install"
       end
     end

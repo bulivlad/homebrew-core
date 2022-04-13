@@ -1,15 +1,18 @@
 class Nuget < Formula
   desc "Package manager for Microsoft development platform including .NET"
   homepage "https://www.nuget.org/"
-  url "https://dist.nuget.org/win-x86-commandline/v5.8.0/nuget.exe" # make sure libexec.install below matches case
-  sha256 "5c5b9c96165d3283b2cb9e5b65825d343e0e7139b9e70a250b4bb24c2285f3ba"
+  url "https://dist.nuget.org/win-x86-commandline/v6.0.0/nuget.exe" # make sure libexec.install below matches case
+  sha256 "04eb6c4fe4213907e2773e1be1bbbd730e9a655a3c9c58387ce8d4a714a5b9e1"
+  license "MIT"
 
   livecheck do
     url "https://dist.nuget.org/tools.json"
     regex(%r{"url":\s*?"[^"]+/v?(\d+(?:\.\d+)+)/nuget\.exe",\s*?"stage":\s*?"ReleasedAndBlessed"}i)
   end
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any_skip_relocation, all: "e819eb531412fd5f4244df4d74b0d98c8ab70cc6a4c94ec0c729ab57675eccbc"
+  end
 
   depends_on "mono"
 

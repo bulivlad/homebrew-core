@@ -2,24 +2,28 @@ class Pnpm < Formula
   require "language/node"
 
   desc "📦🚀 Fast, disk space efficient package manager"
-  homepage "https://pnpm.js.org"
-  url "https://registry.npmjs.org/pnpm/-/pnpm-5.15.1.tgz"
-  sha256 "f6e8901cedd18188fe66be93fdb43569b5b25ce2542e61e427a4ed420f03cd26"
+  homepage "https://pnpm.io/"
+  url "https://registry.npmjs.org/pnpm/-/pnpm-6.32.6.tgz"
+  sha256 "488d1ec675d7e84b19678f466ee7cfa429a82a432399207825c4a98a16f29ba2"
   license "MIT"
 
   livecheck do
-    url :stable
+    url "https://registry.npmjs.org/pnpm/latest"
+    regex(/["']version["']:\s*?["']([^"']+)["']/i)
   end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "f3149add0a41d85253075d8f825e560f79bd2319135450d7c6d13b784c2f2a41" => :big_sur
-    sha256 "d934d9fc6c3a3251299f2f4d95e6005118c32ee38f507a7e09d77951f67b5646" => :arm64_big_sur
-    sha256 "6fe403a3ac91dcb1e111ed6ec31b948fb52c3169442644e9b0b5e2bcc06d51bd" => :catalina
-    sha256 "416d0b9a3c6b10663099e7da624763f685b0509b6011a2401e96e7a291c50db1" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "0e8b16969809a6386efe7759961ea17d5aab66d8d1e3b47caad18641558e9604"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "0e8b16969809a6386efe7759961ea17d5aab66d8d1e3b47caad18641558e9604"
+    sha256 cellar: :any_skip_relocation, monterey:       "2d0fc0e08d16f7be9d455aa3b3e3548d78dd70fc96b4306571e5f342bedd3ae9"
+    sha256 cellar: :any_skip_relocation, big_sur:        "2328f08310d12c90199e0b3957b0b6b45a17c4b6e291edb7e1ea6f8da4b73901"
+    sha256 cellar: :any_skip_relocation, catalina:       "2328f08310d12c90199e0b3957b0b6b45a17c4b6e291edb7e1ea6f8da4b73901"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0e8b16969809a6386efe7759961ea17d5aab66d8d1e3b47caad18641558e9604"
   end
 
   depends_on "node"
+
+  conflicts_with "corepack", because: "both installs `pnpm` and `pnpx` binaries"
 
   def install
     system "npm", "install", *Language::Node.std_npm_install_args(libexec)

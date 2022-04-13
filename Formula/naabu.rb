@@ -1,20 +1,24 @@
 class Naabu < Formula
   desc "Fast port scanner"
   homepage "https://github.com/projectdiscovery/naabu"
-  url "https://github.com/projectdiscovery/naabu/archive/v2.0.3.tar.gz"
-  sha256 "ec967a094f4de76880072f83db830745d4b34ce8f41b14047d8158187ec14212"
+  url "https://github.com/projectdiscovery/naabu/archive/v2.0.5.tar.gz"
+  sha256 "ec9ef8c7cff41d43b754859e4eba9c7aa2453100371c4bd01e82ac46dcf8f424"
   license "MIT"
-  head "https://github.com/projectdiscovery/naabu.git"
+  head "https://github.com/projectdiscovery/naabu.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "76af89c3ff6b834a4ab16b86e981b761ed2811630bc99675f5516ab7fd6c96c0" => :big_sur
-    sha256 "ae9dbd299ba99a226616d232b3b75882428bce0828a1dc32abe56c5de58fd0d9" => :arm64_big_sur
-    sha256 "ca6a24af7e25bc3ded93af7982de6e5568a12cbc13d291a484e41d55f652f77b" => :catalina
-    sha256 "74c393d06df9c4dfb29165803b573378f4beacb4b979e07c3d68b4972ba45eec" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "07cde489c34a237411f64ec430fafdfaa096e006ad0fff7c504ae8ac10d9788b"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "b2cbc2fcb81774b4ba7f82548d2e4f67e383ca06af6c308eaa0a463144159a2c"
+    sha256 cellar: :any_skip_relocation, monterey:       "8c4ed0ee5cd0708252cf6ea0fb0fad11d0fbcd6069fc1c8343d191cce40aa0ea"
+    sha256 cellar: :any_skip_relocation, big_sur:        "d029d03fce9096c163de85b9084d2c7a8eab195fb3895196680fc3d7c9948801"
+    sha256 cellar: :any_skip_relocation, catalina:       "93bbe2f3b71611f35213a7c6c2ed2938156858931254c7b6356e6527412d3cc6"
+    sha256 cellar: :any_skip_relocation, mojave:         "0ede7021872b98becd1eea302209b11cbc0198a7fb812517a4cbbe1d8325f0a0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "788f0f18ac38c7047441dd6db332a176e27aef39830d77b78c85e08b280db424"
   end
 
   depends_on "go" => :build
+
+  uses_from_macos "libpcap"
 
   def install
     cd "v2" do

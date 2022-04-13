@@ -1,18 +1,15 @@
 class CreateDmg < Formula
   desc "Shell script to build fancy DMGs"
   homepage "https://github.com/create-dmg/create-dmg"
-  url "https://github.com/create-dmg/create-dmg/archive/v1.0.8.tar.gz"
-  sha256 "6eb256e6835e650e4a529c9ea0630c409e6d1d5413fc9076b94d231674fa4cae"
+  url "https://github.com/create-dmg/create-dmg/archive/v1.0.10.tar.gz"
+  sha256 "8fd43498988f6d334d483faf4e4a330a25228784995d72c57e4565967d09e6ab"
   license "MIT"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "579aa12677f4d4772436afbf22e730bd0be8a8045597995c9aadd94a8f0a77d1" => :big_sur
-    sha256 "862e35170855882f5aef6be695f4e3134b71889529f68e85af6a7c9b4278fff8" => :arm64_big_sur
-    sha256 "42ba5df600cee3cc0c2ea3da594e2c09b710e93345f36941bf11cbece30464be" => :catalina
-    sha256 "42ba5df600cee3cc0c2ea3da594e2c09b710e93345f36941bf11cbece30464be" => :mojave
-    sha256 "42ba5df600cee3cc0c2ea3da594e2c09b710e93345f36941bf11cbece30464be" => :high_sierra
+    sha256 cellar: :any_skip_relocation, all: "2f7ff645731a8108b32f4aba84a8b501177c5a4de47d0a2c8db23b5119fd7c92"
   end
+
+  depends_on :macos
 
   def install
     system "make", "install", "prefix=#{prefix}"

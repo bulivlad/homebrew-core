@@ -1,9 +1,11 @@
 class Gh < Formula
   desc "GitHub command-line tool"
   homepage "https://github.com/cli/cli"
-  url "https://github.com/cli/cli/archive/v1.4.0.tar.gz"
-  sha256 "9f8851264938e48f5ccabe12e4de404ee0f94c8e33c107b818c4e324dbafa558"
+  url "https://github.com/cli/cli/archive/v2.7.0.tar.gz"
+  sha256 "d6cd8887f22fd57d477a0e640b63f7632b345056bf01b4dfc080e1e7a8191136"
   license "MIT"
+
+  head "https://github.com/cli/cli.git", branch: "trunk"
 
   livecheck do
     url :stable
@@ -11,19 +13,23 @@ class Gh < Formula
   end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "daf4c5b566b1a1b9f00ac73aeffcc72792479da9ddebfdb3a91ce5d19fbba309" => :big_sur
-    sha256 "b039ae32ed849b635eb7b3e1c7528d9934537c4dac76f170a2d195eab2148466" => :arm64_big_sur
-    sha256 "70c9d617f18341ab35bebc17b1916ec79cc053dbed5782eb34656babdb6908a8" => :catalina
-    sha256 "930dd87d86bcc1b6ac220cc488766df4fc00472d49221b37f51281970015cabe" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "d6c89eda2537f55def232192c14182ede14937ae2e0f906c07070bedb0b0503e"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "bf4dbaebf14efa5afcdde3ecf6f0a0a19c955142ba0f243994a05ca01a94cf6a"
+    sha256 cellar: :any_skip_relocation, monterey:       "b122c62851ed16f82232ea79892dbb790e71a6b5d04e6458f2c41446e86975c6"
+    sha256 cellar: :any_skip_relocation, big_sur:        "1bf231ae6fdea3c85feb6e15e6036412a3581f3da0f6e177461099a40bc79823"
+    sha256 cellar: :any_skip_relocation, catalina:       "5a3a005cd5449ee492c9152da195516bcff37673b04ee781bce9cbe11f1c7dc1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "aecf37ed802e1aa6ede4ec59a84c16077cb967a86ce9eaf1d3903f7831c4f7d7"
   end
 
   depends_on "go" => :build
 
   def install
-    ENV["GH_VERSION"] = version.to_s
-    ENV["GO_LDFLAGS"] = "-s -w"
-    system "make", "bin/gh", "manpages"
+    with_env(
+      "GH_VERSION" => version.to_s,
+      "GO_LDFLAGS" => "-s -w -X main.updaterEnabled=cli/cli",
+    ) do
+      system "make", "bin/gh", "manpages"
+    end
     bin.install "bin/gh"
     man1.install Dir["share/man/man1/gh*.1"]
     (bash_completion/"gh").write `#{bin}/gh completion -s bash`

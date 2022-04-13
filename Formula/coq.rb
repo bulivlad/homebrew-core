@@ -1,23 +1,26 @@
 class Coq < Formula
   desc "Proof assistant for higher-order logic"
   homepage "https://coq.inria.fr/"
-  url "https://github.com/coq/coq/archive/V8.13.0.tar.gz"
-  sha256 "06445dbd6cb3c8a2e4e957dbd12e094d609a62fcb0c8c3cad0cd1fdedda25c9b"
+  url "https://github.com/coq/coq/archive/V8.15.0.tar.gz"
+  sha256 "73466e61f229b23b4daffdd964be72bd7a110963b9d84bd4a86bb05c5dc19ef3"
   license "LGPL-2.1-only"
-  head "https://github.com/coq/coq.git"
+  head "https://github.com/coq/coq.git", branch: "master"
 
   livecheck do
-    url :head
+    url :stable
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
   bottle do
-    rebuild 1
-    sha256 "7dd6076443266eac49ec08a6dfa21e87bc5ca4078c9f437a5332f1608850feca" => :big_sur
-    sha256 "efa50a3b7b3e835905f814c8de3a8ec05348f5039387ec0ec615c034e92b985e" => :catalina
-    sha256 "201e0b61e6a02145c3afa3083cdf7b05fe270306317eedeaa35a27e8d8470445" => :mojave
+    sha256 arm64_monterey: "94d901ca4675f97322ae04f3474bb0345673d8925c30128c170c09ef97c9904d"
+    sha256 arm64_big_sur:  "f58c9dd0cf172093fbc08189ed89885c0eb492685cf8d852798366414733eb05"
+    sha256 monterey:       "b8b12628eb6693abc60a80e02b312429d01d354569338f7641e54238b7abf754"
+    sha256 big_sur:        "40514554b814a1d95d128baf4d2fffb54b01ec51821dc3cb228a4332a79ea6f5"
+    sha256 catalina:       "8b9006e565578633129b4eba9ec6bc752456a70748ad9358beefb7c4d389c7fb"
+    sha256 x86_64_linux:   "01ac370c205cc12a7b1370b476013e085d418a2ba4b420d1f8f7d21ae52d4953"
   end
 
+  depends_on "dune" => :build
   depends_on "ocaml-findlib" => :build
   depends_on "ocaml"
   depends_on "ocaml-zarith"
@@ -28,7 +31,7 @@ class Coq < Formula
   def install
     system "./configure", "-prefix", prefix,
                           "-mandir", man,
-                          "-coqdocdir", "#{pkgshare}/latex",
+                          "-docdir", "#{pkgshare}/latex",
                           "-coqide", "no",
                           "-with-doc", "no"
     system "make", "world"

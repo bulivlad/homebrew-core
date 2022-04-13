@@ -1,9 +1,9 @@
 class Gpsbabel < Formula
   desc "Converts/uploads GPS waypoints, tracks, and routes"
   homepage "https://www.gpsbabel.org/"
-  url "https://github.com/gpsbabel/gpsbabel/archive/gpsbabel_1_7_0.tar.gz"
-  sha256 "30b186631fb43db576b8177385ed5c31a5a15c02a6bc07bae1e0d7af9058a797"
-  license "GPL-2.0"
+  url "https://github.com/GPSBabel/gpsbabel/archive/gpsbabel_1_8_0.tar.gz"
+  sha256 "448379f0bf5f5e4514ed9ca8a1069b132f4d0e2ab350e2277e0166bf126b0832"
+  license "GPL-2.0-or-later"
 
   livecheck do
     url :stable
@@ -11,10 +11,12 @@ class Gpsbabel < Formula
   end
 
   bottle do
-    sha256 "1527cf246d7bc4c9ad4ea32f1dae2df36a34c2f10e1a561474a52e40fd455114" => :big_sur
-    sha256 "ef08f246d1d7321d1bb605591194f2d207fc0cd2465755dbbe86afc640cb41db" => :catalina
-    sha256 "7a622c1a689d239e3a98185220428127cffee6f3d060519d509106a8a37fdbc1" => :mojave
-    sha256 "d8a8ecec7300d96476fbba89a2343d87712628cfd2f4325df19aed2dabec4b17" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "7b5c28ab75dade273785b1e7f7080a2067e10262462bb4e4a19da5daa0e7e64d"
+    sha256 cellar: :any,                 arm64_big_sur:  "ac807500298ffee8afc0ad6d884db0307d73fb639733ae4c074c91f04ef1ba72"
+    sha256                               monterey:       "8c12af303436297edaf88e0e78583d76c31032ff3477659caaeae64c134428b9"
+    sha256                               big_sur:        "3e47fe71c6074f53f9ca9c25e357e6f8fb3b146bbc829dea38fae76a767e068b"
+    sha256                               catalina:       "3d4f1679c62ccd105a106cd2aba55e091d1312d3b636230721f3c7c4e33f78f2"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7e500ef423595a42e5fe19e50221d210201a7a2cd6bd556654f1a8ba66122154"
   end
 
   depends_on "pkg-config" => :build
@@ -24,11 +26,11 @@ class Gpsbabel < Formula
 
   uses_from_macos "zlib"
 
-  # upstream https://github.com/gpsbabel/gpsbabel/pull/611 added support for configuration of third party libraries.
-  patch do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/8122e505c149fdb42132a18a9749f7b8c9940b77/gpsbabel/1.7.0.patch"
-    sha256 "8f6572aa8dc3a7b4db028bf75d952d97f7b47de278a91c3cc86bebed608be86a"
+  on_linux do
+    depends_on "gcc"
   end
+
+  fails_with gcc: "5"
 
   def install
     ENV.cxx11

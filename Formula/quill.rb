@@ -1,17 +1,19 @@
 class Quill < Formula
   desc "C++14 Asynchronous Low Latency Logging Library"
   homepage "https://github.com/odygrd/quill"
-  url "https://github.com/odygrd/quill/archive/v1.6.1.tar.gz"
-  sha256 "282f54a67fecaa7f094cf986a9e2f7fab342f39e9167c76d7619ad531d0bbaa5"
+  url "https://github.com/odygrd/quill/archive/v1.6.3.tar.gz"
+  sha256 "886120b084db952aafe651c64f459e69fec481b4e189c14daa8c4108afebcba3"
   license "MIT"
-  head "https://github.com/odygrd/quill.git"
+  head "https://github.com/odygrd/quill.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "68eb91bec1bb6aa4940c8810fcc52249d481d561d330c3b47e1a81bf7ad04e05" => :big_sur
-    sha256 "95fe2829bbb6e32603f6643bcee27c1d35cedbbe2a0fd46c68c9e761a69a2e20" => :arm64_big_sur
-    sha256 "f2cbdd35b47985eb42e2704dcf66350bdedf9e81d71e2d180ed2c584882056ff" => :catalina
-    sha256 "d44cf769025e1d4b1a0cb54e4f6868bbfd48f7b2f7b21d9043add433d3163244" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "d43aba895c3307a5965b4cdb34124967af8f748c5da80d7d9b0842c88d979eed"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "20314cbc7129a86e7431687ba26d26ba0add0e115e80536b02dfcf5398217097"
+    sha256 cellar: :any_skip_relocation, monterey:       "94577e70e360724ae8e3fa750d6f210e4b14ebcf5eb946caf051dafda0276cb5"
+    sha256 cellar: :any_skip_relocation, big_sur:        "22f64135866f9600feb5495d4a8b58b29ef1f7c02de8edafe50960b2595910aa"
+    sha256 cellar: :any_skip_relocation, catalina:       "2112f5965f599db294f9e2c2cfb86acf39b8482120c181cf841ee2a569e7c30e"
+    sha256 cellar: :any_skip_relocation, mojave:         "d8a4190b8461b8860363d96a0623e4ad75a1da416a21bcc48a00340f50ce41ea"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3daaf537147bfa374930cb088a271cb735d42a12f208727680e578eef62a0f38"
   end
 
   depends_on "cmake" => :build
@@ -39,7 +41,7 @@ class Quill < Formula
       }
     EOS
 
-    system ENV.cxx, "-std=c++14", "test.cpp", "-I#{include}", "-L#{lib}", "-lquill", "-o", "test"
+    system ENV.cxx, "-std=c++14", "test.cpp", "-I#{include}", "-L#{lib}", "-lquill", "-o", "test", "-pthread"
     system "./test"
     assert_predicate testpath/"basic-log.txt", :exist?
     assert_match "Test", (testpath/"basic-log.txt").read

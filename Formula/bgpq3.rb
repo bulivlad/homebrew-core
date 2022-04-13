@@ -1,10 +1,10 @@
 class Bgpq3 < Formula
   desc "BGP filtering automation for Cisco, Juniper, BIRD and OpenBGPD routers"
   homepage "http://snar.spb.ru/prog/bgpq3/"
-  url "https://github.com/snar/bgpq3/archive/v0.1.35.tar.gz"
-  sha256 "571b99dc4186618ad3c77317eef2c20a8e601ce665a6b0f1ffca6e3d8d804cde"
+  url "https://github.com/snar/bgpq3/archive/v0.1.36.1.tar.gz"
+  sha256 "68d602434d072115b848f6047a7a29812d53c709835a4fbd0ba34dcc31553bcd"
   license "BSD-2-Clause"
-  head "https://github.com/snar/bgpq3.git"
+  head "https://github.com/snar/bgpq3.git", branch: "master"
 
   livecheck do
     url :stable
@@ -12,13 +12,12 @@ class Bgpq3 < Formula
   end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "4550c91dd5daeaf0320c7b678ffd68c5d5fc3d611857f5dcb4fe9b7130e3f439" => :big_sur
-    sha256 "8007ef3e5542b067d4684b88e1ac509d2bc8566ba85536235070081dba0994f1" => :arm64_big_sur
-    sha256 "428a0dcb0af2876c03374236ee10b2385ab993dc54cc12e080198d7e552bbdea" => :catalina
-    sha256 "a16c482aa8e1a821d6747b2871174109ccbcf407e5799794f6307303fcffafcb" => :mojave
-    sha256 "2bf730bec0bca51bd9a3db7a3cd5e4bf36199717a8190db270a5f4751bb1a5e1" => :high_sierra
-    sha256 "052fb1ae9a1546b13f865b25f4ff5879f4a7c77350d14720442fc6cd898d833d" => :sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "890ade49fae97d8e9967362b464b57cc172fb5305e05dee84d7c3b5ab5e869bd"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "b9edea14c24ccca9986d9dbf14cedd8e245fc49ecffb07a3079deff2b6576448"
+    sha256 cellar: :any_skip_relocation, monterey:       "7a130fc4a82b1ab7255290dc18058a369ba604905386a32ac7f76a6bab543ee7"
+    sha256 cellar: :any_skip_relocation, big_sur:        "6d04e58f086891a0a8f1bd8c91e813afb4de0fff26f61a8bc30d3c82d2829a42"
+    sha256 cellar: :any_skip_relocation, catalina:       "4294f76491ed0fe10c6df11b695489e2765b7eb8bd4ccfe0adcabced418968a2"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ee8fc268ac1e1293ee27d9b8a82411c7dc98f2a4df8e4a88efed3635699bc4ba"
   end
 
   # Makefile: upstream has been informed of the patch through email (multiple
@@ -37,15 +36,11 @@ class Bgpq3 < Formula
 end
 
 __END__
-diff --git a/Makefile.in b/Makefile.in
-index c2d7e96..afec780 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -29,9 +29,10 @@ clean:
- 	rm -rf *.o *.core core.* core
-
+@@ -32,8 +32,8 @@
  install: bgpq3
-+	if test ! -d @prefix@/bin ; then mkdir -p @prefix@/bin ; fi
+ 	if test ! -d @bindir@ ; then mkdir -p @bindir@ ; fi
  	${INSTALL} -c -s -m 755 bgpq3 @bindir@
 -	if test ! -d @prefix@/man/man8 ; then mkdir -p @prefix@/man/man8 ; fi
 -	${INSTALL} -m 644 bgpq3.8 @prefix@/man/man8

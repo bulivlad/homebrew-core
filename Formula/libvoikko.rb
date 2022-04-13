@@ -1,9 +1,9 @@
 class Libvoikko < Formula
   desc "Linguistic software and Finnish dictionary"
   homepage "https://voikko.puimula.org/"
-  url "https://www.puimula.org/voikko-sources/libvoikko/libvoikko-4.3.tar.gz"
-  sha256 "e843df002fcea2a90609d87e4d6c28f8a0e23332d3b42979ab1793e18f839307"
-  revision 3
+  url "https://www.puimula.org/voikko-sources/libvoikko/libvoikko-4.3.1.tar.gz"
+  sha256 "368240d4cfa472c2e2c43dc04b63e6464a3e6d282045848f420d0f7a6eb09a13"
+  license "GPL-2.0-only"
 
   livecheck do
     url "https://www.puimula.org/voikko-sources/libvoikko/"
@@ -11,22 +11,23 @@ class Libvoikko < Formula
   end
 
   bottle do
-    cellar :any
-    sha256 "0d36dae546a309c83750f42e8eba3b6d9b51765f78093a9b6bffa5c9d5bc0cd8" => :big_sur
-    sha256 "32d024915b3a784c2142507c1d8c0b2ef675635ef9e387880b467a2c8aa7044b" => :arm64_big_sur
-    sha256 "94d12634dd73cba44a8e8c0fad1f2a2bea4db5ef50bffb277faaa400f798ccb0" => :catalina
-    sha256 "bc325b6ce79a331c7046c54449174ca7cd2640703e90f50244b5ddfe5ed8de3b" => :mojave
-    sha256 "5171bd4eeaba0f6712fd945622f76c0d615f3e6fad826329fa2ce77d8711380b" => :high_sierra
+    rebuild 1
+    sha256 cellar: :any,                 arm64_monterey: "bf4aa996837cb8eb1c000949a487966d5deb6ce3d6ccd8fcf877442af65a0053"
+    sha256 cellar: :any,                 arm64_big_sur:  "4268b4f20b4188f01bb26f407a46072f78533deb885e5c524e03ac0f52b34cfd"
+    sha256 cellar: :any,                 monterey:       "d7c7153b746f693b568d91aa33b5e31e12606628a410949978e867fce6c95830"
+    sha256 cellar: :any,                 big_sur:        "523ea2f2f1d90a9ecb5e3480dd21be34aec7fdd1aab436fcd1c7e086b7d5a974"
+    sha256 cellar: :any,                 catalina:       "122c2876b26e22df22bcce9557b2f1ef52c0529742a7a8a10b2f78e56164281d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4017cb4a9720f4da0d144f4ed811dcd8328b788471cecf8bea2e3d45a5d6a66f"
   end
 
   depends_on "foma" => :build
   depends_on "pkg-config" => :build
-  depends_on "python@3.9" => :build
+  depends_on "python@3.10" => :build
   depends_on "hfstospell"
 
   resource "voikko-fi" do
-    url "https://www.puimula.org/voikko-sources/voikko-fi/voikko-fi-2.3.tar.gz"
-    sha256 "37b7886a23cfbde472715ba1266e1a81e2a87c3f5ccce8ae23bd7b38bacdcec2"
+    url "https://www.puimula.org/voikko-sources/voikko-fi/voikko-fi-2.4.tar.gz"
+    sha256 "320b2d4e428f6beba9d0ab0d775f8fbe150284fbbafaf3e5afaf02524cee28cc"
   end
 
   def install
@@ -46,6 +47,6 @@ class Libvoikko < Formula
   end
 
   test do
-    pipe_output("#{bin}/voikkospell -m", "onkohan\n")
+    assert_match "C: onkohan", pipe_output("#{bin}/voikkospell -m", "onkohan\n")
   end
 end

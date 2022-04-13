@@ -3,27 +3,24 @@ require "language/node"
 class BitwardenCli < Formula
   desc "Secure and free password manager for all of your devices"
   homepage "https://bitwarden.com/"
-  url "https://registry.npmjs.org/@bitwarden/cli/-/cli-1.13.3.tgz"
-  sha256 "afb2d19f4a2c153a7a9978a48b394f013d3c472bb23b0bf46dbcb2f53a7eed54"
-  license "GPL-3.0"
-
-  livecheck do
-    url :stable
-  end
+  url "https://registry.npmjs.org/@bitwarden/cli/-/cli-1.22.0.tgz"
+  sha256 "6c05e7d31d6c885d43aee8370bbb50691ea07ae379b818ff2c90ebdcbf9363ac"
+  license "GPL-3.0-only"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "d8d85b4f14d7b98d7ca5844741fc5009c21500724e9ce034b1ebc5298c54f667" => :big_sur
-    sha256 "169dc03c6e32060e3e8e32e9cd61d58e386b52238c4ff0d9d830bba84015a7c2" => :arm64_big_sur
-    sha256 "ef80f95534d1e0731599620dbbd06d8297a1b4c83a486b14a9c2f507313422f9" => :catalina
-    sha256 "32f5ccd2ac760504711915d3291c0787a4b6b477ad44670b9c351d909a455167" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "356505be1123a39f3e013b0e44711e50ba6dd5ea9881d0bc0f1c5619ae1c0775"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "356505be1123a39f3e013b0e44711e50ba6dd5ea9881d0bc0f1c5619ae1c0775"
+    sha256 cellar: :any_skip_relocation, monterey:       "689dfe0c3ceb82d45e6a11db4440d644f8079256e9304099ec55c7f1e5ab3626"
+    sha256 cellar: :any_skip_relocation, big_sur:        "689dfe0c3ceb82d45e6a11db4440d644f8079256e9304099ec55c7f1e5ab3626"
+    sha256 cellar: :any_skip_relocation, catalina:       "689dfe0c3ceb82d45e6a11db4440d644f8079256e9304099ec55c7f1e5ab3626"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "356505be1123a39f3e013b0e44711e50ba6dd5ea9881d0bc0f1c5619ae1c0775"
   end
 
   depends_on "node"
 
   def install
     system "npm", "install", *Language::Node.std_npm_install_args(libexec)
-    bin.install_symlink Dir["#{libexec}/bin/*"]
+    bin.install_symlink Dir[libexec/"bin/*"]
   end
 
   test do

@@ -1,9 +1,10 @@
 class Libedit < Formula
   desc "BSD-style licensed readline alternative"
   homepage "https://thrysoee.dk/editline/"
-  url "https://thrysoee.dk/editline/libedit-20191231-3.1.tar.gz"
-  version "20191231-3.1"
-  sha256 "dbb82cb7e116a5f8025d35ef5b4f7d4a3cdd0a3909a146a39112095a2d229071"
+  url "https://thrysoee.dk/editline/libedit-20210910-3.1.tar.gz"
+  version "20210910-3.1"
+  sha256 "6792a6a992050762edcca28ff3318cdb7de37dccf7bc30db59fcd7017eed13c5"
+  license "BSD-3-Clause"
 
   livecheck do
     url :homepage
@@ -11,12 +12,13 @@ class Libedit < Formula
   end
 
   bottle do
-    cellar :any
-    sha256 "7add4831a5be1d9829064a690c36fb47a9a3b75e8a59acf266f4fc4f2a3ad4f6" => :big_sur
-    sha256 "9150af78748811901eee0d2e3c5199ed14dd7722a466d6fb9b1d900369e3e86f" => :arm64_big_sur
-    sha256 "faa58f2e587c5b982af44765f7a034a27837fc1e94816e094ace3f408ab4a7bf" => :catalina
-    sha256 "a707377be9d5fef881cdbb77ad3b562c9d5f54befb97a10d0b7158e4db87ef86" => :mojave
-    sha256 "06e087927f024a9030947216be3aaa46f97fc9dcc1b70959f60240b86bd8f574" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "d94db2216d13244df5b1b3a5d8a158c5a8403090b08b9acaf146c10c3226d4e5"
+    sha256 cellar: :any,                 arm64_big_sur:  "87f49ccb584888cb95885c09a586ec0d97f7d3813cdc38f66e07690143226583"
+    sha256 cellar: :any,                 monterey:       "95938022416b3a19c67763eef069c3b98922f58d87a5c2c0d6a654a9a9a08323"
+    sha256 cellar: :any,                 big_sur:        "f1c631b30d1daf17da2bdd3d1f59330d99439ff15dd573e52364bc014a664803"
+    sha256 cellar: :any,                 catalina:       "38e6ae9c4fd560bc93003106a786fac1e26749426b837e8f92fb38b547b0edb7"
+    sha256 cellar: :any,                 mojave:         "44e7ce6ef6d1f558f565d03e4287d6da98a36e120b736a083d5c751669fdb7c1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c0bdbd74d04e366389621c1951d0a1de06a359c19da5c2c5b847605bca617753"
   end
 
   keg_only :provided_by_macos
@@ -28,6 +30,11 @@ class Libedit < Formula
                           "--disable-silent-rules",
                           "--prefix=#{prefix}"
     system "make", "install"
+
+    if OS.linux?
+      # Conflicts with readline.
+      mv man3/"history.3", man3/"history_libedit.3"
+    end
   end
 
   test do

@@ -3,35 +3,30 @@ class Libgusb < Formula
 
   desc "GObject wrappers for libusb1"
   homepage "https://github.com/hughsie/libgusb"
+  url "https://people.freedesktop.org/~hughsient/releases/libgusb-0.3.10.tar.xz"
+  sha256 "0eb0b9ab0f8bba0c59631c809c37b616ef34eb3c8e000b0b9b71cf11e4931bdc"
   license "LGPL-2.1-only"
-  revision 2
-  head "https://github.com/hughsie/libgusb.git"
+  head "https://github.com/hughsie/libgusb.git", branch: "main"
 
-  stable do
-    url "https://people.freedesktop.org/~hughsient/releases/libgusb-0.3.5.tar.xz"
-    sha256 "5b2a00c6997cc4b0133c5a5748a2e616e9e7504626922105b62aadced78e65df"
-
-    # Patch accepted upstream to allow for building without meson-internal
-    # Remove on next release
-    patch do
-      url "https://github.com/hughsie/libgusb/commit/b2ca7ebb887ff10314a5a000e7d21e33fd4ffc2f.patch?full_index=1"
-      sha256 "a068b0f66079897866d2b9280b3679f58c040989f74ee8d8bd70b0f8e977ec37"
-    end
+  livecheck do
+    url "https://people.freedesktop.org/~hughsient/releases/"
+    regex(/href=.*?libgusb[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 "7fe394a32e306eb3a5acc9f51b6f07cc46243bb863b15f17eea800d2a1a09231" => :big_sur
-    sha256 "934cca2fcf888878cf8da4b40cdbd6548d060f09318242c2818ee3686104ee72" => :arm64_big_sur
-    sha256 "4a5345775e87130c47c9c78a9fbe16d28c6dcfc7f74dc76850cae8e1a24ad948" => :catalina
-    sha256 "571f51cd56f7ed502e349d63909977cdf44629976ce7b81a765d6dce39be8fa4" => :mojave
-    sha256 "570e84e48faa46bb217f581272679c26cb47c13e0bfe25a33916782e7cdebfdf" => :high_sierra
+    sha256 arm64_monterey: "849f1b3ce8992e6c1d2526bfb1f49e708a00ef11096b3523040bc4d78cf1d81e"
+    sha256 arm64_big_sur:  "f6134de07f56b644a6eaad1a89b242c5a894ce7dd3e208bb6aca0e018c8bf915"
+    sha256 monterey:       "e73694daf4e1af0b676471e2e608b180761d93004c79574a94097d1624e73fa5"
+    sha256 big_sur:        "eb972073fabe0280e785d734d4f456bb703b4b602deff16d9d3211da5604e8cb"
+    sha256 catalina:       "d2822cd3978da5ffb0ff27f2e792bae66e2c4cc6b1f8d814afbef6ae283291c0"
+    sha256 x86_64_linux:   "47eb5f3aab7e66f6145891370c5061571c33106c57aab378143f258e76516032"
   end
 
   depends_on "gobject-introspection" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
   depends_on "pkg-config" => :build
-  depends_on "python@3.9" => :build
+  depends_on "python@3.10" => :build
   depends_on "vala" => :build
   depends_on "glib"
   depends_on "libusb"
@@ -75,10 +70,10 @@ class Libgusb < Formula
       -lgio-2.0
       -lglib-2.0
       -lgobject-2.0
-      -lintl
       -lusb-1.0
       -lgusb
     ]
+    flags << "-lintl" if OS.mac?
     system ENV.cc, "test.c", "-o", "test", *flags
     system "./test"
   end

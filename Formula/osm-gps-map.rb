@@ -1,17 +1,18 @@
 class OsmGpsMap < Formula
   desc "GTK+ library to embed OpenStreetMap maps"
-  homepage "https://nzjrs.github.com/osm-gps-map/"
-  url "https://github.com/nzjrs/osm-gps-map/releases/download/1.1.0/osm-gps-map-1.1.0.tar.gz"
-  sha256 "8f2ff865ed9ed9786cc5373c37b341b876958416139d0065ebb785cf88d33586"
-  license "GPL-2.0"
-  revision 5
+  homepage "https://github.com/nzjrs/osm-gps-map"
+  url "https://github.com/nzjrs/osm-gps-map/releases/download/1.2.0/osm-gps-map-1.2.0.tar.gz"
+  sha256 "ddec11449f37b5dffb4bca134d024623897c6140af1f9981a8acc512dbf6a7a5"
+  license "GPL-2.0-or-later"
+  revision 1
 
   bottle do
-    sha256 "1f7e957d457ba285d3cfe1ed7993455a5283f48941ba3a6de0c1add17a5b61f7" => :big_sur
-    sha256 "26630bf508c2b9bcacde4c4e40d9c3b393103d044dd0d15f34e3a34931e85d40" => :arm64_big_sur
-    sha256 "cbaa9aca7464061d5eb6bb92c24df2a643e065156d67d3615c18c7581e839eda" => :catalina
-    sha256 "da1513dbd5379a9176ab65fcd908892332cbc441757aaa4bdd9c7acd8b35c953" => :mojave
-    sha256 "25403998f03d0079d5bfecd396f58b5f3ba8277b3af6f76e506c33f0f09a4cad" => :high_sierra
+    rebuild 1
+    sha256                               arm64_big_sur: "69c8b2b22877a14f14d04d3f40a890f6b092b992bcb86270c1f82ff79f54ae50"
+    sha256                               monterey:      "322015ebc1b2ce52d40d2db2d27662f639725bd474aca83b1af9238abccb903e"
+    sha256                               big_sur:       "5e88cd60732ed86ec019f82a136d3445af500893435b804f68c41d25fe8de72c"
+    sha256                               catalina:      "3bd120a4480aaf535f90b4660a3029682adf413eca6243c5a69e15856be192fb"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1a70b74c033694c33f50fdd6190676cf47deb46e7ed0425e5be4e085fbc3c357"
   end
 
   head do
@@ -28,7 +29,12 @@ class OsmGpsMap < Formula
   depends_on "gdk-pixbuf"
   depends_on "glib"
   depends_on "gtk+3"
-  depends_on "libsoup"
+  depends_on "libsoup@2"
+
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+    sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
+  end
 
   def install
     system "./autogen.sh" if build.head?
@@ -84,6 +90,10 @@ class OsmGpsMap < Formula
       -losmgpsmap-1.0
     ]
     system ENV.cc, "test.c", "-o", "test", *flags
+
+    # (test:40601): Gtk-WARNING **: 23:06:24.466: cannot open display
+    return if OS.linux? && ENV["HOMEBREW_GITHUB_ACTIONS"]
+
     system "./test"
   end
 end

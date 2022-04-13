@@ -6,9 +6,13 @@ class SbtAT013 < Formula
   license "Apache-2.0"
   revision 1
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any_skip_relocation, all: "062ba4d79200936c79c38aa382d7fe0732c8d73c042916309022b6f34a7cb749"
+  end
 
   keg_only :versioned_formula
+
+  deprecate! date: "2022-03-01", because: :unsupported
 
   depends_on "openjdk@8"
 

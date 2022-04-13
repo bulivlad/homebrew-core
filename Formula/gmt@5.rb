@@ -5,22 +5,24 @@ class GmtAT5 < Formula
   mirror "https://mirrors.ustc.edu.cn/gmt/gmt-5.4.5-src.tar.gz"
   mirror "https://fossies.org/linux/misc/GMT/gmt-5.4.5-src.tar.gz"
   sha256 "225629c7869e204d5f9f1a384c4ada43e243f83e1ed28bdca4f7c2896bf39ef6"
-  license "LGPL-3.0"
-  revision 8
+  license "LGPL-3.0-or-later"
+  revision 13
 
   bottle do
-    sha256 "e93f97c3d5a207755822613ab93855ccb63632cd8e6a52e92c32572a42ae4392" => :big_sur
-    sha256 "384da7de72dff2ba60d184bbf86fa4b1bc29d192eda5eae64cab1a748ad044cd" => :catalina
-    sha256 "729293041d98bbfde07882587e72e6009bd43ae5edb58f1a7a4092d9db6a98b3" => :mojave
+    sha256 monterey: "be46e95fb3bb1cb83195f10338e991c3dcff7ffe68b9dfdaf0daa7c3777cb2c2"
+    sha256 big_sur:  "67c2cbd893bdb2d5e36aa034964df1d626547634608dc4b6385e0f64fe06163f"
+    sha256 catalina: "8c1f9855d6f7b0636b7bec1a2c6349a5cb1d6665598369f921b7b50b3c24b9d3"
   end
 
   keg_only :versioned_formula
+
+  deprecate! date: "2021-05-22", because: :unmaintained
 
   depends_on "cmake" => :build
   depends_on "fftw"
   depends_on "gdal"
   depends_on "netcdf"
-  depends_on "pcre"
+  depends_on "pcre2"
 
   resource "gshhg" do
     url "https://github.com/GenericMappingTools/gshhg-gmt/releases/download/2.3.7/gshhg-gmt-2.3.7.tar.gz"
@@ -42,6 +44,11 @@ class GmtAT5 < Formula
     sha256 "d894869830f6e57b0670dc31df6b5c684e079418f8bf5c0cd0f7014b65c1981f"
   end
 
+  # This patch is required because of incorrect usage of the `date` command in
+  # cmake/modules/ConfigCMake.cmake; this arises because SOURCE_DATE_EPOCH is
+  # set for builds.
+  patch :DATA
+
   def install
     (buildpath/"gshhg").install resource("gshhg")
     (buildpath/"dcw").install resource("dcw")
@@ -57,7 +64,8 @@ class GmtAT5 < Formula
       -DFFTW3_ROOT=#{Formula["fftw"].opt_prefix}
       -DGDAL_ROOT=#{Formula["gdal"].opt_prefix}
       -DNETCDF_ROOT=#{Formula["netcdf"].opt_prefix}
-      -DPCRE_ROOT=#{Formula["pcre"].opt_prefix}
+      -DPCRE2_ROOT=#{Formula["pcre2"].opt_prefix}
+      -DGMT_EXCLUDE_PCRE:BOOL=TRUE
       -DFLOCK:BOOL=TRUE
       -DGMT_INSTALL_MODULE_LINKS:BOOL=TRUE
       -DGMT_INSTALL_TRADITIONAL_FOLDERNAMES:BOOL=FALSE
@@ -82,3 +90,18 @@ class GmtAT5 < Formula
     assert_predicate testpath/"test.ps", :exist?
   end
 end
+
+__END__
+diff --git a/cmake/modules/ConfigCMake.cmake b/cmake/modules/ConfigCMake.cmake
+index 3579171..cbe75d6 100644
+--- a/cmake/modules/ConfigCMake.cmake
++++ b/cmake/modules/ConfigCMake.cmake
+@@ -79,7 +79,7 @@ set (GMT_LONG_VERSION_STRING "${GMT_PACKAGE_NAME} - ${GMT_PACKAGE_DESCRIPTION_SU
+ # Get date
+ if(DEFINED ENV{SOURCE_DATE_EPOCH})
+ 	EXECUTE_PROCESS(
+-	  COMMAND "date" "-u" "-d" "@$ENV{SOURCE_DATE_EPOCH}" "+%Y;%m;%d;%B"
++	  COMMAND "date" "-u" "-j" "-f" "%s" "@$ENV{SOURCE_DATE_EPOCH}" "+%Y;%m;%d;%B"
+ 	  OUTPUT_VARIABLE _today
+ 	  OUTPUT_STRIP_TRAILING_WHITESPACE)
+ else(DEFINED ENV{SOURCE_DATE_EPOCH})

@@ -1,28 +1,33 @@
 class Counterfeiter < Formula
   desc "Tool for generating self-contained, type-safe test doubles in go"
   homepage "https://github.com/maxbrunsfeld/counterfeiter"
-  url "https://github.com/maxbrunsfeld/counterfeiter/archive/v6.3.0.tar.gz"
-  sha256 "4e1bbbde6e5ccf9d766ffd80c8f6d232f5a4904b63e0b7102396d2766ab486ce"
+  url "https://github.com/maxbrunsfeld/counterfeiter/archive/refs/tags/v6.5.0.tar.gz"
+  sha256 "a03c3f1428bbb29cd0a050bb4732c94000b7edd769f6863b5447d2c07bd06695"
   license "MIT"
-  head "https://github.com/maxbrunsfeld/counterfeiter.git"
+  revision 1
+  head "https://github.com/maxbrunsfeld/counterfeiter.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "7c5bad9e7f55695e1cfdd2eed013d16ca3b5cf6853a6834a0ba7b1de294afeab" => :big_sur
-    sha256 "79e5bf8e174902a8db25c31f379a29b7a59ca1007c75f0e32a1a2a66df5d14f7" => :arm64_big_sur
-    sha256 "c8d8b1fedc2205d8ee93b686df168d8045eea70494cd27cb93ba308d305a9ccd" => :catalina
-    sha256 "b6cbfda0d1461c9afaf3f00bf8fe215ffcf7d3a1732b2dd829747740d2ba69c5" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "8e43cf62248f6e7ff02b67cfffa38f5f1ae81b3f79d6e289bebc16a814238ad2"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "8e43cf62248f6e7ff02b67cfffa38f5f1ae81b3f79d6e289bebc16a814238ad2"
+    sha256 cellar: :any_skip_relocation, monterey:       "d77a7211900355c0e440921a8b06fb8e1d91a650d98d1eea280bded849dc2739"
+    sha256 cellar: :any_skip_relocation, big_sur:        "d77a7211900355c0e440921a8b06fb8e1d91a650d98d1eea280bded849dc2739"
+    sha256 cellar: :any_skip_relocation, catalina:       "d77a7211900355c0e440921a8b06fb8e1d91a650d98d1eea280bded849dc2739"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9ae35345e995a8d7ab54d0c08d10dbfefb2fc28b47da0e93b6bf16c1f6f45955"
   end
 
   depends_on "go"
 
   def install
-    system "go", "build", *std_go_args
+    system "go", "build", *std_go_args(ldflags: "-s -w")
   end
 
   test do
-    output = shell_output("#{bin}/counterfeiter -p os 2>&1", 1)
-    assert_match "Writing `Os` to `osshim`...", output
+    ENV["GOROOT"] = Formula["go"].opt_libexec
+
+    output = shell_output("#{bin}/counterfeiter -p os 2>&1")
+    assert_predicate testpath/"osshim", :exist?
+    assert_match "Writing `Os` to `osshim/os.go`...", output
 
     output = shell_output("#{bin}/counterfeiter -generate 2>&1", 1)
     assert_match "no buildable Go source files", output

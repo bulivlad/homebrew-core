@@ -4,13 +4,13 @@ class Hashlink < Formula
   url "https://github.com/HaxeFoundation/hashlink/archive/1.11.tar.gz"
   sha256 "b087ded7b93c7077f5b093b999f279a37aa1e31df829d882fa965389b5ad1aea"
   license "MIT"
-  revision 2
-  head "https://github.com/HaxeFoundation/hashlink.git"
+  revision 5
+  head "https://github.com/HaxeFoundation/hashlink.git", branch: "master"
 
   bottle do
-    sha256 "2854d13e66bfcc6cd612c3fc5144812a2b19e62201629054d36c0f9dc7943a44" => :big_sur
-    sha256 "859d700dd2fce986a79bc12f7d3d3ec175a554a12ed91d0d6b8d41515408ca00" => :catalina
-    sha256 "973181bf2e0bd06c4cdace139173a0c52e0aea5d91a3f47e54f5330aa41d25ca" => :mojave
+    sha256 cellar: :any, monterey: "dd59e2432f05225f3eb9601fce04278d694c6d164a6a713be968ef04b4c81e4a"
+    sha256 cellar: :any, big_sur:  "1116d33cba9669325b72a9d2567a79469887886d2da656b37a94a0094b1965d1"
+    sha256 cellar: :any, catalina: "f64cd8e07074671d1e4322246e87b586c1dab39d97c92e70238a3c89d8a5a3c4"
   end
 
   depends_on "haxe" => :test
@@ -19,7 +19,7 @@ class Hashlink < Formula
   depends_on "libpng"
   depends_on "libuv"
   depends_on "libvorbis"
-  depends_on "mbedtls"
+  depends_on "mbedtls@2"
   depends_on "openal-soft"
   depends_on "sdl2"
 

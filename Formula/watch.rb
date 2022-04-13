@@ -2,18 +2,18 @@ class Watch < Formula
   desc "Executes a program periodically, showing output fullscreen"
   homepage "https://gitlab.com/procps-ng/procps"
   url "https://gitlab.com/procps-ng/procps.git",
-      tag:      "v3.3.16",
-      revision: "59c88e18f29000ceaf7e5f98181b07be443cf12f"
-  license "GPL-2.0"
-  head "https://gitlab.com/procps-ng/procps.git"
+      tag:      "v4.0.0",
+      revision: "61825a5cc56b40c4afffd8c880b641210b05b3b7"
+  license all_of: ["GPL-2.0-or-later", "LGPL-2.1-or-later"]
+  head "https://gitlab.com/procps-ng/procps.git", branch: "master"
 
   bottle do
-    cellar :any
-    sha256 "3933eb4166737df39b49d7abf3279385e09867c516f2952095cfbe3b74d93175" => :big_sur
-    sha256 "dac922f7e9d6ca9ec89dc8529acf11f15bd4c40cfb24718e81701173cbde778e" => :arm64_big_sur
-    sha256 "011e48363fe62c7a4ba0dec746d5964ee25545bde7855a31db0cb411420df190" => :catalina
-    sha256 "d17aba6f80c530e6b91b30e088df60aab3dc84b2f57ca7499928322438b9f0d2" => :mojave
-    sha256 "13d63ebc419965182d98f10b25cc99961679e1ba5ce6118e66b7037eb4e78de8" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "99135b41e5c85d6faaeaa3b3f9c74b17eea68d1394b639e3f4824ed4a582e9c4"
+    sha256 cellar: :any,                 arm64_big_sur:  "4560b743e716fa5aaff0b809fbf8e0fbcc9c71f4e4f502b77acb2f9130b846e0"
+    sha256 cellar: :any,                 monterey:       "2133244ca4acb47a37f24fa3930c5ab7d200b98d0d46fb80a7fb459373389e0e"
+    sha256 cellar: :any,                 big_sur:        "77383edb8de69055e0156ac24ba26f9c786b0d40e72d8e72a2c068d36f64c45e"
+    sha256 cellar: :any,                 catalina:       "32271afc05e243444040094864b075f61079a3464197699870b5026d4b3f62a8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f6b323f891f08beffb572b77b70e371906ec9a263de9176bcf444e5d91c41719"
   end
 
   depends_on "autoconf" => :build

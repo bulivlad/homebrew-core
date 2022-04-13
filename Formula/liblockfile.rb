@@ -1,27 +1,31 @@
 class Liblockfile < Formula
   desc "Library providing functions to lock standard mailboxes"
   homepage "https://tracker.debian.org/pkg/liblockfile"
-  url "https://deb.debian.org/debian/pool/main/libl/liblockfile/liblockfile_1.16.orig.tar.gz"
-  sha256 "cf6e3828ced3fcc7e5ed36b7dabdf9e0e3ba55a973dab8ed212fb86afc901c69"
+  url "https://deb.debian.org/debian/pool/main/libl/liblockfile/liblockfile_1.17.orig.tar.gz"
+  sha256 "6e937f3650afab4aac198f348b89b1ca42edceb17fb6bb0918f642143ccfd15e"
+  license "LGPL-2.0-or-later"
 
   bottle do
-    sha256 "c22eb6cb53066f5a9b16a60cf77a1b4980ad28b4f71f89a9e3c6bc5674c62b51" => :big_sur
-    sha256 "4fd8e00fafc2190ddfba9a3de861ce86b5ce3d9942ccaed88833e0a78589ac37" => :arm64_big_sur
-    sha256 "e5991a3eac0b5cd41f2850d73643607c33bb41b7014105f0ed80b75c5e7ef866" => :catalina
-    sha256 "18663ff713cb46c514546f5a73026deb4e3df5b701b082b5cd68275581b05ba8" => :mojave
-    sha256 "bc532693f97e4d14ac59974b80f5a31b121b5cc404efb2aacda1c1607f4bcf5b" => :high_sierra
+    sha256                               arm64_monterey: "69933a745062ff9b8a41b7b3b7fec871efa9a99896b1ace2ccbf4cbafb2437f8"
+    sha256                               arm64_big_sur:  "41a9d79f95f938532b4320a29c5f5bf3d7229a6df3f06413112d903e23589078"
+    sha256                               monterey:       "fec045c7ef1d9e55d1aac480298de26dce1754a73cb86f2545be737bc528d84b"
+    sha256                               big_sur:        "d13b1ce9f35885e1b05c9bd436e8edd0fc1b0dc7475219773655cb69bafcfbb3"
+    sha256                               catalina:       "a923faddb180ea86f1038424613c3191bf5212fc44e25548284f5a0525e1b5e9"
+    sha256                               mojave:         "143542d504f3f37df987e6f2c4291c2966cdb9ac15a6fd581155a4079758575e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b40e192cdbc7b9ecbc0e6ea36a893f5de7b4d26f5f8a094bec6ab31b3dc86b03"
   end
 
   def install
     # brew runs without root privileges (and the group is named "wheel" anyway)
     inreplace "Makefile.in", " -g root ", " "
 
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-debug",
-                          "--with-mailgroup=staff",
-                          "--prefix=#{prefix}",
-                          "--sysconfdir=#{etc}",
-                          "--mandir=#{man}"
+    args = %W[
+      --sysconfdir=#{etc}
+      --mandir=#{man}
+    ]
+    args << "--with-mailgroup=staff" if OS.mac?
+
+    system "./configure", *std_configure_args, *args
     bin.mkpath
     lib.mkpath
     include.mkpath

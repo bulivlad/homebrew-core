@@ -3,14 +3,16 @@ class Unpaper < Formula
   homepage "https://www.flameeyes.com/projects/unpaper"
   url "https://www.flameeyes.com/files/unpaper-6.1.tar.xz"
   sha256 "237c84f5da544b3f7709827f9f12c37c346cdf029b1128fb4633f9bafa5cb930"
-  revision 7
+  license "GPL-2.0-or-later"
+  revision 8
 
   bottle do
-    cellar :any
-    sha256 "a9841d58884ee1a0616a2a115c21c593eab613c0e040bf2b21d02ddeec682765" => :big_sur
-    sha256 "8aadd07d5712465893b6c3625e7da966c8bfdee572c7ba660cedaa3b0cdff034" => :arm64_big_sur
-    sha256 "63a30f9ac771386a0f7d7302c31abe60855b4c4028458cbf9371270f42ee49e6" => :catalina
-    sha256 "15d95668bd014ac329b703502832f020efcdb9011558ab8ba86ee0c8a458046d" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "15a1aa7548aed02a7f8c82e541386b9122b2d74e628f0e123c3381c1690b11da"
+    sha256 cellar: :any,                 arm64_big_sur:  "af3c1cb708fce8f19b3fd2b25a2aad65bfbb14513774be7cbbbc6eb6f755fb0b"
+    sha256 cellar: :any,                 monterey:       "dffbdc83b6fb112d2bf8326ed93078749063a4796262a397fa7de93a46824056"
+    sha256 cellar: :any,                 big_sur:        "96f88ae0ccb984448e56e48ad8cd2c1444e30beabcf375177bc2f064cc822a3e"
+    sha256 cellar: :any,                 catalina:       "c9082fb7f7c6381df451dc2cdb14cece9f59605e563a70d811ffe9dae38c94c8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b8dfbd593ccaa3f878eea978943866a2791d66aa4ce15fdd183e6fea1a7be261"
   end
 
   head do
@@ -20,7 +22,7 @@ class Unpaper < Formula
   end
 
   depends_on "pkg-config" => :build
-  depends_on "ffmpeg"
+  depends_on "ffmpeg@4"
 
   uses_from_macos "libxslt"
 
@@ -29,8 +31,13 @@ class Unpaper < Formula
     depends_on "automake" => :build
   end
 
+  fails_with gcc: "5" # ffmpeg is compiled with GCC
+
   def install
     system "autoreconf", "-i" if build.head?
+
+    system "autoreconf", "-i" if OS.linux?
+
     system "./configure", "--disable-dependency-tracking", "--prefix=#{prefix}"
     system "make", "install"
   end

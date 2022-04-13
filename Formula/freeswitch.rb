@@ -1,53 +1,24 @@
 class Freeswitch < Formula
   desc "Telephony platform to route various communication protocols"
   homepage "https://freeswitch.org"
+  url "https://github.com/signalwire/freeswitch.git",
+      tag:      "v1.10.7",
+      revision: "883d2cb662bed0316e157bd3beb9853e96c60d02"
   license "MPL-1.1"
   revision 3
-  head "https://github.com/signalwire/freeswitch.git"
-
-  stable do
-    url "https://github.com/signalwire/freeswitch.git",
-        tag:      "v1.10.5",
-        revision: "25569c16311afb3fe04a445830a8ab5c88488a5e"
-
-    # Fix find_if_index
-    # see https://github.com/signalwire/freeswitch/issues/859 and https://github.com/signalwire/freeswitch/pull/863
-    #
-    # remove this in next release
-    patch do
-      url "https://github.com/signalwire/freeswitch/commit/611377d40b560402f21ec5bd5a23f32ef09c9d1d.patch?full_index=1"
-      sha256 "95323626a7720e16e3f35e2889d5925fdc6c2c2efbe37f6fe5ab6e8733e3ae4d"
-    end
-
-    # Fix mod_spandsp
-    # see https://github.com/signalwire/freeswitch/pull/812
-    #
-    # remove this in next release
-    patch do
-      url "https://github.com/signalwire/freeswitch/commit/61368b24c16d7f9509fe7f5b1895d8404e23cd50.patch?full_index=1"
-      sha256 "f03fe3f8ae993af045ee7910c6a7446f84c29f8bea936ab4c0f700344f3d5afb"
-    end
-
-    # Fix mod_gsmopen
-    # see https://github.com/signalwire/freeswitch/pull/812
-    #
-    # remove this in next release
-    patch do
-      url "https://github.com/signalwire/freeswitch/commit/51fba83ed3ed2d9753d8e6b13e13001aca50b493.patch?full_index=1"
-      sha256 "1c5332127af09cddd3cba3b71d02de5deb025d552cc93b1f383874d89566956e"
-    end
-  end
+  head "https://github.com/signalwire/freeswitch.git", branch: "master"
 
   livecheck do
-    url :head
+    url :stable
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
   bottle do
-    sha256 "19e0a370f2fe60614b445320390d5ebe50394888656504b3f1e880ff25c86ba5" => :big_sur
-    sha256 "119079ed092cc07ff5cdedfd8006707720817f4be61a15b450f509a977e027d9" => :arm64_big_sur
-    sha256 "fa3a8be21c9e496242bdb03328bc00c082482e23fab48dad194b2c4fa73e5936" => :catalina
-    sha256 "a0be2b29eda5a4343b3dc7f244af901ddfa7e6f790da6a49d16ea4ac056c1cc9" => :mojave
+    sha256 arm64_monterey: "8a9ff125ecaa773df591f966aa67802081c8b69c4b9e09eabe8594b79adf08b6"
+    sha256 arm64_big_sur:  "40ebdc302afd918094c7bdd42c76ce4e63e18e56037a95801f7458576d504768"
+    sha256 monterey:       "ed31b09230a436d612b6fb61e184877c2d3d78ac69da8d0f61bce35eedff7b80"
+    sha256 big_sur:        "61ea9b3f18494c0f0db577c5ca02d9b27a7716a64841b2af741b77c652b98d91"
+    sha256 catalina:       "9f1e49ab9e8a7a43ad21adc6d4baca1922f160045edc5ec3ccffb3b60338c909"
   end
 
   depends_on "autoconf" => :build
@@ -56,7 +27,7 @@ class Freeswitch < Formula
   depends_on "libtool" => :build
   depends_on "pkg-config" => :build
   depends_on "yasm" => :build
-  depends_on "ffmpeg"
+  depends_on "ffmpeg@4"
   depends_on "jpeg"
   depends_on "ldns"
   depends_on "libpq"
@@ -74,6 +45,8 @@ class Freeswitch < Formula
 
   uses_from_macos "libedit"
   uses_from_macos "zlib"
+
+  fails_with gcc: "5" # ffmpeg is compiled with GCC
 
   # https://github.com/Homebrew/homebrew/issues/42865
 
@@ -135,13 +108,13 @@ class Freeswitch < Formula
   # There's no tags for now https://github.com/freeswitch/spandsp/issues/13
   resource "spandsp" do
     url "https://github.com/freeswitch/spandsp.git",
-        revision: "6351b1824a7634853bf963c0ec399e783e35d4d1"
+        revision: "284fe91dd068d0cf391139110fdc2811043972b9"
   end
 
   resource "libks" do
     url "https://github.com/signalwire/libks.git",
-        tag:      "1.6.0",
-        revision: "637e0e3db192a6d73a248cf0e794a4b03424805b"
+        tag:      "v1.7.0",
+        revision: "db9bfa746b1fffcaf062bbe060c8cef70c227116"
   end
 
   resource "signalwire-c" do
@@ -180,12 +153,15 @@ class Freeswitch < Formula
 
     system "./bootstrap.sh", "-j"
 
-    system "./configure", "--disable-dependency-tracking",
-                          "--enable-shared",
-                          "--enable-static",
-                          "--prefix=#{prefix}",
-                          "--exec_prefix=#{prefix}"
+    args = std_configure_args + %W[
+      --enable-shared
+      --enable-static
+      --exec_prefix=#{prefix}
+    ]
+    # Fails on ARM: https://github.com/signalwire/freeswitch/issues/1450
+    args << "--disable-libvpx" if Hardware::CPU.arm?
 
+    system "./configure", *args
     system "make", "all"
     system "make", "install"
 
@@ -206,31 +182,9 @@ class Freeswitch < Formula
     end
   end
 
-  plist_options manual: "freeswitch -nc -nonat"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-      <dict>
-        <key>KeepAlive</key>
-          <true/>
-        <key>Label</key>
-          <string>#{plist_name}</string>
-        <key>ProgramArguments</key>
-          <array>
-            <string>#{opt_bin}/freeswitch</string>
-            <string>-nc</string>
-            <string>-nonat</string>
-          </array>
-        <key>RunAtLoad</key>
-          <true/>
-        <key>ServiceIPC</key>
-          <true/>
-      </dict>
-      </plist>
-    EOS
+  service do
+    run [opt_bin/"freeswitch", "-nc", "-nonat"]
+    keep_alive true
   end
 
   test do

@@ -2,7 +2,7 @@ class RustcCompletion < Formula
   desc "Bash completion for rustc"
   homepage "https://github.com/roshan/rust-bash-completion"
   license "MIT"
-  head "https://github.com/roshan/rust-bash-completion.git"
+  head "https://github.com/roshan/rust-bash-completion.git", branch: "master"
 
   stable do
     url "https://github.com/roshan/rust-bash-completion/archive/0.12.1.tar.gz"
@@ -15,7 +15,9 @@ class RustcCompletion < Formula
     end
   end
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any_skip_relocation, all: "c4f9d8b0d48e56ed56ccf9a3124dda1868afc003326defce3e9d6ededc7b4468"
+  end
 
   def install
     bash_completion.install "etc/bash_completion.d/rustc"
@@ -23,6 +25,6 @@ class RustcCompletion < Formula
 
   test do
     assert_match "-F _rustc",
-      shell_output("source #{bash_completion}/rustc && complete -p rustc")
+      shell_output("bash -c 'source #{bash_completion}/rustc && complete -p rustc'")
   end
 end

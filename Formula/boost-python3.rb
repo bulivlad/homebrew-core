@@ -1,32 +1,28 @@
 class BoostPython3 < Formula
   desc "C++ library for C++/Python3 interoperability"
   homepage "https://www.boost.org/"
-  url "https://dl.bintray.com/boostorg/release/1.75.0/source/boost_1_75_0.tar.bz2"
-  mirror "https://dl.bintray.com/homebrew/mirror/boost_1_75_0.tar.bz2"
-  sha256 "953db31e016db7bb207f11432bef7df100516eeb746843fa0486a222e3fd49cb"
+  # Please add to synced_versions_formulae.json once version synced with boost
+  url "https://boostorg.jfrog.io/artifactory/main/release/1.78.0/source/boost_1_78_0.tar.bz2"
+  sha256 "8681f175d4bdb26c52222665793eef08490d7758529330f98d3b29dd0735bccc"
   license "BSL-1.0"
-  head "https://github.com/boostorg/boost.git"
+  head "https://github.com/boostorg/boost.git", branch: "master"
+
+  livecheck do
+    formula "boost"
+  end
 
   bottle do
-    cellar :any
-    rebuild 1
-    sha256 "7015c83ae4726838a1e67900ed201578949afd195ccdd6eb13fd7336794155e6" => :big_sur
-    sha256 "2737924fe270f67d7b6ed9913a30e18f084b5ce2590041d70d6523206f55e437" => :arm64_big_sur
-    sha256 "2daea9e8951e79d78ea85e4e5abd11c749ae5f6dea889a7357648f04328de0dd" => :catalina
-    sha256 "96dfc26b8b8a3a1090eb883f2f555cdacbb9425b6a9a9627e46c38759ff32257" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "836470a175e4c95bcadd8da25cfbeb86e521aafbae2d23d3b5101619cbd9b8a4"
+    sha256 cellar: :any,                 arm64_big_sur:  "bad95d638e26a8882bd0a3a86c756777b572c0cddff98f0d119c4ec5d4e5944b"
+    sha256 cellar: :any,                 monterey:       "5b326c00a026c199ef9d6248163e7643fcf15e99a1df425c4d5fcba7b46484c3"
+    sha256 cellar: :any,                 big_sur:        "4b99b887b77708dadee882d3cba171e1f3ce9c8fa36a2cd8f458da7a559a591a"
+    sha256 cellar: :any,                 catalina:       "4a311cf08f87d7422778f81cba94abd862328b0b8965fdea0a3b26679fc52855"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "aa8e5b98ae2979745240f581c5578b757b09e929e9f3516c457d1fdc60625a1a"
   end
 
   depends_on "numpy" => :build
   depends_on "boost"
   depends_on "python@3.9"
-
-  # Fix build system issues on Apple silicon. This change has aleady
-  # been merged upstream, remove this patch once it lands in a release.
-  patch do
-    url "https://github.com/boostorg/build/commit/456be0b7ecca065fbccf380c2f51e0985e608ba0.patch?full_index=1"
-    sha256 "e7a78145452fc145ea5d6e5f61e72df7dcab3a6eebb2cade6b4cfae815687f3a"
-    directory "tools/build"
-  end
 
   def install
     # "layout" should be synchronized with boost
@@ -52,10 +48,16 @@ class BoostPython3 < Formula
 
     pyver = Language::Python.major_minor_version Formula["python@3.9"].opt_bin/"python3"
     py_prefix = Formula["python@3.9"].opt_frameworks/"Python.framework/Versions/#{pyver}"
+    py_prefix = Formula["python@3.9"].opt_prefix if OS.linux?
 
     # Force boost to compile with the desired compiler
+    compiler_text = if OS.mac?
+      "using darwin : : #{ENV.cxx} ;"
+    else
+      "using gcc : : #{ENV.cxx} ;"
+    end
     (buildpath/"user-config.jam").write <<~EOS
-      using darwin : : #{ENV.cxx} ;
+      #{compiler_text}
       using python : #{pyver}
                    : python3
                    : #{py_prefix}/include/python#{pyver}
@@ -95,7 +97,7 @@ class BoostPython3 < Formula
     pylib = shell_output("#{Formula["python@3.9"].opt_bin}/python3-config --ldflags --embed").chomp.split
     pyver = Language::Python.major_minor_version(Formula["python@3.9"].opt_bin/"python3").to_s.delete(".")
 
-    system ENV.cxx, "-shared", "hello.cpp", "-L#{lib}", "-lboost_python#{pyver}", "-o",
+    system ENV.cxx, "-shared", "-fPIC", "hello.cpp", "-L#{lib}", "-lboost_python#{pyver}", "-o",
            "hello.so", *pyincludes, *pylib
 
     output = <<~EOS

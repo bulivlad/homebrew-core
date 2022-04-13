@@ -4,13 +4,15 @@ class OsmPbf < Formula
   url "https://github.com/scrosby/OSM-binary/archive/v1.5.0.tar.gz"
   sha256 "2abf3126729793732c3380763999cc365e51bffda369a008213879a3cd90476c"
   license "LGPL-3.0"
+  revision 3
 
   bottle do
-    cellar :any
-    sha256 "cde905f5e30549acb2e9d002b95e8ebbf581aa078108abddc2e8a645329ffa71" => :big_sur
-    sha256 "5cfaf02637be652c5d7913288a576961c1d6bd9bf67c7818196c18aff0bda149" => :arm64_big_sur
-    sha256 "a61abe978818b7abd27cf0716204b24cc0135f2589298b63d7cad95577d2550f" => :catalina
-    sha256 "16ba12db1cc49ec09169e8463cdac17edeefb91ef7a32ff0eaa62556bfc409a0" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "7c54ae6cece29667791513344f8ca1f07412dbf7c0030eb000c835864dda96b7"
+    sha256 cellar: :any,                 arm64_big_sur:  "91108e1f36a68528f39a4c90a15b21de280f25e1846b7b7d2014e056d8373308"
+    sha256 cellar: :any,                 monterey:       "df65cb7860d85aaf7f2b0273cd4bd36438440120e275580c72cb118051bf63ee"
+    sha256 cellar: :any,                 big_sur:        "3e563c0635212cdbad3330addbbbb32e054ccb64267d8dc28b2c79ce223d1c2a"
+    sha256 cellar: :any,                 catalina:       "4e43efc37899fb2ea13d831f24ac192fec230a9265e25337fbbffdb4c5196914"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "72f304c07b272e036f0aea9601c22d1e06cb44376bebb4d26cdefdf994c1d429"
   end
 
   depends_on "cmake" => :build

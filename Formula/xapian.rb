@@ -1,28 +1,27 @@
 class Xapian < Formula
   desc "C++ search engine library"
   homepage "https://xapian.org/"
-  url "https://oligarchy.co.uk/xapian/1.4.17/xapian-core-1.4.17.tar.xz"
-  sha256 "b5eb8556dea1b0cad4167a66223522e66d670ec1eba16c7fdc844ed6b652572e"
-  license "GPL-2.0"
-  revision 1
+  url "https://oligarchy.co.uk/xapian/1.4.19/xapian-core-1.4.19.tar.xz"
+  sha256 "1fca48fca6cc3526cc4ba93dd194fe9c1326857b78edcfb37e68d086d714a9c3"
+  license "GPL-2.0-or-later"
   version_scheme 1
 
   livecheck do
-    url :homepage
-    regex(/latest stable version.*?is v?(\d+(?:\.\d+)+)</im)
+    url "https://xapian.org/download"
+    regex(/href=.*?xapian-core[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    cellar :any
-    rebuild 1
-    sha256 "5645bdbfbf7ebb1e0d068bb51cce7a28c1e4102a29da6647b5959d0607100d21" => :big_sur
-    sha256 "255bee7728a81eaf941120a7085c724b57dfe074de8a8987cc0403d01572fef1" => :arm64_big_sur
-    sha256 "f9e6103d9938f2708d0d5d38030c833c5f78d02efe53091616d1fd9e645a69ee" => :catalina
-    sha256 "9ad6e312f0949659d3d96f7ef1edc63cd4e8b2a45e7a94243ffa4cb3abf940f8" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "9315c3b45b4196bffdb67cd0d175338632a8732e1b54504beedd12b9502234e4"
+    sha256 cellar: :any,                 arm64_big_sur:  "a90af30e8e274cb3d2959dbf1634af032df88dea7d179c3e912e961edf92ae4e"
+    sha256 cellar: :any,                 monterey:       "15cef8314c190eed223235ee443985c6f130bd99e2a4f5ca111fbae8e3e17013"
+    sha256 cellar: :any,                 big_sur:        "594406eadbc569a372949a376a49b4bf5956506c86ba81ad696f7ba94a798ead"
+    sha256 cellar: :any,                 catalina:       "bc5c3ce60eb9299c92a4f003cd362e5f8af2d2ac4815ada5cf63a2153fe02ad3"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "bfbb14f36f134d1fcbd4c3a7e7a3a90ea97eac7063e388668e673fba6afa0efc"
   end
 
+  depends_on "python@3.10" => [:build, :test]
   depends_on "sphinx-doc" => :build
-  depends_on "python@3.9"
 
   uses_from_macos "zlib"
 
@@ -33,14 +32,19 @@ class Xapian < Formula
   skip_clean :la
 
   resource "bindings" do
-    url "https://oligarchy.co.uk/xapian/1.4.17/xapian-bindings-1.4.17.tar.xz"
-    sha256 "48a65d91e0c3a4a8f4a1ca05dc39225912088aca2c47c0048cc93b09d338ebd3"
+    url "https://oligarchy.co.uk/xapian/1.4.19/xapian-bindings-1.4.19.tar.xz"
+    sha256 "91c385a48951aa7cdf665effd25533f7477fc22781ca712e50b5496459a2883d"
+  end
+
+  # Fix -flat_namespace being used on Big Sur and later.
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+    sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
   end
 
   def install
-    python = Formula["python@3.9"].opt_bin/"python3"
+    python = Formula["python@3.10"].opt_bin/"python3"
     ENV["PYTHON"] = python
-
     system "./configure", "--disable-dependency-tracking",
                           "--disable-silent-rules",
                           "--prefix=#{prefix}"
@@ -55,10 +59,6 @@ class Xapian < Formula
       ENV.append_path "PYTHONPATH", Formula["sphinx-doc"].opt_libexec/"lib/python#{xy}/site-packages"
       ENV.append_path "PYTHONPATH", Formula["sphinx-doc"].opt_libexec/"vendor/lib/python#{xy}/site-packages"
 
-      # Fix build on Big Sur (darwin20)
-      # https://github.com/xapian/xapian/pull/319
-      inreplace "configure", "*-darwin[91]*", "*-darwin[912]*"
-
       system "./configure", "--disable-dependency-tracking",
                             "--prefix=#{prefix}",
                             "--with-python3"
@@ -69,6 +69,6 @@ class Xapian < Formula
 
   test do
     system bin/"xapian-config", "--libs"
-    system Formula["python@3.9"].opt_bin/"python3", "-c", "import xapian"
+    system Formula["python@3.10"].opt_bin/"python3", "-c", "import xapian"
   end
 end

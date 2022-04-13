@@ -1,17 +1,18 @@
 class Direnv < Formula
   desc "Load/unload environment variables based on $PWD"
   homepage "https://direnv.net/"
-  url "https://github.com/direnv/direnv/archive/v2.27.0.tar.gz"
-  sha256 "9dc5ce43c63d9d9ff510c6bcd6ae06f3f2f907347e7cbb2bb6513bfb0f151621"
+  url "https://github.com/direnv/direnv/archive/v2.31.0.tar.gz"
+  sha256 "f82694202f584d281a166bd5b7e877565f96a94807af96325c8f43643d76cb44"
   license "MIT"
-  head "https://github.com/direnv/direnv.git"
+  head "https://github.com/direnv/direnv.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "bf23db053d25081095366198f72f8b00ce272fd682d29e38f8af61dd3e5a61d5" => :big_sur
-    sha256 "0c982e714b93db8139ca8712e994bcdba19c1341132304b17d282ce1a6caa13b" => :arm64_big_sur
-    sha256 "02454d5571292dcc4520687ae721518de35deadccf7fe3b4de8eade2d19b27b1" => :catalina
-    sha256 "6be47ea404f214c73485e722555c5f59c0a857cc553cc8a455763ac4d73f974a" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "3b13e0dddc9622fac2670443ffc1e782411fb959108b9452ed0b09f17bc59250"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "a29ff9f7c8cf4cec8cc4caa91c3d164b1d80c224d5de76dfda8ab7a9578129b8"
+    sha256 cellar: :any_skip_relocation, monterey:       "76e1669a3c6de7f3027fd42de855f8578875940ad9bc2c4bfe572233f4ec79ca"
+    sha256 cellar: :any_skip_relocation, big_sur:        "5493887df938d10af71efb0e80889619c61e73b9cf5f117e87df945c88abf3f9"
+    sha256 cellar: :any_skip_relocation, catalina:       "388a31d52084fb6399abaa5fe05d0b7e88e25e911f8904e71a606214bced862c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ce0cd8ba4e113a782ad3a5f8a05dfdfe5cf202b9f18980c41c4729ce31eceb87"
   end
 
   depends_on "go" => :build

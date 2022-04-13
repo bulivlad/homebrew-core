@@ -1,24 +1,24 @@
 class Buildifier < Formula
   desc "Format bazel BUILD files with a standard convention"
   homepage "https://github.com/bazelbuild/buildtools"
-  url "https://github.com/bazelbuild/buildtools.git",
-      tag:      "3.5.0",
-      revision: "10384511ce98d864faf064a8ed54cdf31b98ac04"
+  url "https://github.com/bazelbuild/buildtools/archive/5.0.1.tar.gz"
+  sha256 "7f43df3cca7bb4ea443b4159edd7a204c8d771890a69a50a190dc9543760ca21"
   license "Apache-2.0"
+  head "https://github.com/bazelbuild/buildtools.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "21da6d6c0020f91ea197b48dbc5a108527d9aa2e41b47406d79403d49fda164e" => :big_sur
-    sha256 "154877a4bfb01a9fd0498a42015e75ca3df72d7c2b92c47254866c8b9832ceb4" => :catalina
-    sha256 "36f2f0c2946d5e3a79f9287285cf335f14b1f181190907dfc29b12231764bc49" => :mojave
-    sha256 "5b54427b4bd78b0b3dccfd66b8003a52aab3b4d1a7683586b66d6a6c835c0b4b" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "9df8a6228e452d2057a50a4e3360c6227bdb19110e60aae1cca15333ee26fa92"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "9df8a6228e452d2057a50a4e3360c6227bdb19110e60aae1cca15333ee26fa92"
+    sha256 cellar: :any_skip_relocation, monterey:       "59b2312bf1a953388c55e9cc8e451b0461b220244c504ab581449258b2dfcfb1"
+    sha256 cellar: :any_skip_relocation, big_sur:        "59b2312bf1a953388c55e9cc8e451b0461b220244c504ab581449258b2dfcfb1"
+    sha256 cellar: :any_skip_relocation, catalina:       "59b2312bf1a953388c55e9cc8e451b0461b220244c504ab581449258b2dfcfb1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "51c5894e1f050468024927a882927f17ed9f06b5754a81c9138ba8f61c1788db"
   end
 
-  depends_on "bazelisk" => :build
+  depends_on "go" => :build
 
   def install
-    system "bazelisk", "build", "--config=release", "buildifier:buildifier"
-    bin.install "bazel-bin/buildifier/darwin_amd64_stripped/buildifier"
+    system "go", "build", *std_go_args(ldflags: "-s -w"), "./buildifier"
   end
 
   test do

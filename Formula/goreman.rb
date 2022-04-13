@@ -1,10 +1,10 @@
 class Goreman < Formula
   desc "Foreman clone written in Go"
   homepage "https://github.com/mattn/goreman"
-  url "https://github.com/mattn/goreman/archive/v0.3.7.tar.gz"
-  sha256 "424dde6592c99468dce19c1302222a15ccc2367f0c908ee2147709398ce6497b"
+  url "https://github.com/mattn/goreman/archive/v0.3.11.tar.gz"
+  sha256 "2ff6a2746f17b00fe13ae942b556f346713e743de9a0f66208d63fe2d5586063"
   license "MIT"
-  head "https://github.com/mattn/goreman.git"
+  head "https://github.com/mattn/goreman.git", branch: "master"
 
   livecheck do
     url :homepage
@@ -12,12 +12,12 @@ class Goreman < Formula
   end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "7935ca50f9a9c6fc0caceb81d64a6439aab37c61fb75edbbff99729e3542568b" => :big_sur
-    sha256 "b23fc772de996cff73c26a93ba73c826b5f7e56929f0c717c9388066bb689067" => :arm64_big_sur
-    sha256 "8985d410d3b9c56064ceb7a01be4fd448e46c414f0a0b8c3a4f6ec7374c2f5b6" => :catalina
-    sha256 "d7781e6ce9c1ab5844f06d77dbbb8355a5f749daa5cd3c2b12266385d73b9a77" => :mojave
-    sha256 "df59dbb8a079d4eaf095b7a807dcbd0a96de11874dec3b6e560454617eed9b2b" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "f84399eff06321a5b182e2bf72db14cf1d16ea66de880ed28ae21d84c3049530"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "617893eee7167522eef137b451a75c58ebf61763342873c5931e8489c8048f5c"
+    sha256 cellar: :any_skip_relocation, monterey:       "47ef7cb6bd2b6dd3c369699979a1a627507d80e2b55c6c591f3fd339db8bfab2"
+    sha256 cellar: :any_skip_relocation, big_sur:        "3cbad1a55ba81b99570db12e9223b9be3ccacfb2064bb8811cdf63307141430b"
+    sha256 cellar: :any_skip_relocation, catalina:       "ac244b86a6b0fc62a1f04d68914f303abd7a1f29ada7650643797c43720c2973"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7551327a1f817fa1778cd790ca681ea2fc46d3dcea41780158f96cf91a512cab"
   end
 
   depends_on "go" => :build

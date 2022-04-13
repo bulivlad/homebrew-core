@@ -1,25 +1,25 @@
 class Subfinder < Formula
   desc "Subdomain discovery tool"
   homepage "https://github.com/projectdiscovery/subfinder"
-  url "https://github.com/projectdiscovery/subfinder/archive/v2.4.5.tar.gz"
-  sha256 "1adbd9c180f7ca6378796748491e23a808e423268bc61fe63af0206877f0ba68"
+  url "https://github.com/projectdiscovery/subfinder/archive/v2.5.1.tar.gz"
+  sha256 "c93daf616ad3c0f60e91a2626a97c7cfcc3662735db5e6e0b1e2bd0706638fb2"
   license "MIT"
-  head "https://github.com/projectdiscovery/subfinder.git"
+  head "https://github.com/projectdiscovery/subfinder.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "1844b137c9daf184b4891134f8b895b20be66c71afaa978a6b649e2d35fec74e" => :big_sur
-    sha256 "0593069a404934438b9a012fa7534a15ce1f0701a115d5b4a48cceeb1643e02a" => :arm64_big_sur
-    sha256 "e0605119e8efcf7a6ea237665fae5b5bda1715b9844921b3fc0bcd9d67af5013" => :catalina
-    sha256 "61061910e7fbaf2223c06791704c021adc8df0dd96643803decfc55be305f8e4" => :mojave
-    sha256 "46398f2facb9cf9c2143d0841f5c9293aa98c63667e2470ffd999ade3cc8af0d" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "f989c20846cbb92f2a8043e65dd0983a8661eecc2dd6a9dc014f05b0e36ac1d9"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "725087785fcee040aa761b1dca9181898c95895a48eb18da6b361a7cb7a9517b"
+    sha256 cellar: :any_skip_relocation, monterey:       "d676ccd958202dbff5a37d30b26f2ab26c2e0e2ae17877d711931784b20db758"
+    sha256 cellar: :any_skip_relocation, big_sur:        "4a023742880227c798f5a71788ca03ba2066a15e9462015988a5552b1827d686"
+    sha256 cellar: :any_skip_relocation, catalina:       "138af7cf381b382b4a8ca9286b8a00543f74c3b455b0f2d3511f8f434bb94eef"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "16523ce07ed480354e4dc17f4a8d5094c0ffa9755e26c0c0cd2e6913df49c7d8"
   end
 
   depends_on "go" => :build
 
   def install
     cd "v2" do
-      system "go", "build", *std_go_args, "./cmd/subfinder"
+      system "go", "build", *std_go_args(ldflags: "-s -w"), "./cmd/subfinder"
     end
   end
 

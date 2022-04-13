@@ -1,8 +1,8 @@
 class Wal2json < Formula
   desc "Convert PostgreSQL changesets to JSON format"
   homepage "https://github.com/eulerto/wal2json"
-  url "https://github.com/eulerto/wal2json/archive/wal2json_2_3.tar.gz"
-  sha256 "2ebf71ace3c9f4b66703bcf6e3fa6ef7b6b026f9e31db4cf864eb3deb4e1a5b3"
+  url "https://github.com/eulerto/wal2json/archive/wal2json_2_4.tar.gz"
+  sha256 "87e627cac2d86f7203b1580a78b51e1da8aa61bb0af9ebfa14435370f3878237"
   license "BSD-3-Clause"
 
   livecheck do
@@ -12,12 +12,13 @@ class Wal2json < Formula
   end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "42d07ec8236e2e24a592524d32a2b1b2df6e43683f5a98b2f2a25a29ccef0b1a" => :big_sur
-    sha256 "9f3ff6d1b451198b891c384e197701cab3f1ee1c1b439d7413855bebb338776b" => :arm64_big_sur
-    sha256 "ec25d4dffbb7b4205565f2ec5ad6c17fa62a965d841a75b475b11bd7ff759c51" => :catalina
-    sha256 "fbe884982b54b6d4c17a608f8f861368322cc7f74024b20516632f83ccc7fbe4" => :mojave
-    sha256 "f382e783fbba2a97a79f0bda4db61211e3fbc4b5d2d859daa777ffa6845dc8ac" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "562c8d9b754cca6f4ec3c96159f622d1aa0e495e6c96356733aa6bd74ff6536a"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "45d6b3f62b30281f54c34a045977f99b7abc2183b3b36ab3a4652a8f53ade698"
+    sha256 cellar: :any_skip_relocation, monterey:       "3a2926a52fe9aa779a85d765739eefcccf29b65736546756d4e806ce366e0bf7"
+    sha256 cellar: :any_skip_relocation, big_sur:        "d738e9dfcd5e546388697263c28b5fba8d93ab9e9cbd8fc4761506cab2444c2a"
+    sha256 cellar: :any_skip_relocation, catalina:       "52971794eb21cd96a1abdac41073544ecf42008fd2fa61724996c674771e0d36"
+    sha256 cellar: :any_skip_relocation, mojave:         "65bc96789f47c2d9c2afb74dd60d6b63242454440f8da2612edef3a9fb899e9c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e390370160cf6213efc8b3436d544a2c48d82c47404a243ed7a384940ce53ea6"
   end
 
   depends_on "postgresql"
@@ -26,117 +27,5 @@ class Wal2json < Formula
     mkdir "stage"
     system "make", "install", "USE_PGXS=1", "DESTDIR=#{buildpath}/stage"
     lib.install Dir["stage/#{HOMEBREW_PREFIX}/lib/*"]
-  end
-
-  test do
-    return if ENV["CI"]
-
-    system "initdb", testpath/"datadir"
-    mkdir testpath/"socket"
-    File.open(testpath/"datadir"/"postgresql.conf", "a") do |f|
-      f << "wal_level = logical\n"
-      f << "listen_addresses = ''\n"
-      f << "unix_socket_directories = '#{testpath}/socket'\n"
-      f << "dynamic_library_path = '$libdir:#{lib}/postgresql'\n"
-    end
-    pid = Process.fork { exec "postgres", "-D", testpath/"datadir" }
-    sleep 2
-    begin
-      system "createdb", "-h", testpath/"socket", "test"
-
-      input_sql = <<~EOS
-        CREATE TABLE table2_with_pk (a SERIAL, b VARCHAR(30), c TIMESTAMP NOT NULL, PRIMARY KEY(a, c));
-        CREATE TABLE table2_without_pk (a SERIAL, b NUMERIC(5,2), c TEXT);
-
-        SELECT 'init' FROM pg_create_logical_replication_slot('test_slot', 'wal2json');
-
-        BEGIN;
-        INSERT INTO table2_with_pk (b, c) VALUES('Backup and Restore', '2019-10-08 12:00:00');
-        INSERT INTO table2_with_pk (b, c) VALUES('Tuning', '2019-10-08 12:00:00');
-        INSERT INTO table2_with_pk (b, c) VALUES('Replication', '2019-10-08 12:00:00');
-        DELETE FROM table2_with_pk WHERE a < 3;
-
-        INSERT INTO table2_without_pk (b, c) VALUES(2.34, 'Tapir');
-        -- it is not added to stream because there isn't a pk or a replica identity
-        UPDATE table2_without_pk SET c = 'Anta' WHERE c = 'Tapir';
-        COMMIT;
-
-        SELECT data FROM pg_logical_slot_get_changes('test_slot', NULL, NULL, 'pretty-print', '1');
-        SELECT 'stop' FROM pg_drop_replication_slot('test_slot');
-      EOS
-
-      File.open(testpath/"input.sql", "w") do |f|
-        f.write(input_sql)
-      end
-
-      system "psql", "-h", testpath/"socket", "-f", testpath/"input.sql", "-o", testpath/"output.txt", "-Atq", "test"
-      actual_output = File.read(testpath/"output.txt")
-
-      expected_output = <<~EOS
-        init
-        {
-          "change": [
-            {
-              "kind": "insert",
-              "schema": "public",
-              "table": "table2_with_pk",
-              "columnnames": ["a", "b", "c"],
-              "columntypes": ["integer", "character varying(30)", "timestamp without time zone"],
-              "columnvalues": [1, "Backup and Restore", "2019-10-08 12:00:00"]
-            }
-            ,{
-              "kind": "insert",
-              "schema": "public",
-              "table": "table2_with_pk",
-              "columnnames": ["a", "b", "c"],
-              "columntypes": ["integer", "character varying(30)", "timestamp without time zone"],
-              "columnvalues": [2, "Tuning", "2019-10-08 12:00:00"]
-            }
-            ,{
-              "kind": "insert",
-              "schema": "public",
-              "table": "table2_with_pk",
-              "columnnames": ["a", "b", "c"],
-              "columntypes": ["integer", "character varying(30)", "timestamp without time zone"],
-              "columnvalues": [3, "Replication", "2019-10-08 12:00:00"]
-            }
-            ,{
-              "kind": "delete",
-              "schema": "public",
-              "table": "table2_with_pk",
-              "oldkeys": {
-                "keynames": ["a", "c"],
-                "keytypes": ["integer", "timestamp without time zone"],
-                "keyvalues": [1, "2019-10-08 12:00:00"]
-              }
-            }
-            ,{
-              "kind": "delete",
-              "schema": "public",
-              "table": "table2_with_pk",
-              "oldkeys": {
-                "keynames": ["a", "c"],
-                "keytypes": ["integer", "timestamp without time zone"],
-                "keyvalues": [2, "2019-10-08 12:00:00"]
-              }
-            }
-            ,{
-              "kind": "insert",
-              "schema": "public",
-              "table": "table2_without_pk",
-              "columnnames": ["a", "b", "c"],
-              "columntypes": ["integer", "numeric(5,2)", "text"],
-              "columnvalues": [1, 2.34, "Tapir"]
-            }
-          ]
-        }
-        stop
-      EOS
-
-      assert_equal(expected_output.gsub(/\s+/, ""), actual_output.gsub(/\s+/, ""))
-    ensure
-      Process.kill 9, pid
-      Process.wait pid
-    end
   end
 end

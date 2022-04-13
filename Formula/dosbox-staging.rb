@@ -1,40 +1,44 @@
 class DosboxStaging < Formula
   desc "Modernized DOSBox soft-fork"
   homepage "https://dosbox-staging.github.io/"
-  url "https://github.com/dosbox-staging/dosbox-staging/archive/v0.76.0.tar.gz"
-  sha256 "7df53c22f7ce78c70afb60b26b06742b90193b56c510219979bf12e0bb2dc6c7"
+  url "https://github.com/dosbox-staging/dosbox-staging/archive/v0.78.1.tar.gz"
+  sha256 "dcd93ce27f5f3f31e7022288f7cbbc1f1f6eb7cc7150c2c085eeff8ba76c3690"
   license "GPL-2.0-or-later"
   revision 1
-  head "https://github.com/dosbox-staging/dosbox-staging.git"
+  head "https://github.com/dosbox-staging/dosbox-staging.git", branch: "main"
 
-  bottle do
-    cellar :any
-    sha256 "3b309a468fd37f2f5acd86dfdc13ba761a2dba9b3844c67d7a726761408997ff" => :big_sur
-    sha256 "fb8f0447f5090363a78aba9bc2d454706b5c0fb509ac7fd5887d1f893640c8ee" => :arm64_big_sur
-    sha256 "634724b72b5fcdd54c0bc29bd37bbb00457a4a3762a896f1b743c7d9175c398a" => :catalina
-    sha256 "403eba84e98409729480a474508c66b259b4125a80efede453da0021f6893611" => :mojave
+  # New releases of dosbox-staging are indicated by a GitHub release (and
+  # an announcement on the homepage), not just a new version tag.
+  livecheck do
+    url :stable
+    strategy :github_latest
   end
 
-  depends_on "autoconf" => :build
-  depends_on "automake" => :build
+  bottle do
+    sha256 cellar: :any, arm64_monterey: "1d186ea2c0a3ca07ffa8c1ddd02d34832d7c50d4c718dd50c7aa5469489e4901"
+    sha256 cellar: :any, arm64_big_sur:  "92315173b7a51d4af3db388cb65420026d7864aa27f5ef89a03942bf42afcf79"
+    sha256 cellar: :any, monterey:       "7ca82e1f018eebd2650823754122b999dba06cd3c923edb7fec0cf07d356e54e"
+    sha256 cellar: :any, big_sur:        "48c5d2212056baf6bf7cf5ac1db657148322f8e90a70fd065f11df3dc0262e98"
+    sha256 cellar: :any, catalina:       "12ee01a5d78a0d1b24c51deccc311b2ab8bddec499265c088d5174a16a49837f"
+  end
+
+  depends_on "meson" => :build
+  depends_on "ninja" => :build
   depends_on "pkg-config" => :build
   depends_on "fluid-synth"
   depends_on "libpng"
+  depends_on "libslirp"
+  depends_on "mt32emu"
   depends_on "opusfile"
   depends_on "sdl2"
   depends_on "sdl2_net"
 
   def install
-    args = %W[
-      --prefix=#{prefix}
-      --disable-dependency-tracking
-      --disable-sdltest
-      --enable-core-inline
-    ]
-
-    system "./autogen.sh"
-    system "./configure", *args
-    system "make", "install"
+    mkdir "build" do
+      system "meson", *std_meson_args, "-Db_lto=true", ".."
+      system "ninja", "-v"
+      system "ninja", "install", "-v"
+    end
     mv bin/"dosbox", bin/"dosbox-staging"
     mv man1/"dosbox.1", man1/"dosbox-staging.1"
   end

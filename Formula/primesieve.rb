@@ -1,24 +1,25 @@
 class Primesieve < Formula
   desc "Fast C/C++ prime number generator"
   homepage "https://github.com/kimwalisch/primesieve"
-  url "https://github.com/kimwalisch/primesieve/archive/v7.6.tar.gz"
-  sha256 "485669e8f9a6c74e528947d274df705f13caaf276d460d0f037b8dbc0c9c0a99"
+  url "https://github.com/kimwalisch/primesieve/archive/v7.8.tar.gz"
+  sha256 "0cd0490259e6e919c6e3dd3f3e69ac6d91e6cbe616e22a219abe4006d9293d5d"
   license "BSD-2-Clause"
 
   bottle do
-    cellar :any
-    sha256 "50ab785aea91644c88fae8d3a75118dbebd2206a99942d1dd5d813df5afd1d56" => :big_sur
-    sha256 "46b89a5aebe93c324af325e1a4f15dd84a334564569c5a6816f998396289192c" => :catalina
-    sha256 "379ba3585b2ac86f43f58654ee9c8d9bc8e552bfda6d3b476399744880f85f2a" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "adf30b1134b1704cad2bf4995b815932393d50046d203f2ca8d2cdf51a1315b8"
+    sha256 cellar: :any,                 arm64_big_sur:  "0c9982a14171709de0381a3f39fa9ff2528416ac056f768f963bed9a125e7f61"
+    sha256 cellar: :any,                 monterey:       "0ab03ec9e809c917a3bef7a14db0a9c6a296a9a3f7d456bf32c77824d3435e61"
+    sha256 cellar: :any,                 big_sur:        "4f9a4873dee72a4466630609c610863781eef59b8cf290c5666394ab6604f974"
+    sha256 cellar: :any,                 catalina:       "a82b43b80f8372ae3e85a322c7e84856cdebc407b86c2c9c66b2cf0051d1a267"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "44679f7c19d5183cdd8b66605f248bae3d56f7430a3ad6bc3cd6c0eb5051dcb7"
   end
 
   depends_on "cmake" => :build
 
   def install
-    mkdir "build" do
-      system "cmake", "..", *std_cmake_args
-      system "make", "install"
-    end
+    system "cmake", "-S", ".", "-B", "build", "-DCMAKE_INSTALL_RPATH=#{rpath}", *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do

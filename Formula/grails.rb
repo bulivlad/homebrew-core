@@ -1,8 +1,8 @@
 class Grails < Formula
   desc "Web application framework for the Groovy language"
   homepage "https://grails.org"
-  url "https://github.com/grails/grails-core/releases/download/v4.0.6/grails-4.0.6.zip"
-  sha256 "77a3d01ce99d07717c799449c73275c4c93c39393e0eb05d33bd3fe36a408346"
+  url "https://github.com/grails/grails-core/releases/download/v5.1.6/grails-5.1.6.zip"
+  sha256 "1f873f36eea23a06912e5fee579d67627350839a7d72397fb5a7b1667978b7e2"
   license "Apache-2.0"
 
   livecheck do
@@ -10,15 +10,17 @@ class Grails < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any_skip_relocation, all: "608654123012045309788e97acd2c8d096fa183caafc527df63b0548587a62ff"
+  end
 
   depends_on "openjdk@11"
 
   def install
     rm_f Dir["bin/*.bat", "bin/cygrails", "*.bat"]
     libexec.install Dir["*"]
-    bin.install Dir["#{libexec}/bin/*"]
-    bin.env_script_all_files libexec/"bin", JAVA_HOME: "${JAVA_HOME:-#{Formula["openjdk@11"].opt_prefix}}"
+    bin.install Dir[libexec/"bin/*"]
+    bin.env_script_all_files libexec/"bin", Language::Java.overridable_java_home_env("11")
   end
 
   def caveats

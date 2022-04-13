@@ -3,27 +3,27 @@ class Docutils < Formula
 
   desc "Text processing system for reStructuredText"
   homepage "https://docutils.sourceforge.io"
-  url "https://downloads.sourceforge.net/project/docutils/docutils/0.16/docutils-0.16.tar.gz"
-  sha256 "7d4e999cca74a52611773a42912088078363a30912e8822f7a3d38043b767573"
-  revision 2
-
-  livecheck do
-    url :stable
-  end
+  url "https://downloads.sourceforge.net/project/docutils/docutils/0.18.1/docutils-0.18.1.tar.gz"
+  sha256 "679987caf361a7539d76e584cbeddc311e3aee937877c87346f31debc63e9d06"
+  license all_of: [:public_domain, "BSD-2-Clause", "GPL-3.0-or-later", "Python-2.0"]
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "5a05e748f77245ccca711d5363d498b4c5c656fed6600bd3b011aa38b3d579fc" => :big_sur
-    sha256 "bf6ed6207b7aa3f030661e670e69a561af961c6ed3f920489997454c137480b4" => :arm64_big_sur
-    sha256 "b29e292e287170881f5e88d0e05fa41420515081126e486332d9036c8024f9ef" => :catalina
-    sha256 "8fe38011ae417e9f2476fdadc5a3c96558fa4f6ce7c86ac3961a71b9b35ecfbc" => :mojave
-    sha256 "771eee4e347d10e5e9722e2c74f99c31e4c712aa06d422bd1c03903b2bba7b97" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "d7be7131a30339be430d398e605bf870d1afa6842ece2f723b9ae4539f680c9c"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "d7be7131a30339be430d398e605bf870d1afa6842ece2f723b9ae4539f680c9c"
+    sha256 cellar: :any_skip_relocation, monterey:       "b29fd5b105a8b42efb62815ddde41221d70aed081f2a0e8dd1f127da631a1b27"
+    sha256 cellar: :any_skip_relocation, big_sur:        "b29fd5b105a8b42efb62815ddde41221d70aed081f2a0e8dd1f127da631a1b27"
+    sha256 cellar: :any_skip_relocation, catalina:       "b29fd5b105a8b42efb62815ddde41221d70aed081f2a0e8dd1f127da631a1b27"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "204621df50ede7cc0c892dba0f23923945ef919eb0eb87b62f46963bf4a00c99"
   end
 
-  depends_on "python@3.9"
+  depends_on "python@3.10"
 
   def install
     virtualenv_install_with_resources
+
+    Dir.glob("#{libexec}/bin/*.py") do |f|
+      bin.install_symlink f => File.basename(f, ".py")
+    end
   end
 
   test do

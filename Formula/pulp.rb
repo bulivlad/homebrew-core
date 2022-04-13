@@ -2,21 +2,18 @@ require "language/node"
 
 class Pulp < Formula
   desc "Build tool for PureScript projects"
-  homepage "https://github.com/bodil/pulp"
-  url "https://registry.npmjs.org/pulp/-/pulp-15.0.0.tgz"
-  sha256 "695da1581389d060810ed1a5962ab7e53696db8493b224fa7dc2358f255b8b53"
-  license "LGPL-3.0"
+  homepage "https://github.com/purescript-contrib/pulp"
+  url "https://registry.npmjs.org/pulp/-/pulp-16.0.0-0.tgz"
+  sha256 "77b8a5ff21291257766f54289dbe92d2558fc64e9a034513647a76400c0e7d94"
+  license "LGPL-3.0-or-later"
 
   livecheck do
     url :stable
+    regex(%r{href=.*?/package/pulp/v/(\d+(?:[.-]\d+)+)["']}i)
   end
 
   bottle do
-    cellar :any_skip_relocation
-    rebuild 1
-    sha256 "b8171d3e267d32cb7c785ee72fb8a1dbe96d7a66a7d5311a23b314a0e742156c" => :catalina
-    sha256 "9ee409ce24c46c02db3dade7b2942d8990708de840e03e0a80d5f2498a9bc46e" => :mojave
-    sha256 "56016abc98b66356ad0d58c0ea951de4da772abca1f12fd2c3635a7700e36c63" => :high_sierra
+    sha256 cellar: :any_skip_relocation, all: "c2b46cd6552c65509f86882217f616c80344e5e53a2f22866c958da790694762"
   end
 
   depends_on "bower"

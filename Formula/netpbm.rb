@@ -3,8 +3,8 @@ class Netpbm < Formula
   homepage "https://netpbm.sourceforge.io/"
   # Maintainers: Look at https://sourceforge.net/p/netpbm/code/HEAD/tree/
   # for stable versions and matching revisions.
-  url "https://svn.code.sf.net/p/netpbm/code/stable", revision: "3997"
-  version "10.86.18"
+  url "https://svn.code.sf.net/p/netpbm/code/stable", revision: "4311"
+  version "10.86.32"
   license "GPL-3.0-or-later"
   version_scheme 1
   head "https://svn.code.sf.net/p/netpbm/code/trunk"
@@ -16,11 +16,12 @@ class Netpbm < Formula
   end
 
   bottle do
-    cellar :any
-    sha256 "f67c2c93ff2c6a3d95640f228f9f7b8b0865a93f4fd4870871016015db79331f" => :big_sur
-    sha256 "0b8a01fca6a878a893dc0d0259e83f1663e0d71ba83fbad26a955812c798e729" => :arm64_big_sur
-    sha256 "9b136982e2785817585826f084a3282cce0b1bd643ddf3af54bf42213fc9eb25" => :catalina
-    sha256 "4b4243c7384518eaee83aeff5e422a467395945300002496fda4d4f4dd8badc9" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "631f1cab0394dcfa01aba30eb971fdb0532207eb327f854668dd18568c1e671b"
+    sha256 cellar: :any,                 arm64_big_sur:  "0448d80545090f5e4922c82d8e776b21fe23bcd4e32c4910b664dd7e1bac22db"
+    sha256 cellar: :any,                 monterey:       "ea9046815c5d1803c0bbb53d221f308baf57bf647a87424ff321a6a0f3ceb748"
+    sha256 cellar: :any,                 big_sur:        "cfc749333431aa07b626edac0e73a1f8f2512aed00656044ae3fc4a7b8da7518"
+    sha256 cellar: :any,                 catalina:       "69ced83f7701dd74f5fb944ee66f4e9822a70afece7a27586880db5c19bef960"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c3492eefa5aefe8173e943bccd7b85fd4cdf2b7f309c4509c5ce66ed91f17bcc"
   end
 
   depends_on "jasper"
@@ -32,25 +33,28 @@ class Netpbm < Formula
   uses_from_macos "libxml2"
   uses_from_macos "zlib"
 
-  def install
-    # Fix file not found errors for /usr/lib/system/libsystem_symptoms.dylib and
-    # /usr/lib/system/libsystem_darwin.dylib on 10.11 and 10.12, respectively
-    ENV["SDKROOT"] = MacOS.sdk_path if MacOS.version <= :sierra
+  conflicts_with "jbigkit", because: "both install `pbm.5` and `pgm.5` files"
 
+  def install
     cp "config.mk.in", "config.mk"
 
     inreplace "config.mk" do |s|
       s.remove_make_var! "CC"
-      s.change_make_var! "CFLAGS_SHLIB", "-fno-common"
-      s.change_make_var! "NETPBMLIBTYPE", "dylib"
-      s.change_make_var! "NETPBMLIBSUFFIX", "dylib"
-      s.change_make_var! "LDSHLIB", "--shared -o $(SONAME)"
       s.change_make_var! "TIFFLIB", "-ltiff"
       s.change_make_var! "JPEGLIB", "-ljpeg"
       s.change_make_var! "PNGLIB", "-lpng"
       s.change_make_var! "ZLIB", "-lz"
       s.change_make_var! "JASPERLIB", "-ljasper"
       s.change_make_var! "JASPERHDR_DIR", "#{Formula["jasper"].opt_include}/jasper"
+
+      if OS.mac?
+        s.change_make_var! "CFLAGS_SHLIB", "-fno-common"
+        s.change_make_var! "NETPBMLIBTYPE", "dylib"
+        s.change_make_var! "NETPBMLIBSUFFIX", "dylib"
+        s.change_make_var! "LDSHLIB", "--shared -o $(SONAME)"
+      else
+        s.change_make_var! "CFLAGS_SHLIB", "-fPIC"
+      end
     end
 
     ENV.deparallelize
@@ -65,7 +69,7 @@ class Netpbm < Formula
       end
 
       prefix.install %w[bin include lib misc]
-      lib.install Dir["staticlink/*.a"], Dir["sharedlink/*.dylib"]
+      lib.install Dir["staticlink/*.a"], Dir["sharedlink/#{shared_library("*")}"]
       (lib/"pkgconfig").install "pkgconfig_template" => "netpbm.pc"
     end
   end

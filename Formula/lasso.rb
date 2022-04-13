@@ -1,46 +1,43 @@
 class Lasso < Formula
   desc "Library for Liberty Alliance and SAML protocols"
   homepage "https://lasso.entrouvert.org/"
-  url "https://dev.entrouvert.org/releases/lasso/lasso-2.6.1.tar.gz"
-  sha256 "f8a8dbce238802f6bb9c3b8bd528b4dce2a1dc44e2d34d8d839aa54fbc8ed1de"
-  license "GPL-2.0"
-  revision 1
+  url "https://dev.entrouvert.org/releases/lasso/lasso-2.8.0.tar.gz"
+  sha256 "ffcbd5851d98586c7e1caf43bad66164211a3b61d12bf860a0598448ff9f2b38"
+  license "GPL-2.0-or-later"
+
+  livecheck do
+    url :homepage
+    regex(/href=.*?lasso[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
 
   bottle do
-    cellar :any
-    sha256 "83fa7671b9b8635dbf79c5db616d72c0f8d53ca543a508effd4bf628f46af26e" => :big_sur
-    sha256 "aef8a4d9b81790ff84aad53da1c7d9a582ac69db8d775d930a30444174e186dc" => :arm64_big_sur
-    sha256 "bc1f4dc6fccff1c5631d37b4539d2d9a657357445488ce892756feccf98f660b" => :catalina
-    sha256 "d4bfe838fe8fd0b32ff7e19a4601c85a3b98a49ed8e1f05dc796ed5adf89005b" => :mojave
-    sha256 "8256178a39f08386db515226b334a93f895cb8d96c043acfe1a8d420efbb668f" => :high_sierra
+    rebuild 1
+    sha256 cellar: :any,                 arm64_monterey: "1234da53fe66054f3b22628b155ddad4b701e039aef6f648d4233ed0fbba0177"
+    sha256 cellar: :any,                 arm64_big_sur:  "41c8f358f24567d8e813a30362c67e14a66ae7534746aaad23f5b36eaa1c35e6"
+    sha256 cellar: :any,                 monterey:       "24604ecf58d01e58194a75e57c69237ecf85cceaf544b314cd4a59d4fd5e4f77"
+    sha256 cellar: :any,                 big_sur:        "8a395f2aa86ef1a5f22f23b3bc4b7fbca51e108b0c3afbea149e731932d59033"
+    sha256 cellar: :any,                 catalina:       "149148a36bada2068998128bdccb2887149cb8bbf8da23398546f734a1a8e03b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b5818abda0bcd05f97c6bc342142623a13e70f3b0ae4fe036703b3d2e944f354"
   end
 
   depends_on "pkg-config" => :build
-  depends_on "python@3.9" => :build
+  depends_on "python@3.10" => :build
+  depends_on "six" => :build
   depends_on "glib"
   depends_on "libxmlsec1"
   depends_on "openssl@1.1"
 
-  resource "six" do
-    url "https://files.pythonhosted.org/packages/21/9f/b251f7f8a76dec1d6651be194dfba8fb8d7781d10ab3987190de8391d08e/six-1.14.0.tar.gz"
-    sha256 "236bdbdce46e6e6a3d61a337c0f8b763ca1e8717c03b369e87a7ec7ce1319c0a"
-  end
+  uses_from_macos "libxml2"
 
   def install
     xy = Language::Python.major_minor_version "python3"
-    ENV.prepend_create_path "PYTHONPATH", libexec/"vendor/lib/python#{xy}/site-packages"
-    resources.each do |r|
-      r.stage do
-        system "python3", *Language::Python.setup_install_args(libexec/"vendor")
-      end
-    end
-
     ENV.prepend_create_path "PYTHONPATH", libexec/"lib/python#{xy}/site-packages"
     system "./configure", "--disable-dependency-tracking",
                           "--disable-silent-rules",
                           "--disable-java",
                           "--disable-perl",
                           "--disable-php5",
+                          "--disable-php7",
                           "--disable-python",
                           "--prefix=#{prefix}",
                           "--with-pkg-config=#{ENV["PKG_CONFIG_PATH"]}"
@@ -55,10 +52,11 @@ class Lasso < Formula
         return lasso_init();
       }
     EOS
+    libxml = OS.mac? ? MacOS.sdk_path/"usr/include/libxml2" : Formula["libxml2"].include/"libxml2"
     system ENV.cc, "test.c",
                    "-I#{Formula["glib"].include}/glib-2.0",
                    "-I#{Formula["glib"].lib}/glib-2.0/include",
-                   "-I#{MacOS.sdk_path}/usr/include/libxml2",
+                   "-I#{libxml}",
                    "-I#{Formula["libxmlsec1"].include}/xmlsec1",
                    "-L#{lib}", "-llasso", "-o", "test"
     system "./test"

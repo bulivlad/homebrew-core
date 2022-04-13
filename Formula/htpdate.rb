@@ -1,24 +1,23 @@
 class Htpdate < Formula
   desc "Synchronize time with remote web servers"
-  homepage "http://www.vervest.org/htp/"
-  url "http://www.vervest.org/htp/archive/c/htpdate-1.2.2.tar.xz"
-  sha256 "5f1f959877852abb3153fa407e8532161a7abe916aa635796ef93f8e4119f955"
+  homepage "https://www.vervest.org/htp/"
+  url "https://www.vervest.org/htp/archive/c/htpdate-1.3.3.tar.gz"
+  sha256 "74f34b013eba6f99369819fa4b3d48e9ab5e531ad04f6af59cc04e8777c76ed7"
+  license "GPL-2.0-or-later"
 
   livecheck do
-    url "http://www.vervest.org/htp/archive/c/?C=M&O=D"
+    url "https://www.vervest.org/htp/?download"
     regex(/href=.*?htpdate[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "ee879a482a1437018b7db5a44863b230e211fb7093acaaae35730097c08896e8" => :big_sur
-    sha256 "f131e857951e55ae5f61836ce5f86944ba25812f85dff9e9cd868af7eb6adf17" => :arm64_big_sur
-    sha256 "ed41231b1e7d1760603e39f3e161be7cf817abc978f70c0dcbaec3bb206d9d8d" => :catalina
-    sha256 "4da5825b9f51a83c7de24d289719f0d341b79685a7e1580f2de867e53941934a" => :mojave
-    sha256 "437b8823d451f79f1ad8e2420387a3f50c3dc5919ef19717d41c437a88b77247" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "8fbd7789126d96fef41cd7d9fc2c74a1bf9feb5c64e92ae2892980429f2a149d"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "99a88da3d42b316fec3edd327a2adc2e8f96b7f7d6f37a97d9dab08205f41c42"
+    sha256 cellar: :any_skip_relocation, monterey:       "6d352630028cc7e4dd5fb4f084f4e715d0df7387fa3273b409b6068487232044"
+    sha256 cellar: :any_skip_relocation, big_sur:        "87386fb83d33eb8784a9e950884d74473b49d87c7b4d258acd3a24bd648979bc"
+    sha256 cellar: :any_skip_relocation, catalina:       "689c87e94f22843715a22764bed4ca130ba37c51ccdbfbb107f4892c1345208b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "600585ac1f7d5c3be35ddf23d7b0389bbeb9ba6bdabb675069a1b225ff4ff65f"
   end
-
-  depends_on macos: :high_sierra # needs <sys/timex.h>
 
   def install
     system "make", "prefix=#{prefix}",
@@ -29,6 +28,6 @@ class Htpdate < Formula
   end
 
   test do
-    system "#{bin}/htpdate", "-q", "-d", "-u", ENV["USER"], "example.org"
+    system "#{sbin}/htpdate", "-q", "-d", "-u", ENV["USER"], "example.org"
   end
 end

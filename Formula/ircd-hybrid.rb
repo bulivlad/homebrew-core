@@ -1,8 +1,8 @@
 class IrcdHybrid < Formula
   desc "High-performance secure IRC server"
   homepage "https://www.ircd-hybrid.org/"
-  url "https://downloads.sourceforge.net/project/ircd-hybrid/ircd-hybrid/ircd-hybrid-8.2.37/ircd-hybrid-8.2.37.tgz"
-  sha256 "aef14055c9d63bd09d44673709f089a0f782bd45e384334fe4add641171989b0"
+  url "https://downloads.sourceforge.net/project/ircd-hybrid/ircd-hybrid/ircd-hybrid-8.2.39/ircd-hybrid-8.2.39.tgz"
+  sha256 "035d271f6b0dd451157f80146d189bc1c9b84cc9ba1b7ad06fd72ee5108e6e4d"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -11,14 +11,18 @@ class IrcdHybrid < Formula
   end
 
   bottle do
-    sha256 "2b6ce3ff52f15d7d7b6c3c6ac437af712943026f8bdaf71c927e53fd945abc35" => :big_sur
-    sha256 "d141fe8e277ade8a5edc34ab7aacfcdb6268c0db54e6e8ba3cf2beff6ae112d6" => :arm64_big_sur
-    sha256 "ba22ee45e8d7d37d25ca476422d531775695bfaf4bf5a23530687d3efeceea09" => :catalina
-    sha256 "eb7e7634623b5c3ba34475c4f9ba83f3bf3e1bc680e8ad5bc6e88afbd92fbe9b" => :mojave
+    sha256 arm64_monterey: "3a92eb47b04dddeb6b626f232d859c6cfb1828c331438b1ccaedb99ff92c494e"
+    sha256 arm64_big_sur:  "b31fc7ba489af06e2decf331466810c4477774e3c7af42fcbba77882e535c97a"
+    sha256 monterey:       "429c423e85d054b705c31c68d98f32259820f9893ee1b5975d1e47d2fc2552bf"
+    sha256 big_sur:        "c0b51453c0d7c82c6fe504fcb3d7de3aaf181774621ecdfb1a298bc21bebe6ee"
+    sha256 catalina:       "c918bce271461b22e1eb2632db3c55ea82ba8b3e3822b1acf6e0dc09a804cda4"
+    sha256 mojave:         "53db2d5110d8a486bbb7ed75858f5920838abc4c263e8e732814a87d0015575a"
+    sha256 x86_64_linux:   "fc31f26e809d59c021617055aa26a5f318ba101ce8311c18afbb08233c959627"
   end
 
   depends_on "openssl@1.1"
 
+  conflicts_with "expect", because: "both install an `mkpasswd` binary"
   conflicts_with "ircd-irc2", because: "both install an `ircd` binary"
 
   # ircd-hybrid needs the .la files
@@ -43,31 +47,11 @@ class IrcdHybrid < Formula
     EOS
   end
 
-  plist_options manual: "ircd"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-      <dict>
-        <key>KeepAlive</key>
-        <false/>
-        <key>Label</key>
-        <string>#{plist_name}</string>
-        <key>ProgramArguments</key>
-        <array>
-          <string>#{opt_bin}/ircd</string>
-        </array>
-        <key>RunAtLoad</key>
-        <true/>
-        <key>WorkingDirectory</key>
-        <string>#{HOMEBREW_PREFIX}</string>
-        <key>StandardErrorPath</key>
-        <string>#{var}/ircd.log</string>
-      </dict>
-      </plist>
-    EOS
+  service do
+    run opt_bin/"ircd"
+    keep_alive false
+    working_dir HOMEBREW_PREFIX
+    error_log_path var/"ircd.log"
   end
 
   test do

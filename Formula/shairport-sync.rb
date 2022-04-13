@@ -1,10 +1,10 @@
 class ShairportSync < Formula
   desc "AirTunes emulator that adds multi-room capability"
   homepage "https://github.com/mikebrady/shairport-sync"
-  url "https://github.com/mikebrady/shairport-sync/archive/3.3.7.tar.gz"
-  sha256 "7f8d4ecec53f2f681a962467bf09205568fc936c8c31a9ee07b1bd72d3d95b12"
+  url "https://github.com/mikebrady/shairport-sync/archive/3.3.9.tar.gz"
+  sha256 "17990cb2620551caa07a1c3b371889e55803071eaada04e958c356547a7e1795"
   license "MIT"
-  head "https://github.com/mikebrady/shairport-sync.git", branch: "development"
+  head "https://github.com/mikebrady/shairport-sync.git", branch: "master"
 
   livecheck do
     url :stable
@@ -12,10 +12,12 @@ class ShairportSync < Formula
   end
 
   bottle do
-    sha256 "3db1d86ee0deaecd65c024f9918b60fcf9d14b19c147f186baa3ae8c97181f15" => :big_sur
-    sha256 "63312b9a9084550abbc4b057617b60734c83d5e2d591a72c4e94acac2783f870" => :arm64_big_sur
-    sha256 "65a5e9fb739fac564e2e4f70523fe6467cafd344db63394aea7faaf21d51dde2" => :catalina
-    sha256 "b3c0527359c314d59d68533c1c158952818867ccb8a42a0a8a8c7afaabcc012e" => :mojave
+    sha256 arm64_monterey: "05049c6b445e6b5697a92a40969bff64f7b8b9d4da8c00464a245e6912c9c594"
+    sha256 arm64_big_sur:  "bc1357912acf12b02c1ec752ceb7ca2a888f3d06b104e773c69d05b358d56e58"
+    sha256 monterey:       "e4267faaffe1bad79c0d85a0b14de861be45db92e31d529dc07ca14ef76d5a68"
+    sha256 big_sur:        "f6aee5b85a169e6b6356a4d9c79e961fd057ec9ed47e71dc1a0f2c39f3cc5308"
+    sha256 catalina:       "516e9b4cba222f86f6aee6535840e4185c7c42c35926e881b994c35774be253c"
+    sha256 x86_64_linux:   "4b82128bbe54f55e7a72d16ae694fd62d45bfc35d3382ed4c539cbb620ace2a0"
   end
 
   depends_on "autoconf" => :build
@@ -32,10 +34,8 @@ class ShairportSync < Formula
   def install
     system "autoreconf", "-fvi"
     args = %W[
-      --with-os=darwin
       --with-libdaemon
       --with-ssl=openssl
-      --with-dns_sd
       --with-ao
       --with-stdout
       --with-pa
@@ -46,6 +46,10 @@ class ShairportSync < Formula
       --sysconfdir=#{etc}/shairport-sync
       --prefix=#{prefix}
     ]
+    if OS.mac?
+      args << "--with-dns_sd" # Enable bonjour
+      args << "--with-os=darwin"
+    end
     system "./configure", *args
     system "make", "install"
   end
@@ -54,8 +58,19 @@ class ShairportSync < Formula
     (var/"run").mkpath
   end
 
+  service do
+    run [opt_bin/"shairport-sync", "--use-stderr", "--verbose"]
+    keep_alive true
+    log_path var/"log/shairport-sync.log"
+    error_log_path var/"log/shairport-sync.log"
+  end
+
   test do
     output = shell_output("#{bin}/shairport-sync -V")
-    assert_match "libdaemon-OpenSSL-dns_sd-ao-pa-stdout-pipe-soxr-metadata", output
+    if OS.mac?
+      assert_match "libdaemon-OpenSSL-dns_sd-ao-pa-stdout-pipe-soxr-metadata", output
+    else
+      assert_match "OpenSSL-ao-pa-stdout-pipe-soxr-metadata-sysconfdir", output
+    end
   end
 end

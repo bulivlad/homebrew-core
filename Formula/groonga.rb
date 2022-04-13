@@ -1,8 +1,8 @@
 class Groonga < Formula
   desc "Fulltext search engine and column store"
   homepage "https://groonga.org/"
-  url "https://packages.groonga.org/source/groonga/groonga-10.1.0.tar.gz"
-  sha256 "fbf29a8de1cb0f463030118ca146846b8f5fbaa5a090cc2b45eef372d4e4aabf"
+  url "https://packages.groonga.org/source/groonga/groonga-12.0.2.tar.gz"
+  sha256 "7ef0bb0607c0a92f414e74359683315e0fc993736a09cbd2cf28b9d5a467405a"
   license "LGPL-2.1-or-later"
 
   livecheck do
@@ -11,14 +11,16 @@ class Groonga < Formula
   end
 
   bottle do
-    sha256 "419409c6038aae136e393c23aec113d3e9753dc0d0b6a9198629b8845617afae" => :big_sur
-    sha256 "1cb0de370692f287fc3254a855a81f8f72fcada63201e75265b9210c03372e04" => :arm64_big_sur
-    sha256 "b3c9405d12bcd8c6402ccb3fd568803a3ca219a12239c9f4bd98d82b635fb1d3" => :catalina
-    sha256 "587b7a0ad2fa589d7ef72cb398b403a58ea65f8de9cd65251362c22290bd4ec0" => :mojave
+    sha256 arm64_monterey: "6536f1ba81e6e1dcb4b43344f79c3cabc4b8ebdf48b4dc731a185c9061ab88ce"
+    sha256 arm64_big_sur:  "f59ad1c7dc5763562b19403d5fdd7f7396213864de17c486f136940e43b4ed2c"
+    sha256 monterey:       "7002a6b7ac366e881735df9800f039963862d105fa3a5d0a79032a2bdce0c983"
+    sha256 big_sur:        "a751b12703de23776250b2e0247d8b42e3b3f6035672e3c40b750e09774cfef0"
+    sha256 catalina:       "9379f8ec2f6eaabb1bd1a4a4870d1a7d0381bbcf9694d5e5218fa7b3438b0bc6"
+    sha256 x86_64_linux:   "f824f933618baff38c77df931f45aae9dab70de74c5fd61e40844ab881bf11fb"
   end
 
   head do
-    url "https://github.com/groonga/groonga.git"
+    url "https://github.com/groonga/groonga.git", branch: "master"
     depends_on "autoconf" => :build
     depends_on "automake" => :build
     depends_on "libtool" => :build
@@ -40,15 +42,17 @@ class Groonga < Formula
   link_overwrite "lib/pkgconfig/groonga-normalizer-mysql.pc"
 
   resource "groonga-normalizer-mysql" do
-    url "https://packages.groonga.org/source/groonga-normalizer-mysql/groonga-normalizer-mysql-1.1.4.tar.gz"
-    sha256 "084a74742ba7cf396c617354fa58d691b0c22e1c5d1ddfc3722123d7161fcd96"
+    url "https://packages.groonga.org/source/groonga-normalizer-mysql/groonga-normalizer-mysql-1.1.8.tar.gz"
+    sha256 "0ed23e0c0b4d4dca23c57bbd98fe3d051c3f3ddacbbe55d07fddb6c53142cae5"
   end
 
   def install
     args = %W[
       --prefix=#{prefix}
       --disable-zeromq
+      --disable-apache-arrow
       --enable-mruby
+      --with-luajit=no
       --with-ssl
       --with-zlib
       --without-libstemmer
@@ -60,8 +64,10 @@ class Groonga < Formula
       system "./autogen.sh"
     end
 
-    system "./configure", *args
-    system "make", "install"
+    mkdir "builddir" do
+      system "../configure", *args
+      system "make", "install"
+    end
 
     resource("groonga-normalizer-mysql").stage do
       ENV.prepend_path "PATH", bin

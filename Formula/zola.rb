@@ -1,16 +1,17 @@
 class Zola < Formula
   desc "Fast static site generator in a single binary with everything built-in"
   homepage "https://www.getzola.org/"
-  url "https://github.com/getzola/zola/archive/v0.13.0.tar.gz"
-  sha256 "84c20cf5c851a465266c5cc343623752102c53929f6da31b2a4ce747a87c5c23"
+  url "https://github.com/getzola/zola/archive/v0.15.3.tar.gz"
+  sha256 "89a590549249e60a01f1a1f66ee23fedc711afd4e9a669ee1328e5c99ea958c8"
   license "MIT"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "d4ecc13ce735449bbba5e83c57617ce03b939e69493e9e65d2c23a294ff6ea2e" => :big_sur
-    sha256 "3578486fdec183e82c51c5c489e9a78f9f997cbc05ebcb541fc60059163a9b44" => :arm64_big_sur
-    sha256 "aaccf8b7fe4e9256c38021902dcffca291d02de1ac662ce0219a1fca0e8fac0a" => :catalina
-    sha256 "d883c9f8439ee6226f1392f1350ce974b4312367e026c1ae756fd7c1765d5bf5" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "63760f215220bd08487475ebaf4f80ab0b273bb55457edcc6b04b56caff5fb65"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "139d609fcfac6874762aa4d087c38408e2bae0b8c4ff01111503f64300a50aae"
+    sha256 cellar: :any_skip_relocation, monterey:       "1a27978ece92ac0d189fb774c4eafb6001b7bace4a85530b3fe3e8843670ca65"
+    sha256 cellar: :any_skip_relocation, big_sur:        "ebfaee43ae5ce7653c4efc97abbf9c26af1141443b4af31863236b684786b0fd"
+    sha256 cellar: :any_skip_relocation, catalina:       "903262361a0baa26ceb1dd259e987b89cdc9404437138c891f3af40379c8de6c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1d4b9cd2103cc6584e1aeef9d2976a0f269f3feae4ce15edb454ad8740938984"
   end
 
   depends_on "cmake" => :build
@@ -21,9 +22,7 @@ class Zola < Formula
   end
 
   def install
-    on_linux do
-      ENV["OPENSSL_DIR"] = Formula["openssl@1.1"].opt_prefix
-    end
+    ENV["OPENSSL_DIR"] = Formula["openssl@1.1"].opt_prefix if OS.linux?
     system "cargo", "install", *std_cargo_args
 
     bash_completion.install "completions/zola.bash"

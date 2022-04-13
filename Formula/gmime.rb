@@ -5,22 +5,27 @@ class Gmime < Formula
   sha256 "2aea96647a468ba2160a64e17c6dc6afe674ed9ac86070624a3f584c10737d44"
   license "LGPL-2.1"
 
-  livecheck do
-    url :stable
-  end
-
   bottle do
-    sha256 "3714b2907a93c2495efb79c0cf870bdab5683c64c17696836b19e5b34108b852" => :big_sur
-    sha256 "0c12167da5badd3447325e0770666c1e7f5e5e8945613e4c54c4e3e5ef1915fa" => :arm64_big_sur
-    sha256 "877f2024cc0d97bc94f559ad992f87bdf6fdc23f9a1acc7b5bb13f0711b734c3" => :catalina
-    sha256 "7a0bda5bca906bc62e3ab24fc39752e2858fce861ba759040fc864928ab18d96" => :mojave
-    sha256 "0bb48841eae316695037bcd793673d518d0f2be20968a115a81c92824fb77ac0" => :high_sierra
+    sha256                               arm64_monterey: "18050619c00d2e6b994b91472ed9567716f0d77ee64b200626ff6ab066e87aaa"
+    sha256                               arm64_big_sur:  "0c12167da5badd3447325e0770666c1e7f5e5e8945613e4c54c4e3e5ef1915fa"
+    sha256                               monterey:       "ea53d26dfed5e8441375732cc9c626436480ad9cfae885b9883b00e3b09b197b"
+    sha256                               big_sur:        "3714b2907a93c2495efb79c0cf870bdab5683c64c17696836b19e5b34108b852"
+    sha256                               catalina:       "877f2024cc0d97bc94f559ad992f87bdf6fdc23f9a1acc7b5bb13f0711b734c3"
+    sha256                               mojave:         "7a0bda5bca906bc62e3ab24fc39752e2858fce861ba759040fc864928ab18d96"
+    sha256                               high_sierra:    "0bb48841eae316695037bcd793673d518d0f2be20968a115a81c92824fb77ac0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "07bffed5c3be937ee007bd878ff92561ed7f17f841d5062eccc7a8900e416b42"
   end
 
   depends_on "gobject-introspection" => :build
   depends_on "pkg-config" => :build
   depends_on "glib"
   depends_on "gpgme"
+
+  # Fix -flat_namespace being used on Big Sur and later.
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+    sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
+  end
 
   def install
     args = %W[
@@ -70,9 +75,7 @@ class Gmime < Formula
       -lgmime-3.0
       -lgobject-2.0
     ]
-    on_macos do
-      flags << "-lintl"
-    end
+    flags << "-lintl" if OS.mac?
     system ENV.cc, "-o", "test", "test.c", *flags
     system "./test"
   end

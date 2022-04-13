@@ -1,18 +1,18 @@
 class Cloc < Formula
   desc "Statistics utility to count lines of code"
   homepage "https://github.com/AlDanial/cloc/"
-  url "https://github.com/AlDanial/cloc/archive/1.88.tar.gz"
-  sha256 "e85c2d1b3ec389d892955cf20b3fa5c797e81136e231d9a09e4f4c62e272f8cd"
+  url "https://github.com/AlDanial/cloc/archive/v1.92.tar.gz"
+  sha256 "b5f18f4dbc05eff08ada215b6c2a8cbdab397e9b4b4e25c7427d4ed86fb6e248"
   license "GPL-2.0-or-later"
-  head "https://github.com/AlDanial/cloc.git"
+  head "https://github.com/AlDanial/cloc.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "9f1cc1669e19c4a9a539f0c8aaa91dccf74572a6ccb38948c3d60efe0c966ed6" => :big_sur
-    sha256 "debaf5cbb9e961ea9c7192d2a98ae8349a1e8e7a085bd5fdf3d7c3a0858fe2e5" => :arm64_big_sur
-    sha256 "f287c5bccd7c70cd25a17eaa235b392c6b3f27da6a9d4c47d5b0cbd45608dc84" => :catalina
-    sha256 "eda8d2e68c995503592bc9b2ec5e49fb30e93464df512d20ba45c08d0a9e8886" => :mojave
-    sha256 "24d26f59347952a7469fdb10830486a0f34b5c11884f5c4da05d34a858c8bd20" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "0efc12ede2a34d0f3861223327a7e1ea559e401e567969e50d84d825cc3c90b9"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "05ea934d7a6ce536bbb928c9cd9a5d9ba27bc09109da8edf5ce39c39fdc71d82"
+    sha256 cellar: :any_skip_relocation, monterey:       "3e7b13dcfa8cfa88ac066471984c7966768f104085fd3384ee4948f481a1108d"
+    sha256 cellar: :any_skip_relocation, big_sur:        "79233c01f28f7f76b4e763c2f4301297502b47b77e8f39fea10f18576d12cc62"
+    sha256 cellar: :any_skip_relocation, catalina:       "c66fde2a289083b2e121817f17f5b75769f638a4b90c0b49a3e0fc89cec9e655"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "879b082292c2ca231e4146d94867f121006494ae5331a6aee8b0f531d63918a3"
   end
 
   uses_from_macos "perl"
@@ -23,8 +23,8 @@ class Cloc < Formula
   end
 
   resource "Algorithm::Diff" do
-    url "https://cpan.metacpan.org/authors/id/T/TY/TYEMQ/Algorithm-Diff-1.1903.tar.gz"
-    sha256 "30e84ac4b31d40b66293f7b1221331c5a50561a39d580d85004d9c1fff991751"
+    url "https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Algorithm-Diff-1.201.tar.gz"
+    sha256 "0022da5982645d9ef0207f3eb9ef63e70e9713ed2340ed7b3850779b0d842a7d"
   end
 
   resource "Parallel::ForkManager" do
@@ -38,8 +38,8 @@ class Cloc < Formula
   end
 
   resource "Moo::Role" do
-    url "https://cpan.metacpan.org/authors/id/H/HA/HAARG/Moo-2.004000.tar.gz"
-    sha256 "323240d000394cf38ec42e865b05cb8928f625c82c9391cd2cdc72b33c51b834"
+    url "https://cpan.metacpan.org/authors/id/H/HA/HAARG/Moo-2.005004.tar.gz"
+    sha256 "e3030b80bd554a66f6b3c27fd53b1b5909d12af05c4c11ece9a58f8d1e478928"
   end
 
   resource "Module::Runtime" do
@@ -48,8 +48,8 @@ class Cloc < Formula
   end
 
   resource "Role::Tiny" do
-    url "https://cpan.metacpan.org/authors/id/H/HA/HAARG/Role-Tiny-2.001004.tar.gz"
-    sha256 "92ba5712850a74102c93c942eb6e7f62f7a4f8f483734ed289d08b324c281687"
+    url "https://cpan.metacpan.org/authors/id/H/HA/HAARG/Role-Tiny-2.002004.tar.gz"
+    sha256 "d7bdee9e138a4f83aa52d0a981625644bda87ff16642dfa845dcb44d9a242b45"
   end
 
   resource "Devel::GlobalDestruction" do

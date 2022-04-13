@@ -1,24 +1,24 @@
 class Cataclysm < Formula
   desc "Fork/variant of Cataclysm Roguelike"
   homepage "https://github.com/CleverRaven/Cataclysm-DDA"
-  url "https://github.com/CleverRaven/Cataclysm-DDA/archive/0.E-3.tar.gz"
-  version "0.E-3"
-  sha256 "21ac5226a996ac465842f188cadea8815eae7309fe38cf8d94de2f8ac97cd820"
+  url "https://github.com/CleverRaven/Cataclysm-DDA/archive/0.F-3.tar.gz"
+  version "0.F-3"
+  sha256 "5cde334df76f80723532896a995304fd789cc7207172dd817960ffdbb46d87a4"
   license "CC-BY-SA-3.0"
-  head "https://github.com/CleverRaven/Cataclysm-DDA.git"
+  head "https://github.com/CleverRaven/Cataclysm-DDA.git", branch: "master"
 
   livecheck do
     url :stable
+    regex(%r{href=["']?[^"' >]*?/tag/([^"' >]+)["' >]}i)
     strategy :github_latest
-    regex(%r{href=.*?/tag/([^"' >]+)["' >]}i)
   end
 
   bottle do
-    cellar :any
-    sha256 "0e93a967d9e4e01129912388ef9b9b0de954d25088ee65c05a6fea80aca7acbb" => :big_sur
-    sha256 "aacc35c573fa5f841054e73d76c1c954086a990f5821372ab0716652d4b7ee7a" => :arm64_big_sur
-    sha256 "c81600f8324c60d92121e5134fbb26a1212375c5e0c017363cceb473e0ef10e7" => :catalina
-    sha256 "2a3c5ef376aaeb2ee93ddbf3b6ebbb1997056411d48369454283b9518a4da345" => :mojave
+    sha256 cellar: :any, arm64_monterey: "e150bf1941d1cd877cf4916b077e26fa92f6e455537239819fb47507ce9bc5ea"
+    sha256 cellar: :any, arm64_big_sur:  "022d3fea15cfc0a322ae88e5b2f1b5cfc43cf1800e47edb0c67a7497ea02a8e6"
+    sha256 cellar: :any, monterey:       "4eded1f647775447ce5e3ee1db263adf3af99f744de14c1d51c6181c5f94e1ef"
+    sha256 cellar: :any, big_sur:        "e0b9a3933fd920e5955cd0464845f7a9e7dfe808b67b5bb2858239843755e47f"
+    sha256 cellar: :any, catalina:       "74397a9575dc94327a5c2eaf9b1a8a306699c991847e6ecf642f37e439f42d2c"
   end
 
   depends_on "pkg-config" => :build
@@ -68,10 +68,6 @@ class Cataclysm < Formula
     sleep 30
     assert_predicate user_config_dir/"config",
                      :exist?, "User config directory should exist"
-    assert_predicate user_config_dir/"templates",
-                     :exist?, "User template directory should exist"
-    assert_predicate user_config_dir/"save",
-                     :exist?, "User save directory should exist"
   ensure
     Process.kill("TERM", pid)
   end

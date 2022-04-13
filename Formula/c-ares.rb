@@ -1,10 +1,14 @@
 class CAres < Formula
   desc "Asynchronous DNS library"
-  homepage "https://c-ares.haxx.se/"
-  url "https://c-ares.haxx.se/download/c-ares-1.17.1.tar.gz"
-  sha256 "d73dd0f6de824afd407ce10750ea081af47eba52b8a6cb307d220131ad93fc40"
+  homepage "https://c-ares.org/"
+  url "https://c-ares.org/download/c-ares-1.18.1.tar.gz"
+  mirror "https://github.com/c-ares/c-ares/releases/download/cares-1_17_2/c-ares-1.18.1.tar.gz"
+  mirror "http://fresh-center.net/linux/misc/dns/c-ares-1.18.1.tar.gz"
+  mirror "http://fresh-center.net/linux/misc/dns/legacy/c-ares-1.18.1.tar.gz"
+  sha256 "1a7d52a8a84a9fbffb1be9133c0f6e17217d91ea5a6fa61f6b4729cda78ebbcf"
   license "MIT"
-  head "https://github.com/c-ares/c-ares.git"
+  revision 1
+  head "https://github.com/c-ares/c-ares.git", branch: "main"
 
   livecheck do
     url :homepage
@@ -12,22 +16,20 @@ class CAres < Formula
   end
 
   bottle do
-    cellar :any
-    sha256 "514de64e48f4d2c6e448547a30ba03f613b899f30f97f9026740c59eb3f49aeb" => :big_sur
-    sha256 "63627c4d2e4698ba13b82aeb2a10f3aef3a7bcbb7b459c265dbd840e91e5b175" => :arm64_big_sur
-    sha256 "3fc1e6a9c560039998b288db7dfb268c87db614841a6fa1048880b8b6bdd6e4c" => :catalina
-    sha256 "8785faa759b2f10fcaefef1e7398b9ffe79b76b2339b4bc4b552fd9c418b1097" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "a5818fef12f8028c1ee36d9df5213a74b8e3f33b08889043908bc59364cc29b5"
+    sha256 cellar: :any,                 arm64_big_sur:  "2a3a10365f123633607a3569a8cb31afeac814229e17d975c95be5139f33fed5"
+    sha256 cellar: :any,                 monterey:       "62b9590a3b9d30d2db8696da78948fb79a26c139536c3820c4275327fd808559"
+    sha256 cellar: :any,                 big_sur:        "e276dddce0e43aba6e8f39b26be811294ae36cb7c45e203ff656bb52fa30242c"
+    sha256 cellar: :any,                 catalina:       "3d1c10f0de6c0847e972f67e7e6021fde7ccc1f58dc5497182ae7af80bb127f0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7b66f4b75a81bd37ad1eebefc4a59e4ac41eb8d2d0f2b47f56a661366193dffc"
   end
 
   depends_on "cmake" => :build
-  depends_on "ninja" => :build
 
   def install
-    mkdir "build" do
-      system "cmake", "..", "-GNinja", *std_cmake_args
-      system "ninja"
-      system "ninja", "install"
-    end
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args, "-DCMAKE_INSTALL_RPATH=#{rpath}"
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
@@ -44,5 +46,7 @@ class CAres < Formula
     EOS
     system ENV.cc, "test.c", "-L#{lib}", "-lcares", "-o", "test"
     system "./test"
+
+    system "#{bin}/ahost", "127.0.0.1"
   end
 end

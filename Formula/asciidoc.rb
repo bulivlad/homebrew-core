@@ -1,51 +1,33 @@
 class Asciidoc < Formula
-  include Language::Python::Shebang
+  include Language::Python::Virtualenv
 
-  desc "Formatter/translator for text files to numerous formats. Includes a2x"
-  homepage "https://asciidoc.org/"
-  url "https://github.com/asciidoc/asciidoc-py3/archive/9.0.4.tar.gz"
-  sha256 "9e269f336a71e8685d03a00c71b55ca029eed9f7baf1afe67c447be32206b176"
+  desc "Formatter/translator for text files to numerous formats"
+  homepage "https://asciidoc-py.github.io/"
+  url "https://files.pythonhosted.org/packages/8f/94/aa5be7907b9dd1733e4e7a1fa0bb737022d6fb13f80a9283520c66435f4d/asciidoc-10.1.4.tar.gz"
+  sha256 "e614fe7cd6ff096d2aea06733ecfb6b15411b2a0f4aef8267964a32c7f7472ac"
   license "GPL-2.0-only"
-  head "https://github.com/asciidoc/asciidoc-py3.git"
+  head "https://github.com/asciidoc-py/asciidoc-py.git", branch: "main"
+
+  livecheck do
+    url :head
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
+  end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "a7f6a49939e627eece6cddf4cbb91ae72922e6beb88ae9715cfd479051b3fb4b" => :big_sur
-    sha256 "a27b62e2f37f96b534abb47af010a7b6282339439a4a3b19682544e7634f3ca1" => :arm64_big_sur
-    sha256 "0d4c6143d618720d9d1907d4a914b0ba685e67ee024859de3afb7fb6f50bbbb5" => :catalina
-    sha256 "23836dcab06fc863b9babf4501179317d6e28899a83f078aca1cac564ef585e2" => :mojave
-    sha256 "e61daf8474cb187643e49c313b839c957dbaecc5944ed43c9b8a8116ff656a5f" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "c481476e831d0af1a2cb5f7bd6fc0d1be7528e7e434684db292ec5393159cdc7"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "c481476e831d0af1a2cb5f7bd6fc0d1be7528e7e434684db292ec5393159cdc7"
+    sha256 cellar: :any_skip_relocation, monterey:       "3c0862fcbfa7be68166ca49e5308a0bd90ea7571d1b730bdac4e3268631b6076"
+    sha256 cellar: :any_skip_relocation, big_sur:        "3c0862fcbfa7be68166ca49e5308a0bd90ea7571d1b730bdac4e3268631b6076"
+    sha256 cellar: :any_skip_relocation, catalina:       "3c0862fcbfa7be68166ca49e5308a0bd90ea7571d1b730bdac4e3268631b6076"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5356dad49d65b08d80f6c643bcb4a89bbca0f79908b791de035f93b6a0b8732b"
   end
 
-  depends_on "autoconf" => :build
-  depends_on "docbook-xsl" => :build
   depends_on "docbook"
-  depends_on "python@3.9"
+  depends_on "python@3.10"
   depends_on "source-highlight"
 
-  uses_from_macos "libxml2" => :build
-  uses_from_macos "libxslt" => :build
-
-  on_linux do
-    depends_on "xmlto" => :build
-  end
-
   def install
-    ENV["XML_CATALOG_FILES"] = etc/"xml/catalog"
-
-    system "autoconf"
-    system "./configure", "--prefix=#{prefix}"
-
-    %w[
-      a2x.py asciidoc.py filters/code/code-filter.py
-      filters/graphviz/graphviz2png.py filters/latex/latex2img.py
-      filters/music/music2png.py filters/unwraplatex.py
-    ].map { |f| rewrite_shebang detected_python_shebang, f }
-
-    # otherwise macOS's xmllint bails out
-    inreplace "Makefile", "-f manpage", "-f manpage -L"
-    system "make", "install"
-    system "make", "docs"
+    virtualenv_install_with_resources
   end
 
   def caveats
@@ -65,7 +47,7 @@ class Asciidoc < Formula
 
   test do
     (testpath/"test.txt").write("== Hello World!")
-    system "#{bin}/asciidoc", "-b", "html5", "-o", "test.html", "test.txt"
-    assert_match %r{<h2 id="_hello_world">Hello World!</h2>}, File.read("test.html")
+    system "#{bin}/asciidoc", "-b", "html5", "-o", testpath/"test.html", testpath/"test.txt"
+    assert_match %r{<h2 id="_hello_world">Hello World!</h2>}, File.read(testpath/"test.html")
   end
 end

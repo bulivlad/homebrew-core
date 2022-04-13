@@ -1,20 +1,17 @@
 class FileRoller < Formula
   desc "GNOME archive manager"
   homepage "https://wiki.gnome.org/Apps/FileRoller"
-  url "https://download.gnome.org/sources/file-roller/3.38/file-roller-3.38.0.tar.xz"
-  sha256 "723d1c6e567d35dad5eeeaeb86b8d18705658ee73e0b3b97ea16adc7a4dc331a"
+  url "https://download.gnome.org/sources/file-roller/3.42/file-roller-3.42.0.tar.xz"
+  sha256 "1c438e6d53ec10ff4f2eb5b22d7bbf28a7c2a84957ab64a751c1cdf3c52302c7"
   license "GPL-2.0-or-later"
 
-  livecheck do
-    url :stable
-  end
-
   bottle do
-    sha256 "5f93b042a4c184676715979ee56beac1eac0d4cf371d314e4746968d5bc163d3" => :big_sur
-    sha256 "48e094d70bf4efb02ca607e581c257d78f7da62b287c0293ca141472c70f3e05" => :arm64_big_sur
-    sha256 "0bfabe3ee4fcb30fc9b85f98c2c241b625238856c5d9af9fa325cb29bab27de2" => :catalina
-    sha256 "fae6eecff0f93c8c033754829e7f8260b3308e9e6f838c80c494aeb6a9b7f9e0" => :mojave
-    sha256 "78680c1e5096d8769a9f780c72f0ac3ecc009660085ce8cc29065fd07c1f0e71" => :high_sierra
+    sha256 arm64_monterey: "4beb47f33e5f0829a1bb2afc229327c18e9ea1e555283066df56bae6e8dc35f8"
+    sha256 arm64_big_sur:  "49adb5120e4a854e49a3a437a20cecb4968438cf70f9b633733ff4e3dd8cf8dc"
+    sha256 monterey:       "a3482cea0278ad464148e4bdb47892b1548a35f25c86aa370c19f64e0d8f95aa"
+    sha256 big_sur:        "7c535b2b24a9bd6902dc40ee6423a838c2d5a8e1f65846fa90bb2132c3e67b7f"
+    sha256 catalina:       "4aec12ffc7731540e37f874eea27e18ae25b4358f99a0c4bd4c4b48ac19596e9"
+    sha256 x86_64_linux:   "b083f2d968ccc6ea981e53fc5105b39ded995f37c49a5115e34e830f91a02981"
   end
 
   depends_on "itstool" => :build
@@ -26,6 +23,7 @@ class FileRoller < Formula
   depends_on "hicolor-icon-theme"
   depends_on "json-glib"
   depends_on "libarchive"
+  depends_on "libhandy"
   depends_on "libmagic"
 
   def install

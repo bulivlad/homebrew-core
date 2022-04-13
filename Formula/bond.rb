@@ -1,15 +1,15 @@
 class Bond < Formula
   desc "Cross-platform framework for working with schematized data"
   homepage "https://github.com/microsoft/bond"
-  url "https://github.com/microsoft/bond/archive/9.0.4.tar.gz"
-  sha256 "59392145dbe271c3f1fd4b784958a08cf5c9e38c1a769af007ce6ac7100daf01"
+  url "https://github.com/microsoft/bond/archive/10.0.0.tar.gz"
+  sha256 "87858b597a1da74421974d5c3cf3a9ea56339643b19b48274d44b13bc9483f29"
   license "MIT"
 
   bottle do
-    cellar :any
-    sha256 "b777ee788ae5d9ee234cc7dea3f671d4d8e50edafdd2b48ecd990c6643ffcacb" => :big_sur
-    sha256 "c4677d09cbf02e66671d9760ca64fcfbab1127b778c70719d9db58daca9b7c7e" => :catalina
-    sha256 "432c38ccaa1931fb8320cbbc8692d3982ce225732f70cdb5c7f3b8596c487f31" => :mojave
+    sha256 cellar: :any,                 monterey:     "7c8b0675dd3148dee7a8cf6fd0a73fb870e1979a9a2121af9bd8486e3cc12f78"
+    sha256 cellar: :any,                 big_sur:      "31b834df421932bba76bc64d08b6a6900d6c05205c87e4f3d8c4e4218c3a953e"
+    sha256 cellar: :any,                 catalina:     "d20864dea9b364962c2025a463ca19cc1136a633df86ff5d1f59b44ae9262f38"
+    sha256 cellar: :any_skip_relocation, x86_64_linux: "c5c047bff8729f94818174f40051191e242ccd8383553b30b18e0bc598847126"
   end
 
   depends_on "cmake" => :build
@@ -17,6 +17,8 @@ class Bond < Formula
   depends_on "haskell-stack" => :build
   depends_on "boost"
   depends_on "rapidjson"
+
+  uses_from_macos "xz" => :build
 
   def install
     mkdir "build" do

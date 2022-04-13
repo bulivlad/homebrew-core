@@ -1,10 +1,10 @@
 class Terraform < Formula
   desc "Tool to build, change, and version infrastructure"
   homepage "https://www.terraform.io/"
-  url "https://github.com/hashicorp/terraform/archive/v0.14.4.tar.gz"
-  sha256 "56da03b95c62c849adf5c5397ae4bc3b8cad2ca4ffb26244d3daf90567208e63"
+  url "https://github.com/hashicorp/terraform/archive/v1.1.8.tar.gz"
+  sha256 "2d2f2dcb5e438ef4587c2a1476646d19c7d69e6e6c86112d05dce8d780da8d79"
   license "MPL-2.0"
-  head "https://github.com/hashicorp/terraform.git"
+  head "https://github.com/hashicorp/terraform.git", branch: "main"
 
   livecheck do
     url "https://releases.hashicorp.com/terraform/"
@@ -12,15 +12,25 @@ class Terraform < Formula
   end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "a521e4a3ed75ba0886c61f721d91513a260dc1a2d47873a9613c97a290392895" => :big_sur
-    sha256 "f704278bd984943a4205e11e2f4767666e9947e86d2402a23f9638e8e1eb9125" => :catalina
-    sha256 "1f83f86e66c211279b7b556174433322000baa3361cad5129978d80f74ba0412" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "00f036443d245b6156e7ac7220fb57c15445269df3fb8be2ac5eee61a729231b"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "11385c6e3222c0b461d2a0e2e8ddbb4df453460d3eae41e0594812da3e8aeba9"
+    sha256 cellar: :any_skip_relocation, monterey:       "62beb0d37a03ce90c338e8f44eb93bfde88e0532e761cc5d8a42ea90fdb32b2a"
+    sha256 cellar: :any_skip_relocation, big_sur:        "c568345d52c524e160df863264c6e0d2970b2b2854d9a3e0b27d46cb365418cc"
+    sha256 cellar: :any_skip_relocation, catalina:       "03b6132cecb0105d88fb102a935bc7aba85b3ab6a9d175c06c7cab0741f929e2"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "38cab7780d4b5ab92dcb0066f238f42ca3d32eb5af827e285ef0d739310121d1"
   end
 
   depends_on "go" => :build
 
+  on_linux do
+    depends_on "gcc"
+  end
+
   conflicts_with "tfenv", because: "tfenv symlinks terraform binaries"
+
+  # Needs libraries at runtime:
+  # /usr/lib/x86_64-linux-gnu/libstdc++.so.6: version `GLIBCXX_3.4.29' not found (required by node)
+  fails_with gcc: "5"
 
   def install
     # v0.6.12 - source contains tests which fail if these environment variables are set locally.

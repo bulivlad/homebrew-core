@@ -1,27 +1,24 @@
 class Restic < Formula
   desc "Fast, efficient and secure backup program"
-  homepage "https://restic.github.io/"
-  url "https://github.com/restic/restic/archive/v0.11.0.tar.gz"
-  sha256 "73cf434ec93e2e20aa3d593dc5eacb221a71d5ae0943ca59bdffedeaf238a9c6"
+  homepage "https://restic.net/"
+  url "https://github.com/restic/restic/archive/v0.13.1.tar.gz"
+  sha256 "8430f80dc17b98fd78aca6f7d635bf12a486687677e15989a891ff4f6d8490a9"
   license "BSD-2-Clause"
-  head "https://github.com/restic/restic.git"
+  head "https://github.com/restic/restic.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "b3f793b85cc360a4c233feee013aa2ca1a6e4a377fbfa2c6f19295dba84c77e3" => :big_sur
-    sha256 "d51856c70e962afded7ba89767171a1243f062d958648f376e73bcffc674801f" => :arm64_big_sur
-    sha256 "0cc7ded94181a29d12bcd929ddb2ebcd2b87c1a5146447e576bd5937b71406f3" => :catalina
-    sha256 "e5ed5cfaadac4ddb44cd6b84d5ba9adb16f793226dec2d6a7cca95caf5995d58" => :mojave
-    sha256 "3101131416c93161a0a51ceb0645e6fb5e0810261889200ea951668fd878388c" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "525e62a21ce0ffe1d91eb2f99be699a5bef4cccacdbb67fd328a11506ca78ba7"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "525e62a21ce0ffe1d91eb2f99be699a5bef4cccacdbb67fd328a11506ca78ba7"
+    sha256 cellar: :any_skip_relocation, monterey:       "fe187c82575e9c7877976974dd13a47b9d43b9ddffd16e07ab0dbbad8d95509a"
+    sha256 cellar: :any_skip_relocation, big_sur:        "fe187c82575e9c7877976974dd13a47b9d43b9ddffd16e07ab0dbbad8d95509a"
+    sha256 cellar: :any_skip_relocation, catalina:       "fe187c82575e9c7877976974dd13a47b9d43b9ddffd16e07ab0dbbad8d95509a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9beed0be209369479f0ad798ed215becd5c271479e8d3a6a6cb49fa8400067b8"
   end
 
   depends_on "go" => :build
 
   def install
-    ENV["GOPATH"] = HOMEBREW_CACHE/"go_cache"
-    ENV["CGO_ENABLED"] = "1"
-
-    system "go", "run", "-mod=vendor", "build.go", "--enable-cgo"
+    system "go", "run", "build.go"
 
     mkdir "completions"
     system "./restic", "generate", "--bash-completion", "completions/restic"

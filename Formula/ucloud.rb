@@ -1,20 +1,21 @@
 class Ucloud < Formula
   desc "Official tool for managing UCloud services"
   homepage "https://www.ucloud.cn"
-  url "https://github.com/ucloud/ucloud-cli/archive/0.1.35.tar.gz"
-  sha256 "75d89abe8b6f170a0957dbc1742b060409337161d16988d14a9df8c05b81aa48"
+  url "https://github.com/ucloud/ucloud-cli/archive/0.1.37.tar.gz"
+  sha256 "91c8153854b102dcd671c58976e35b056b3ed32258a6daea3755c8cb35aed742"
   license "Apache-2.0"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "c7652d227d29011105ab15ff1bbdce3d3a176afc2ae27c1003746c7a1000f4e7" => :big_sur
-    sha256 "23eb0647583f539f176bb8110df100b14496817b7fc5da1860060bea4a1e72bf" => :arm64_big_sur
-    sha256 "0e447115650b1cfc4a6149dd83f39c7ca849d740ec430a581be09e8e21adbff5" => :catalina
-    sha256 "e5a5bcfec828253269cd75c1f0e7f6d606748a4b4d5ef987088581f7b5425e17" => :mojave
-    sha256 "e7208d9e0dc5db081191c336d4e11ad44fb39d98221253a9577f6c2b7de3a374" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "99d77eefb237043ab551e21c7bc5c4d8290987e92b2b06c5ede39d6a6946358d"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "3104755ba0d6f6c6ece54041f351b5626a1b6eab413f02ba1d6f7910ad145ca3"
+    sha256 cellar: :any_skip_relocation, monterey:       "d3e402a2646997e17c4b585d898a05f8341a58753f16546b9c4bf7ad717bbda7"
+    sha256 cellar: :any_skip_relocation, big_sur:        "e17891249c6853edd5e48bdb01417815944a593c2549fec53cb90797ed020878"
+    sha256 cellar: :any_skip_relocation, catalina:       "360540194c9c3f46ecd1a7fbdb659908123afcc3fa44d093cd641a6e87282ff8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e5326dd1f207ab2ac02a00c06d8231ec5895735a595d543fe3a670a2c93854e3"
   end
 
-  depends_on "go" => :build
+  # Bump to 1.18 on the next release, if possible.
+  depends_on "go@1.17" => :build
 
   def install
     dir = buildpath/"src/github.com/ucloud/ucloud-cli"

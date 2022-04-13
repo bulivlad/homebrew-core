@@ -1,18 +1,18 @@
 class Kepubify < Formula
   desc "Convert ebooks from epub to kepub"
   homepage "https://pgaskin.net/kepubify/"
-  url "https://github.com/pgaskin/kepubify/archive/v3.1.6.tar.gz"
-  sha256 "09b81eff1cf53fb184773cf289c1eee56c3354cf6e1efddb5e308566b31de69f"
+  url "https://github.com/pgaskin/kepubify/archive/v4.0.4.tar.gz"
+  sha256 "a3bf118a8e871b989358cb598746efd6ff4e304cba02fd2960fe35404a586ed5"
   license "MIT"
-  head "https://github.com/pgaskin/kepubify.git"
+  head "https://github.com/pgaskin/kepubify.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "ab32b2f204c1f4ece431637f102377f7eb75d9dd186699aabb6e915d0bab3846" => :big_sur
-    sha256 "b38ad070890e803edf906436df1c6080c741c0af97ceaed978c35b56706783f7" => :arm64_big_sur
-    sha256 "02f990a949cebef432e4355e90c5e4685d85f556519392ecb425a0d7e0730add" => :catalina
-    sha256 "6f5f0a9dff4919fbdd57fece754775014f2528fdd86e0f6a3ed5b30333d14435" => :mojave
-    sha256 "ea8a1abda1b013780b9475fdcd9ee1332fbb33d22e8e41a43bfd4ad7b99bbfd1" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "6eed09543886f705e754733ad743a2a7a94616f62682dba4649698a93ccebb5e"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "79ae709163355512ca9e1c03be16705b14c9c6807ec0901669a02550eaccbfdf"
+    sha256 cellar: :any_skip_relocation, monterey:       "a1bdda9176651328920e0f2cbd324c1c25454a44c9eefeb1334a53d74bca9761"
+    sha256 cellar: :any_skip_relocation, big_sur:        "ecbcea2b9d17e15d4fc6f97e794bb9b6b423e4c3934e9fb2c0ecd24984d8dee2"
+    sha256 cellar: :any_skip_relocation, catalina:       "55a0859a1695c34fc8edb2462211d7861042f059bee5bcfe359df3b3d65732fb"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "86ad03277ca649f1f36c37ec388de04b120dc2dd865ffc1d0cf80ad1a83314c7"
   end
 
   depends_on "go" => :build
@@ -29,8 +29,6 @@ class Kepubify < Formula
                    "-ldflags", "-s -w -X main.version=#{version}",
                    "./cmd/#{p}"
     end
-
-    pkgshare.install "kepub/test.epub"
   end
 
   test do
@@ -38,7 +36,7 @@ class Kepubify < Formula
     output = shell_output("#{bin}/kepubify #{pdf} 2>&1", 1)
     assert_match "Error: invalid extension", output
 
-    system bin/"kepubify", pkgshare/"test.epub"
+    system bin/"kepubify", test_fixtures("test.epub")
     assert_predicate testpath/"test_converted.kepub.epub", :exist?
   end
 end

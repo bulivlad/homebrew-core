@@ -1,21 +1,29 @@
 class Flatbuffers < Formula
   desc "Serialization library for C++, supporting Java, C#, and Go"
   homepage "https://google.github.io/flatbuffers"
-  url "https://github.com/google/flatbuffers/archive/v1.12.0.tar.gz"
-  sha256 "62f2223fb9181d1d6338451375628975775f7522185266cd5296571ac152bc45"
+  url "https://github.com/google/flatbuffers/archive/v2.0.6.tar.gz"
+  sha256 "e2dc24985a85b278dd06313481a9ca051d048f9474e0f199e372fea3ea4248c9"
   license "Apache-2.0"
-  head "https://github.com/google/flatbuffers.git"
+  head "https://github.com/google/flatbuffers.git", branch: "master"
+
+  livecheck do
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
+  end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "9af0beec65e79be83e699b65e8f149d02c3d5980cc65f8caa5dd33cf30882559" => :big_sur
-    sha256 "5f02d8f7be90f080e8682fa07365f72116f85449ff8176877b691bbe8c2b3696" => :arm64_big_sur
-    sha256 "6af7ac37134539beb7c1003bd2cf8d1e530606cac616239acf4d2b1df31b0dbc" => :catalina
-    sha256 "270bebda4048754554cd587d48db10ee5fe1a2795ef6e881cafd1b8f90c7af78" => :mojave
-    sha256 "f45982e6ca71b10e59c607b9d984108e1b18fc84b8c52dd23325b6b9211e407f" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "5bbae757302623a372216f106b93de53d5597f263521e43ddd1ef8a3fa280a20"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "602f63e1a229e1aa7ae75ab98e85c9925c133ef1f4c5fde22d8b9422505216c4"
+    sha256 cellar: :any_skip_relocation, monterey:       "8c355d7efaa5cb1e3f5de82aa4846e14c05429bbe28bd84066c535d1241a034b"
+    sha256 cellar: :any_skip_relocation, big_sur:        "a72632bee30385a63c8cfdc6d2b8b4ee424441628b45f9171c15a8c646e7aec4"
+    sha256 cellar: :any_skip_relocation, catalina:       "79b5ced50e23277d66e15dc30e71adabad35f8cc6e855fbcb3b3463c303026ff"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7e6cbb4603971c8c17ba98e95e428732c2096836eda6ed852180de2e34ac6310"
   end
 
   depends_on "cmake" => :build
+  depends_on "python@3.10" => :build
+
+  conflicts_with "osrm-backend", because: "both install flatbuffers headers"
 
   def install
     system "cmake", "-G", "Unix Makefiles", *std_cmake_args

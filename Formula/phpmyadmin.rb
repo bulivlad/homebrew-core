@@ -1,15 +1,22 @@
 class Phpmyadmin < Formula
   desc "Web interface for MySQL and MariaDB"
   homepage "https://www.phpmyadmin.net"
-  url "https://files.phpmyadmin.net/phpMyAdmin/5.0.4/phpMyAdmin-5.0.4-all-languages.tar.gz"
-  sha256 "fbb993b74a7c29ce2fcdb6b6be22b0b6c58bff8df3292ab42f6280871450c316"
+  url "https://files.phpmyadmin.net/phpMyAdmin/5.1.3/phpMyAdmin-5.1.3-all-languages.tar.gz"
+  sha256 "7a85454d82d88cc1a6beb09114a67fa40230c4eff2ae1778b434fa74e80dc6d7"
 
   livecheck do
     url "https://www.phpmyadmin.net/files/"
     regex(/href=.*?phpMyAdmin[._-]v?(\d+(?:\.\d+)+)-all-languages\.zip["' >]/i)
   end
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "6be8d4e8e4bcea35c18f9898345c6158e08cdcada6b39cf876a48969cee1cdbc"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "6be8d4e8e4bcea35c18f9898345c6158e08cdcada6b39cf876a48969cee1cdbc"
+    sha256 cellar: :any_skip_relocation, monterey:       "e7f668722047870a70055b32f1a0ceacf7385d6e81f6835ee521e253dbb44a35"
+    sha256 cellar: :any_skip_relocation, big_sur:        "e7f668722047870a70055b32f1a0ceacf7385d6e81f6835ee521e253dbb44a35"
+    sha256 cellar: :any_skip_relocation, catalina:       "e7f668722047870a70055b32f1a0ceacf7385d6e81f6835ee521e253dbb44a35"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6be8d4e8e4bcea35c18f9898345c6158e08cdcada6b39cf876a48969cee1cdbc"
+  end
 
   depends_on "php" => :test
 

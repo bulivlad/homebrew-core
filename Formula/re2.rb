@@ -1,11 +1,11 @@
 class Re2 < Formula
   desc "Alternative to backtracking PCRE-style regular expression engines"
   homepage "https://github.com/google/re2"
-  url "https://github.com/google/re2/archive/2020-11-01.tar.gz"
-  version "20201101"
-  sha256 "8903cc66c9d34c72e2bc91722288ebc7e3ec37787ecfef44d204b2d6281954d7"
+  url "https://github.com/google/re2/archive/2022-04-01.tar.gz"
+  version "20220401"
+  sha256 "1ae8ccfdb1066a731bba6ee0881baad5efd2cd661acd9569b689f2586e1a50e9"
   license "BSD-3-Clause"
-  head "https://github.com/google/re2.git"
+  head "https://github.com/google/re2.git", branch: "main"
 
   # The `strategy` block below is used to massage upstream tags into the
   # YYYYMMDD format used in the `version`. This is necessary for livecheck
@@ -19,12 +19,12 @@ class Re2 < Formula
   end
 
   bottle do
-    cellar :any
-    sha256 "02fed353151f3d3d936af926e1fcd18cd68ca0e51694eb48acccbc5280316ce2" => :big_sur
-    sha256 "0a41585c7bd946cd0b427533c79c272cb5ba7b031054d3892ca0bd9763cc6749" => :arm64_big_sur
-    sha256 "3775e06cd4478f7ef90cfe76bbd01d051c8ba2b646fd84601e307a8c0e2ec7de" => :catalina
-    sha256 "621f2bcea8c2f42d3ddb2de7f3df669259b5818763290d7b957c6bd406102a45" => :mojave
-    sha256 "6be4625dab709d29564e85823b24c668c1b7fe061365d443ac4956f4ad3135fc" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "37132b360c414438108478cce8b4a2e0f3f0cda6964a0f2234b43db286c2fd21"
+    sha256 cellar: :any,                 arm64_big_sur:  "34486668ba2da5ea41ad6fd8a66af1b43ba1b019597c6b44fe7804da093dc80b"
+    sha256 cellar: :any,                 monterey:       "62cd468dafec02c1a1c0d28fd93b93364b5ea67f0fdbdcbb3b91044c9a5bfeec"
+    sha256 cellar: :any,                 big_sur:        "eed008dc0f16e4e27c6261a485e2de246129fdf2ee6e66c68377bba5a801c0fc"
+    sha256 cellar: :any,                 catalina:       "1de4aeb39e788675d4fed079ce848e18bdcda373034030ae282f74f4776880e6"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d42453c1a06530cd54dbcc66dd71f8707eb5c06e15f9233abcbf3aeeb4cc321e"
   end
 
   depends_on "cmake" => :build
@@ -51,8 +51,8 @@ class Re2 < Formula
         return 0;
       }
     EOS
-    system ENV.cxx, "-std=c++11", "-I#{include}", "-L#{lib}", "-lre2",
-           "test.cpp", "-o", "test"
+    system ENV.cxx, "-std=c++11", "test.cpp", "-o", "test",
+                    "-I#{include}", "-L#{lib}", "-lre2"
     system "./test"
   end
 end

@@ -1,8 +1,8 @@
 class Liboqs < Formula
   desc "Library for quantum-safe cryptography"
   homepage "https://openquantumsafe.org/"
-  url "https://github.com/open-quantum-safe/liboqs/archive/0.4.0.tar.gz"
-  sha256 "05836cd2b5c70197b3b6eed68b97d0ccb2c445061d5c19c15aef7c959842de0b"
+  url "https://github.com/open-quantum-safe/liboqs/archive/0.7.1.tar.gz"
+  sha256 "c8a1ffcfd4facc90916557c0efae9a28c46e803b088d0cb32ee7b0b010555d3a"
   license "MIT"
 
   livecheck do
@@ -11,11 +11,11 @@ class Liboqs < Formula
   end
 
   bottle do
-    cellar :any
-    sha256 "37ccef44b4ea6d76bbd98343ef266dda8d3f6b7c103f981a4194ecd841685017" => :big_sur
-    sha256 "ffd8b834836ed6b28606c173766f99d168c57b322153cbea5100bbbc27e1073d" => :catalina
-    sha256 "1253594d96910c9bea3566d75461de4e497097dd24e94fcddb232dac3d2bdbfd" => :mojave
-    sha256 "c0fb642f6934a0413fbd2e4a32a02f8cd5e7b7491f3f6d6423ab4856cef8f5df" => :high_sierra
+    sha256 cellar: :any, arm64_monterey: "ae18883dbc2f1a7cef2be0fa53639b3d3622d20989865050372fe5facaced6ee"
+    sha256 cellar: :any, arm64_big_sur:  "19c321ef0d8849fd71bf1f559cab3eab9ddb312ef15de2af5eeb40b6d07b8dd6"
+    sha256 cellar: :any, monterey:       "413c2c6b86b61989e040d7c3652863ccf37552d9479cecdf4ded3f7b787768f2"
+    sha256 cellar: :any, big_sur:        "7ae518ce5f8519e009182f88f6365b306ef6940c892c938312ff82f0dcd4bef4"
+    sha256 cellar: :any, catalina:       "c304ee2212e895d3a5e0622aeb0dd9c4ee182a4042463b43ef71270ba369e5ca"
   end
 
   depends_on "cmake" => :build

@@ -1,28 +1,24 @@
 class TomcatNative < Formula
   desc "Lets Tomcat use some native resources for performance"
   homepage "https://tomcat.apache.org/native-doc/"
-  url "https://www.apache.org/dyn/closer.lua?path=tomcat/tomcat-connectors/native/1.2.26/source/tomcat-native-1.2.26-src.tar.gz"
-  mirror "https://archive.apache.org/dist/tomcat/tomcat-connectors/native/1.2.26/source/tomcat-native-1.2.26-src.tar.gz"
-  sha256 "b7e5449d206803d6581e0bda7694c9ca8b989938e0054c468df87f9ecb28757d"
+  url "https://www.apache.org/dyn/closer.lua?path=tomcat/tomcat-connectors/native/1.2.32/source/tomcat-native-1.2.32-src.tar.gz"
+  mirror "https://archive.apache.org/dist/tomcat/tomcat-connectors/native/1.2.32/source/tomcat-native-1.2.32-src.tar.gz"
+  sha256 "805ca999267f07afe701a8a434d517dc0b7f4317c366560f43c0fbca593578bd"
   license "Apache-2.0"
 
-  livecheck do
-    url :stable
-  end
-
   bottle do
-    cellar :any
-    sha256 "3b0f75610b602e3708086306a3e1d0bbe999733d31781528c9046c438466f1df" => :big_sur
-    sha256 "2ee50a4c91f3aa4730f5c377c4ef7c9a9494b3e02e6749412bb75e1708ad31b3" => :arm64_big_sur
-    sha256 "cbf3a72459605532c35448ef1b6cf29096c727ee351e21da920f0f3b60f35da6" => :catalina
-    sha256 "69416e41dfcad81232fb36a103e3e62c57f8f4a1418ebbf5e083c17fba5b5f9b" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "0db604ba8ddb54aee98fd24a6dd429d6a329e43c48db4304718bfb0e279895d4"
+    sha256 cellar: :any,                 arm64_big_sur:  "d7b2dad97f753b4aff411742464680db833ef41af0c7f72d5eed3af8fda88c4a"
+    sha256 cellar: :any,                 monterey:       "dec7b9b3548b1219ca40ef6b3de6fdb6d86b40f90dbc591cce5f81500bb0cfd3"
+    sha256 cellar: :any,                 big_sur:        "e448323560b59e7dba38eced437f40e97d16b8cb22928eb2516f375726cb833b"
+    sha256 cellar: :any,                 catalina:       "24d1d3240e4d75d46db1ee1272da32eb86fed9df138b7006242950b85f0faca6"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "50f3b5c9a2405cbbc89dfae6ab20d792e9eb48a2eb3cc0939a7db0d75ce1fc9b"
   end
 
   depends_on "libtool" => :build
   depends_on "apr"
   depends_on "openjdk"
   depends_on "openssl@1.1"
-  depends_on "tomcat"
 
   def install
     cd "native" do

@@ -3,17 +3,17 @@ require "language/node"
 class ProtocGenGrpcWeb < Formula
   desc "Protoc plugin that generates code for gRPC-Web clients"
   homepage "https://github.com/grpc/grpc-web"
-  url "https://github.com/grpc/grpc-web/archive/1.2.1.tar.gz"
-  sha256 "23cf98fbcb69743b8ba036728b56dfafb9e16b887a9735c12eafa7669862ec7b"
+  url "https://github.com/grpc/grpc-web/archive/1.3.1.tar.gz"
+  sha256 "d292df306b269ebf83fb53a349bbec61c07de4d628bd6a02d75ad3bd2f295574"
   license "Apache-2.0"
-  revision 1
 
   bottle do
-    cellar :any
-    sha256 "0ad66a3cf6e5132dc51920722e2213f50ebc57c843d7120dd07636896ac09a03" => :big_sur
-    sha256 "ab78bbc2a63768bd68930eccdb773a18d77a456f84162f5d14260a67e4df333c" => :arm64_big_sur
-    sha256 "26bc7c5c83a68b2fdd4b031807b410bffc9ce03619a0b75e228ddbcd058c467e" => :catalina
-    sha256 "b8b91ccdca4ea4d0014ea5ef890391c1e3ec88d10f1abcfa04cb0fabd99733c9" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "e679f48db0744502049cda46308f89de294134b522ba731fcfc88486589e992d"
+    sha256 cellar: :any,                 arm64_big_sur:  "fcf29b351eb68c7db6dbe314dd819bd5f89909e46135008745362e345934d898"
+    sha256 cellar: :any,                 monterey:       "0834212bc2e4be2c88985582ba06b15481cbd0fe2b8da2f1543c69089f64b5dd"
+    sha256 cellar: :any,                 big_sur:        "e93c341c55c974b7be14075b248a1cac4722b3371ddd46dd5a1656e1ea5d817e"
+    sha256 cellar: :any,                 catalina:       "4e46ddd1da2a1d3ddd2081ab8870b8cf813bf099b48a7a000e4bf8e524b3d748"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "24c1d8d62acd218135d6cee0bfdfa0962604121cfcd3b42c6c56d0edb14b49c7"
   end
 
   depends_on "cmake" => :build
@@ -23,8 +23,7 @@ class ProtocGenGrpcWeb < Formula
 
   def install
     bin.mkpath
-    inreplace "javascript/net/grpc/web/Makefile", "/usr/local/bin/", "#{bin}/"
-    system "make", "install-plugin"
+    system "make", "install-plugin", "PREFIX=#{prefix}"
   end
 
   test do
@@ -58,6 +57,7 @@ class ProtocGenGrpcWeb < Formula
     EOS
     (testpath/"test.ts").write testts
     system "npm", "install", *Language::Node.local_npm_install_args, "grpc-web", "@types/google-protobuf"
-    system "tsc", "test.ts"
+    # Specify including lib for `tsc` since `es6` is required for `@types/google-protobuf`.
+    system "tsc", "--lib", "es6", "test.ts"
   end
 end

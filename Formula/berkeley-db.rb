@@ -1,29 +1,36 @@
 class BerkeleyDb < Formula
   desc "High performance key/value database"
-  homepage "https://www.oracle.com/technology/products/berkeley-db/index.html"
-  # Requires registration to download so we mirror it
-  url "https://dl.bintray.com/homebrew/mirror/berkeley-db-18.1.32.tar.gz"
-  mirror "https://fossies.org/linux/misc/db-18.1.32.tar.gz"
-  sha256 "fa1fe7de9ba91ad472c25d026f931802597c29f28ae951960685cde487c8d654"
+  homepage "https://www.oracle.com/database/technologies/related/berkeleydb.html"
+  url "https://download.oracle.com/berkeley-db/db-18.1.40.tar.gz"
+  mirror "https://fossies.org/linux/misc/db-18.1.40.tar.gz"
+  sha256 "0cecb2ef0c67b166de93732769abdeba0555086d51de1090df325e18ee8da9c8"
+  license "AGPL-3.0-only"
   revision 1
 
   livecheck do
-    url "https://www.oracle.com/technetwork/database/" \
-    "database-technologies/berkeleydb/downloads/index.html"
+    url "https://www.oracle.com/database/technologies/related/berkeleydb-downloads.html"
     regex(%r{href=.*?/berkeley-db/db[._-]v?(\d+(?:\.\d+)+)\.t}i)
   end
 
   bottle do
-    cellar :any
-    sha256 "223eb7fbe303293676740e34fb6ff3f494ce17cba44029fb7ca47d64e138098f" => :big_sur
-    sha256 "069db18392eb453adbf6862ff6ab7c694fba8a0885c432a4c9c63ef2946d73a4" => :arm64_big_sur
-    sha256 "f2fc006ecf0cddfeaf94af43572ca4cebc6654d8a87f3ebfdb55329174596887" => :catalina
-    sha256 "eb5d0a59cec0fab48a0539f96195b1890599603577ca1792f831085418b19707" => :mojave
-    sha256 "fa53aeeca3bef551d9f604b5eafb6b94bf1f14b95530a8d16e243fb7c2ad790e" => :high_sierra
-    sha256 "1b3c06f6d3b1f45180068cb7127508072ed661e981e922dd273d6faef0030bc1" => :sierra
+    sha256 cellar: :any,                 arm64_monterey: "8da7ddbf86ba57c94235796b4acddefba7a67b20cef9c4955e5601f80f8a0e23"
+    sha256 cellar: :any,                 arm64_big_sur:  "5a9de497a3fb74b8b7fd3b1be77fcd0b808361a3adf228c04132106a16f03aa5"
+    sha256 cellar: :any,                 monterey:       "923b8995be6b3da9742b8c283d18dbf3142f73b478b60f85f76db97c37e9b280"
+    sha256 cellar: :any,                 big_sur:        "eca9cf2bbc656225f096789d5e5f5f73fc62e82aae70233835a7bb29e0e8220c"
+    sha256 cellar: :any,                 catalina:       "8b868ae69e708c22e04ba3d7ab6164d31d9de5611458f6aae0a0c636b1bf6dc5"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ed8bbe73f3996dce31e082f325cb5230e6026d2067824e6ceaaceeafc146ff0c"
   end
 
+  keg_only :provided_by_macos
+
   depends_on "openssl@1.1"
+
+  # Fix -flat_namespace being used on Big Sur and later.
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-pre-0.4.2.418-big_sur.diff"
+    sha256 "83af02f2aa2b746bb7225872cab29a253264be49db0ecebb12f841562d9a2923"
+    directory "dist"
+  end
 
   def install
     # BerkeleyDB dislikes parallel builds
@@ -33,6 +40,7 @@ class BerkeleyDb < Formula
     # the system berkeley db 1.x
     args = %W[
       --disable-debug
+      --disable-static
       --prefix=#{prefix}
       --mandir=#{man}
       --enable-cxx
@@ -46,11 +54,10 @@ class BerkeleyDb < Formula
     # BerkeleyDB requires you to build everything from the build_unix subdirectory
     cd "build_unix" do
       system "../dist/configure", *args
-      system "make", "install"
+      system "make", "install", "DOCLIST=license"
 
-      # use the standard docs location
-      doc.parent.mkpath
-      mv prefix/"docs", doc
+      # delete docs dir because it is huge
+      rm_rf prefix/"docs"
     end
   end
 

@@ -1,29 +1,30 @@
 class Fetch < Formula
   desc "Download assets from a commit, branch, or tag of GitHub repositories"
   homepage "https://www.gruntwork.io/"
-  url "https://github.com/gruntwork-io/fetch/archive/v0.3.12.tar.gz"
-  sha256 "949e7ba4123c358d961a0bef7a389f07d1021d9d6e33b205dbe91be4a87bf586"
+  url "https://github.com/gruntwork-io/fetch/archive/v0.4.4.tar.gz"
+  sha256 "5e5af89111a2e986d7d59c156c55ca301c9f2199369c9dc89b80dc94cb62b31a"
   license "MIT"
-  head "https://github.com/gruntwork-io/fetch.git"
+  head "https://github.com/gruntwork-io/fetch.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "9b51881c031a1a69f6c5a4e71302328b09df6486ab277124318f261523cae431" => :big_sur
-    sha256 "280a2436bf5fa3bdfe399cbfb21300c65d5a0fe049c7d95f52e099f4abc1902f" => :arm64_big_sur
-    sha256 "5c9e2f5f27cc12d38717073b082b31c3ad50b9cc3a40555211ef3385a27b0706" => :catalina
-    sha256 "92d29770f6071eb78017423cb89f7177bee95e176e0263e70ccb3e9ccbccd393" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "837779f78d0700888b4f42cd0c3ae77bfb4365dcc1ffc4480082375b3de4750f"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "5f1a5814ad2577387d356b1a10bf897b3ec2185b5b9de9a44fdbcd11f9116258"
+    sha256 cellar: :any_skip_relocation, monterey:       "0d5dba201cabff02a8da2779a805ef4552ef54098b4eab86b110085c7d81c8b5"
+    sha256 cellar: :any_skip_relocation, big_sur:        "da985a806b15f92791d6df43b5e541df94e2fb9f6a0238a8fe3b4ae6064a52ac"
+    sha256 cellar: :any_skip_relocation, catalina:       "85ce4f6c485a19995f8e4ed2f80a7bd898b31bc28a734175268d3087fc4457d9"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c415e6fb8720c825034807d77167f4ddcd382ab9c1374d912ba46398b4f41643"
   end
 
   depends_on "go" => :build
 
   def install
-    system "go", "build", "-ldflags", "-X main.VERSION=v#{version}", *std_go_args
+    system "go", "build", *std_go_args(ldflags: "-X main.VERSION=v#{version}")
   end
 
   test do
     repo_url = "https://github.com/gruntwork-io/fetch"
 
     assert_match "Downloading release asset SHA256SUMS to SHA256SUMS",
-      shell_output("#{bin}/fetch --repo=\"#{repo_url}\" --tag=\"v0.3.10\" --release-asset=\"SHA256SUMS\" . 2>1&")
+      shell_output("#{bin}/fetch --repo=\"#{repo_url}\" --tag=\"v0.3.10\" --release-asset=\"SHA256SUMS\" . 2>&1")
   end
 end

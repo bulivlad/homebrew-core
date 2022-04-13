@@ -1,65 +1,31 @@
 class Postgrest < Formula
   desc "Serves a fully RESTful API from any existing PostgreSQL database"
   homepage "https://github.com/PostgREST/postgrest"
-  url "https://github.com/PostgREST/postgrest/archive/v7.0.1.tar.gz"
-  sha256 "12f621065b17934c474c85f91ad7b276bff46f684a5f49795b10b39eaacfdcaa"
+  url "https://github.com/PostgREST/postgrest/archive/v9.0.0.tar.gz"
+  sha256 "14ce20a0e4eb12f7cacb73360c3d40c837a4007d94b7a82f5a586f34587bf233"
   license "MIT"
-  head "https://github.com/PostgREST/postgrest.git"
+  head "https://github.com/PostgREST/postgrest.git", branch: "main"
+
+  livecheck do
+    url :stable
+    strategy :github_latest
+  end
 
   bottle do
-    cellar :any
-    sha256 "bb885e5c86b0e997b660b0ab3975d59c458f0db4436bce9ea158b89c65dcd6e2" => :big_sur
-    sha256 "691546e89701fd582d47c697dc27551ef3284ee21933a5912f406e6fee4dd272" => :catalina
-    sha256 "34c0413e71a41bc8550b7ea5286e0330aa888990d2e2a8fe6d81b57152c83d61" => :mojave
-    sha256 "6ca3bb9cd14c9ab4ddd028493e4ffd70ddae571be74723997b677c6c67542c87" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "42944adf10de9717f24e87f2cf9ed58fb1cf2c4b3a5720d047cedb50b7fafd79"
+    sha256 cellar: :any,                 arm64_big_sur:  "23819a365f67d9be02599d9a6ce66f70d5d2d64d54d7828156a2008793450de4"
+    sha256 cellar: :any,                 monterey:       "e5e0124159c0099b01986015830fada6b5096488db7d33aa4d0702762052c1c4"
+    sha256 cellar: :any,                 big_sur:        "2e69962c69b9c2adc0f11ab2de8580546f6221ae3c3dce0a4527b899a772978e"
+    sha256 cellar: :any,                 catalina:       "65b917925217316d1d1efc7d4b3e00ef17f9bdbb14650c6d2aff8d2d406d1c74"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c252ee6b1f53fd611cd4dee29fa9e581c34fcc254f668317da600580b2839fc9"
   end
 
   depends_on "cabal-install" => :build
-  depends_on "ghc@8.8" => :build
+  depends_on "ghc" => :build
   depends_on "postgresql"
 
   def install
     system "cabal", "v2-update"
     system "cabal", "v2-install", *std_cabal_v2_args
-  end
-
-  test do
-    return if ENV["CI"]
-
-    pg_bin  = Formula["postgresql"].bin
-    pg_port = free_port
-    pg_user = "postgrest_test_user"
-    test_db = "test_postgrest_formula"
-
-    system "#{pg_bin}/initdb", "-D", testpath/test_db,
-      "--auth=trust", "--username=#{pg_user}"
-
-    system "#{pg_bin}/pg_ctl", "-D", testpath/test_db, "-l",
-      testpath/"#{test_db}.log", "-w", "-o", %Q("-p #{pg_port}"), "start"
-
-    begin
-      port = free_port
-      system "#{pg_bin}/createdb", "-w", "-p", pg_port, "-U", pg_user, test_db
-      (testpath/"postgrest.config").write <<~EOS
-        db-uri = "postgres://#{pg_user}@localhost:#{pg_port}/#{test_db}"
-        db-schema = "public"
-        db-anon-role = "#{pg_user}"
-        server-port = #{port}
-      EOS
-      pid = fork do
-        exec "#{bin}/postgrest", "postgrest.config"
-      end
-      sleep 5 # Wait for the server to start
-
-      output = shell_output("curl -s http://localhost:#{port}")
-      assert_match "200", output
-    ensure
-      begin
-        Process.kill("TERM", pid) if pid
-      ensure
-        system "#{pg_bin}/pg_ctl", "-D", testpath/test_db, "stop",
-          "-s", "-m", "fast"
-      end
-    end
   end
 end

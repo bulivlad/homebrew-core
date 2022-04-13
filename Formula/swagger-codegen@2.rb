@@ -1,8 +1,8 @@
 class SwaggerCodegenAT2 < Formula
   desc "Generate clients, server stubs, and docs from an OpenAPI spec"
   homepage "https://swagger.io/swagger-codegen/"
-  url "https://github.com/swagger-api/swagger-codegen/archive/v2.4.18.tar.gz"
-  sha256 "dbda71ef9cf24de72056c5eb55ca3ad93ec9631ed2d136124f11b6b555e73d48"
+  url "https://github.com/swagger-api/swagger-codegen/archive/v2.4.27.tar.gz"
+  sha256 "d0a11cb5ca141cf2f5db28c3d88ce2685c49cc2544ea1f12bae6c1f414f24798"
   license "Apache-2.0"
 
   livecheck do
@@ -11,15 +11,16 @@ class SwaggerCodegenAT2 < Formula
   end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "f40d93973e1307433c76b8708bce2d0a4d7f72a33f9abb0710d591ebb88a16c4" => :big_sur
-    sha256 "4ae64b61b26aed2224c479413671658e218c32570c3f3cfef8622768f66cf3df" => :catalina
-    sha256 "4aec15628c6d6652aa8d34bf9dfe6e9ebec4708ef5dd06b5ebb3a9db93848bff" => :mojave
+    sha256 cellar: :any_skip_relocation, monterey:     "c64e5c92b7d19a5d17d63174f101884aba3a7a9265f42467a521378257491ae7"
+    sha256 cellar: :any_skip_relocation, big_sur:      "f7a80d9c84ca79b5461ad7f59b1ec009d8af6de7ceb5cb3605455d6a60330ab4"
+    sha256 cellar: :any_skip_relocation, catalina:     "a2d47d074b31e4d42f11769925b79d5f54adc5890debd3ee0954795da77bb930"
+    sha256 cellar: :any_skip_relocation, x86_64_linux: "47a48826b0a8253bac8fdc39acba4146b0a4d47f4c8f9f9232f1558adc1c5839"
   end
 
   keg_only :versioned_formula
 
   depends_on "maven" => :build
+  depends_on arch: :x86_64 # openjdk@8 is not supported on ARM
   depends_on "openjdk@8"
 
   def install

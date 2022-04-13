@@ -1,26 +1,33 @@
 class GitTown < Formula
   desc "High-level command-line interface for Git"
   homepage "https://www.git-town.com/"
-  url "https://github.com/git-town/git-town/archive/v7.4.0.tar.gz"
-  sha256 "f9ff00839fde70bc9b5024bae9a51d8b00e0bb309c3542ed65be50bb8a13e6a5"
+  url "https://github.com/git-town/git-town/archive/v7.7.0.tar.gz"
+  sha256 "edc4f87ef904ac297b9fbb30014e2ab474ee633c1687ed5011b38cd6f8b950e2"
   license "MIT"
 
   bottle do
-    cellar :any_skip_relocation
-    rebuild 1
-    sha256 "95e2d5299980978b1901814ada3baa3b42a5c38474e042f891ba0aff10bbbeff" => :big_sur
-    sha256 "81f31ec12cd8abae36633570d7bfb4649e880c13b9312f30009272f6d8b7afe1" => :arm64_big_sur
-    sha256 "9c90e21d837c016a37117bbf04a6cb66e5acda6ea129dd7013a133cbf3e23d72" => :catalina
-    sha256 "f54ad1a3ad30a40be97995c2a8abbecc447e4d93966f18fbb43fcfaf65448bfc" => :mojave
-    sha256 "2ff4e78e7a3472caa0f5961996efd2ef9e4cfc82455363dfb4f9eaebd441cbe7" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "b895a2527cb025670bc0785bc1979ee37ada8e5debc666f33495487518320ae3"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "0653a75795037279e493bcdff33c72e53697cc5d505867f6dd967420bbce45c1"
+    sha256 cellar: :any_skip_relocation, monterey:       "47cc3cddd23eb6a28920f94f3334cd521f35d4a9a504df3c9ffd46d158903a1e"
+    sha256 cellar: :any_skip_relocation, big_sur:        "0eb3a68dbe09af790dffe7f9651b754fd080e731f5cf16a2e6c2eaecf49dcce5"
+    sha256 cellar: :any_skip_relocation, catalina:       "0a9df8537d6eda035c7ef2901c15cdcf80f8eb4471081c57864bca984c559ddc"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "773aa43c7bdb8760f05dad469b016a091a74ab9a2321e22a01a1cc180cb8ea03"
   end
 
   depends_on "go" => :build
 
   def install
-    system "go", "build", *std_go_args, "-ldflags",
-           "-X github.com/git-town/git-town/src/cmd.version=v#{version} "\
-           "-X github.com/git-town/git-town/src/cmd.buildDate=#{Time.new.strftime("%Y/%m/%d")}"
+    ldflags = %W[
+      -s -w
+      -X github.com/git-town/git-town/v7/src/cmd.version=v#{version}
+      -X github.com/git-town/git-town/v7/src/cmd.buildDate=#{time.strftime("%Y/%m/%d")}
+    ]
+    system "go", "build", *std_go_args(ldflags: ldflags)
+
+    # Install shell completions
+    (bash_completion/"git-town").write Utils.safe_popen_read(bin/"git-town", "completions", "bash")
+    (zsh_completion/"_git-town").write Utils.safe_popen_read(bin/"git-town", "completions", "zsh")
+    (fish_completion/"git-town.fish").write Utils.safe_popen_read(bin/"git-town", "completions", "fish")
   end
 
   test do
@@ -31,6 +38,6 @@ class GitTown < Formula
     system "git", "add", "testing.txt"
     system "git", "commit", "-m", "Testing!"
 
-    system "#{bin}/git-town", "config"
+    system bin/"git-town", "config"
   end
 end

@@ -3,26 +3,23 @@ class GitPlus < Formula
 
   desc "Git utilities: git multi, git relation, git old-branches, git recent"
   homepage "https://github.com/tkrajina/git-plus"
-  url "https://files.pythonhosted.org/packages/73/b5/6cf7f0513fd1ef42b5a3ac0e342b3c4176551f60ad17fc5dbe52329f2b58/git-plus-v0.4.6.tar.gz"
-  sha256 "bcf3a83a2730e8b6f5bc106db00b7b6be5df534cb9543ba7ecc506c535c5158b"
+  url "https://files.pythonhosted.org/packages/e5/01/f7ff2dc29fd5b8ffe1382c5e44d4be671ea00000cb216ad2b67b8e58a5b4/git-plus-v0.4.7.tar.gz"
+  sha256 "22e0e118ed94bdc4413a763774e8cf8dfd167a1209b9ee831eac1835d4bb5302"
   license "Apache-2.0"
   revision 1
-  head "https://github.com/tkrajina/git-plus.git"
-
-  livecheck do
-    url :stable
-  end
+  head "https://github.com/tkrajina/git-plus.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "6fbeb0f79fb3149feec139360140b71dc8905336fe3e57979a5555542b14315d" => :big_sur
-    sha256 "e2a53a282b0e444cb0aca6173d8475b803b247b72462605574f28f62d2f7d9b9" => :arm64_big_sur
-    sha256 "77a2c33cfbcaa7eeebf0599197ef9865821df0a513c60f768586049c78795709" => :catalina
-    sha256 "de4043e1cd948c93b60ba863ddc3ed42528e733263efb54f4e4c608cc6fcb148" => :mojave
-    sha256 "774bf600193c1446a6097675f995ec808eada8f45d9b78f735121de23cd3d56c" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "8bc27d01ae10334384f7bfa583f7cf3558246738d95a15969d234a3744808c61"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "8bc27d01ae10334384f7bfa583f7cf3558246738d95a15969d234a3744808c61"
+    sha256 cellar: :any_skip_relocation, monterey:       "c27fdb895dfe71c44fa92aef98ccdf5d3c042e57873c9b6b98c79348199af34a"
+    sha256 cellar: :any_skip_relocation, big_sur:        "c27fdb895dfe71c44fa92aef98ccdf5d3c042e57873c9b6b98c79348199af34a"
+    sha256 cellar: :any_skip_relocation, catalina:       "c27fdb895dfe71c44fa92aef98ccdf5d3c042e57873c9b6b98c79348199af34a"
+    sha256 cellar: :any_skip_relocation, mojave:         "c27fdb895dfe71c44fa92aef98ccdf5d3c042e57873c9b6b98c79348199af34a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ebe89d33926bdb53327c6712fac31d805a47778e103c2bfeeb532803a5f52a4c"
   end
 
-  depends_on "python@3.9"
+  depends_on "python@3.10"
 
   def install
     virtualenv_install_with_resources

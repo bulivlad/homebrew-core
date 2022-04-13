@@ -1,26 +1,26 @@
 class Libtcod < Formula
   desc "API for roguelike developers"
   homepage "https://github.com/libtcod/libtcod"
-  url "https://github.com/libtcod/libtcod/archive/1.15.1.tar.gz"
-  sha256 "2713d8719be53db7a529cbf53064e5bc9f3adf009db339d3a81b50d471bc306f"
+  url "https://github.com/libtcod/libtcod/archive/1.20.1.tar.gz"
+  sha256 "e36dccd1ad531503d1ceefe794a57b3b661e5e669c3d1db1d5bfaf0b95c933df"
   license "BSD-3-Clause"
-  revision 2
 
   bottle do
-    cellar :any
-    rebuild 1
-    sha256 "464855bc6a479110433503a085c22f0bd8c2389875334595f9e525528982c1c3" => :big_sur
-    sha256 "2307306cad3fe74920216768953f8b2ba6721a49d1738870f7b2ccbab8a2691e" => :arm64_big_sur
-    sha256 "0ac1dde6fa975c1504880848ba2ec66dd0d044c5cfeccb92d3afe4f6ebb8231a" => :catalina
-    sha256 "e076b9fe253e60fc065493cab467d30c4db178d9364e410a3c7cf71293df7cf0" => :mojave
+    sha256 cellar: :any, arm64_monterey: "ad5ff63a79a4dc88a396c2354a35069b1b6a071f1a74fe1bc1c7409cee7a3306"
+    sha256 cellar: :any, arm64_big_sur:  "e0c79bd33806e5778030ed58f8713f20ba330abb8db1863e35a30fa296233986"
+    sha256 cellar: :any, monterey:       "a48f8f4b894bf0bdf686e32b68aaec6f3c7b542b6ceb6e034fa28e3460653a84"
+    sha256 cellar: :any, big_sur:        "b0b8a769e7517133a3b18afb736818f33f1f43bffa7e5bad6718d1d5b9a8b4a6"
+    sha256 cellar: :any, catalina:       "42fae47e69489901101dd96237ee313752814f58a07f2470d00354e34b90eb72"
   end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
   depends_on "pkg-config" => :build
-  depends_on "python@3.9" => :build
+  depends_on "python@3.10" => :build
   depends_on "sdl2"
+
+  conflicts_with "libzip", "minizip-ng", because: "libtcod, libzip and minizip-ng install a `zip.h` header"
 
   def install
     cd "buildsys/autotools" do
@@ -49,16 +49,17 @@ class Libtcod < Formula
       }
     EOS
     system ENV.cc, "-I#{include}", "-L#{lib}", "-ltcod", "version-c.c", "-o", "version-c"
-    assert_equal "#{version}\n", `./version-c`
+    assert_equal version.to_s, shell_output("./version-c").strip
     (testpath/"version-cc.cc").write <<~EOS
       #include <libtcod/libtcod.hpp>
+      #include <iostream>
       int main()
       {
         std::cout << TCOD_STRVERSION << std::endl;
         return 0;
       }
     EOS
-    system ENV.cxx, "-std=c++14", "-I#{include}", "-L#{lib}", "-ltcod", "version-cc.cc", "-o", "version-cc"
-    assert_equal "#{version}\n", `./version-cc`
+    system ENV.cxx, "-std=c++17", "-I#{include}", "-L#{lib}", "-ltcod", "version-cc.cc", "-o", "version-cc"
+    assert_equal version.to_s, shell_output("./version-cc").strip
   end
 end

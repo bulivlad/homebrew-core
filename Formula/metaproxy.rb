@@ -1,17 +1,22 @@
 class Metaproxy < Formula
   desc "Z39.50 proxy and router utilizing Yaz toolkit"
-  homepage "https://www.indexdata.com/resources/software/metaproxy"
-  url "http://ftp.indexdata.dk/pub/metaproxy/metaproxy-1.19.1.tar.gz"
-  sha256 "8861f9f3b44c2b170a4a00ed6861d49e0e5bbab9e3d736f939b9e2ca5e9b1b91"
+  homepage "https://www.indexdata.com/resources/software/metaproxy/"
+  url "https://ftp.indexdata.com/pub/metaproxy/metaproxy-1.20.0.tar.gz"
+  sha256 "2bd0cb514e6cdfe76ed17130865d066582b3fa4190aa5b0ea2b42db0cd6f9d8c"
   license "GPL-2.0-or-later"
 
+  # The homepage doesn't link to the latest source file, so we have to check
+  # the directory listing page directly.
+  livecheck do
+    url "https://ftp.indexdata.com/pub/metaproxy/"
+    regex(/href=.*?metaproxy[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
+
   bottle do
-    cellar :any
-    sha256 "77999b937db7fce7a23c222186faaf51df456a2b8b9cb344741cf652f13da536" => :big_sur
-    sha256 "99d44edf3d390c5c370bb2e7fc70b2b2c133895c4a4472142c695fcdcf3dbbac" => :arm64_big_sur
-    sha256 "8464920fa204d87a67e7c2f2ae1f09c0cad0065c7f04a9d1b3ad5a254c33b00d" => :catalina
-    sha256 "4d1144c7c7b0bcd886eac667660611c10f233fc347db48c925dd45d2a528b303" => :mojave
-    sha256 "1a36a5089c85d0c51c5a62b5c56a47d95d7e7345cc0cee44ef9a45a071091481" => :high_sierra
+    sha256 cellar: :any, arm64_big_sur: "a443529903a38577237d577f72b441de2853ab5e4dfebc1f9402a2bc7d25413f"
+    sha256 cellar: :any, big_sur:       "88bde89594c64dbbe9a79e5c3301506611b490be7bdb0e573bdcd6e07ab75fe9"
+    sha256 cellar: :any, catalina:      "4319580fd77eef8cf4da3a1e392669151471f397e71a9f6bdc1080f65678e17f"
+    sha256 cellar: :any, mojave:        "3f853cf457181ab372cd1eccafad913223a52a328cfcde07b96390c17b8ce349"
   end
 
   depends_on "pkg-config" => :build

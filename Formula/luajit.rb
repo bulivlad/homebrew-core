@@ -15,32 +15,32 @@ class Luajit < Formula
 
   livecheck do
     url "https://luajit.org/download.html"
-    regex(/class="downname">LuaJIT[._-]v?([\d.]+)</i)
+    regex(/href=.*?LuaJIT[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    cellar :any
-    rebuild 3
-    sha256 "527ed375a89f8f017af2e557da99046bc98047433ea367953e3a731ca3119ec0" => :big_sur
-    sha256 "907d7fbbd3be370fac28341bf902a551c1d07dd929b9379bb19e30ccaf0bdef6" => :catalina
-    sha256 "a127723ca4997acaa45e3b548eeb43f06ada464f2f59d518c4d68a89d9cfe6cf" => :mojave
-    sha256 "afd383c796b7d3d7826a6a72acea41ecf57cf183ae84d590a777fb6a71166e80" => :high_sierra
+    rebuild 5
+    sha256 cellar: :any,                 monterey:     "351112e416f845b313dc71cb2a54d349330a6c676ea381d30f5d9d1c676e795c"
+    sha256 cellar: :any,                 big_sur:      "5f5d205e4e49f015379ef230d3a068a2fa3079ab42341a473297290fa654a782"
+    sha256 cellar: :any,                 catalina:     "ee0c6394223cff8789452c0fc413d91cefeea1a3b5b5e2e39931620e8037c628"
+    sha256 cellar: :any_skip_relocation, x86_64_linux: "67663e6413774ef4b8be6678e389a6adb8e23ef50f52d5bb6d44f2b1069f6e8a"
   end
 
   def install
     # 1 - Override the hardcoded gcc.
     # 2 - Remove the "-march=i686" so we can set the march in cflags.
     # Both changes should persist and were discussed upstream.
+    # Also: Set `LUA_ROOT` to `HOMEBREW_PREFIX` so that Luajit can find modules outside its own keg.
+    # This should avoid the need for writing env scripts that specify `LUA_PATH` or `LUA_CPATH`.
     inreplace "src/Makefile" do |f|
       f.change_make_var! "CC", ENV.cc
-      f.change_make_var! "CCOPT_x86", ""
+      f.gsub!(/-march=\w+\s?/, "")
+      f.gsub!(/^(  TARGET_XCFLAGS\+= -DLUA_ROOT=)\\"\$\(PREFIX\)\\"$/, "\\1\\\"#{HOMEBREW_PREFIX}\\\"")
     end
 
     # Per https://luajit.org/install.html: If MACOSX_DEPLOYMENT_TARGET
     # is not set then it's forced to 10.4, which breaks compile on Mojave.
     ENV["MACOSX_DEPLOYMENT_TARGET"] = MacOS.version
-
-    ENV.O2 # Respect the developer's choice.
 
     args = %W[PREFIX=#{prefix}]
 
@@ -77,11 +77,13 @@ class Luajit < Formula
   end
 
   test do
-    system "#{bin}/luajit", "-e", <<~EOS
+    system bin/"luajit", "-e", <<~EOS
       local ffi = require("ffi")
       ffi.cdef("int printf(const char *fmt, ...);")
       ffi.C.printf("Hello %s!\\n", "#{ENV["USER"]}")
     EOS
+    # Check that LuaJIT can find its own `jit.*` modules
+    system bin/"luajit", "-l", "jit.bcsave", "-e", ""
   end
 end
 

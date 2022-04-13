@@ -2,26 +2,33 @@ class Gor < Formula
   desc "Real-time HTTP traffic replay tool written in Go"
   homepage "https://goreplay.org"
   url "https://github.com/buger/goreplay.git",
-      tag:      "v1.2.0",
-      revision: "2b73ea1f0ceee50bd96f705e23af3885f990daa3"
-  license "LGPL-3.0"
-  head "https://github.com/buger/goreplay.git"
+      tag:      "1.3.3",
+      revision: "f8ef77e8cf4aae59029daf6cbd2fc784af811cee"
+  license "LGPL-3.0-only"
+  head "https://github.com/buger/goreplay.git", branch: "master"
+
+  livecheck do
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
+  end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "b02c8cacea6257c1faf97f6c3a686f09fc1519e54cbd80713b19c95b9c03ced2" => :big_sur
-    sha256 "c5cb3c8f00af6a0ef7a8d1c24c4de59563c85bc51bb8a9f878ad4c283aa1954b" => :arm64_big_sur
-    sha256 "0a2c7715c47fa3fb9ba70494b1bf20a4216cabb09d909702f86d810a07c58f17" => :catalina
-    sha256 "347fab444ceaee3d2dae0f23cedcd924267bbbba95a099ad5602ba3051fd5c1f" => :mojave
-    sha256 "0e07f5bf90d57b9bd1b0ccb961e6ee240fd8346a923c45d075b66cd7c4714a63" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "fe66f6fc334df036e4fe3f6cd579bc73ac6eacef6848e2c46a6e475a4874c9c2"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "227fba89a0ef4516c6b25e9c865c60de19731213a96f6b471ea7780f7bb72485"
+    sha256 cellar: :any_skip_relocation, monterey:       "be4aae24b0d4f5c8e55631a5314eb0f1f08a77c404b432b7db71b7e2d5186d82"
+    sha256 cellar: :any_skip_relocation, big_sur:        "6ff4869f7dcd7a5b830eb005940900360f31450d82538ff4208e6093e09840ce"
+    sha256 cellar: :any_skip_relocation, catalina:       "822445285cbf26edb06857be8bdeb0c5a7f6df0c9a801316e1537fc1794becb2"
+    sha256 cellar: :any_skip_relocation, mojave:         "25f3c17675fa60d8ce06a2a94c95ac5210f00e23d4dfcad6e6a98449080e2b33"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1239ddcc67670144a35dbdf90712514bc56f52ccbc755285eef6e54ed909afb1"
   end
 
   depends_on "go" => :build
 
+  uses_from_macos "netcat" => :test
   uses_from_macos "libpcap"
 
   def install
-    system "go", "build", "-ldflags", "-X main.VERSION=#{version}", *std_go_args
+    system "go", "build", *std_go_args(ldflags: "-X main.VERSION=#{version}")
   end
 
   test do

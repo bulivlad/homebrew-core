@@ -1,18 +1,23 @@
 class Dlib < Formula
   desc "C++ library for machine learning"
   homepage "http://dlib.net/"
-  url "http://dlib.net/files/dlib-19.21.tar.bz2"
-  sha256 "be728a03ae8c4dc8b48408d90392a3c28bc6642a6eb22f3885895b434d7df53c"
+  url "http://dlib.net/files/dlib-19.23.tar.bz2"
+  sha256 "b1be30672302abdb8e010a21edf50d20a398ef9c38fddc45334dedf058af288a"
   license "BSL-1.0"
-  head "https://github.com/davisking/dlib.git"
+  head "https://github.com/davisking/dlib.git", branch: "master"
+
+  livecheck do
+    url :homepage
+    regex(/href=.*?dlib[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
 
   bottle do
-    cellar :any
-    rebuild 1
-    sha256 "655d96ba94159cd7a80ff842ea8693aa7857e91496a8447b3df23ddf50ee0993" => :big_sur
-    sha256 "81dc4133691925848cc96ccaac3158456d47544a0614b35c29a9948f7faef10b" => :arm64_big_sur
-    sha256 "597a1595ee2f5071afcac72128f85b3aadda96002253e54ae16995e151fb5432" => :catalina
-    sha256 "52ab2f5e4073682520ec0f5cf7410bad8f1a03a4e783bdc4a93d1372cacee808" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "716804b2263be0d5838f771743a0c2c3bf2edb5d90b9c45daa71a9aab5fbf52f"
+    sha256 cellar: :any,                 arm64_big_sur:  "f076d570b9b83d388a153ca175780a39a1aded6270955bc2d983184240ee107a"
+    sha256 cellar: :any,                 monterey:       "a507111d2b5820fa2ae50266df3e3063ac0a52e16ec2aaf6cfb015fbd111e615"
+    sha256 cellar: :any,                 big_sur:        "dbca75d3d14e4c314ebb9d3f273684140dd999929019a950b111d6fbcc012439"
+    sha256 cellar: :any,                 catalina:       "54272687cbb34d28d0b61e93183d8cc1257db518357ed7fdf3fdb997c0666395"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7b2a7242c594ca4f6da385e61701705f1b309f96bcc007aa942491dcd1e7ae82"
   end
 
   depends_on "cmake" => :build
@@ -52,8 +57,8 @@ class Dlib < Formula
         dlog << dlib::LINFO << "The answer is " << 42;
       }
     EOS
-    system ENV.cxx, "-std=c++11", "test.cpp", "-o", "test", "-I#{include}",
+    system ENV.cxx, "-pthread", "-std=c++11", "test.cpp", "-o", "test", "-I#{include}",
                     "-L#{lib}", "-ldlib"
-    assert_match /INFO.*example: The answer is 42/, shell_output("./test")
+    assert_match(/INFO.*example: The answer is 42/, shell_output("./test"))
   end
 end

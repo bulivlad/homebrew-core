@@ -1,10 +1,9 @@
 class Libxmlxx < Formula
   desc "C++ wrapper for libxml"
   homepage "https://libxmlplusplus.sourceforge.io/"
-  url "https://download.gnome.org/sources/libxml++/2.42/libxml++-2.42.0.tar.xz"
-  sha256 "3d032aede98a033eb5e815b4bfa9fa7b4e745268e6fd1ce8b1d0f70bcaf4736d"
+  url "https://download.gnome.org/sources/libxml++/2.42/libxml++-2.42.1.tar.xz"
+  sha256 "9b59059abe5545d28ceb388a55e341095f197bd219c73e6623aeb6d801e00be8"
   license "LGPL-2.1-or-later"
-  revision 1
 
   livecheck do
     url :stable
@@ -12,17 +11,19 @@ class Libxmlxx < Formula
   end
 
   bottle do
-    cellar :any
-    sha256 "978e880dad83f659e9ce4fbcf91192e3a6eb95a304f2436a39b66eec54e699b1" => :big_sur
-    sha256 "3fe497baf7ad15e1a3be26bd1715425ef58ac1781b6086270a2c5f2c0e9af794" => :arm64_big_sur
-    sha256 "b3b9902d962865ca0e816ba8eeb3e624c15db661ab51791a9d5a62c390c6d680" => :catalina
-    sha256 "9c331eafcc60bd576d35acdbb63988026fedcd8cadd0a82f7043a15032c489a1" => :mojave
+    sha256 cellar: :any, arm64_monterey: "b7da42c199f838866894627be4939e7eca4a3bda8524f125781b21ec29f5383d"
+    sha256 cellar: :any, arm64_big_sur:  "e2aba0455833404cb02800c272d4b1c8e4f8216da5bc15798f8e64c0d784ecb2"
+    sha256 cellar: :any, monterey:       "20ac747ac5363fd842bf1e71ee0836b211bc3a8b74328aea43b7d7f671fb1365"
+    sha256 cellar: :any, big_sur:        "2b16a17ecc1683587eb672acc18ba98ee88795c54cb7edac974ed4e3459bfc3a"
+    sha256 cellar: :any, catalina:       "d6e621d8511f48b17f1e33a87efb04fcc9b65a1afe6ca6d442f4d9e7ce98b3e4"
+    sha256 cellar: :any, mojave:         "f76bb4f5672bd0d2c50ba19efdc192e6eb31166043ace553a33fc9e7d4604cfb"
+    sha256               x86_64_linux:   "dc1b0fe9971c2cd23cc9dfc94b72e8052e4ab76f5e2fab39fe382bfd44e1f21f"
   end
 
   depends_on "meson" => :build
   depends_on "ninja" => :build
   depends_on "pkg-config" => :build
-  depends_on "glibmm@2.64"
+  depends_on "glibmm@2.66"
 
   uses_from_macos "libxml2"
 
@@ -50,7 +51,7 @@ class Libxmlxx < Formula
     ENV.libxml2
     gettext = Formula["gettext"]
     glib = Formula["glib"]
-    glibmm = Formula["glibmm@2.64"]
+    glibmm = Formula["glibmm@2.66"]
     libsigcxx = Formula["libsigc++@2"]
     flags = %W[
       -I#{gettext.opt_include}
@@ -74,9 +75,7 @@ class Libxmlxx < Formula
       -lxml++-2.6
       -lxml2
     ]
-    on_macos do
-      flags << "-lintl"
-    end
+    flags << "-lintl" if OS.mac?
     system ENV.cxx, "-std=c++11", "test.cpp", "-o", "test", *flags
     system "./test"
   end

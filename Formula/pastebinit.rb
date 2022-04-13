@@ -3,24 +3,15 @@ class Pastebinit < Formula
   homepage "https://launchpad.net/pastebinit"
   url "https://launchpad.net/pastebinit/trunk/1.5/+download/pastebinit-1.5.tar.gz"
   sha256 "0d931dddb3744ed38aa2d319dd2d8a2f38a391011ff99db68ce7c83ab8f5b62f"
-  license "GPL-2.0"
-  revision 3
-
-  livecheck do
-    url :stable
-  end
+  license "GPL-2.0-or-later"
+  revision 4
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "43c42eb708a8452001802163a22e637ff7685c1e9fbd72b58102a68ccdffaf52" => :big_sur
-    sha256 "90c20fef3e5c3e0944fadf42e45692288edb5e5ee241a4d936fe509c2e8ec16d" => :arm64_big_sur
-    sha256 "f24d4dbd9723f5726c7786af82cd16df86485ea3ae075906531f82d0544ec688" => :catalina
-    sha256 "d2195934de64bf7814790b59d2429b90cb58e492f13f08430958b82ec3bd652d" => :mojave
-    sha256 "4ca0432c7652ab49ee0f61823335d0e0ea70caaf220f4654291406dcb425cd23" => :high_sierra
+    sha256 cellar: :any_skip_relocation, all: "811962a281bc547c1d6ca15ea68ee862798e88ccc4346ab5425432495bc4867c"
   end
 
   depends_on "docbook2x" => :build
-  depends_on "python@3.9"
+  depends_on "python@3.10"
 
   # Remove for next release
   patch do
@@ -30,7 +21,7 @@ class Pastebinit < Formula
 
   def install
     inreplace "pastebinit" do |s|
-      s.gsub! "/usr/bin/python3", Formula["python@3.9"].opt_bin/"python3"
+      s.gsub! "/usr/bin/python3", Formula["python@3.10"].opt_bin/"python3"
       s.gsub! "/usr/local/etc/pastebin.d", etc/"pastebin.d"
     end
 

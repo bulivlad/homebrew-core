@@ -1,14 +1,17 @@
 class MysqlClientAT57 < Formula
   desc "Open source relational database management system"
   homepage "https://dev.mysql.com/doc/refman/5.7/en/"
-  url "https://cdn.mysql.com/Downloads/MySQL-5.7/mysql-boost-5.7.32.tar.gz"
-  sha256 "9a8a04a2b0116ccff9a8d8aace07aaeaacf47329b701c5dfa9fa4351d3f1933b"
+  url "https://cdn.mysql.com/archives/mysql-5.7/mysql-boost-5.7.34.tar.gz"
+  sha256 "5bc2c7c0bb944b5bb219480dde3c1caeb049e7351b5bba94c3b00ac207929c7b"
 
   bottle do
-    sha256 "61ca8bedda853898d6fca0036a520a39f514e33aca2ce691fa7e889b81790706" => :big_sur
-    sha256 "c5752cf67dff22a4e32b0c32651eb73d898adf04528a25d2a17e64ff2bc05374" => :arm64_big_sur
-    sha256 "effec4ea0f7867d42ea33ee16d6ea523e09f7ba9fe4e60fd9d55e6a6c577d2f8" => :catalina
-    sha256 "0991a1d5fcb24e23761f8ca17d4896b46054ac80aca88d4eca17b944fbb178f2" => :mojave
+    sha256 arm64_monterey: "a625d490e1aec7c1c940d4820a4296785f0d5885a5f44f207089b69ab14e4a13"
+    sha256 arm64_big_sur:  "36dad98547a79e55ee6402bcfe841ab90e4f3ed8a0f22004a5d8e7b7e832ad3b"
+    sha256 monterey:       "9591ce6380dc73dddd90716de26127b6269b3bb1d79ff3d821f7d59deb3513b8"
+    sha256 big_sur:        "b00ea0ee1635933022d25b996a789fd57896c090526b86d767d1e868beaf82ad"
+    sha256 catalina:       "8a9414707afa3c8462e45ef54f2da13361e96e8bbfb74102491bc28844a115fc"
+    sha256 mojave:         "de54dc5ec1aaacf144cfeea5f2ba560450279f0464d44c0d3210c11b828efdfb"
+    sha256 x86_64_linux:   "043c4687dce671f68a0e9023656086ab5a100f3b1151e30a4cd53ff3c08e5736"
   end
 
   keg_only :versioned_formula
@@ -16,6 +19,8 @@ class MysqlClientAT57 < Formula
   depends_on "cmake" => :build
 
   depends_on "openssl@1.1"
+
+  uses_from_macos "libedit"
 
   def install
     # https://bugs.mysql.com/bug.php?id=87348

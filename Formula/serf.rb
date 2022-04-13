@@ -2,18 +2,18 @@ class Serf < Formula
   desc "Service orchestration and management tool"
   homepage "https://serfdom.io/"
   url "https://github.com/hashicorp/serf.git",
-      tag:      "v0.9.5",
-      revision: "7faa1b06262f70780c3c35ac25a4c96d754f06f3"
+      tag:      "v0.9.7",
+      revision: "daf7d4f50ee2b06d67af854112a7ccd26f398c83"
   license "MPL-2.0"
-  head "https://github.com/hashicorp/serf.git"
+  head "https://github.com/hashicorp/serf.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "5ae109c95ab044f550a3e20702eb165d014d618198a7fbf280f9731cc02f9e1b" => :big_sur
-    sha256 "9ebda6b1a139cb8b900799676be12c0993bbd894b1869577739a0ef2a4682d38" => :arm64_big_sur
-    sha256 "9fa6ba9a73d743e404c84088e64ef860dcf3f8e0bc0fbeb74a39437440c0dc72" => :catalina
-    sha256 "2bcfffa14b7a86099e6dc3574f1dcece4d125b72f32d8fad6be943a63380da75" => :mojave
-    sha256 "78b0abfda4b9f41da7df720f79e93346ad524450e801c3528706232d012cbadc" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "b43898b70b7822d41f86f4e4a1b5b101cbcc5187326b9f5e5008b086c9a1fb92"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "448c655cf74e72e2e919ac5cbd8ca9799b3d10638028af6f475a453e0d29bdd3"
+    sha256 cellar: :any_skip_relocation, monterey:       "5492c1e76121ebd5fa28d863623676360885c04e1bc3742d4cb8856b2c6c438f"
+    sha256 cellar: :any_skip_relocation, big_sur:        "ce2cbd6e2ad0344a9b0dd2f19da1ab752ed4021645df4c0667081768cf58bcd0"
+    sha256 cellar: :any_skip_relocation, catalina:       "bb7216fd18e55536f70a9df6d592c3daacf4b5609f3e2e807aee573189ed4a6d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6ec7af898cf71117c9569d4c28a2b82867da62374bdf497b103a246094a6785d"
   end
 
   depends_on "go" => :build
@@ -34,7 +34,7 @@ class Serf < Formula
       exec "#{bin}/serf", "agent"
     end
     sleep 1
-    assert_match /:7946.*alive$/, shell_output("#{bin}/serf members")
+    assert_match(/:7946.*alive$/, shell_output("#{bin}/serf members"))
   ensure
     system "#{bin}/serf", "leave"
     Process.kill "SIGINT", pid

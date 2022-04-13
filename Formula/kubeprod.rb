@@ -1,24 +1,27 @@
 class Kubeprod < Formula
   desc "Installer for the Bitnami Kubernetes Production Runtime (BKPR)"
   homepage "https://kubeprod.io"
-  url "https://github.com/bitnami/kube-prod-runtime/archive/v1.6.1.tar.gz"
-  sha256 "fdf5b82ea274033488af2c2c6057507e601366f61b2f888b33bee767e4000d77"
+  url "https://github.com/bitnami/kube-prod-runtime/archive/v1.8.0.tar.gz"
+  sha256 "cc2fbda4c115d164afcaaabbbef4b5824b9b09b6df95d9cce021aee50c2ad2c1"
   license "Apache-2.0"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "ea49a918a879287e50d1b4161113efd395bd0c80afc0394f6453f9d70af9e60d" => :big_sur
-    sha256 "a65d7ea7bfd9b2d2fbd6606440ea83c6b0003fbbdccaa47bb50bac7499d842df" => :arm64_big_sur
-    sha256 "72b78c5b8393d7fe37d9b1ec1e53f32a34162f4a6379ddd2250bbe5680c53d3e" => :catalina
-    sha256 "75fc89249f53f9b8fe8e09bf3970c11ddc2aaa417f49735c2ac79b0d468dca3e" => :mojave
-    sha256 "bf0f97d8da14fd61c43cf1844eb4899f81073719c233aaaa0856f971e0dfc048" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "397d87c63d6eb199e49a2d695d3f16619f0fef0ffdf905c6378d241d1259b4c4"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "0cf8f68102f72c4f3dc4398baa40bed174c9383fe70d6c092416a2413b59fea7"
+    sha256 cellar: :any_skip_relocation, monterey:       "da4dad9205b38cf15027cb688595bdc75b1b6fa653edea53061e151fae192987"
+    sha256 cellar: :any_skip_relocation, big_sur:        "b5bcbbcfb672ba55f4cc8ff037265ad5609637c680a3913ed70902fcd942446f"
+    sha256 cellar: :any_skip_relocation, catalina:       "d93e5540cc7b2b7a479b69613c9aab0e9809a838cb1241f20650c01c9c37fc56"
+    sha256 cellar: :any_skip_relocation, mojave:         "8eacc39ef3927f4405137db71864e0db6d0b27f97d5c5499f00d5d60ed58eebc"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d33e013a915ab5b777bcdf0d11476c55905896c29cf168c76558bf66e6753403"
   end
 
-  depends_on "go" => :build
+  deprecate! date: "2022-03-18", because: :repo_archived
+
+  depends_on "go@1.17" => :build
 
   def install
     cd "kubeprod" do
-      system "go", "build", *std_go_args, "-ldflags", "-X main.version=v#{version}", "-mod=vendor"
+      system "go", "build", *std_go_args(ldflags: "-X main.version=v#{version}"), "-mod=vendor"
     end
   end
 

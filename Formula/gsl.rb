@@ -1,23 +1,24 @@
 class Gsl < Formula
   desc "Numerical library for C and C++"
   homepage "https://www.gnu.org/software/gsl/"
-  url "https://ftp.gnu.org/gnu/gsl/gsl-2.6.tar.gz"
-  mirror "https://ftpmirror.gnu.org/gsl/gsl-2.6.tar.gz"
-  sha256 "b782339fc7a38fe17689cb39966c4d821236c28018b6593ddb6fd59ee40786a8"
-  license "GPL-3.0"
-
-  livecheck do
-    url :stable
-  end
+  url "https://ftp.gnu.org/gnu/gsl/gsl-2.7.1.tar.gz"
+  mirror "https://ftpmirror.gnu.org/gsl/gsl-2.7.1.tar.gz"
+  sha256 "dcb0fbd43048832b757ff9942691a8dd70026d5da0ff85601e52687f6deeb34b"
+  license "GPL-3.0-or-later"
 
   bottle do
-    cellar :any
-    sha256 "49b52d742f10f6a62de28658419c33ab11027eef3427e81b771921bf8d068637" => :big_sur
-    sha256 "b4d8687427eb3a7f951c211f5a0b8051ca0bbaf174e68265fb6619d43b282aeb" => :arm64_big_sur
-    sha256 "5972e8669b2560124278b43788a002e3ff22f024c761750a1a33b41d2002f292" => :catalina
-    sha256 "6c88a066c85f76c93a20f6e3256fb9022d6e7db828d184be5b42fd0b322ca7b8" => :mojave
-    sha256 "8213b1a73d038e499223ccae6d04afe6eb2d9455e327d9558351cf47a0431b84" => :high_sierra
-    sha256 "8515f26e5a06a99097e87dc9b88ee79787b95448ab67f09b449aee4b0d67bdba" => :sierra
+    sha256 cellar: :any,                 arm64_monterey: "207ba177628696ce2179fe94125ecd637794396a442a7550c92f9a8a202c03bf"
+    sha256 cellar: :any,                 arm64_big_sur:  "1184a75460c96dc80a9fa5299f3f0931bbff729b556607e2b7492608dd7e44d7"
+    sha256 cellar: :any,                 monterey:       "3125ff756739ec6eea0ddac3c3b01e879f525eb3b7de88586d6438cd954e28a8"
+    sha256 cellar: :any,                 big_sur:        "3cfd6c05d383ad930471e6d92942de62982d5e4149d5508bbbf5ed513561c288"
+    sha256 cellar: :any,                 catalina:       "03a4c21c0384602ec0d5c802f61fdc0737730a703396b3fe37274c884019a6b8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "daf456a559c5f031b5584db251ffe07aa02fbb04c3d7dc06e1202cfd9109a0c7"
+  end
+
+  # Fix -flat_namespace being used on Big Sur and later.
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+    sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
   end
 
   def install

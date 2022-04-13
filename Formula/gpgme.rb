@@ -1,8 +1,8 @@
 class Gpgme < Formula
   desc "Library access to GnuPG"
   homepage "https://www.gnupg.org/related_software/gpgme/"
-  url "https://www.gnupg.org/ftp/gcrypt/gpgme/gpgme-1.15.1.tar.bz2"
-  sha256 "eebc3c1b27f1c8979896ff361ba9bb4778b508b2496c2fc10e3775a40b1de1ad"
+  url "https://www.gnupg.org/ftp/gcrypt/gpgme/gpgme-1.17.1.tar.bz2"
+  sha256 "711eabf5dd661b9b04be9edc9ace2a7bc031f6bd9d37a768d02d0efdef108f5f"
   license "LGPL-2.1-or-later"
 
   livecheck do
@@ -11,11 +11,12 @@ class Gpgme < Formula
   end
 
   bottle do
-    cellar :any
-    sha256 "b7db3dbcd653200ed5f08789582d27f5ada1d70373fc0deaa908167869415362" => :big_sur
-    sha256 "cb5bc3ae542bb57f6eb2ba0ec5e2980f34d43cfbaa1349a77c50b0caba2d2b69" => :arm64_big_sur
-    sha256 "d2f6e379b0c47d4b62275a588a69bd08fb1c79e153b348c96280f3162548a1e4" => :catalina
-    sha256 "4a783a98f9f37a905e5864a628fcbb955ee9f3fa5ddab7c95edad62abe38697f" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "9ae8d80734f26c576a6bba331cc2d297fd8381529cc5837caadbb0848514fa54"
+    sha256 cellar: :any,                 arm64_big_sur:  "35f92cc8f4d09dbfdbe2b2e98ae86a6810106d5f060e6a57b5bedc1c0ab32ffd"
+    sha256 cellar: :any,                 monterey:       "d984b2487bd72c40a04edfb26b884a873eeca7ad1cecdacc60b41d774991ce55"
+    sha256 cellar: :any,                 big_sur:        "306af04ce2798e3227e643806824fade33961b45a327a36ea5aaf56d27d6b9ec"
+    sha256 cellar: :any,                 catalina:       "a529ae88cf38d8c578e81b90c871dfdfcaf2675ffb5aa173f2e62dd0bc005cdb"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "faec7ead15b656c2655f7a43cec3a5bc6bf9886763349b2fc03e5b85dd8b2abc"
   end
 
   depends_on "python@3.9" => [:build, :test]
@@ -25,7 +26,10 @@ class Gpgme < Formula
   depends_on "libgpg-error"
 
   def install
-    ENV["PYTHON"] = Formula["python@3.9"].opt_bin/"python3"
+    ENV["PYTHON"] = which("python3")
+    # setuptools>=60 prefers its own bundled distutils, which breaks the installation
+    # Remove when distutils is no longer used. Related PR: https://dev.gnupg.org/D545
+    ENV["SETUPTOOLS_USE_DISTUTILS"] = "stdlib"
 
     system "./configure", "--disable-dependency-tracking",
                           "--disable-silent-rules",

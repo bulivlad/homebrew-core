@@ -1,20 +1,17 @@
 class GtkGnutella < Formula
   desc "Share files in a peer-to-peer (P2P) network"
   homepage "https://gtk-gnutella.sourceforge.io"
-  url "https://downloads.sourceforge.net/project/gtk-gnutella/gtk-gnutella/1.2.0/gtk-gnutella-1.2.0.tar.xz"
-  sha256 "9608f28706f75423ac6b0d8f260506f1cf0f345a6f04de7cac1232b2504d94c9"
-  license "GPL-2.0"
-
-  livecheck do
-    url :stable
-  end
+  url "https://downloads.sourceforge.net/project/gtk-gnutella/gtk-gnutella/1.2.2/gtk-gnutella-1.2.2.tar.xz"
+  sha256 "95a5d86878f6599df649b95db126bd72b9e0cecadb96f41acf8fdcc619771eb6"
+  license "GPL-2.0-or-later"
 
   bottle do
-    sha256 "65fe3df74ec576a933c4aa3576b7cf387e09f1d1757b45e835a1daa326dd4df4" => :big_sur
-    sha256 "0c52c25d2374166f992060c2975b920cd37d4a258de01e391102765c286009fb" => :arm64_big_sur
-    sha256 "88c016e26d7b8d48bb7f1be67c5b84fadc6af0c58f3d258928f3d7a62c4d7e57" => :catalina
-    sha256 "573fef65f5e1766416cfd94f715e2bffe39c6adf3108232d0f80fe76b0711348" => :mojave
-    sha256 "c270c4e7d01b10b80a0dac8fc0b91981769c77186f975c5d1ba69a772aae6470" => :high_sierra
+    sha256 arm64_monterey: "dfc1a6e5ea48981b08e4ec2a74dbf2e60204c0577ebd42512252dfd465dfb312"
+    sha256 arm64_big_sur:  "e6569a85d4d46b2583050ab09c1716ebabef593d560c07808e9530a629b5db79"
+    sha256 monterey:       "50e16867768e56729aa34a8a8b96a103652b056c508744542cf1108d11a9937c"
+    sha256 big_sur:        "92c2fcc1744502b5b1baf63ad167e70414c0434ad2d7aaf6598bfd2625ed8c5f"
+    sha256 catalina:       "78151f5c823fce4c91ec7fec4cd8845c420117b558f3664c38846172a05b6129"
+    sha256 x86_64_linux:   "801d4b14d9fe1195d465389d0281a1b3812f77bc116cb322f5213a5b87e7df77"
   end
 
   depends_on "pkg-config" => :build

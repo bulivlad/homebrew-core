@@ -1,21 +1,22 @@
 class XmlrpcC < Formula
   desc "Lightweight RPC library (based on XML and HTTP)"
   homepage "https://xmlrpc-c.sourceforge.io/"
-  url "https://downloads.sourceforge.net/project/xmlrpc-c/Xmlrpc-c%20Super%20Stable/1.51.06/xmlrpc-c-1.51.06.tgz"
-  sha256 "06dcd87d9c88374559369ffbe83b3139cf41418c1a2d03f20e08808085f89fd0"
-
-  livecheck do
-    url :stable
-  end
+  url "https://downloads.sourceforge.net/project/xmlrpc-c/Xmlrpc-c%20Super%20Stable/1.51.08/xmlrpc-1.51.08.tgz"
+  sha256 "a48f6becfdc2897b8a90522ec506000f966a75e4a7c348c3f8b18fce828d49e6"
+  license "BSD-3-Clause"
 
   bottle do
-    cellar :any
-    sha256 "4bf06fc636da854ff791a9d0af52db23e08b42fa9b8fe062cf22e10c57605822" => :big_sur
-    sha256 "43d9a3b95d745bc46c1a22e4d853a7f874d3f833c437032963331490a34ce00b" => :arm64_big_sur
-    sha256 "f7d6a12c5e57d9ceb97b88dba518a6bae79e41e95343395a3f3c94bc168c92ab" => :catalina
-    sha256 "638d1d6484717f57228174db4b9e875798b3ee1558ac6bcab59c96d80fcdab56" => :mojave
-    sha256 "88a9ab0c2baea0aac627427628b00bce6828e5fc436533c0de8cfb0a99c21a24" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "9f7858eb619ac9b470e37ce8fcfdf426c7a849102edc34b533739d721c5a7b7f"
+    sha256 cellar: :any,                 arm64_big_sur:  "263c197c509a240444d4750945f8d7d079054844439dfa533bc0fd6d49632eac"
+    sha256 cellar: :any,                 monterey:       "7aa123e28ad0454e83f89a6b342f42ab23fd53bcbd48b7e49e97afce1bcc48f1"
+    sha256 cellar: :any,                 big_sur:        "98d8880157242c495ca5f3d2c87066b52fe858d5c14dc4078d1e8c1a63b7481c"
+    sha256 cellar: :any,                 catalina:       "ea46c848e7b738b515733b89338f6e4d3a88f2ca35ba4c2188af5e165a671dac"
+    sha256 cellar: :any,                 mojave:         "88ab4b50934d1d53dc0cc44e7985a2326757883a204c531a22c7d2867293d2b9"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b9982d7f0d38a9b87fa13abbfaf64c3b2af31e2dc0361e836a9b41cdd190bf9c"
   end
+
+  uses_from_macos "curl"
+  uses_from_macos "libxml2"
 
   def install
     ENV.deparallelize

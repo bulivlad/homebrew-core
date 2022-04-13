@@ -1,16 +1,20 @@
 class Sollya < Formula
   desc "Library for safe floating-point code development"
   homepage "https://www.sollya.org/"
-  url "https://gforge.inria.fr/frs/download.php/file/37749/sollya-7.0.tar.gz"
-  sha256 "30487b8242fb40ba0f4bc2ef23a8ef216477e57b1db277712fde1f53ceebb92a"
-  revision 1
+  url "https://www.sollya.org/releases/sollya-8.0/sollya-8.0.tar.gz"
+  sha256 "58d734f9a2fc8e6733c11f96d2df9ab25bef24d71c401230e29f0a1339a81192"
+  license "CECILL-C"
+
+  livecheck do
+    url "https://www.sollya.org/download.php"
+    regex(/href=.*?sollya[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
 
   bottle do
-    cellar :any
-    sha256 "c4bfa257d2e396ec055f3032d5ece3753d47f582db360d2f5c639d5d21304bc9" => :big_sur
-    sha256 "e85099273aa58bed86a2f3f5cecd630d6ef34733eb82781db493baf17e3beecb" => :arm64_big_sur
-    sha256 "2a005ddf4e5215f870f20efd84297d27d7683b5acc5ff771545893cf729da2a4" => :catalina
-    sha256 "711853a4670a2951c6160f5681c8c511136f3f731e7a7806dd4a9f39b3eff209" => :mojave
+    sha256 cellar: :any,                 arm64_big_sur: "c07fef942ebff9171d52926e76947ad8eeccdc74be40290b18799c7dd67046fb"
+    sha256 cellar: :any,                 big_sur:       "b3a49a1f76957bcbd5a81c8ea141b952b814eb45ff32063451550a7775d9f97b"
+    sha256 cellar: :any,                 catalina:      "614701c860f55043408ff5f1d3a6f4d527db39e07ea4f72715b969bacdeb9826"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "b7ca886155f71257dd0fa97945db31705c58028169ea4c51f7c8f22631109db5"
   end
 
   depends_on "automake" => :build

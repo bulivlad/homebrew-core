@@ -5,13 +5,20 @@ class Mpir < Formula
   sha256 "52f63459cf3f9478859de29e00357f004050ead70b45913f2c2269d9708675bb"
   license "GPL-3.0-or-later"
 
+  livecheck do
+    url "https://mpir.org/downloads.html"
+    regex(/href=.*?mpir[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
+
   bottle do
-    cellar :any
     rebuild 2
-    sha256 "2364f0bb79cf8a0ef739f077eaacc7228fd89d39d18d0b9f1e135a2577472684" => :big_sur
-    sha256 "dcfb7c5e0b679f0d3cc14ec76fa3a565f8b521ba19a2d6212e6f39b27f220a6c" => :arm64_big_sur
-    sha256 "884e9e0b62c809c531c55d6da43fbebadd5428976afbf95d2dc8968599e6e013" => :catalina
-    sha256 "1b930468cbd16840c9c689b8b24c91ce45a136b7512ccd06b6c13a14cd5405e2" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "047110a0c73f2c6224609727d07e6e581b4e7f3f57de477971b0d4e795a9af29"
+    sha256 cellar: :any,                 arm64_big_sur:  "dcfb7c5e0b679f0d3cc14ec76fa3a565f8b521ba19a2d6212e6f39b27f220a6c"
+    sha256 cellar: :any,                 monterey:       "8b2b3fe7672e36b0323c3fefff3cac5e68eb48b249829a23ffac5c60056b75f6"
+    sha256 cellar: :any,                 big_sur:        "2364f0bb79cf8a0ef739f077eaacc7228fd89d39d18d0b9f1e135a2577472684"
+    sha256 cellar: :any,                 catalina:       "884e9e0b62c809c531c55d6da43fbebadd5428976afbf95d2dc8968599e6e013"
+    sha256 cellar: :any,                 mojave:         "1b930468cbd16840c9c689b8b24c91ce45a136b7512ccd06b6c13a14cd5405e2"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "255666a3f9f3520885fba30dbe76714a89a10d914473e6cf834f55caba125a2a"
   end
 
   depends_on "autoconf" => :build

@@ -1,20 +1,22 @@
 class Mdbtools < Formula
   desc "Tools to facilitate the use of Microsoft Access databases"
   homepage "https://github.com/mdbtools/mdbtools/"
-  url "https://github.com/mdbtools/mdbtools/releases/download/v0.9.1/mdbtools-0.9.1.tar.gz"
-  sha256 "f62b4dcf06a43ad2b4342be670fc934d03886da9feb9f38434029facc0b98f3c"
+  url "https://github.com/mdbtools/mdbtools/releases/download/v1.0.0/mdbtools-1.0.0.tar.gz"
+  sha256 "3446e1d71abdeb98d41e252777e67e1909b186496fda59f98f67032f7fbcd955"
   license "GPL-2.0-or-later"
 
   bottle do
-    cellar :any
-    sha256 "6a653b4fc6a4c990a1ea0f08085875010a1560fffcf100eafe0d81de52778464" => :big_sur
-    sha256 "51482d465b9bf4315b80f9b4b31423dbf1349b24f29358fdf0e6ea9a87a12b0b" => :arm64_big_sur
-    sha256 "04bb52a1f30aed9209498ea4fdbdf1b575a290f931632a2b37d1e6433b43f7b7" => :catalina
-    sha256 "d2d9d42dee37437e5e9c6c701efd38b13456d59ebb1fb2fbebbcba8af7ff32c6" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "c4502a9b481c4e40f0bc5c1767af43938cea64ea125a564dd1371e0cdad5729c"
+    sha256 cellar: :any,                 arm64_big_sur:  "1f808f4f3574633bb4d3176046a4b98dd0f673291db20ef5f34357f8e04aa3f1"
+    sha256 cellar: :any,                 monterey:       "b11d8015632397cfcc11ce21225d3f5d5001bcf64f55996c20713ac9ddc48c46"
+    sha256 cellar: :any,                 big_sur:        "705cecb093ad9dc51806e241b75389a4843b2ea57170a5653aa15face44323ba"
+    sha256 cellar: :any,                 catalina:       "472f8d9eb6f9608ef300715e1e7774625643c5433dfef4844eb8337c00a1cdfd"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "941c3eae4065118abd7bf72a1a42da8c33d7d1c706f655622254a8989e4e0468"
   end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
+  depends_on "bison" => :build
   depends_on "gawk" => :build
   depends_on "libtool" => :build
   depends_on "pkg-config" => :build
@@ -25,7 +27,6 @@ class Mdbtools < Formula
   def install
     system "autoreconf", "-fvi"
     system "./configure", "--prefix=#{prefix}",
-                          "--enable-sql",
                           "--enable-man"
     system "make", "install"
   end

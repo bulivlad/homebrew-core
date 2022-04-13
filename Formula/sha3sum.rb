@@ -1,25 +1,20 @@
 class Sha3sum < Formula
   desc "Keccak, SHA-3, SHAKE, and RawSHAKE checksum utilities"
   homepage "https://github.com/maandree/sha3sum"
-  url "https://github.com/maandree/sha3sum/archive/1.2.tar.gz"
-  sha256 "e3c10938ed3e8218e17f3ab69daf2df958d97ca9a263003f0e890bc17c783787"
+  url "https://github.com/maandree/sha3sum/archive/1.2.2.tar.gz"
+  sha256 "57cfda5d9d16aa14c78d278b1c14fd9f3504424ee62bc18137ce6435c1364d12"
   license "ISC"
 
   bottle do
-    cellar :any
-    sha256 "c1d9c795aa8919edcf17567be2dc5604561b9d5a6596d2ef1ec05051c68915e9" => :big_sur
-    sha256 "401b68d1d6ca95b27fb06ae62d5f03ea1938745976d8de1309e71b0230276e34" => :arm64_big_sur
-    sha256 "112203983307e26b79141bd8886e4bb4e5c5f33fdd240f08d487aed870e0f004" => :catalina
-    sha256 "d5648273485e7cc33aa58186215b39ec7795df427cb5060643029447c8dbc8a1" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "a71bf2beb54a0ec5ef6defe1651d404239b16aa724cfc11e56c7a479dd5afd45"
+    sha256 cellar: :any,                 arm64_big_sur:  "6a982032346aa17ceb4d050e6dd1334a4428039883036758e514f14d6c9b2c6c"
+    sha256 cellar: :any,                 monterey:       "3db74567332ebcf2abe80d544df93b937bdff3ff4a593491265c647c23926aae"
+    sha256 cellar: :any,                 big_sur:        "96f9780c5cb6ee06dbcca4b28eabbc7e92a4ae705db98a3f3ab66366280f1200"
+    sha256 cellar: :any,                 catalina:       "23d79754d2579e0ea0bd2757dbf6f8f47ae2f093dfa54f4869e437f7ee0ab73a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9eff34d53d4a0f794bcd8303ad66ff23056a1a3f89b56bf737dae3689e5cb6f4"
   end
 
   depends_on "libkeccak"
-
-  # remove in next release
-  patch do
-    url "https://github.com/maandree/sha3sum/commit/d01c03c.patch?full_index=1"
-    sha256 "c958d05b67330291c3d14608d1566351e05f23cf3f4fb27186e5e99765ab7dd0"
-  end
 
   def install
     system "make", "install", "PREFIX=#{prefix}"

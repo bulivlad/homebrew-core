@@ -1,10 +1,10 @@
 class Ethereum < Formula
   desc "Official Go implementation of the Ethereum protocol"
-  homepage "https://ethereum.github.io/go-ethereum/"
-  url "https://github.com/ethereum/go-ethereum/archive/v1.9.25.tar.gz"
-  sha256 "d7b733aeef4eba97f5351ba435001fa7365f55adabffdfdda909700335e98b0e"
+  homepage "https://geth.ethereum.org/"
+  url "https://github.com/ethereum/go-ethereum/archive/v1.10.17.tar.gz"
+  sha256 "00db123e1b23d3d904bd8a6bd4de8f3330d14db1622e8f22bf1653c94f03e09c"
   license "LGPL-3.0-or-later"
-  head "https://github.com/ethereum/go-ethereum.git"
+  head "https://github.com/ethereum/go-ethereum.git", branch: "master"
 
   livecheck do
     url :stable
@@ -12,16 +12,20 @@ class Ethereum < Formula
   end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "236e8976bd37896135951f14345d2c431aa30c35c06a8f564ee0d1890dde6e36" => :big_sur
-    sha256 "cb6c2c4ef5992fcd944887052099d846e865b29486152f3eaaaeae7b64a97770" => :arm64_big_sur
-    sha256 "c94e46a6bea15393eb22e15bd4bbbb63cb08db493989b2008aa16c5b9106d3f1" => :catalina
-    sha256 "0f1a9478c1873537097fa246ed25956d606df2b91939bf2d98102a95fcca2b96" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "5f3ee53cb2809f026496cb1dbabb66b27555ce691608166cbdcdcdd15489a6a6"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "bcb07942fddad27093e4b987a30b5b56dc8c5b9421191afb14ea66254d8617db"
+    sha256 cellar: :any_skip_relocation, monterey:       "1645e38df863b085c94e632b1abb53f7b2267199db1c9e700773593650650604"
+    sha256 cellar: :any_skip_relocation, big_sur:        "13a96148a182e46c24082a1c6642f0d232bc5ea570fbd6bbff8ce5752812beae"
+    sha256 cellar: :any_skip_relocation, catalina:       "64b0aa19ed69711f55f819ee135caae41515e32abc3f36aed5e954654d27f2ab"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "eea127fb7cdd35e4d132733832eda9a30ae8e25ad64e5c3e43b41fd5a6f7d743"
   end
 
   depends_on "go" => :build
 
   def install
+    # See https://github.com/golang/go/issues/26487
+    ENV.O0 if OS.linux?
+
     system "make", "all"
     bin.install Dir["build/bin/*"]
   end

@@ -1,8 +1,8 @@
 class Leptonica < Formula
   desc "Image processing and image analysis library"
   homepage "http://www.leptonica.org/"
-  url "http://www.leptonica.org/source/leptonica-1.80.0.tar.gz"
-  sha256 "ec9c46c2aefbb960fb6a6b7f800fe39de48343437b6ce08e30a8d9688ed14ba4"
+  url "http://www.leptonica.org/source/leptonica-1.82.0.tar.gz"
+  sha256 "155302ee914668c27b6fe3ca9ff2da63b245f6d62f3061c8f27563774b8ae2d6"
   license "BSD-2-Clause"
 
   livecheck do
@@ -11,12 +11,13 @@ class Leptonica < Formula
   end
 
   bottle do
-    cellar :any
-    sha256 "7cdcfbb0616b884ace6657b1a009f874ac249bf7c38e08ec8b43217584968e64" => :big_sur
-    sha256 "2d7db56dad646ed732585242e50716dd3152882d16811f72a86de11ea651e0d8" => :arm64_big_sur
-    sha256 "2772ab6d50bb48132db5bf6d2d7b4086058635c060392dc375b23769513ebca7" => :catalina
-    sha256 "b6503796ec87ac555bb4c5278aa3c8bf6b5ef3c88d66da9a040c04e0cafdcade" => :mojave
-    sha256 "01c2fe703b082f830fffec5f1d21d50d41c1c30967cb74e1bc0b744dcb72d50d" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "f42b450f0dcc303c65e30de8ca6639bf5559c416072fe3f95b36bf5bfe0049d1"
+    sha256 cellar: :any,                 arm64_big_sur:  "f0d0cdb312ad51dc498f25765c7f4566e246eb7d74bd7ddc87b9a23f539f0bba"
+    sha256 cellar: :any,                 monterey:       "4eedc66fac0ac4e4f922c318b7de264d3b1af043a23e882867291c8808652468"
+    sha256 cellar: :any,                 big_sur:        "850aac10ef99d81dacea54d7b0f04df1a2058aac792b2649c4ecd91adcf1bbeb"
+    sha256 cellar: :any,                 catalina:       "a758e0b2eb14c548dd87946193185784cdb8d868e0aa17b2426660fad6ecdab2"
+    sha256 cellar: :any,                 mojave:         "8cef538c6bda97b6f8d71010259bced7ae5400f8a02e79e32cec1eee939b1463"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "118d4902ab8357da71a85d4461d460f1db63baed0d50bd717b145c3fd387f47d"
   end
 
   depends_on "pkg-config" => :build
@@ -45,7 +46,7 @@ class Leptonica < Formula
       #include <leptonica/allheaders.h>
 
       int main(int argc, char **argv) {
-          std::fprintf(stdout, "%d.%d.%d", LIBLEPT_MAJOR_VERSION, LIBLEPT_MINOR_VERSION, LIBLEPT_PATCH_VERSION);
+          fprintf(stdout, "%d.%d.%d", LIBLEPT_MAJOR_VERSION, LIBLEPT_MINOR_VERSION, LIBLEPT_PATCH_VERSION);
           return 0;
       }
     EOS

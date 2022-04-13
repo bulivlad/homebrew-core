@@ -7,10 +7,10 @@ class CouchdbLucene < Formula
   revision 2
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "8c75a95f3c1909e99602f51ed4c55fc2eb495910d8772b9b693347c633141715" => :big_sur
-    sha256 "5888b91cbf5c0fe4744ee9f1cf0ca204f9dd89e125a06fc928375b1d2770ae87" => :catalina
-    sha256 "d7e8191c66bc938d7c8e15c10c13612be41ef601f5f6ab78b9ef5275c04bf89d" => :mojave
+    sha256 cellar: :any_skip_relocation, big_sur:      "8c75a95f3c1909e99602f51ed4c55fc2eb495910d8772b9b693347c633141715"
+    sha256 cellar: :any_skip_relocation, catalina:     "5888b91cbf5c0fe4744ee9f1cf0ca204f9dd89e125a06fc928375b1d2770ae87"
+    sha256 cellar: :any_skip_relocation, mojave:       "d7e8191c66bc938d7c8e15c10c13612be41ef601f5f6ab78b9ef5275c04bf89d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux: "0d08b00d0ef852160eb6f5fef96f8cc9387b2fa4c29a792cfe9a13ccdf2d690b"
   end
 
   depends_on "maven" => :build
@@ -59,37 +59,11 @@ class CouchdbLucene < Formula
     EOS
   end
 
-  plist_options manual: "#{HOMEBREW_PREFIX}/opt/couchdb-lucene/bin/cl_run"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN"
-        "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>EnvironmentVariables</key>
-          <dict>
-            <key>HOME</key>
-            <string>~</string>
-          </dict>
-          <key>ProgramArguments</key>
-          <array>
-            <string>#{opt_bin}/cl_run</string>
-          </array>
-          <key>StandardOutPath</key>
-          <string>/dev/null</string>
-          <key>StandardErrorPath</key>
-          <string>/dev/null</string>
-          <key>RunAtLoad</key>
-          <true/>
-          <key>KeepAlive</key>
-          <true/>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run opt_bin/"cl_run"
+    environment_variables HOME: "~"
+    run_type :immediate
+    keep_alive true
   end
 
   test do

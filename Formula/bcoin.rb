@@ -3,27 +3,32 @@ require "language/node"
 class Bcoin < Formula
   desc "Javascript bitcoin library for node.js and browsers"
   homepage "https://bcoin.io"
-  url "https://github.com/bcoin-org/bcoin/archive/v2.1.2.tar.gz"
-  sha256 "b4c63598ee1efc17e4622ef88c1dff972692da1157e8daf7da5ea8abc3d234df"
+  url "https://github.com/bcoin-org/bcoin/archive/v2.2.0.tar.gz"
+  sha256 "fa1a78a73bef5837b7ff10d18ffdb47c0e42ad068512987037a01e8fad980432"
   license "MIT"
-  revision 2
-  head "https://github.com/bcoin-org/bcoin.git"
+  head "https://github.com/bcoin-org/bcoin.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 "18e9b1f2074c5c98b15cb118b72a6104db12e9c80bc56d4c74374d86f394dece" => :big_sur
-    sha256 "f401dfcda058e68165418880973b275201dd372734fb866de7a51f6a48c0e6ce" => :arm64_big_sur
-    sha256 "3f46d506838e38420dc9ed5bd5b8c5c3ae8038bea02fad83f36f1ed36cda9046" => :catalina
-    sha256 "5adbc476b4e3ef00c5e8fe7fc1554a891b4a3b09bd5d318103d0ac44f7540d80" => :mojave
-    sha256 "c4bdb0a86a7fbfce14261af58ab4954c93f2eba09806a6933959fdfe8698878d" => :high_sierra
+    sha256                               arm64_monterey: "0c4f787a2f63c1db4221a17f1c275f31a2649858c9219deefa65c90484e023e7"
+    sha256                               arm64_big_sur:  "f5c6098faf7dba740533388c16d2bcf72e37416d7c5e5bdf6610f67fc85134aa"
+    sha256                               monterey:       "d5fd6c1050ff44c36d79496648630c0ff04e8ee3acf45c97069a360267441073"
+    sha256                               big_sur:        "593c59f9f3e790c1736093490ac0586d6b46e1672f450d3b8b5b32547c86a951"
+    sha256                               catalina:       "3e55360c62032fafb4590bd3b80d6cd2cb84ac49737ec129199417db39dfd6cf"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ac2900d97c5844734f8bb79f41c30d0eb3a482349da8d0c6e1d3542d8a5800ca"
   end
 
-  depends_on "python@3.9" => :build
-  depends_on "node"
+  depends_on "python@3.10" => :build
+  depends_on "node@16"
+
+  def node
+    deps.reject(&:build?)
+        .map(&:to_formula)
+        .find { |f| f.name.match?(/^node(@\d+(\.\d+)*)?$/) }
+  end
 
   def install
-    system "#{Formula["node"].libexec}/bin/npm", "install", *Language::Node.std_npm_install_args(libexec)
-    (bin/"bcoin").write_env_script libexec/"bin/bcoin", PATH: "#{Formula["node"].opt_bin}:$PATH"
+    system "npm", "install", *Language::Node.std_npm_install_args(libexec)
+    (bin/"bcoin").write_env_script libexec/"bin/bcoin", PATH: "#{node.opt_bin}:$PATH"
   end
 
   test do
@@ -40,7 +45,7 @@ class Bcoin < Formula
         await node.ensure();
       })();
     EOS
-    system "#{Formula["node"].bin}/node", testpath/"script.js"
-    assert_true File.directory?("#{testpath}/.bcoin")
+    system "#{node.opt_bin}/node", testpath/"script.js"
+    assert File.directory?("#{testpath}/.bcoin")
   end
 end

@@ -4,7 +4,18 @@ class JbossForge < Formula
   url "https://downloads.jboss.org/forge/releases/3.9.8.Final/forge-distribution-3.9.8.Final-offline.zip"
   sha256 "a08387f2d7010ac34e13593707d4d93a135a6e3b42cbe78ebcdae4ef3e5c0bf2"
 
-  bottle :unneeded
+  # The first-party download page (https://forge.jboss.org/download) uses
+  # JavaScript to render the download links and the version information comes
+  # from the /api/metadata endpoint in JSON format.
+  livecheck do
+    url "https://forge.jboss.org/api/metadata"
+    regex(/["']latestVersion["']:\s*["']([^"']+?)["']/i)
+  end
+
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "d7570b0c75b054635f6718eb8eab0702fcde155bb94f460c85d4c667adda953c"
+  end
 
   depends_on "openjdk"
 

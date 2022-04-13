@@ -3,19 +3,20 @@ class YoutubeDl < Formula
 
   desc "Download YouTube videos from the command-line"
   homepage "https://youtube-dl.org/"
-  url "https://files.pythonhosted.org/packages/0c/d7/dab57dd6384db36a9a2752307b321c0719297ea1ee21b17b55cd6a714dd9/youtube_dl-2021.1.8.tar.gz"
-  sha256 "1a216c0172b145e7231e8f87f66dc914dce996f993920857b77996fa04e6290c"
+  url "https://files.pythonhosted.org/packages/01/4f/ab0d0806f4d818168d0ec833df14078c9d1ddddb5c42fa7bfb6f15ecbfa7/youtube_dl-2021.12.17.tar.gz"
+  sha256 "bc59e86c5d15d887ac590454511f08ce2c47698d5a82c27bfe27b5d814bbaed2"
   license "Unlicense"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "71cfc3dd72360d9f1dabc947df11ad92ce9ac4f11d989203ca7dcaf48b2e6905" => :big_sur
-    sha256 "5830a74e0fad078e68c5866deea607846bd70b1e7c47d430a19eeaf625e97170" => :arm64_big_sur
-    sha256 "32cde0c3e4e40469eae6005df8e3f65fe0aa44aa69a65bb20e422d479571f560" => :catalina
-    sha256 "be97c9636cc7faeaf814ec4332bd09c53d7833e2fdd912037542e5c99f32b37c" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "79bc7ca875b43074c1a7097674b900835c5358e80d81a177b1eecf0e69b77a7a"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "79bc7ca875b43074c1a7097674b900835c5358e80d81a177b1eecf0e69b77a7a"
+    sha256 cellar: :any_skip_relocation, monterey:       "a8da6929ac2005f3bf5e004ccd1f860c6368cc49ea4d4846a0b902d21cc0cb7b"
+    sha256 cellar: :any_skip_relocation, big_sur:        "a8da6929ac2005f3bf5e004ccd1f860c6368cc49ea4d4846a0b902d21cc0cb7b"
+    sha256 cellar: :any_skip_relocation, catalina:       "a8da6929ac2005f3bf5e004ccd1f860c6368cc49ea4d4846a0b902d21cc0cb7b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1d96e5082a83cd8d333f72f40592ff577a4c4ccf4e654ddf2c3e38fccbb5c1f9"
   end
 
-  depends_on "python@3.9"
+  depends_on "python@3.10"
 
   def install
     virtualenv_install_with_resources

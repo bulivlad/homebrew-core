@@ -1,20 +1,15 @@
 class EasyTag < Formula
   desc "Application for viewing and editing audio file tags"
-  homepage "https://projects.gnome.org/easytag"
+  homepage "https://wiki.gnome.org/Apps/EasyTAG"
   url "https://download.gnome.org/sources/easytag/2.4/easytag-2.4.3.tar.xz"
   sha256 "fc51ee92a705e3c5979dff1655f7496effb68b98f1ada0547e8cbbc033b67dd5"
-  revision 5
-
-  livecheck do
-    url :stable
-  end
+  license "GPL-2.0-or-later"
+  revision 6
 
   bottle do
-    sha256 "0f5db8b133620eeea75819572f9bb644ad42c0608ca72a1e0972fa87e791eab8" => :big_sur
-    sha256 "d710681540b59898e8eb6560a5970ba0862d726f47b4ea2f2deda97d199ca619" => :arm64_big_sur
-    sha256 "cf6e6683991f2aaf8072b3ff0ab1c645ecf189ca009787ed179022d65d8111e4" => :catalina
-    sha256 "bc97c0feed958d5af987bf691e669e4e358d06f072568e5c68eb746a852a7bdb" => :mojave
-    sha256 "7e95b30ce2c317eb3ced35ae007d3396e4f3e0dfada0a88914695341ecd03c83" => :high_sierra
+    sha256 arm64_big_sur: "8a1cef2c91b3216179ce0eb8ace40e845c2956bb08602747d9c4b433b8c138e2"
+    sha256 big_sur:       "f10db53f7c6852dc2d83920c64b5166612b7ebfcfd8b8789228bcc2917b183c4"
+    sha256 catalina:      "cf12b241113c19be8fb1b91871d0428f29c9d4e39066c5fd0c197bba1f12088a"
   end
 
   depends_on "intltool" => :build

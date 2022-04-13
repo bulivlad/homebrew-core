@@ -2,19 +2,25 @@ require "language/node"
 
 class Copilot < Formula
   desc "CLI tool for Amazon ECS and AWS Fargate"
-  homepage "https://github.com/aws/copilot-cli/wiki"
+  homepage "https://aws.github.io/copilot-cli/"
   url "https://github.com/aws/copilot-cli.git",
-      tag:      "v1.0.0",
-      revision: "238fd708679d4534b2f4c58cc3b7a85e6e1a768d"
+      tag:      "v1.17.0",
+      revision: "1fdcfc0e187e34ea8135f6d6b48e3cd9508a2afa"
   license "Apache-2.0"
-  head "https://github.com/aws/copilot-cli.git"
+  head "https://github.com/aws/copilot-cli.git", branch: "mainline"
+
+  livecheck do
+    url :stable
+    strategy :github_latest
+  end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "00d35d5ada87fda4b7c2cdef4da58e9a026e1a3e942dc30b575cbd8d3a8260e6" => :big_sur
-    sha256 "482aa57df717ff9fbbbdea49c8ddb507f7d507121a0cdfa3a7a97d6c63957ee7" => :arm64_big_sur
-    sha256 "fc8ad0a5cbb32d5c68fa2e2e20e0fd57aa7d93b0a866329e36b7887947d845aa" => :catalina
-    sha256 "c90fa63256de5549f88b3f0fe88b3c3def47866bf5999a71b0fc5e9f7eeee690" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "c3f369c5bcdd2d1ff087d015b7f73788dc2627c2cd81d27ff9bddb703e66056e"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "0783ae060b8769e25cae69e88766a1f7024e1e613026e60871fbcd4c91d7712d"
+    sha256 cellar: :any_skip_relocation, monterey:       "bed82c4288667474b988c67344b75f47237e6246fcd4c789ad7f543336717800"
+    sha256 cellar: :any_skip_relocation, big_sur:        "7d19bbe51eb6377befc401149853a25e2ad4440a906b8f14b4f54776e332cc9b"
+    sha256 cellar: :any_skip_relocation, catalina:       "630ce334911241089ad92a9f478350422242a617739e6ac2348e6fe0a434827f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6095ac78955d7249b6f733852cc9fd442e2e13cf97d78e0f3d3b9787e943bb4b"
   end
 
   depends_on "go" => :build
@@ -29,18 +35,25 @@ class Copilot < Formula
 
     bin.install "bin/local/copilot"
 
-    output = Utils.safe_popen_read({ "SHELL" => "bash" }, "#{bin}/copilot", "completion", "bash")
+    output = Utils.safe_popen_read(bin/"copilot", "completion", "bash")
     (bash_completion/"copilot").write output
 
-    output = Utils.safe_popen_read({ "SHELL" => "zsh" }, "#{bin}/copilot", "completion", "zsh")
+    output = Utils.safe_popen_read(bin/"copilot", "completion", "zsh")
     (zsh_completion/"_copilot").write output
+
+    output = Utils.safe_popen_read(bin/"copilot", "completion", "fish")
+    (fish_completion/"copilot.fish").write output
   end
 
   test do
-    assert_match "Welcome to the Copilot CLI! We're going to walk you through some questions",
-      shell_output("#{bin}/copilot init 2>&1", 1)
+    begin
+      _, stdout, wait_thr = Open3.popen2("AWS_REGION=eu-west-1 #{bin}/copilot init 2>&1")
+      assert_match "Note: It's best to run this command in the root of your Git repository.", stdout.gets("\n")
+    ensure
+      Process.kill 9, wait_thr.pid
+    end
 
-    assert_match "list environments for application : MissingRegion: could not find region",
-      shell_output("#{bin}/copilot pipeline init 2>&1", 1)
+    assert_match "could not find an application attached to this workspace, please run `app init` first",
+      shell_output("AWS_REGION=eu-west-1 #{bin}/copilot pipeline init 2>&1", 1)
   end
 end

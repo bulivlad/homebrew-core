@@ -1,21 +1,21 @@
 class Sniffglue < Formula
   desc "Secure multithreaded packet sniffer"
   homepage "https://github.com/kpcyrd/sniffglue"
-  url "https://github.com/kpcyrd/sniffglue/archive/v0.11.1.tar.gz"
-  sha256 "f3d4a42ee12113ef82a8033bb0d64359af5425c821407a7469e99c7a5af3186d"
+  url "https://github.com/kpcyrd/sniffglue/archive/v0.15.0.tar.gz"
+  sha256 "ac30c0748a4247d2a36b82d623e88863480c300d3f6bbbdc303077240a8292c5"
   license "GPL-3.0-or-later"
 
   bottle do
-    cellar :any_skip_relocation
-    rebuild 1
-    sha256 "6c3bc15a04988b962743d108c67f28293829f96184e4c9d68e7a6e90bd0baa9c" => :big_sur
-    sha256 "b461513034c9943c75eb70a7b23f0fdf4386760716a893e9b86cd81f3c637d4b" => :arm64_big_sur
-    sha256 "3c1e6e2eca7f6441d0c892089bd46c8451dd5fa3b1f42350b05592bb7fef06b7" => :catalina
-    sha256 "b781fc29156663e2b55f1fcb2a8647cf2eb2d452d43767c50ed9b57e88d92ff2" => :mojave
-    sha256 "ad3744f7f3da5f36683cb16d0dbb3a5eaf0773cb59400eb972de68f12d999bb5" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "72e503d05f93135533908160fd5177dfc127ace77105b1bb3f6cfbc07d14d8a3"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "18cd8994cafdd4f65c8a3d8256a1bbfcd7b14509c80957c2cff317f08304e439"
+    sha256 cellar: :any_skip_relocation, monterey:       "f06a73defd5704e2456c383969d10d5676fb90b1563b581701f7aa6bcd7cc32a"
+    sha256 cellar: :any_skip_relocation, big_sur:        "7015cb6764ad2920116a4ff4d163450bc23475cb5554c1835e0c09abab350769"
+    sha256 cellar: :any_skip_relocation, catalina:       "516c6d7ee05760c06cd9418a19107de3612eebf6196dc8f5efdf2f805e7a5fa8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b67998a0546e7c4c19810d9f9b940ec15b4ff9206d18f2606d594cd41efa372a"
   end
 
   depends_on "rust" => :build
+  depends_on "scdoc" => :build
 
   uses_from_macos "libpcap"
 
@@ -23,20 +23,21 @@ class Sniffglue < Formula
     depends_on "libseccomp"
   end
 
-  resource "testdata" do
+  resource "homebrew-testdata" do
     url "https://github.com/kpcyrd/sniffglue/raw/163ca299bab711fb0082de216d07d7089c176de6/pcaps/SkypeIRC.pcap"
     sha256 "bac79a9c3413637f871193589d848697af895b7f2700d949022224d59aa6830f"
   end
 
   def install
     system "cargo", "install", *std_cargo_args
+    system "make", "docs"
 
     etc.install "sniffglue.conf"
     man1.install "docs/sniffglue.1"
   end
 
   test do
-    testpath.install resource("testdata")
-    system "#{bin}/sniffglue", "-r", "SkypeIRC.pcap"
+    testpath.install resource("homebrew-testdata")
+    system bin/"sniffglue", "-r", "SkypeIRC.pcap"
   end
 end

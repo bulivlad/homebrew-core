@@ -1,14 +1,21 @@
 class Pycodestyle < Formula
+  include Language::Python::Shebang
+
   desc "Simple Python style checker in one Python file"
   homepage "https://pycodestyle.pycqa.org/"
-  url "https://github.com/PyCQA/pycodestyle/archive/2.6.0.tar.gz"
-  sha256 "08347fbc48cc92afd33117c1e8af9b99b292a4e5889f6b776f402e062fc39c97"
+  url "https://github.com/PyCQA/pycodestyle/archive/2.8.0.tar.gz"
+  sha256 "9116bd3686beaa22be34be1e5259fb9eecbf246a3991849d33ff6ab07d52f86e"
   license "MIT"
-  head "https://github.com/PyCQA/pycodestyle.git"
+  head "https://github.com/PyCQA/pycodestyle.git", branch: "master"
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any_skip_relocation, all: "7b5d9577c8a3c826bb9f24e170bf7bf64a402b54181a98af3eeb6bdf83399150"
+  end
+
+  depends_on "python@3.10"
 
   def install
+    rewrite_shebang detected_python_shebang, "pycodestyle.py"
     bin.install "pycodestyle.py" => "pycodestyle"
   end
 

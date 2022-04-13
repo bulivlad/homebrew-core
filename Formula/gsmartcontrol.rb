@@ -1,19 +1,17 @@
 class Gsmartcontrol < Formula
   desc "Graphical user interface for smartctl"
   homepage "https://gsmartcontrol.sourceforge.io"
-  url "https://downloads.sourceforge.net/project/gsmartcontrol/1.1.3/gsmartcontrol-1.1.3.tar.bz2"
-  sha256 "b64f62cffa4430a90b6d06cd52ebadd5bcf39d548df581e67dfb275a673b12a9"
-  revision 8
-
-  livecheck do
-    url :stable
-  end
+  url "https://downloads.sourceforge.net/project/gsmartcontrol/1.1.4/gsmartcontrol-1.1.4.tar.bz2"
+  sha256 "fc409f2b8a84cc40bb103d6c82401b9d4c0182d5a3b223c93959c7ad66191847"
+  license any_of: ["GPL-2.0", "GPL-3.0"]
 
   bottle do
-    sha256 "a7edc375fddc2f1bd0a0ef54579aebb80941b51ce0b16d6dc0e6e174b894376b" => :big_sur
-    sha256 "87f1f004a8d37328c3a246bd66a3338ad14247ed38f7c7e75c5f8e274795b610" => :arm64_big_sur
-    sha256 "013dc10e96aee3db96ad08f2b460839cd1c2afa7440965b0f64f12dda5dd1728" => :catalina
-    sha256 "1fd22b0404a9b3da97aa728c6421340380d271d708c0c15734eadcf82bde6410" => :mojave
+    sha256 arm64_monterey: "1e638dd71d7ddc505c114a12ee172019e76b5ea5e887d3dd699029da4f575d64"
+    sha256 arm64_big_sur:  "8ec9da219ebbd29a27c12d64733f54c978772403eced3eff0e716fcd2a27b142"
+    sha256 monterey:       "9d91be56a57124bd9ccaa72fe221c6d84cb9a718b01d48b5619f0671e3aa0a78"
+    sha256 big_sur:        "9113d814ff679e418fa8df8805149a8194e7235662093bc8509229ecb739d240"
+    sha256 catalina:       "f70423df2f81d5cf77155c4c81925aaa6c70864164c01d34b9d77e0c90ec8133"
+    sha256 x86_64_linux:   "c8c73de1f4753da98c34ebb9d57944850d7d9fc1f7b79b8ffd12fedebad049b2"
   end
 
   depends_on "pkg-config" => :build

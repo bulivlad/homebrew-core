@@ -1,25 +1,27 @@
 class Angband < Formula
   desc "Dungeon exploration game"
-  homepage "https://rephial.org/"
-  url "https://rephial.org/downloads/4.2/angband-4.2.1.tar.gz"
-  sha256 "acd735c9d46bf86ee14337c71c56f743ad13ec2a95d62e7115604621e7560d0f"
-  license "GPL-2.0"
-  head "https://github.com/angband/angband.git"
+  homepage "https://angband.github.io/angband/"
+  url "https://github.com/angband/angband/releases/download/4.2.4/Angband-4.2.4.tar.gz"
+  sha256 "a07c78c1dd05e48ddbe4d8ef5d1880fcdeab55fd05f1336d9cba5dd110b15ff3"
+  license "GPL-2.0-only"
+  head "https://github.com/angband/angband.git", branch: "master"
 
-  bottle do
-    sha256 "ed5e9c7b858074dbb7bea12199e8a326cd61e0335fb268e0d88894609995c88d" => :big_sur
-    sha256 "156672377070d2d66c338e5ebc9e6a3ea0afd544a1da97f9ef35cdd2b0a859cc" => :arm64_big_sur
-    sha256 "b59aedacab5c3588719bfc1ebc17b936ffe5105ed8e7edd19caccc340a81271f" => :catalina
-    sha256 "96f6f2e31023c69aba44c4ccc40acf652d5a76bbd1b9cd6a7ebead33a0a2161e" => :mojave
-    sha256 "95463908fbefe4988a9ab3dcc031cd1c7d6767ed6557d1baca813446e5ca6b9c" => :high_sierra
+  livecheck do
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
-  depends_on "autoconf" => :build
-  depends_on "automake" => :build
+  bottle do
+    sha256 arm64_monterey: "a35fe8d9924485cd51dceb3ba4cd1c915bfc65b6b1bd8eb7f67a9fc5e505fe42"
+    sha256 arm64_big_sur:  "94495ff709647df63efa6c16f22f5be1de4ac52c404047fadcbb08a4aef55a3e"
+    sha256 monterey:       "b68729b3a66c3c3f4777af5e5abf53752a192773f5c2f9a2ef9dea5844e95808"
+    sha256 big_sur:        "925eb3391381b336266c068b43779d7ebfd22aba15a9e61fba4b853cba4dc624"
+    sha256 catalina:       "f34102aa4cd0341970481bbca15a98de6021d68b493c5e9ba4f882a79745e5c3"
+    sha256 x86_64_linux:   "3cfa3f60f7b88f2aa13cbbcae6b90e0aec128f5aef92e49c2860e61075c32af3"
+  end
 
   def install
     ENV["NCURSES_CONFIG"] = "#{MacOS.sdk_path}/usr/bin/ncurses5.4-config"
-    system "./autogen.sh"
     system "./configure", "--prefix=#{prefix}",
                           "--bindir=#{bin}",
                           "--libdir=#{libexec}",

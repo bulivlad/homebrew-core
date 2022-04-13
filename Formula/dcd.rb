@@ -2,23 +2,32 @@ class Dcd < Formula
   desc "Auto-complete program for the D programming language"
   homepage "https://github.com/dlang-community/DCD"
   url "https://github.com/dlang-community/DCD.git",
-      tag:      "v0.13.1",
-      revision: "92db0486968f8ee59c16099c21b133dc4e9d91cb"
+      tag:      "v0.13.6",
+      revision: "02acaa534b9be65142aed7b202a6a8d5524abf2a"
   license "GPL-3.0-or-later"
-  head "https://github.com/dlang-community/dcd.git", shallow: false
+  head "https://github.com/dlang-community/dcd.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "662c67e1be52c8a7421e8cd79e3a407e1d1c163e706db86729e0a01fd3f32bb8" => :big_sur
-    sha256 "cb5a1d6c16b9e7a63583f65ef8eea364291b847897e53c7bf2b5533f1965477b" => :catalina
-    sha256 "13afc1eaa6e87e1a37eb80d9eef2febdc9a91b7cb7b68a4ba438a48c29e66776" => :mojave
-    sha256 "b72aa14601e382ab8ea67593dc0b365f7006a7d447291a8314af0bd47906e1ff" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "56500aa45f06a73e05c97dc0162ded325510615148e59cda54ef9e9187951a39"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "7e2b6351728ee0dad099824dd51e31042a3f66f3e66695063530e115e1e3e44e"
+    sha256 cellar: :any_skip_relocation, monterey:       "9e223a3fef8a39d75bbec9012bfa534d50772aa2d536857160c39221fe08f5bb"
+    sha256 cellar: :any_skip_relocation, big_sur:        "e97405796485c96ea4dd9f7458cd548ed609f61ed8d5e006fb73ec00072d0811"
+    sha256 cellar: :any_skip_relocation, catalina:       "1455dd1a3d4919d261c6cc8a73d05f62f4436f17b66d8790db249bcf4fbdcc6f"
+    sha256 cellar: :any_skip_relocation, mojave:         "484f3c51a322172c8bab3cfa850685f91ce9dfdcccc85daeedead97cc63f13e1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "58b613aa6a40fb855b592944f97bc7d66cbf87ee30e2243fd4e1551536b02d4f"
   end
 
-  depends_on "dmd" => :build
+  on_macos do
+    depends_on "ldc" => :build
+  end
+
+  on_linux do
+    depends_on "dmd" => :build
+  end
 
   def install
-    system "make"
+    target = OS.mac? ? "ldc" : "dmd"
+    system "make", target
     bin.install "bin/dcd-client", "bin/dcd-server"
   end
 

@@ -1,43 +1,22 @@
 class Emacs < Formula
   desc "GNU Emacs text editor"
   homepage "https://www.gnu.org/software/emacs/"
+  url "https://ftp.gnu.org/gnu/emacs/emacs-28.1.tar.xz"
+  mirror "https://ftpmirror.gnu.org/emacs/emacs-28.1.tar.xz"
+  sha256 "28b1b3d099037a088f0a4ca251d7e7262eab5ea1677aabffa6c4426961ad75e1"
   license "GPL-3.0-or-later"
 
-  stable do
-    url "https://ftp.gnu.org/gnu/emacs/emacs-27.1.tar.xz"
-    mirror "https://ftpmirror.gnu.org/emacs/emacs-27.1.tar.xz"
-    sha256 "4a4c128f915fc937d61edfc273c98106711b540c9be3cd5d2e2b9b5b2f172e41"
-
-    # The emacs binary is patched with a signature after linking. This invalidates the code
-    # signature. Code signing is required on Apple Silicon. This patch adds a step to resign
-    # the binary after it is patched.
-    patch do
-      url "https://github.com/emacs-mirror/emacs/commit/868f51324ac96bc3af49a826e1db443548c9d6cc.patch?full_index=1"
-      sha256 "d2b19fcca66338d082c15fa11d57abf7ad6b40129478bef4c6234c19966db988"
-    end
-
-    # Back-ported patch for configure and configure.guess to allow configure to complete
-    # for aarch64-apple-darwin targets.
-    patch do
-      url "https://raw.githubusercontent.com/Homebrew/formula-patches/25c1e1797d4004a9e5b9453779399afc63d04b97/emacs/arm.patch"
-      sha256 "5f812fc413b722e294c7f7abd38f3a9bbda84ec68537cea42900a81e57c7ecb1"
-    end
-  end
-
-  livecheck do
-    url :stable
-  end
-
   bottle do
-    sha256 "054fd70aa5e4c6bf44b5f37d965e49f415abaf7a94566ad1ac89780256537bee" => :big_sur
-    sha256 "023b96fbdb0ebcb6b43173bed52fe6d67068b76994d0d4f2843cbdbe794005a8" => :arm64_big_sur
-    sha256 "6586559b5aa8c51ce6cc7738abe4796ef7e803ab3389dc2e30eda7bb5e46b85d" => :catalina
-    sha256 "6704d9430ac4b602a5dc7046f845d8b93d00cb509fc70244403f14af6c97bc3b" => :mojave
-    sha256 "a4808d9f5433bcc9512ae4c62dba04b7954a1c0ee47e01b34ba5a401f227f375" => :high_sierra
+    sha256 arm64_monterey: "5d5b7979695c455cd0a9155c839ad8781633946801f49e380eb08eff61360a9d"
+    sha256 arm64_big_sur:  "7d92995b203d41d78f20bf1684f84dd07309f65dbfb1cdb4924be51210f61b63"
+    sha256 monterey:       "88cc27885119741d9721968636687d2ca9be3d7ebd8c2e5b2cf83c3bf8d5e878"
+    sha256 big_sur:        "fb1317cd13820dd4ebee6b7ba7196bb3486bc1636f4dde79e73b3533bd94d7d8"
+    sha256 catalina:       "7b4630d3158d31b3db01c16c45e9a62a4b6a219dcde1d7fe952718a16f7538a6"
+    sha256 x86_64_linux:   "0cd470905fed77977b8df909c0f1d4fc80b230207857bd79cb940d156d09eabb"
   end
 
   head do
-    url "https://github.com/emacs-mirror/emacs.git"
+    url "https://github.com/emacs-mirror/emacs.git", branch: "master"
 
     depends_on "autoconf" => :build
     depends_on "gnu-sed" => :build
@@ -56,6 +35,11 @@ class Emacs < Formula
   end
 
   def install
+    # Mojave uses the Catalina SDK which causes issues like
+    # https://github.com/Homebrew/homebrew-core/issues/46393
+    # https://github.com/Homebrew/homebrew-core/pull/70421
+    ENV["ac_cv_func_aligned_alloc"] = "no" if MacOS.version == :mojave
+
     args = %W[
       --disable-silent-rules
       --enable-locallisppath=#{HOMEBREW_PREFIX}/share/emacs/site-lisp
@@ -68,6 +52,7 @@ class Emacs < Formula
       --with-modules
       --without-ns
       --without-imagemagick
+      --without-selinux
     ]
 
     if build.head?
@@ -93,28 +78,9 @@ class Emacs < Formula
     (man1/"ctags.1.gz").unlink
   end
 
-  plist_options manual: "emacs"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-      <dict>
-        <key>KeepAlive</key>
-        <true/>
-        <key>Label</key>
-        <string>#{plist_name}</string>
-        <key>ProgramArguments</key>
-        <array>
-          <string>#{opt_bin}/emacs</string>
-          <string>--fg-daemon</string>
-        </array>
-        <key>RunAtLoad</key>
-        <true/>
-      </dict>
-      </plist>
-    EOS
+  service do
+    run [opt_bin/"emacs", "--fg-daemon"]
+    keep_alive true
   end
 
   test do

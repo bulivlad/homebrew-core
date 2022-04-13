@@ -1,75 +1,57 @@
 class Daq < Formula
   desc "Network intrusion prevention and detection system"
   homepage "https://www.snort.org/"
-  url "https://www.snort.org/downloads/snort/daq-2.0.7.tar.gz"
-  mirror "https://fossies.org/linux/misc/daq-2.0.7.tar.gz"
-  sha256 "bdc4e5a24d1ea492c39ee213a63c55466a2e8114b6a9abed609927ae13a7705e"
-
-  livecheck do
-    url "https://www.snort.org/downloads"
-    regex(/id=["']?snort_stable_version["']?.*?href=.*?daq[._-]v?(\d+(?:\.\d+)+)\.t/im)
-  end
+  url "https://github.com/snort3/libdaq/archive/v3.0.6.tar.gz"
+  mirror "https://fossies.org/linux/misc/libdaq-3.0.6.tar.gz"
+  sha256 "08455b2f09dd4b83067810464a98d25e644383375156f8be0c52ca5b5331350e"
+  license "GPL-2.0-only"
+  head "https://github.com/snort3/libdaq.git", branch: "master"
 
   bottle do
-    cellar :any
-    sha256 "97b4ba11a541dc9720410792b363be14a190e5fbdb4f7ed473aef94f99dc0751" => :big_sur
-    sha256 "3b1f25eab6e2c04f4b5e609a1d3e72c3eb55eb12d4a7acb61f43ae815bd10347" => :catalina
-    sha256 "8d57a1f8536259612d6ce312b54a96e8d0fd5527000593d11765baf095d1fd2d" => :mojave
-    sha256 "861fbfd197f0cef898687b427cfa259d6dbf15b2eace0036477910177b8c4c16" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "d9b3ee5412c02960d47e7ec751a77cb7db4c90248e8d0acc86b5109706b94d9a"
+    sha256 cellar: :any,                 arm64_big_sur:  "de7c31db17594cfe76b75b247959bd6771c1deacdd4c170e227e88745ecdf350"
+    sha256 cellar: :any,                 monterey:       "7f3cc6fc33f45e6f30fb87be6687d85f137b0e2b0e23144e67c0d72f040c9adb"
+    sha256 cellar: :any,                 big_sur:        "b19e476f082f9e81038faa89b6f949b382bcac25a688325e5e28973b7367376d"
+    sha256 cellar: :any,                 catalina:       "0b3e1622d7fa64426a06b9d9e2055a4a54c06cd4027a9ea3621eacda242c380e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0c90c7b2ca952f926fd80f70612b1b1084fed2cfddc08634266e628ede24ea15"
   end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
+  depends_on "pkg-config" => :build
 
-  uses_from_macos "bison" => :build
-  uses_from_macos "flex" => :build
   uses_from_macos "libpcap"
 
-  # libpcap on >= 10.12 has pcap_lib_version() instead of pcap_version
-  # Reported 8 Oct 2017 to bugs AT snort DOT org
-  patch :p0, :DATA if MacOS.version >= :sierra
-
   def install
-    rm_f "./configure"
-    system "autoreconf", "-fiv"
-
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}"
-    ENV.deparallelize { system "make", "install" }
+    system "./bootstrap"
+    system "./configure", *std_configure_args, "--disable-silent-rules"
+    system "make", "install"
   end
 
   test do
     (testpath/"test.c").write <<~EOS
-      #include <daq.h>
+      #include <assert.h>
       #include <stdio.h>
+      #include <daq.h>
+      #include <daq_module_api.h>
+
+      extern const DAQ_ModuleAPI_t pcap_daq_module_data;
+      static DAQ_Module_h static_modules[] = { &pcap_daq_module_data, NULL };
 
       int main()
       {
-        DAQ_Module_Info_t* list;
-        int size = daq_get_module_list(&list);
-        daq_free_module_list(list, size);
+        int rval = daq_load_static_modules(static_modules);
+        assert(rval == 1);
+        DAQ_Module_h module = daq_modules_first();
+        assert(module != NULL);
+        printf("[%s] - Type: 0x%x", daq_module_get_name(module), daq_module_get_type(module));
+        module = daq_modules_next();
+        assert(module == NULL);
         return 0;
       }
     EOS
-    system ENV.cc, "test.c", "-L#{lib}", "-ldaq", "-o", "test"
-    system "./test"
+    system ENV.cc, "test.c", "-L#{lib}", "-ldaq", "-ldaq_static_pcap", "-lpcap", "-lpthread", "-o", "test"
+    assert_match "[pcap] - Type: 0xb", shell_output("./test")
   end
 end
-
-__END__
---- ./m4/sf.m4
-+++ ./m4/sf.m4
-@@ -141,10 +141,9 @@
-     [[
-     #include <pcap.h>
-     #include <string.h>
--    extern char pcap_version[];
-     ]],
-     [[
--        if (strcmp(pcap_version, $1) < 0)
-+        if (strcmp(pcap_lib_version(), $1) < 0)
-             return 1;
-     ]])],
-     [daq_cv_libpcap_version_1x="yes"],

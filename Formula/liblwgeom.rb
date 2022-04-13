@@ -3,16 +3,19 @@ class Liblwgeom < Formula
   homepage "https://postgis.net/"
   url "https://download.osgeo.org/postgis/source/postgis-2.5.4.tar.gz"
   sha256 "146d59351cf830e2a2a72fa14e700cd5eab6c18ad3e7c644f57c4cee7ed98bbe"
+  license "GPL-2.0-or-later"
   revision 1
-  head "https://git.osgeo.org/gitea/postgis/postgis.git"
+  head "https://git.osgeo.org/gitea/postgis/postgis.git", branch: "master"
 
   bottle do
-    cellar :any
     rebuild 1
-    sha256 "e28a391dfb1ccf34656e8169d5eda63bb96c7693508429f7c22b47add8a8bd47" => :big_sur
-    sha256 "4f8f0403e973d5e2eafb1b3d49deae54a3cb95a80dc42c50f1f28edcc73da0d8" => :arm64_big_sur
-    sha256 "cd5a31ea1b30721f36fcd64285b3150667c4cf30a148ffafa88d4e5c81456f45" => :catalina
-    sha256 "79247efadb38c42e631ceeb750a8379fd68a2a5c720ec265f8f11502764be46b" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "c6e2f39f90827be84a17c7a1bfd7c0043bf3f0a433bfc1e38e2d9094028caad1"
+    sha256 cellar: :any,                 arm64_big_sur:  "4f8f0403e973d5e2eafb1b3d49deae54a3cb95a80dc42c50f1f28edcc73da0d8"
+    sha256 cellar: :any,                 monterey:       "fe6ef90e0a9026b59e89684f49ad9ddcb25a06fff022168b0b8f1f8d10a92bb7"
+    sha256 cellar: :any,                 big_sur:        "e28a391dfb1ccf34656e8169d5eda63bb96c7693508429f7c22b47add8a8bd47"
+    sha256 cellar: :any,                 catalina:       "cd5a31ea1b30721f36fcd64285b3150667c4cf30a148ffafa88d4e5c81456f45"
+    sha256 cellar: :any,                 mojave:         "79247efadb38c42e631ceeb750a8379fd68a2a5c720ec265f8f11502764be46b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9797785b01201a7eb6c4a2d5ba50e98c0b1c0b89e1671fd5914014a25c90b058"
   end
 
   keg_only "conflicts with PostGIS, which also installs liblwgeom.dylib"
@@ -20,7 +23,7 @@ class Liblwgeom < Formula
   # See details in https://github.com/postgis/postgis/pull/348
   deprecate! date: "2020-11-23", because: "liblwgeom headers are not installed anymore, use librttopo instead"
 
-  depends_on "autoconf" => :build
+  depends_on "autoconf@2.69" => :build
   depends_on "automake" => :build
   depends_on "gpp" => :build
   depends_on "libtool" => :build
@@ -28,7 +31,7 @@ class Liblwgeom < Formula
 
   depends_on "geos"
   depends_on "json-c"
-  depends_on "proj"
+  depends_on "proj@7"
 
   uses_from_macos "libxml2"
 
@@ -40,7 +43,7 @@ class Liblwgeom < Formula
       "--disable-dependency-tracking",
       "--disable-nls",
 
-      "--with-projdir=#{Formula["proj"].opt_prefix}",
+      "--with-projdir=#{Formula["proj@7"].opt_prefix}",
       "--with-jsondir=#{Formula["json-c"].opt_prefix}",
 
       # Disable extraneous support
@@ -73,7 +76,7 @@ class Liblwgeom < Formula
         return 0;
       }
     EOS
-    system ENV.cc, "test.c", "-I#{include}", "-I#{Formula["proj"].opt_include}",
+    system ENV.cc, "test.c", "-I#{include}", "-I#{Formula["proj@7"].opt_include}",
                    "-L#{lib}", "-llwgeom", "-o", "test"
     system "./test"
   end

@@ -1,32 +1,24 @@
 class Miller < Formula
   desc "Like sed, awk, cut, join & sort for name-indexed data such as CSV"
   homepage "https://github.com/johnkerl/miller"
-  url "https://github.com/johnkerl/miller/releases/download/v5.10.0/mlr-5.10.0.tar.gz"
-  sha256 "1e964a97ee0333a57966a2e8d1913aebc28875e9bee3effbbc51506ca5389200"
+  url "https://github.com/johnkerl/miller/releases/download/v6.2.0/miller-6.2.0.tar.gz"
+  sha256 "da26531fe9bca1c1917ea41dd1f1d7338c61f50275ad3ea41d3bc4685da34687"
   license "BSD-2-Clause"
-  head "https://github.com/johnkerl/miller.git"
+  head "https://github.com/johnkerl/miller.git", branch: "main"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "5b19f1751ba3d39d94c371443583a2fd53b035e93c4ffdd8432e6c978ba43601" => :big_sur
-    sha256 "6549e28916d341df56a77990fdd06aa3120821447d12614e233b60b6019b4343" => :arm64_big_sur
-    sha256 "d806164692bbe7077e28e8deb819c24ab3e7ba0794ffa6073654e54d32538649" => :catalina
-    sha256 "bceb6b1ff93c9bb4b11a38af1ce4b4c06f3a572e06f0f8132a9b0799a1caa3e3" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "1977b6173f9cc825908d298f16b8a26eab46e394bbccdaf23b1cee94ab1b62f5"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "58b751816639241f329df20252c4acaf24df5293296ef2149753b2633765116e"
+    sha256 cellar: :any_skip_relocation, monterey:       "431da10bb1143add10132eb5a033f5ac75e554b097294a7717e8b5bba71aaccb"
+    sha256 cellar: :any_skip_relocation, big_sur:        "15fda6eeac690a33c7ed80f841861c7ac6fb16b12244079e8257bf70771e4c67"
+    sha256 cellar: :any_skip_relocation, catalina:       "a1df60ba5a5b9227490ecd0fb1b1bdbd5042fdbf52d97f2ebfcb30d391b5007c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a217a9914c35405facc39fff757eb36d129b60dafed198eaeb7f2a7a29aa45b8"
   end
 
-  depends_on "autoconf" => :build
-  depends_on "automake" => :build
-  depends_on "libtool" => :build
-
-  uses_from_macos "flex" => :build
+  depends_on "go" => :build
 
   def install
-    # Profiling build fails with Xcode 11, remove it
-    inreplace "c/Makefile.am", /noinst_PROGRAMS=\s*mlrg/, ""
-    system "autoreconf", "-fvi"
-
-    system "./configure", "--prefix=#{prefix}", "--disable-silent-rules",
-                          "--disable-dependency-tracking"
+    system "./configure", "--prefix=#{prefix}"
     system "make"
     system "make", "install"
   end
@@ -38,6 +30,6 @@ class Miller < Formula
       4,5,6
     EOS
     output = pipe_output("#{bin}/mlr --csvlite cut -f a test.csv")
-    assert_match /a\n1\n4\n/, output
+    assert_match "a\n1\n4\n", output
   end
 end

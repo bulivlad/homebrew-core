@@ -1,9 +1,9 @@
 class Mpc < Formula
   desc "Command-line music player client for mpd"
   homepage "https://www.musicpd.org/clients/mpc/"
-  url "https://www.musicpd.org/download/mpc/0/mpc-0.33.tar.xz"
-  sha256 "4f40ccbe18f5095437283cfc525a97815e983cbfd3a29e48ff610fa4f1bf1296"
-  license "GPL-2.0"
+  url "https://www.musicpd.org/download/mpc/0/mpc-0.34.tar.xz"
+  sha256 "691e3f3654bc10d022bb0310234d0bc2d8c075a698f09924d9ebed8f506fda20"
+  license "GPL-2.0-or-later"
 
   livecheck do
     url "https://www.musicpd.org/download/mpc/0/"
@@ -11,12 +11,12 @@ class Mpc < Formula
   end
 
   bottle do
-    cellar :any
-    sha256 "cc01508026db65016ee6e2ec1f6663921a5c5ace5c76ea51ffbd1b0b7ade5e63" => :big_sur
-    sha256 "8062f7af33fe3603b4c625509f4c80570d790b15922287025ef7333748dae279" => :arm64_big_sur
-    sha256 "341a4c3cef23004a47f37fa299047e63baedceb07405813d6fc112c9ad7d4ff2" => :catalina
-    sha256 "29742180fafe0fffeba3fc09c3d355395084ef3d063004347a96bc37c72682db" => :mojave
-    sha256 "84bd2c475a7880bf1f36c560a5696c12c27ff6cdb5cd907082d14ffd094b1081" => :high_sierra
+    sha256 cellar: :any, arm64_monterey: "ab7dca71a458e5df0f35443eb3bcee79318dc8e81d1e6994b3c0fec457c516bd"
+    sha256 cellar: :any, arm64_big_sur:  "18b5ad4dc2effa515f23fca972e6793caa382398122538054992b5d2fd8e7855"
+    sha256 cellar: :any, monterey:       "37c0df291c472821d14b459e08d3e9a65971f049869b9f7dc9a14b5c436005de"
+    sha256 cellar: :any, big_sur:        "040a5ce6e08581306ab2aa274e79860390ccb3f0099b7bc8fe132f9a24ba5956"
+    sha256 cellar: :any, catalina:       "1bcbaf7a78216c6ff9482c1b7d7e5df30ebf5c1137e8b35c22996c1e2dc0dbf3"
+    sha256               x86_64_linux:   "518acb382cf9a16a5fad35023892db930b732d9329a6ffe3e0751c7b7bcb6e3c"
   end
 
   depends_on "meson" => :build
@@ -35,6 +35,6 @@ class Mpc < Formula
 
   test do
     assert_match "query", shell_output("#{bin}/mpc list 2>&1", 1)
-    assert_match "-F _mpc", shell_output("source #{bash_completion}/mpc && complete -p mpc")
+    assert_match "-F _mpc", shell_output("bash -c 'source #{bash_completion}/mpc && complete -p mpc'")
   end
 end

@@ -2,10 +2,10 @@ class CfrDecompiler < Formula
   desc "Yet Another Java Decompiler"
   homepage "https://www.benf.org/other/cfr/"
   url "https://github.com/leibnitz27/cfr.git",
-      tag:      "0.150",
-      revision: "1361cd7fa74f25f30a6bbf72c825d83647d2cdaf"
+      tag:      "0.152",
+      revision: "68477be3ff7171ee17ddd1a26064b9b253f1604f"
   license "MIT"
-  head "https://github.com/leibnitz27/cfr.git"
+  head "https://github.com/leibnitz27/cfr.git", branch: "master"
 
   livecheck do
     url :homepage
@@ -13,12 +13,12 @@ class CfrDecompiler < Formula
   end
 
   bottle do
-    cellar :any_skip_relocation
-    rebuild 1
-    sha256 "c57a78cf07cfa022d923fdd3ae4a3121009745e27aef50ff44a64a3144732552" => :big_sur
-    sha256 "0fdf9bba0c9eab8903844218862ae65cbbae69f97b35f36024877d3d087702a5" => :arm64_big_sur
-    sha256 "15268d8c8cb85a283c6f122331cdfbbf380c097e8c0faeea53b92970569d95e1" => :catalina
-    sha256 "735f265fa827e2989a77f35781ca0f5ebae56c076c39a0368d41025d3a28edb5" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "f0860e5883c6453777bcb7dfa447f99639c3bebfc281baa83ba31fca83f0d80a"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "87ac8a8345d70e1a9c7e6d8f5d0c6d2c53f41d54c4099895d3133dace7fd19fc"
+    sha256 cellar: :any_skip_relocation, monterey:       "e8cbec43262bb913ebc307a19fddaf983ac149fdc32fd3cf09da6c1585afbf50"
+    sha256 cellar: :any_skip_relocation, big_sur:        "bb5d9c8ecdeef4e8e950d8b752f85dceb8cd4cf4b97b538f62d63be5c8ed7dff"
+    sha256 cellar: :any_skip_relocation, catalina:       "31565bced5fabda93b658abf71ef43c2a5658c02ae226e385373001dba6503f8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9dc91498cbc8dbaacfed2b9c33aa0e8a290322ea108e4649c977cf8d7b17956e"
   end
 
   depends_on "maven" => :build
@@ -66,11 +66,14 @@ class CfrDecompiler < Formula
 
   test do
     fixture = <<~EOS
+      /*
+       * Decompiled with CFR #{version}.
+       */
       class T {
           T() {
           }
 
-          public static void main(String[] arrstring) {
+          public static void main(String[] stringArray) {
               System.out.println("Hello brew!");
           }
       }

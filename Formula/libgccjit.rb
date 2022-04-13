@@ -1,32 +1,44 @@
 class Libgccjit < Formula
   desc "JIT library for the GNU compiler collection"
+  if Hardware::CPU.arm?
+    # Branch from the Darwin maintainer of GCC with Apple Silicon support,
+    # located at https://github.com/iains/gcc-darwin-arm64 and
+    # backported with his help to gcc-11 branch. Too big for a patch.
+    url "https://github.com/fxcoudert/gcc/archive/refs/tags/gcc-11.2.0-arm-20211124.tar.gz"
+    sha256 "d7f8af7a0d9159db2ee3c59ffb335025a3d42547784bee321d58f2b4712ca5fd"
+    version "11.2.0"
+  else
+    url "https://ftp.gnu.org/gnu/gcc/gcc-11.2.0/gcc-11.2.0.tar.xz"
+    mirror "https://ftpmirror.gnu.org/gcc/gcc-11.2.0/gcc-11.2.0.tar.xz"
+    sha256 "d08edc536b54c372a1010ff6619dd274c0f1603aa49212ba20f7aa2cda36fa8b"
+
+    # Darwin 21 (Monterey) support
+    patch do
+      url "https://github.com/iains/gcc-darwin-arm64/commit/20f61faaed3b335d792e38892d826054d2ac9f15.patch?full_index=1"
+      sha256 "c0605179a856ca046d093c13cea4d2e024809ec2ad4bf3708543fc3d2e60504b"
+    end
+  end
   homepage "https://gcc.gnu.org/"
-  url "https://ftp.gnu.org/gnu/gcc/gcc-10.2.0/gcc-10.2.0.tar.xz"
-  sha256 "b8dd4368bb9c7f0b98188317ee0254dd8cc99d1e3a18d0ff146c855fe16c1d8c"
-  license "GPL-3.0-or-later" => {
-    with: "GCC-exception-3.1",
-  }
+  license "GPL-3.0-or-later" => { with: "GCC-exception-3.1" }
   revision 1
-  head "https://gcc.gnu.org/git/gcc.git"
+  head "https://gcc.gnu.org/git/gcc.git", branch: "master"
 
   livecheck do
-    url :stable
-    regex(%r{href=.*?gcc[._-]v?(\d+(?:\.\d+)+)(?:/?["' >]|\.t)}i)
+    formula "gcc"
   end
 
   bottle do
     rebuild 1
-    sha256 "84b3e7df022c08bd70d96a3897ef0391e48b8e796c49f6600e3b82b65e1120e6" => :big_sur
-    sha256 "014c277de860ab4862ef33a056c559d62693a06f1667ca0b267349ec8f58ddf0" => :catalina
-    sha256 "3b40caf5f7bb340467374f4f020028d1450226436a72290db55ed5eb5a3bfb3b" => :mojave
+    sha256 arm64_monterey: "7b5c768fc2f10513e7f3e2f8586f555a58e4319da9cad99d7c776ccd05952a95"
+    sha256 arm64_big_sur:  "c2d958d5156ebb71a25bdef33701faf393c2a4dce788a46fdcb3f046b86612c3"
+    sha256 monterey:       "7abf6d27997972fc32e1846c8008b5bd9823d34638c5fcd1f67b920fec21b503"
+    sha256 big_sur:        "f7226e1d4230ee0ee059bab2d7b489b4c64aaf8c4bc15903d50f331b03303f38"
+    sha256 catalina:       "ca16e3b69b15df1ced2a9b1d853c4560e16a27695d337621bd15b0032d42b456"
   end
 
   # The bottles are built on systems with the CLT installed, and do not work
   # out of the box on Xcode-only systems due to an incorrect sysroot.
-  pour_bottle? do
-    reason "The bottle needs the Xcode CLT to be installed."
-    satisfy { MacOS::CLT.installed? }
-  end
+  pour_bottle? only_if: :clt_installed
 
   depends_on "gcc" => :test
   depends_on "gmp"
@@ -43,26 +55,31 @@ class Libgccjit < Formula
     # GCC will suffer build errors if forced to use a particular linker.
     ENV.delete "LD"
 
-    osmajor = `uname -r`.split(".").first
     pkgversion = "Homebrew GCC #{pkg_version} #{build.used_options*" "}".strip
+    cpu = Hardware::CPU.arm? ? "aarch64" : "x86_64"
 
     args = %W[
-      --build=x86_64-apple-darwin#{osmajor}
+      --build=#{cpu}-apple-darwin#{OS.kernel_version.major}
       --prefix=#{prefix}
       --libdir=#{lib}/gcc/#{version.major}
       --disable-nls
       --enable-checking=release
+      --with-gcc-major-version-only
       --with-gmp=#{Formula["gmp"].opt_prefix}
       --with-mpfr=#{Formula["mpfr"].opt_prefix}
       --with-mpc=#{Formula["libmpc"].opt_prefix}
       --with-isl=#{Formula["isl"].opt_prefix}
       --with-system-zlib
       --with-pkgversion=#{pkgversion}
-      --with-bugurl=https://github.com/Homebrew/homebrew-core/issues
+      --with-bugurl=#{tap.issues_url}
     ]
 
     # Xcode 10 dropped 32-bit support
     args << "--disable-multilib" if DevelopmentTools.clang_build_version >= 1000
+
+    # Workaround for Xcode 12.5 bug on Intel
+    # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=100340
+    args << "--without-build-config" if Hardware::CPU.intel? && DevelopmentTools.clang_build_version >= 1205
 
     # System headers may not be in /usr/include
     sdk = MacOS.sdk_path_if_needed
@@ -70,9 +87,6 @@ class Libgccjit < Formula
       args << "--with-native-system-header-dir=/usr/include"
       args << "--with-sysroot=#{sdk}"
     end
-
-    # Avoid reference to sed shim
-    args << "SED=/usr/bin/sed"
 
     # Use -headerpad_max_install_names in the build,
     # otherwise updated load commands won't fit in the Mach-O header.

@@ -1,16 +1,18 @@
 class Lightgbm < Formula
   desc "Fast, distributed, high performance gradient boosting framework"
   homepage "https://github.com/microsoft/LightGBM"
-  url "https://github.com/microsoft/LightGBM/archive/v3.1.1.tar.gz"
-  sha256 "a1e64bff404f448681ee33fb131a6218c4388574b83df0d25f45e63268a03b44"
+  url "https://github.com/microsoft/LightGBM.git",
+      tag:      "v3.3.2",
+      revision: "dce7e58b020bc14b69eefc31546c366971ecb2d9"
   license "MIT"
 
   bottle do
-    cellar :any
-    sha256 "e439b3e99f5df4196b48c937cd6b38be16fd566c04e3b52ba78610eaaa8c6185" => :big_sur
-    sha256 "b5003bf5c04772c9fad6c34134bee20ec9bd25cb1e9b7c438e704b0f88aa325b" => :arm64_big_sur
-    sha256 "ff1a50ff028ff22997b0a2807f50bec7d4ef8a297ee0a0965d938166983943a0" => :catalina
-    sha256 "055dbb284840813e365d14b020d9c01c96491ce6586fe6f1b9e90236f8d9f605" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "7683c555fca349d6aa5b4d7c83e4499c911b4bbf49e1293c2580d8de2dd89695"
+    sha256 cellar: :any,                 arm64_big_sur:  "d682a3c8519a8e53586e11cbe469cee7407ab3cf9c04c3e1cb3090718f2e1c37"
+    sha256 cellar: :any,                 monterey:       "cd99e43dc3c64bf0416e13546a359e8c213c4b693a8bb90626b6f2c9f3ff5623"
+    sha256 cellar: :any,                 big_sur:        "35ab7f3c1def696fa9800a98dd0a03f07046d6476f1a2ad35bf324e4907a97b6"
+    sha256 cellar: :any,                 catalina:       "29d375544346e724143a1b145b1fa4cdfcdbc743fa7637b955b769274f238049"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "cb2d01e4572ef9e7a4ab3e3415da0b4b7ccd3d379dd4020e4ec254e3c96faf75"
   end
 
   depends_on "cmake" => :build

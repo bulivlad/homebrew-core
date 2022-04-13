@@ -3,26 +3,21 @@ class GitRevise < Formula
 
   desc "Rebase alternative for easy & efficient in-memory rebases and fixups"
   homepage "https://github.com/mystor/git-revise"
-  url "https://files.pythonhosted.org/packages/8e/80/97eae3a7d93f8c17127ac5722ffb5a0f3b3bfd18525569865d2bfb5d27a1/git-revise-0.6.0.tar.gz"
-  sha256 "21e89eba6602e8bea38b34ac6ec747acba2aee876f2e73ca0472476109e82bf4"
+  url "https://files.pythonhosted.org/packages/99/fe/03e0afc973c19af8ebf9c7a4a090a974c0c39578b1d4082d201d126b7f9a/git-revise-0.7.0.tar.gz"
+  sha256 "af92ca2e7224c5e7ac2e16ed2f302dd36839a33521655c20fe0b7d693a1dc4c4"
   license "MIT"
-  revision 1
-  head "https://github.com/mystor/git-revise.git"
-
-  livecheck do
-    url :stable
-  end
+  head "https://github.com/mystor/git-revise.git", revision: "main"
 
   bottle do
-    cellar :any_skip_relocation
-    rebuild 2
-    sha256 "ba6785e053fa42ad4c59008fff7c72b251e4f4ec106f81fd542603d708bb1ff4" => :big_sur
-    sha256 "b4be5a6878b064979ad4ac52cdad2a4d98b344809bde0ead1a7e91370fdc2ed6" => :arm64_big_sur
-    sha256 "4ecd0d9a33b6d44e4eaa58947893060e01dad9d7e1b67603db6af4cc4a870f43" => :catalina
-    sha256 "2936f4b4f42ffe81269c28181e79ff04631748e2cb3a0d164aadcfd196b9d228" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "6eee8e1415f615aeef5726cb7c82834357f3d2868f21e30ed128d6c51a889e8b"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "6eee8e1415f615aeef5726cb7c82834357f3d2868f21e30ed128d6c51a889e8b"
+    sha256 cellar: :any_skip_relocation, monterey:       "aac1ccf21a7f370ad64d30bc92cefab901913bc81b7561ce3b4232036d28da0c"
+    sha256 cellar: :any_skip_relocation, big_sur:        "aac1ccf21a7f370ad64d30bc92cefab901913bc81b7561ce3b4232036d28da0c"
+    sha256 cellar: :any_skip_relocation, catalina:       "aac1ccf21a7f370ad64d30bc92cefab901913bc81b7561ce3b4232036d28da0c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e55a7ac0fd6a079cb4f5f79c01bc5448f1b415906d6df7f5d3a9851dfa208e58"
   end
 
-  depends_on "python@3.9"
+  depends_on "python@3.10"
 
   def install
     virtualenv_install_with_resources

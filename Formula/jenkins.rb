@@ -1,21 +1,23 @@
 class Jenkins < Formula
   desc "Extendable open source continuous integration server"
-  homepage "https://jenkins.io/"
-  url "http://mirrors.jenkins.io/war/2.275/jenkins.war"
-  sha256 "2db5deb9f119bc955ba0922b7cb239d9e18ab1000ec44493959b600f6ecda2d3"
+  homepage "https://www.jenkins.io/"
+  url "https://get.jenkins.io/war/2.343/jenkins.war"
+  sha256 "e4216e2ad8964df9dd32af623767ef36b05b6569f4e2866407c1990336932047"
   license "MIT"
 
   livecheck do
-    url :head
-    regex(/^jenkins[._-]v?(\d+(?:\.\d+)+)$/i)
+    url "https://www.jenkins.io/download/"
+    regex(%r{href=.*?/war/v?(\d+(?:\.\d+)+)/jenkins\.war}i)
+  end
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, all: "cf89bfaaa83e525b606ef13b46e08853bde6ceba8c3be2c9d6e0d52e13291ffe"
   end
 
   head do
     url "https://github.com/jenkinsci/jenkins.git"
     depends_on "maven" => :build
   end
-
-  bottle :unneeded
 
   depends_on "openjdk@11"
 
@@ -28,6 +30,8 @@ class Jenkins < Formula
     libexec.install Dir["**/jenkins.war", "**/cli-#{version}.jar"]
     bin.write_jar_script libexec/"jenkins.war", "jenkins", java_version: "11"
     bin.write_jar_script libexec/"cli-#{version}.jar", "jenkins-cli", java_version: "11"
+
+    (var/"log/jenkins").mkpath
   end
 
   def caveats
@@ -36,30 +40,12 @@ class Jenkins < Formula
     EOS
   end
 
-  plist_options manual: "jenkins"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>ProgramArguments</key>
-          <array>
-            <string>#{Formula["openjdk@11"].opt_bin}/java</string>
-            <string>-Dmail.smtp.starttls.enable=true</string>
-            <string>-jar</string>
-            <string>#{opt_libexec}/jenkins.war</string>
-            <string>--httpListenAddress=127.0.0.1</string>
-            <string>--httpPort=8080</string>
-          </array>
-          <key>RunAtLoad</key>
-          <true/>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run [Formula["openjdk@11"].opt_bin/"java", "-Dmail.smtp.starttls.enable=true", "-jar", opt_libexec/"jenkins.war",
+         "--httpListenAddress=127.0.0.1", "--httpPort=8080"]
+    keep_alive true
+    log_path var/"log/jenkins/output.log"
+    error_log_path var/"log/jenkins/error.log"
   end
 
   test do
@@ -73,6 +59,6 @@ class Jenkins < Formula
     sleep 60
 
     output = shell_output("curl localhost:#{port}/")
-    assert_match /Welcome to Jenkins!|Unlock Jenkins|Authentication required/, output
+    assert_match(/Welcome to Jenkins!|Unlock Jenkins|Authentication required/, output)
   end
 end

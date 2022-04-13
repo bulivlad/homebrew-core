@@ -2,20 +2,23 @@ class Languagetool < Formula
   desc "Style and grammar checker"
   homepage "https://www.languagetool.org/"
   url "https://github.com/languagetool-org/languagetool.git",
-      tag:      "v5.2",
-      revision: "eb572bf077c1873424ab18b99215f77b5c5d482d"
+      tag:      "v5.7",
+      revision: "35d0d40e1e795919473563d6102df5b464ba7d29"
   license "LGPL-2.1-or-later"
-  head "https://github.com/languagetool-org/languagetool.git"
+  head "https://github.com/languagetool-org/languagetool.git", branch: "master"
 
   livecheck do
-    url :head
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "6e0b47919b400614b541ced972d8513f81bdacad7bce2077cd3ca8d72c2026c6" => :big_sur
-    sha256 "247283b436a70bb8b5b3ecf43becaa3b986d260ff68d602417ed39e441befe5e" => :catalina
-    sha256 "c25896d28e5b4484317fb881478a67122cb847e53dd3f78b99e66790a5d54790" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "76b6e84cbcaf6e3cff9919db0bc2c878edcedf443c121440a0a42bd4e6628e44"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "52da62ec625153b1f785103f1a3e3086f3925123a0a3f34f3203b6d2fa7707f2"
+    sha256 cellar: :any_skip_relocation, monterey:       "721a4898a93243d3ea9c3ca20bc5901b77e914d4bc98d3c4b943212adf1986b8"
+    sha256 cellar: :any_skip_relocation, big_sur:        "03b221baba14ee0e13a6d57d1ffda7b20a657c425fd488309b0e16fec2069cac"
+    sha256 cellar: :any_skip_relocation, catalina:       "42bff670a922542770ea16acd7bc30e84e61b3e7614c4e895eec02d823b7ebfb"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "dd8d29c7aac9805ccefc9ee6810197a5350bb6c1ebb701bfc7fd71c9333e7576"
   end
 
   depends_on "maven" => :build
@@ -42,10 +45,18 @@ class Languagetool < Formula
     EOS
   end
 
+  service do
+    run [bin/"languagetool-server", "--port", "8081", "--allow-origin"]
+    keep_alive true
+    log_path var/"log/languagetool/languagetool-server.log"
+    error_log_path var/"log/languagetool/languagetool-server.log"
+  end
+
   test do
     (testpath/"test.txt").write <<~EOS
-      Homebrew, the missing package manager for macOS.
+      Homebrew, this is an test
     EOS
-    assert_match /Homebrew/, shell_output("#{bin}/languagetool -l en-US test.txt")
+    output = shell_output("#{bin}/languagetool -l en-US test.txt 2>&1")
+    assert_match(/Message: Use \Wa\W instead of \Wan\W/, output)
   end
 end

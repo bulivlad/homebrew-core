@@ -1,32 +1,34 @@
 class Pushpin < Formula
   desc "Reverse proxy for realtime web services"
   homepage "https://pushpin.org/"
-  url "https://dl.bintray.com/fanout/source/pushpin-1.31.0.tar.bz2"
-  sha256 "62504863297a8ec1833486affaff91fade7a970dd43b9c8c2add5944603481ac"
+  url "https://github.com/fanout/pushpin/releases/download/v1.35.0/pushpin-1.35.0.tar.bz2"
+  sha256 "62fbf32d75818b08fd8bce077035de85da47a06c07753e5ba10201a5dd35ca5e"
   license "AGPL-3.0-or-later"
-  head "https://github.com/fanout/pushpin.git"
+  head "https://github.com/fanout/pushpin.git", branch: "master"
 
   bottle do
-    sha256 "2ecabfaf77c7baa3a348b52c04e5d631decf56497f9c243308a4d3ecde956962" => :big_sur
-    sha256 "cba8efdcbb2ce8e426ff46e450fbc686653a902f17d9cd7eb940be072e14914d" => :catalina
-    sha256 "466d8d74ad32796a9d6d1aa1ea19746570d6f5a6763d55ba829c01b9c6ea4656" => :mojave
-    sha256 "326bb88e58a9ab6087ce7c4de8097f62cae5930c2dd469fe847760c467761b94" => :high_sierra
+    sha256 monterey: "2dd88fcce86708d3f04a2edd543ab64fba6b4c854abf7d3eb457d30686800253"
+    sha256 big_sur:  "252f709d3a8426b95aa5bc8b05bb19da6d8b3c2cd1895d685da3334db5218eb1"
+    sha256 catalina: "0386eefc82559327ab180105434304d277d69a9c475b8b46c32ca0ab68b662bd"
   end
 
   depends_on "pkg-config" => :build
+  depends_on "rust" => :build
   depends_on "condure"
   depends_on "mongrel2"
   depends_on "python@3.9"
-  depends_on "qt"
+  depends_on "qt@5"
   depends_on "zeromq"
   depends_on "zurl"
 
   def install
-    system "./configure", "--prefix=#{prefix}",
-                          "--configdir=#{etc}",
-                          "--rundir=#{var}/run",
-                          "--logdir=#{var}/log",
-                          "--extraconf=QMAKE_MACOSX_DEPLOYMENT_TARGET=#{MacOS.version}"
+    args = *std_configure_args + ["--configdir=#{etc}",
+                                  "--rundir=#{var}/run",
+                                  "--logdir=#{var}/log"]
+
+    args << "--extraconf=QMAKE_MACOSX_DEPLOYMENT_TARGET=#{MacOS.version}" if OS.mac?
+    system "./configure", *args
+
     system "make"
     system "make", "install"
   end

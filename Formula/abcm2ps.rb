@@ -1,15 +1,17 @@
 class Abcm2ps < Formula
   desc "ABC music notation software"
   homepage "http://moinejf.free.fr"
-  url "https://github.com/leesavide/abcm2ps/archive/v8.14.11.tar.gz"
-  sha256 "e3b538d62face623619be46b9f7b7520c113fbb1b634073e1162d526adbf3f3b"
+  url "https://github.com/leesavide/abcm2ps/archive/v8.14.13.tar.gz"
+  sha256 "8db29e33f30fce609ddffeb641c3bfe60ae5d16c3305402157ddc88bcaaf0c5b"
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 "576ceb67099499b4456a08434a9638a792eee8d12df2db9d957c80a48fb004e3" => :big_sur
-    sha256 "5a56794cc9fa9e49f3c8850f94ef7f1954832cfb6a0df0444b534e63b77962ba" => :arm64_big_sur
-    sha256 "294a1b897cd3224cfb9c03053c9a7826c9e7cdbe07065ff17f5f9a9f1608a0f8" => :catalina
-    sha256 "5bbc737b7c7b864e6490431cab5359b6193b75faa23ac6d5b5a1d78eda906b1c" => :mojave
+    sha256 arm64_monterey: "66fc98754086e61de352bde7d193516ad03ab7dba6acad7819448d90d8cf1e4a"
+    sha256 arm64_big_sur:  "d7acbc60c7dfc12b7f2d915cd2e4f694fc4cb1e54eb32d561a2a2e3c03cb8e0b"
+    sha256 monterey:       "1dbdf6fc8c90837550bb710d97c546cfe8b8d0a2b37d54086c24a232bffed044"
+    sha256 big_sur:        "07759b5ddeab313116502465116dfe940718c71dfd0867bad82b6d8457537ce7"
+    sha256 catalina:       "c50589d7f7cdf5a0ad7cf8468c619a64f0fd3a801803aeb727e9beaee2fa04d3"
+    sha256 x86_64_linux:   "6ba0c5819c9058230e8af293302616c42aa07a04e0ab2cfb1f3934ceba8a846c"
   end
 
   depends_on "pkg-config" => :build

@@ -1,20 +1,17 @@
 class Pstoedit < Formula
   desc "Convert PostScript and PDF files to editable vector graphics"
   homepage "http://www.pstoedit.net/"
-  url "https://downloads.sourceforge.net/project/pstoedit/pstoedit/3.75/pstoedit-3.75.tar.gz"
-  sha256 "b7b5d8510b40a5b148f7751268712fcfd0c1ed2bb46f359f655b6fcdc53364cf"
-  license "GPL-2.0"
-
-  livecheck do
-    url :stable
-  end
+  url "https://downloads.sourceforge.net/project/pstoedit/pstoedit/3.78/pstoedit-3.78.tar.gz"
+  sha256 "8cc28e34bc7f88d913780f8074e813dd5aaa0ac2056a6b36d4bf004a0e90d801"
+  license "GPL-2.0-or-later"
 
   bottle do
-    sha256 "1eb7bdc1ab76c8ae40450b686b1948f3e037ca871d7c505657489d501e073a5a" => :big_sur
-    sha256 "62d09abcd35a1d933545c501578d9583978eac45569bb7b3702f6fd1b5cbea9a" => :arm64_big_sur
-    sha256 "f048d902c088f0625c0c9e18d84b159493775b40e742812b040e7b517900260a" => :catalina
-    sha256 "1f3ec91e58d95e08081694b43e031ed83f13a73cecff15c55c532268282b0ad1" => :mojave
-    sha256 "22710dd8997d40cec3492c40960a9966b80b386bdbd3fed46515c66bb25053d7" => :high_sierra
+    sha256 arm64_monterey: "0f232079d87357a6a68542eb29625272b61826ab8d0e20620532751bfd080147"
+    sha256 arm64_big_sur:  "93f094bcabc8c0d24377e8cf6e6567cdb3b40f4e8eed2eb38961b28c44f15346"
+    sha256 monterey:       "3403d2caa0bba4718c2c7b26fc9e0449f9a962743d86e1db1d8b25023af1d21b"
+    sha256 big_sur:        "d0e97ac142787f5b0c16c0138675c476f747403e4b94b6c12dad23c70e05d268"
+    sha256 catalina:       "cdc3a9c75a626efd0562e786f08fd57dada5b764f9d39dec61c748eca707ccc9"
+    sha256 x86_64_linux:   "9b5b7269382d2ed28060b51eb8ab82339127121675df1a73de76aabedcb088ff"
   end
 
   depends_on "pkg-config" => :build
@@ -22,9 +19,15 @@ class Pstoedit < Formula
   depends_on "imagemagick"
   depends_on "plotutils"
 
-  def install
-    ENV.cxx11
+  on_linux do
+    depends_on "gcc"
+  end
 
+  # "You need a C++ compiler, e.g., g++ (newer than 6.0) to compile pstoedit."
+  fails_with gcc: "5"
+
+  def install
+    ENV.cxx11 if OS.mac?
     system "./configure", "--disable-dependency-tracking", "--prefix=#{prefix}"
     system "make", "install"
   end

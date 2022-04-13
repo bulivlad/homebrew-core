@@ -1,17 +1,17 @@
 class Embree < Formula
   desc "High-performance ray tracing kernels"
   homepage "https://embree.github.io/"
-  url "https://github.com/embree/embree/archive/v3.12.1.tar.gz"
-  sha256 "0c9e760b06e178197dd29c9a54f08ff7b184b0487b5ba8b8be058e219e23336e"
+  url "https://github.com/embree/embree/archive/v3.13.3.tar.gz"
+  sha256 "74ec785afb8f14d28ea5e0773544572c8df2e899caccdfc88509f1bfff58716f"
   license "Apache-2.0"
-  head "https://github.com/embree/embree.git"
+  head "https://github.com/embree/embree.git", branch: "master"
 
   bottle do
-    cellar :any
-    sha256 "a7d59835dda29e4659392ed9d4fed84d61c03b22eaf77492467c491d575c417b" => :big_sur
-    sha256 "003fdcefa1da6372c782345e295b2188686adb6f7ccadee2f00d15a58b41ef85" => :catalina
-    sha256 "6f347831ed4b4dfa51b88af83c71d9a6c1f7b62775a033a672b1461029f84842" => :mojave
-    sha256 "766356663e8c1970c121c68faec10c8fd2323fbb128c392927a24c3961e20c5f" => :high_sierra
+    sha256 cellar: :any, arm64_monterey: "688baaeb72504ff7d2f19e048121b805a8701e057942696f3323ede58aecf01b"
+    sha256 cellar: :any, arm64_big_sur:  "b845757ab2344160dc54d336c14b2ffe80d3cc05a0b0a296ecf808be24fdb22d"
+    sha256 cellar: :any, monterey:       "c53fb56c890319718fbaf5c6c805fb14aff2a7338aa02f23f4e6a4b3e9e3c23b"
+    sha256 cellar: :any, big_sur:        "bbdc3c8818dc11b86bfdc97f7bd3f6e660673ab783cecee96bbed102820f9615"
+    sha256 cellar: :any, catalina:       "8810f5e20f5cdd151889ed43942c26a73be528ab0b181a6a3a21c3aac017ba99"
   end
 
   depends_on "cmake" => :build
@@ -19,15 +19,13 @@ class Embree < Formula
   depends_on "tbb"
 
   def install
-    max_isa = MacOS.version.requires_sse42? ? "SSE4.2" : "SSE2"
-
-    args = std_cmake_args + %W[
+    args = std_cmake_args + %w[
       -DBUILD_TESTING=OFF
       -DEMBREE_IGNORE_CMAKE_CXX_FLAGS=OFF
       -DEMBREE_ISPC_SUPPORT=ON
-      -DEMBREE_MAX_ISA=#{max_isa}
       -DEMBREE_TUTORIALS=OFF
     ]
+    args << "-DEMBREE_MAX_ISA=#{MacOS.version.requires_sse42? ? "SSE4.2" : "SSE2"}" if Hardware::CPU.intel?
 
     mkdir "build" do
       system "cmake", *args, ".."

@@ -2,42 +2,37 @@ class ErlangAT21 < Formula
   desc "Programming language for highly scalable real-time systems"
   homepage "https://www.erlang.org/"
   # Download tarball from GitHub; it is served faster than the official tarball.
-  url "https://github.com/erlang/otp/archive/OTP-21.3.8.18.tar.gz"
-  sha256 "3481a47503e1ac0c0296970b460d1936ee0432600f685a216608e04b2f608367"
+  url "https://github.com/erlang/otp/releases/download/OTP-21.3.8.24/otp_src_21.3.8.24.tar.gz"
+  sha256 "a82de871d7ba40fd256558b23a3b4c1539e6c7ece7507d6eb2b00330c6135012"
   license "Apache-2.0"
-
-  livecheck do
-    url :stable
-    regex(/^OTP[._-]v?(21(?:\.\d+)+)$/i)
-  end
+  revision 2
 
   bottle do
-    cellar :any
-    sha256 "a45826787cfb9307d0c154eb70c5148546c02cab2791a5912568dcdc4e5645ef" => :catalina
-    sha256 "7bb6af1d1169b82bb631434d826bfbf86cf03cadb669076644710d925e596d56" => :mojave
-    sha256 "5ca5113bc1e1f7ccefc85b36039f8bc35f4f30c1534d3928c867afe2355d53b6" => :high_sierra
+    sha256 cellar: :any,                 monterey:     "9effd9cdb8786f80257db78e9d1c587e4065313628f6c04c1ffe588afe0d9953"
+    sha256 cellar: :any,                 big_sur:      "f05c014c491877da25d19f775a576803a25c36c5d57309548711c253b90711c8"
+    sha256 cellar: :any,                 catalina:     "042070fc8af915df870a67f1eaa43e87beacd3bcf4c8cde8d78bbe1e195cf133"
+    sha256 cellar: :any,                 mojave:       "03315a212e5e5ddcb5bf37d45faacd0ce075d6a2503217f42f5eda083ebacec5"
+    sha256 cellar: :any_skip_relocation, x86_64_linux: "c76e5cd284dfb658a962b06b5aae7d5aefa1d50e2feab458f66f64542f5b719b"
   end
 
   keg_only :versioned_formula
 
-  depends_on "autoconf" => :build
+  deprecate! date: "2022-03-01", because: :unsupported
+
+  depends_on "autoconf@2.69" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
   depends_on arch: :x86_64
   depends_on "openssl@1.1"
-  depends_on "wxmac" # for GUI apps like observer
-
-  uses_from_macos "m4" => :build
+  depends_on "wxwidgets" # for GUI apps like observer
 
   resource "man" do
     url "https://www.erlang.org/download/otp_doc_man_21.3.tar.gz"
-    mirror "https://fossies.org/linux/misc/otp_doc_man_21.3.tar.gz"
     sha256 "f5464b5c8368aa40c175a5908b44b6d9670dbd01ba7a1eef1b366c7dc36ba172"
   end
 
   resource "html" do
     url "https://www.erlang.org/download/otp_doc_html_21.3.tar.gz"
-    mirror "https://fossies.org/linux/misc/otp_doc_html_21.3.tar.gz"
     sha256 "258b1e0ed1d07abbf08938f62c845450e90a32ec542e94455e5d5b7c333da362"
   end
 
@@ -45,12 +40,6 @@ class ErlangAT21 < Formula
   patch do
     url "https://github.com/erlang/otp/commit/3edba0dad391431cbadad44a8bd15c75254fc239.patch?full_index=1"
     sha256 "0c82d9f3bdb668ba78025988c9447bebe91a2f6bb00daa7f0ae7bd1916cd9bfd"
-  end
-
-  # Fix build on Xcode 12+ (https://bugs.erlang.org/browse/ERL-1306)
-  patch do
-    url "https://github.com/erlang/otp/commit/388622e9b626039c1e403b4952c2c905af364a96.patch?full_index=1"
-    sha256 "85d3611fc071f06d421b9c7fae00b656fde054586bf69551aec38930d4086780"
   end
 
   def install
@@ -67,7 +56,6 @@ class ErlangAT21 < Formula
       --prefix=#{prefix}
       --enable-dynamic-ssl-lib
       --enable-hipe
-      --enable-sctp
       --enable-shared-zlib
       --enable-smp-support
       --enable-threads
@@ -76,7 +64,7 @@ class ErlangAT21 < Formula
       --without-javac
     ]
 
-    on_macos do
+    if OS.mac?
       args << "--enable-darwin-64bit"
       args << "--enable-kernel-poll" if MacOS.version > :el_capitan
       args << "--with-dynamic-trace=dtrace" if MacOS::CLT.installed?

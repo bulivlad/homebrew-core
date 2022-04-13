@@ -1,22 +1,25 @@
 class Curl < Formula
   desc "Get a file from an HTTP, HTTPS or FTP server"
-  homepage "https://curl.haxx.se/"
-  url "https://curl.haxx.se/download/curl-7.74.0.tar.bz2"
-  sha256 "0f4d63e6681636539dc88fa8e929f934cd3a840c46e0bf28c73be11e521b77a5"
+  homepage "https://curl.se"
+  url "https://curl.se/download/curl-7.82.0.tar.bz2"
+  mirror "https://github.com/curl/curl/releases/download/curl-7_82_0/curl-7.82.0.tar.bz2"
+  mirror "http://fresh-center.net/linux/www/curl-7.82.0.tar.bz2"
+  mirror "http://fresh-center.net/linux/www/legacy/curl-7.82.0.tar.bz2"
+  sha256 "46d9a0400a33408fd992770b04a44a7434b3036f2e8089ac28b57573d59d371f"
   license "curl"
 
   livecheck do
-    url "https://curl.haxx.se/download/"
+    url "https://curl.se/download/"
     regex(/href=.*?curl[._-]v?(.*?)\.t/i)
   end
 
   bottle do
-    cellar :any
-    rebuild 2
-    sha256 "8189929ebd121b28fc04b5c93503cd7af1e3d5755ccfea080d47056e6068f86f" => :big_sur
-    sha256 "0c9ae84590dcd9d4700fc2fe47badb20cdb6c948c1e351a8a588b23b11087556" => :arm64_big_sur
-    sha256 "18e818ff24895ffd9355c34f79dd92aaf220e16d71ffdef6e2a07c0a6ddb4637" => :catalina
-    sha256 "eb84c59697457a6162f7275f0eff0eefc6ec03de13e467e550d35a496ca19425" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "75bfcf647a9262c5bd8bc7574f810a54c3db1ab2684fddc9be4dcfd8daf2706e"
+    sha256 cellar: :any,                 arm64_big_sur:  "63e4213d2d76076c2f54fd5e0bd79baacd56047915b08be643127cd69819abca"
+    sha256 cellar: :any,                 monterey:       "46cf555fb6503a9f0ed3fe9624098a02db9531ca76fa3ae1934d12c273b55972"
+    sha256 cellar: :any,                 big_sur:        "bcdfd8b4ce27031422d41bbbd2236ea81c1f79ddd64bb74d4bbe66755805d286"
+    sha256 cellar: :any,                 catalina:       "8c51b0b50434fe1757c6f17dcbaa34024373cb12acfb5af2851b82f671d3890f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "13945e90fa78c5baac3a77b5daee126143c452c35e92f9b3f396ef9520aa7608"
   end
 
   head do
@@ -32,9 +35,8 @@ class Curl < Formula
   depends_on "pkg-config" => :build
   depends_on "brotli"
   depends_on "libidn2"
-  depends_on "libmetalink"
+  depends_on "libnghttp2"
   depends_on "libssh2"
-  depends_on "nghttp2"
   depends_on "openldap"
   depends_on "openssl@1.1"
   depends_on "rtmpdump"
@@ -57,20 +59,16 @@ class Curl < Formula
       --with-ca-fallback
       --with-secure-transport
       --with-default-ssl-backend=openssl
-      --with-gssapi
       --with-libidn2
-      --with-libmetalink
       --with-librtmp
       --with-libssh2
       --without-libpsl
     ]
 
-    on_macos do
-      args << "--with-gssapi"
-    end
-
-    on_linux do
-      args << "--with-gssapi=#{Formula["krb5"].opt_prefix}"
+    args << if OS.mac?
+      "--with-gssapi"
+    else
+      "--with-gssapi=#{Formula["krb5"].opt_prefix}"
     end
 
     system "./configure", *args

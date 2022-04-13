@@ -3,27 +3,32 @@ class Fonttools < Formula
 
   desc "Library for manipulating fonts"
   homepage "https://github.com/fonttools/fonttools"
-  url "https://files.pythonhosted.org/packages/3d/f9/ebd619f1393d4536bbf4becb9ffc41d95d01b38441244b28fa39b827db4a/fonttools-4.18.2.zip"
-  sha256 "5c50af6fb9b4de4609c0e5558f3444c20f8632aa319319a7ef14fd5ba677c9f8"
+  url "https://files.pythonhosted.org/packages/88/27/418ac6f1b85856608df81fe6e72fbb85929d7b904540056f3061e27bba04/fonttools-4.32.0.zip"
+  sha256 "59a90de72149893167e3d552ae2402c6874e006b9adc3feaf5f6d706fe20d392"
   license "MIT"
-  head "https://github.com/fonttools/fonttools.git"
+  head "https://github.com/fonttools/fonttools.git", branch: "main"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "2fc8e51466b4fc346c8ce3780692c1176a266b9d6aadbc16a748725684e89495" => :big_sur
-    sha256 "365031c45833a0342bf1b558233be15e8014816184eeeb85ada1dcd7076ea57d" => :arm64_big_sur
-    sha256 "98704bad103b75973589ab1eb1e488509394430e0dd7f226ff67dfadd246800e" => :catalina
-    sha256 "a4a4710e08590d88df88822ec506a34adbc6cd95d17e10f542300f52c155f62b" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "4e82edee5a404ceb08cf67a147b77d737b6811dba0ada365e790a9ad55bc6fb9"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "4e82edee5a404ceb08cf67a147b77d737b6811dba0ada365e790a9ad55bc6fb9"
+    sha256 cellar: :any_skip_relocation, monterey:       "fdf6a0452f4d86f4eb8cefa672de82b40ec8555faf1853c7f43e29d238464e4b"
+    sha256 cellar: :any_skip_relocation, big_sur:        "fdf6a0452f4d86f4eb8cefa672de82b40ec8555faf1853c7f43e29d238464e4b"
+    sha256 cellar: :any_skip_relocation, catalina:       "fdf6a0452f4d86f4eb8cefa672de82b40ec8555faf1853c7f43e29d238464e4b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1af2b0f4cfc5562afdb27c81113e6200331fa6641eaef921a7d8328393f8a25b"
   end
 
-  depends_on "python@3.9"
+  depends_on "python@3.10"
 
   def install
     virtualenv_install_with_resources
   end
 
   test do
-    cp "/System/Library/Fonts/ZapfDingbats.ttf", testpath
-    system bin/"ttx", "ZapfDingbats.ttf"
+    if OS.mac?
+      cp "/System/Library/Fonts/ZapfDingbats.ttf", testpath
+      system bin/"ttx", "ZapfDingbats.ttf"
+    else
+      assert_match "usage", shell_output("#{bin}/ttx -h")
+    end
   end
 end

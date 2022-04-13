@@ -1,16 +1,17 @@
 class Webdis < Formula
   desc "Redis HTTP interface with JSON output"
   homepage "https://webd.is/"
-  url "https://github.com/nicolasff/webdis/archive/0.1.12.tar.gz"
-  sha256 "9f7eb4c7f9a06978611c8d2e38e919d81a288fd656fc815b0cd4392add7020ee"
+  url "https://github.com/nicolasff/webdis/archive/0.1.20.tar.gz"
+  sha256 "1f0c8e8e8b68486fb7ccfc68a2c0d28167f7b243004b8a521c2552d0f9bbbe84"
   license "BSD-2-Clause"
 
   bottle do
-    cellar :any
-    sha256 "fe2d73994d25c1291c308573029c7b408f9b3e3a76b62f9e96b6f54539abadf0" => :big_sur
-    sha256 "651e74b178a69eb2c1b1415343417d77c01c93adcfc7ebd1985067c613418519" => :arm64_big_sur
-    sha256 "11103600a67450f841b39f74739c2a381142f6562bb77d7bfe9ae9ae745c300c" => :catalina
-    sha256 "cef141b4ce5b61b6b616e7247e39cae283efc3e1774eae1678f6d525d4ed497f" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "01d68d884586fcc671ac5db5ee136eab325c122791193fae278ad6542f793ec7"
+    sha256 cellar: :any,                 arm64_big_sur:  "e214f9eb12345cc5998c5e30930eb18b67751540e9be07c7cad9b466f91d147d"
+    sha256 cellar: :any,                 monterey:       "25c756e3714e87f34fb9ba04f03c1ac06a905291a2d67460067f0c43c5965716"
+    sha256 cellar: :any,                 big_sur:        "8121d9e66429ec5b2c94683c7781cbabfdde8c71a90e7a4b986f02bcc451ad53"
+    sha256 cellar: :any,                 catalina:       "ec7bd136523ac94e2644d8d6f8e7e4d9f0163e733af9504ae0e7769906550835"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "cd85baa15e4d7f640c83712d2e507683307fbd8df46257e8c38a59f6967263c5"
   end
 
   depends_on "libevent"
@@ -21,7 +22,7 @@ class Webdis < Formula
 
     inreplace "webdis.prod.json" do |s|
       s.gsub! "/var/log/webdis.log", "#{var}/log/webdis.log"
-      s.gsub! /daemonize":\s*true/, "daemonize\":\tfalse"
+      s.gsub!(/daemonize":\s*true/, "daemonize\":\tfalse")
     end
 
     etc.install "webdis.json", "webdis.prod.json"
@@ -31,33 +32,10 @@ class Webdis < Formula
     (var/"log").mkpath
   end
 
-  plist_options manual: "webdis #{HOMEBREW_PREFIX}/etc/webdis.json"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>ProgramArguments</key>
-          <array>
-              <string>#{opt_bin}/webdis</string>
-              <string>#{etc}/webdis.prod.json</string>
-          </array>
-          <key>RunAtLoad</key>
-          <true/>
-          <key>KeepAlive</key>
-          <dict>
-              <key>SuccessfulExit</key>
-              <false/>
-          </dict>
-          <key>WorkingDirectory</key>
-          <string>#{var}</string>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run [opt_bin/"webdis", etc/"webdis.prod.json"]
+    keep_alive true
+    working_dir var
   end
 
   test do

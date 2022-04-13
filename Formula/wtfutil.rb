@@ -2,16 +2,18 @@ class Wtfutil < Formula
   desc "Personal information dashboard for your terminal"
   homepage "https://wtfutil.com"
   url "https://github.com/wtfutil/wtf.git",
-      tag:      "v0.35.0",
-      revision: "4b8b735a462e6fefa8e73dc36d68b89eb8986c12"
+      tag:      "v0.41.0",
+      revision: "fb027f1ec75b52137bc2828a8e0976a510b5591e"
   license "MPL-2.0"
+  head "https://github.com/wtfutil/wtf.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "d51620e6cf86db673ce46f663d332e113f06470b3ba276965ae779891b5c2437" => :big_sur
-    sha256 "4f4c122267e04735a6529555cc70d14d3161e941509c54f552a11f6210c2f510" => :arm64_big_sur
-    sha256 "7858804dd5d4555868d15c9fd83d150b980f611cff4731fc7ea004e505a44806" => :catalina
-    sha256 "f3dcb23b05d19acdcd2f1511a193ceab69e45e18beb2a3c88c242dc9922459ea" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "328f632701bb230bb7c1f585eaa8e8302caee981132bee7ece771ea620068d93"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "be10a4a93edcba84f41e3ee1963e846e1b0835d4ccf463a7ceef1aa949ea6063"
+    sha256 cellar: :any_skip_relocation, monterey:       "854d20c1a7b251d6c696a43b53bccd951c3ae68848b294067a11a483d77bedf5"
+    sha256 cellar: :any_skip_relocation, big_sur:        "f2b79ebab8e78ad546ef90e286907e85b7973c72be7678ee1f84d7d4c0a7bca9"
+    sha256 cellar: :any_skip_relocation, catalina:       "8f0694be170caf23c9ca6e45acdc0992059adee1dbdd6d477095d2a211dcd368"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "28ccf8bde8dda105bfaae2762d4a2f9bebdd58748fad6db78c1d4b12d6651253"
   end
 
   depends_on "go" => :build
@@ -20,9 +22,9 @@ class Wtfutil < Formula
     ldflags = %W[
       -s -w
       -X main.version=#{version}
-      -X main.date=#{Time.now.iso8601}
-    ]
-    system "go", "build", "-trimpath", "-ldflags", ldflags.join(" "), "-o", bin/"wtfutil"
+      -X main.date=#{time.iso8601}
+    ].join(" ")
+    system "go", "build", *std_go_args(ldflags: ldflags)
   end
 
   test do

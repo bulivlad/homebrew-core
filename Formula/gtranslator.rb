@@ -1,20 +1,19 @@
 class Gtranslator < Formula
   desc "GNOME gettext PO file editor"
   homepage "https://wiki.gnome.org/Design/Apps/Translator"
-  url "https://download.gnome.org/sources/gtranslator/3.38/gtranslator-3.38.0.tar.xz"
-  sha256 "dbcda9b81a22d9233be18e99fd5c448f6ab05759d1e94c10580bb831ca2d7635"
+  url "https://download.gnome.org/sources/gtranslator/40/gtranslator-40.0.tar.xz"
+  sha256 "ec3eba36dee1c549377d1475aef71748dbaebd295005e1990ea9821f02b38834"
   license "GPL-3.0-or-later"
-
-  livecheck do
-    url :stable
-  end
+  revision 1
 
   bottle do
-    sha256 "87af99ef6bff1ac84eb04b70b0923040af2588909078f42ee2926620ebf9fd5c" => :big_sur
-    sha256 "5d5883134917ac1a97cdaafd240fc9f162843e8cc053954bce1381e893663d23" => :arm64_big_sur
-    sha256 "ca6600f0f0d75cc1f9c2a063ac2ad6bdfe790fe89a72533307deda968903eb2b" => :catalina
-    sha256 "d46199ba9a6eb1a9cf068fe5a9ae34529ab60b70ebdaca2f29c82e4eef86d34b" => :mojave
-    sha256 "13cc15d49f5c39f4be9f28860b6e99d7186d7b985fa03308f3a185692f57ad3b" => :high_sierra
+    rebuild 1
+    sha256 arm64_monterey: "15e9c85730e88ddb9544d01722e972bd6b68b3baab42effdf25a585381d90772"
+    sha256 arm64_big_sur:  "e787ad4e441d4ecd4d9c328fb18d2384a21862b0a389170ee54cbbd01879a556"
+    sha256 monterey:       "25908591830110dc32edc52b04ef4c3dbf296b782d1ace73191826205a889fd3"
+    sha256 big_sur:        "8a5b528e062820cdc3ebd9b024b4e96f3ec2d65d521b03026828d32d748774e1"
+    sha256 catalina:       "91dd2d4c85608fb04f7a4f92423dce39ab2ab04a3f11152c30efad1bd96f14c6"
+    sha256 x86_64_linux:   "8e7e8ca6e284f89497170bd47e232d47c9db1566b2e6c5835cc615086bdeeb58"
   end
 
   depends_on "meson" => :build
@@ -30,7 +29,14 @@ class Gtranslator < Formula
   depends_on "json-glib"
   depends_on "libdazzle"
   depends_on "libgda"
-  depends_on "libsoup"
+  depends_on "libhandy"
+  depends_on "libsoup@2"
+
+  # Apply upstream commit to fix build with meson. Remove with next release.
+  patch do
+    url "https://gitlab.gnome.org/GNOME/gtranslator/-/commit/7ac572cc8c8c37ca3826ecf0d395edd3c38e8e22.diff"
+    sha256 "cc93ba73ab5e010171fa21d5e345a2b4f69773bc786d07952181f86d1b66f368"
+  end
 
   def install
     # stop meson_post_install.py from doing what needs to be done in the post_install step

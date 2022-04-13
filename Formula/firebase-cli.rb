@@ -3,29 +3,41 @@ require "language/node"
 class FirebaseCli < Formula
   desc "Firebase command-line tools"
   homepage "https://firebase.google.com/docs/cli/"
-  url "https://registry.npmjs.org/firebase-tools/-/firebase-tools-9.2.0.tgz"
-  sha256 "4429a53519bcca5a5d56ee41ee47dc0f71e5a698b4c3b5881fbe266c2c9177f1"
+  url "https://registry.npmjs.org/firebase-tools/-/firebase-tools-10.6.0.tgz"
+  sha256 "0698964ba92789861b79211b9fca6e8269b0d114c356a302e277775678a30fa2"
   license "MIT"
-  head "https://github.com/firebase/firebase-tools.git"
-
-  livecheck do
-    url :stable
-  end
+  head "https://github.com/firebase/firebase-tools.git", branch: "master"
 
   bottle do
-    sha256 "d2709d1a4eeadf7d81833d9b322dd5c3770c7d258e5bce4b4db762868ec17445" => :big_sur
-    sha256 "d64463aafec7bd87c8e8bd60ac3f4038d382ae7506d6e2ff39c75858154b2c40" => :arm64_big_sur
-    sha256 "1155228b2bc5f4b086786c27f1499a3b9089e8932f15dfa2061aaa3cc7de1adc" => :catalina
-    sha256 "ea211e4ea27932dcdb9de7155ca7196b54a635df40b4232e5982cc1c7bbd545d" => :mojave
+    sha256                               arm64_monterey: "0d6936cd4cd5d2ded711f086169f5543f151aa8cded1d0079f0116bc7600a009"
+    sha256                               arm64_big_sur:  "ee726ee6fa730375d0f360e8b73460180284a7a21c0e72dbe6fb7601c0fd005c"
+    sha256 cellar: :any_skip_relocation, monterey:       "b3585eeb65b5b89af0cdc8aaa3274e5eb56248d55bc7e5c1a265269385c3da9a"
+    sha256 cellar: :any_skip_relocation, big_sur:        "b3585eeb65b5b89af0cdc8aaa3274e5eb56248d55bc7e5c1a265269385c3da9a"
+    sha256 cellar: :any_skip_relocation, catalina:       "b3585eeb65b5b89af0cdc8aaa3274e5eb56248d55bc7e5c1a265269385c3da9a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5e04e26d68d90f35d722e76eeda5a7448ab0c8c3477f3509e2efead63fde334b"
   end
 
   depends_on "node"
 
   uses_from_macos "expect" => :test
 
+  on_macos do
+    depends_on "macos-term-size"
+  end
+
   def install
     system "npm", "install", *Language::Node.std_npm_install_args(libexec)
     bin.install_symlink Dir["#{libexec}/bin/*"]
+
+    term_size_vendor_dir = libexec/"lib/node_modules/firebase-tools/node_modules/term-size/vendor"
+    term_size_vendor_dir.rmtree # remove pre-built binaries
+
+    if OS.mac?
+      macos_dir = term_size_vendor_dir/"macos"
+      macos_dir.mkpath
+      # Replace the vendored pre-built term-size with one we build ourselves
+      ln_sf (Formula["macos-term-size"].opt_bin/"term-size").relative_path_from(macos_dir), macos_dir
+    end
   end
 
   test do

@@ -1,26 +1,26 @@
 class Sdl2 < Formula
   desc "Low-level access to audio, keyboard, mouse, joystick, and graphics"
   homepage "https://www.libsdl.org/"
-  url "https://libsdl.org/release/SDL2-2.0.14.tar.gz"
-  sha256 "d8215b571a581be1332d2106f8036fcb03d12a70bae01e20f424976d275432bc"
+  url "https://libsdl.org/release/SDL2-2.0.20.tar.gz"
+  sha256 "c56aba1d7b5b0e7e999e4a7698c70b63a3394ff9704b5f6e1c57e0c16f04dd06"
   license "Zlib"
-  revision 1
 
   livecheck do
     url "https://www.libsdl.org/download-2.0.php"
-    regex(/SDL2[._-]v?(\d+(?:\.\d+)*)/i)
+    regex(/href=.*?SDL2[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    cellar :any
-    sha256 "ccde7145d4334d9274f9588e6b841bf3749729682e1d25f590bdcf7994dfdd89" => :big_sur
-    sha256 "2ae70b6025c4e241400643f2686c8e288d50e3f04311e63d8a1f8180ed4afb07" => :arm64_big_sur
-    sha256 "d6ae3300160c5bb495b78a5c5c0fc995f9e797e9cdd4b04ef77d59d45d2d694d" => :catalina
-    sha256 "4f3988fb3af0f370bc1648d6eb1d6573fd37381df0f3b9ee0874a49d6a7dec2e" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "3cbd5b0ac7c9f4aedfa57dcfa02cff1e88013e8713cd5ec76d185897ee052b4f"
+    sha256 cellar: :any,                 arm64_big_sur:  "7aca35ed5898e9dbcce4fa5372520f13626224d1600f391e70124012eeb1d0af"
+    sha256 cellar: :any,                 monterey:       "2f9879903f7c18cef28684ee6718510baed17d1dcafc01416da6a35a29f0a1af"
+    sha256 cellar: :any,                 big_sur:        "0a28562932bdf7d4f5b7528297d8a0d3a8e5ce04f67386110bc785800018f3bf"
+    sha256 cellar: :any,                 catalina:       "9469eff3f8d7ddc9064eb8223cd220d8b1934fd6b5205199a8eb7bf50d84df04"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c1c80d0712cd623beb51bdfcfd9494b6b62639dcd70f8ae10f947731b7254236"
   end
 
   head do
-    url "https://hg.libsdl.org/SDL", using: :hg
+    url "https://github.com/libsdl-org/SDL.git", branch: "main"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
@@ -29,17 +29,41 @@ class Sdl2 < Formula
 
   on_linux do
     depends_on "pkg-config" => :build
+    depends_on "libice"
+    depends_on "libxcursor"
+    depends_on "libxscrnsaver"
+    depends_on "libxxf86vm"
+    depends_on "xinput"
+    depends_on "pulseaudio"
   end
 
   def install
-    # we have to do this because most build scripts assume that all SDL modules
+    # We have to do this because most build scripts assume that all SDL modules
     # are installed to the same prefix. Consequently SDL stuff cannot be
     # keg-only but I doubt that will be needed.
     inreplace %w[sdl2.pc.in sdl2-config.in], "@prefix@", HOMEBREW_PREFIX
 
     system "./autogen.sh" if build.head?
 
-    args = %W[--prefix=#{prefix} --without-x --enable-hidapi]
+    args = %W[--prefix=#{prefix} --enable-hidapi]
+    args << if OS.mac?
+      "--without-x"
+    else
+      args << "--with-x"
+      args << "--enable-pulseaudio"
+      args << "--enable-pulseaudio-shared"
+      args << "--enable-video-dummy"
+      args << "--enable-video-opengl"
+      args << "--enable-video-opengles"
+      args << "--enable-video-x11"
+      args << "--enable-video-x11-scrnsaver"
+      args << "--enable-video-x11-xcursor"
+      args << "--enable-video-x11-xinerama"
+      args << "--enable-video-x11-xinput"
+      args << "--enable-video-x11-xrandr"
+      args << "--enable-video-x11-xshape"
+      "--enable-x11-shared"
+    end
     system "./configure", *args
     system "make", "install"
   end

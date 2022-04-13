@@ -1,17 +1,22 @@
 class Chrony < Formula
   desc "Versatile implementation of the Network Time Protocol (NTP)"
   homepage "https://chrony.tuxfamily.org"
-  url "https://download.tuxfamily.org/chrony/chrony-4.0.tar.gz"
-  sha256 "be27ea14c55e7a4434b2fa51d53018c7051c42fa6a3198c9aa6a1658bae0c625"
+  url "https://download.tuxfamily.org/chrony/chrony-4.2.tar.gz"
+  sha256 "273f9fd15c328ed6f3a5f6ba6baec35a421a34a73bb725605329b1712048db9a"
   license "GPL-2.0-only"
 
+  livecheck do
+    url "https://chrony.tuxfamily.org/download.html"
+    regex(/href=.*?chrony[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
+
   bottle do
-    cellar :any_skip_relocation
-    sha256 "66ae96878def0abda5c946891877604bae3490d5d5f98d9f31a234c77f705bf0" => :big_sur
-    sha256 "9b985414e3e8987475a318069ef5c23817e1a9cb824c25f361ba815d708fcb5f" => :arm64_big_sur
-    sha256 "18080256097344abcf595e69bc8e0b15faefbe5e9d5e36f1326e0bae8e089d5d" => :catalina
-    sha256 "5227442d8a26057125ac087fb30520dc65d65ee287ce56362d08b2f12e5e6f7c" => :mojave
-    sha256 "c92b075e3cfd4419cf2339b2bfd779e2df4479ab58c23b19b396c4e85bdeb300" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "cb83f99b7e12d8f5ad1b734f2b7566a8c8c866981b6c296dad5d2edec6b12d22"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "2c8a63cf7644533253ee6b80d5e3b93622a953dd7521f13c2f843ad97a4c63f5"
+    sha256 cellar: :any_skip_relocation, monterey:       "9c72a415e288c845f5491f9b8243a5b50a78f6f82afecb458d201968f5de40db"
+    sha256 cellar: :any_skip_relocation, big_sur:        "40792ab0bc8e915469e9ec32972b1fc0f829a19daa808fbae999ec56da850040"
+    sha256 cellar: :any_skip_relocation, catalina:       "57851e6d80dc3512bb0060c0338b5de0c12ad74d200a0dd7276264c85275f04a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e54104a016acbd42cae4b92ea71ea898ec2b4401858f13894a3c0feca8d12779"
   end
 
   depends_on "nettle"
@@ -27,6 +32,6 @@ class Chrony < Formula
   test do
     (testpath/"test.conf").write "pool pool.ntp.org iburst\n"
     output = shell_output(sbin/"chronyd -Q -f #{testpath}/test.conf 2>&1")
-    assert_match /System clock wrong by -?\d+\.\d+ seconds \(ignored\)/, output
+    assert_match(/System clock wrong by -?\d+\.\d+ seconds \(ignored\)/, output)
   end
 end

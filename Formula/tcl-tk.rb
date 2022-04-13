@@ -1,10 +1,11 @@
 class TclTk < Formula
   desc "Tool Command Language"
   homepage "https://www.tcl-lang.org"
-  url "https://downloads.sourceforge.net/project/tcl/Tcl/8.6.11/tcl8.6.11-src.tar.gz"
-  mirror "https://fossies.org/linux/misc/tcl8.6.11-src.tar.gz"
-  sha256 "8c0486668586672c5693d7d95817cb05a18c5ecca2f40e2836b9578064088258"
+  url "https://downloads.sourceforge.net/project/tcl/Tcl/8.6.12/tcl8.6.12-src.tar.gz"
+  mirror "https://fossies.org/linux/misc/tcl8.6.12-src.tar.gz"
+  sha256 "26c995dd0f167e48b11961d891ee555f680c175f7173ff8cb829f4ebcde4c1a6"
   license "TCL"
+  revision 1
 
   livecheck do
     url :stable
@@ -12,19 +13,25 @@ class TclTk < Formula
   end
 
   bottle do
-    sha256 "f7c4fb93ca32dca70f3ead938b44bce22c7a99f060242ce802ca8955d274f361" => :big_sur
-    sha256 "644ee6e6ddc248535a25e515b0792dfa3e80a801f1173b50fffc97abd68574d8" => :arm64_big_sur
-    sha256 "5bc2306be500fe9eba4df65215a7322196260c91864095591216b442d62dfccf" => :catalina
-    sha256 "2980557e6f0539e821c50207631a6cd45bc5999715c48972d3857ba792443d51" => :mojave
+    sha256 arm64_monterey: "8accfee37564f1f390c27ba44a1e501ae3a2ba23fb8ecf126da43c105aa3411c"
+    sha256 arm64_big_sur:  "6097b84f40aded10af8c4bd300e1b82cd89f2f019bf05721cc433a78c553932a"
+    sha256 monterey:       "6dd6e9147cab000f8fee32efb4b7069f8128d2b0eb0f6d45fc96ddcedb936afe"
+    sha256 big_sur:        "ed8b2d7204d9afc96153af7df2954714c4a07af6f2cbd90b60da15f270a82977"
+    sha256 catalina:       "73092f5fab605e4e35c05721d9689c93e728e6005eb2a0c564d5a8c08f9628cc"
+    sha256 x86_64_linux:   "9be465cbb1307669acc2e62c5788611c8ff5917d4007437b1d32796de68de7ad"
   end
 
   keg_only :provided_by_macos
 
   depends_on "openssl@1.1"
 
+  uses_from_macos "zlib"
+
   on_linux do
     depends_on "freetype" => :build
     depends_on "pkg-config" => :build
+    depends_on "libx11"
+    depends_on "libxext"
   end
 
   resource "critcl" do
@@ -43,9 +50,9 @@ class TclTk < Formula
   end
 
   resource "tk" do
-    url "https://downloads.sourceforge.net/project/tcl/Tcl/8.6.11/tk8.6.11-src.tar.gz"
-    mirror "https://fossies.org/linux/misc/tk8.6.11-src.tar.gz"
-    sha256 "5228a8187a7f70fa0791ef0f975270f068ba9557f57456f51eb02d9d4ea31282"
+    url "https://downloads.sourceforge.net/project/tcl/Tcl/8.6.12/tk8.6.12-src.tar.gz"
+    mirror "https://fossies.org/linux/misc/tk8.6.12-src.tar.gz"
+    sha256 "12395c1f3fcb6bed2938689f797ea3cdf41ed5cb6c4766eec8ac949560310630"
   end
 
   resource "itk4" do
@@ -74,8 +81,8 @@ class TclTk < Formula
 
     resource("tk").stage do
       cd "unix" do
-        system "./configure", *args, "--enable-aqua=yes",
-                              "--without-x", "--with-tcl=#{lib}"
+        args << "--enable-aqua=yes" if OS.mac?
+        system "./configure", *args, "--without-x", "--with-tcl=#{lib}"
         system "make"
         system "make", "install"
         system "make", "install-private-headers"
@@ -90,10 +97,9 @@ class TclTk < Formula
     resource("tcllib").stage do
       system "./configure", "--prefix=#{prefix}", "--mandir=#{man}"
       system "make", "install"
-      ENV["SDKROOT"] = MacOS.sdk_path
       system "make", "critcl"
       cp_r "modules/tcllibc", "#{lib}/"
-      ln_s "#{lib}/tcllibc/macosx-x86_64-clang", "#{lib}/tcllibc/macosx-x86_64"
+      ln_s "#{lib}/tcllibc/macosx-x86_64-clang", "#{lib}/tcllibc/macosx-x86_64" if OS.mac?
     end
 
     resource("tcltls").stage do
@@ -117,10 +123,26 @@ class TclTk < Formula
       system "make"
       system "make", "install"
     end
+
+    # Conflicts with perl
+    mv man/"man3/Thread.3", man/"man3/ThreadTclTk.3"
+
+    # Use the sqlite-analyzer formula instead
+    # https://github.com/Homebrew/homebrew-core/pull/82698
+    rm bin/"sqlite3_analyzer"
+  end
+
+  def caveats
+    <<~EOS
+      The sqlite3_analyzer binary is in the `sqlite-analyzer` formula.
+    EOS
   end
 
   test do
     assert_equal "honk", pipe_output("#{bin}/tclsh", "puts honk\n").chomp
+
+    # Fails with: no display name and no $DISPLAY environment variable
+    return if OS.linux? && ENV["HOMEBREW_GITHUB_ACTIONS"]
 
     test_itk = <<~EOS
       # Check that Itcl and Itk load, and that we can define, instantiate,

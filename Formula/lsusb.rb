@@ -6,15 +6,13 @@ class Lsusb < Formula
   license "MIT"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "a1b7ef763a83e68074528407469fae8fd265269981332d139ab0acca67ea4376" => :big_sur
-    sha256 "3ad2f30f538b1ec0122a492b6e5f07ee70b2d7f2bb9e1cd267b8879b7534dc7d" => :arm64_big_sur
-    sha256 "7ab2cb027f186840ea1c96e47b4d48a8dfc42d91847d79bdd3faa6677ef603ca" => :catalina
-    sha256 "4f2f4f45cb6df2d5262bb823e02f750e7e5b4f117dca8a41fc6956435a277cb9" => :mojave
-    sha256 "e696db36d09169064b3e97852d07464125e5bc6e400cb2a4cc186e6aa606574a" => :high_sierra
-    sha256 "e696db36d09169064b3e97852d07464125e5bc6e400cb2a4cc186e6aa606574a" => :sierra
-    sha256 "e696db36d09169064b3e97852d07464125e5bc6e400cb2a4cc186e6aa606574a" => :el_capitan
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "03895259bbcb43d072aacd4d000cb28807f5bff928bc8585663320beed5a7409"
   end
+
+  depends_on :macos
+
+  conflicts_with "usbutils", because: "both provide an `lsusb` binary"
 
   def install
     bin.install "lsusb"
@@ -23,6 +21,6 @@ class Lsusb < Formula
 
   test do
     output = shell_output("#{bin}/lsusb")
-    assert_match /^Bus [0-9]+ Device [0-9]+:/, output
+    assert_match(/^Bus [0-9]+ Device [0-9]+:/, output)
   end
 end

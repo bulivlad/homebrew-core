@@ -1,19 +1,17 @@
 class Librsvg < Formula
   desc "Library to render SVG files using Cairo"
   homepage "https://wiki.gnome.org/Projects/LibRsvg"
-  url "https://download.gnome.org/sources/librsvg/2.50/librsvg-2.50.2.tar.xz"
-  sha256 "6211f271ce4cd44a7318190d36712e9cea384a933d3e3570004edeb210a056d3"
+  url "https://download.gnome.org/sources/librsvg/2.52/librsvg-2.52.8.tar.xz"
+  sha256 "bade8eda74f2d7efb414e9bae53004806e1fa7dc05f04cad59b74eb1a5756962"
   license "LGPL-2.1-or-later"
 
-  livecheck do
-    url :stable
-  end
-
   bottle do
-    sha256 "37f06d5645603a844550a8ef7fd9b2b1b5abdfde4865fdc97530744673c31a38" => :big_sur
-    sha256 "7a9b9d526de36bec0544fb61c5834a464a12533da36777ebd4b9db6079477f7b" => :arm64_big_sur
-    sha256 "31e57e1d77eb1ffde7abebaca3bcb1a8552dc7cdaf9484687f575865a9f02906" => :catalina
-    sha256 "9b9242aeb3b35e08fd08a9a46df3ed11d30e22031be23465a2e4aafe2dadf82d" => :mojave
+    sha256                               arm64_monterey: "329012ae8855a987804b8de3fd6aa2e2a0d43cf1a2524da67a8a7b11bd0df97b"
+    sha256                               arm64_big_sur:  "b6ea5a817ff63c865c02db080ef474926ddd49e8f89ca4017da13de0abc22a65"
+    sha256                               monterey:       "f36427d1112775836175132d5316b95d693c7ac7cc8347f39cccc7a24f72d739"
+    sha256                               big_sur:        "f59a0fdfca3a229b131ff37bfb46d7f3af668fb6e81d4a8453af84f4f9fd3c6f"
+    sha256                               catalina:       "e9e9a1529b58c0839d165ec4101214aabacd424821534ac39036aa9989ee8a9a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b17b560b0d30470cad93284b6239a09c1313aa94e2f2eee9bb3a351ab2300153"
   end
 
   depends_on "gobject-introspection" => :build
@@ -25,9 +23,6 @@ class Librsvg < Formula
   depends_on "pango"
 
   def install
-    # https://gitlab.gnome.org/GNOME/librsvg/issues/545#note_753842
-    ENV.append "LDFLAGS", "-lobjc"
-
     args = %W[
       --disable-dependency-tracking
       --prefix=#{prefix}
@@ -96,10 +91,10 @@ class Librsvg < Formula
       -lgio-2.0
       -lglib-2.0
       -lgobject-2.0
-      -lintl
       -lm
       -lrsvg-2
     ]
+    flags << "-lintl" if OS.mac?
     system ENV.cc, "test.c", "-o", "test", *flags
     system "./test"
   end

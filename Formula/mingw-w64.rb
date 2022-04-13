@@ -1,10 +1,9 @@
 class MingwW64 < Formula
   desc "Minimalist GNU for Windows and GCC cross-compilers"
   homepage "https://sourceforge.net/projects/mingw-w64/"
-  url "https://downloads.sourceforge.net/project/mingw-w64/mingw-w64/mingw-w64-release/mingw-w64-v8.0.0.tar.bz2"
-  sha256 "44c740ea6ab3924bc3aa169bad11ad3c5766c5c8459e3126d44eabb8735a5762"
+  url "https://downloads.sourceforge.net/project/mingw-w64/mingw-w64/mingw-w64-release/mingw-w64-v10.0.0.tar.bz2"
+  sha256 "ba6b430aed72c63a3768531f6a3ffc2b0fde2c57a3b251450dcf489a894f0894"
   license "ZPL-2.1"
-  revision 1
 
   livecheck do
     url :stable
@@ -12,9 +11,12 @@ class MingwW64 < Formula
   end
 
   bottle do
-    sha256 "6ff09391503acb9a79e8c21d5e80711f4d19db7db0c4c0687db8094f9c76ce9b" => :big_sur
-    sha256 "e5f465db3f1e4238b1c58400a0a76df3c96ad3b91bb55ab886c52d2e394ed7f0" => :catalina
-    sha256 "42929fb1daa8b9e17ca07215658c9ad8b9df39ead958c166787b45292ea29346" => :mojave
+    sha256 arm64_monterey: "0be206b11225c8c065512f0fcb51dcbe5945105e5e491ddc17a4a4a71487e97b"
+    sha256 arm64_big_sur:  "68973da0ff787d7c8407e1d827bd1b971dbcfb8ee515c34de7a321c4c7b9fc24"
+    sha256 monterey:       "cb42c44f41f86e02ecf279a13f4198e1d595348285e9df7fac94a89aefcef4dd"
+    sha256 big_sur:        "cfbf6fd1f20dade260a11b9f8bdfa3b84787ff530e86e60b8c00093ef079cff8"
+    sha256 catalina:       "1d45a53a6265dac0f260f0101eda61d8d739dbe4ebea42ba6dccdb5858b9bc8b"
+    sha256 x86_64_linux:   "4242ffa31a4a86f7e9d204c07d4dd32599aef03bac4e8e0d8a2290727178f179"
   end
 
   # Apple's makeinfo is old and has bugs
@@ -26,15 +28,31 @@ class MingwW64 < Formula
   depends_on "mpfr"
 
   resource "binutils" do
-    url "https://ftp.gnu.org/gnu/binutils/binutils-2.35.1.tar.xz"
-    mirror "https://ftpmirror.gnu.org/binutils/binutils-2.35.1.tar.xz"
-    sha256 "3ced91db9bf01182b7e420eab68039f2083aed0a214c0424e257eae3ddee8607"
+    url "https://ftp.gnu.org/gnu/binutils/binutils-2.38.tar.xz"
+    mirror "https://ftpmirror.gnu.org/binutils/binutils-2.38.tar.xz"
+    sha256 "e316477a914f567eccc34d5d29785b8b0f5a10208d36bbacedcc39048ecfe024"
+
+    # Fix dlltool failures during parallel builds until the release after 2.38, upstream patch
+    # https://sourceware.org/bugzilla/show_bug.cgi?id=28885
+    #
+    # patch is from https://sourceware.org/git/?p=binutils-gdb.git;a=patch;h=d65c0ddddd85645cab6f11fd711d21638a74489f
+    # with ChangeLog patch removed
+    patch :DATA
   end
 
   resource "gcc" do
-    url "https://ftp.gnu.org/gnu/gcc/gcc-10.2.0/gcc-10.2.0.tar.xz"
-    mirror "https://ftpmirror.gnu.org/gcc/gcc-10.2.0/gcc-10.2.0.tar.xz"
-    sha256 "b8dd4368bb9c7f0b98188317ee0254dd8cc99d1e3a18d0ff146c855fe16c1d8c"
+    url "https://ftp.gnu.org/gnu/gcc/gcc-11.2.0/gcc-11.2.0.tar.xz"
+    mirror "https://ftpmirror.gnu.org/gcc/gcc-11.2.0/gcc-11.2.0.tar.xz"
+    sha256 "d08edc536b54c372a1010ff6619dd274c0f1603aa49212ba20f7aa2cda36fa8b"
+
+    # Remove when upstream has Apple Silicon support
+    if Hardware::CPU.arm?
+      patch do
+        # patch from gcc-11.1.0-arm branch
+        url "https://github.com/fxcoudert/gcc/commit/eea3046c5fa62d4dee47e074c7a758570d9da61c.patch?full_index=1"
+        sha256 "b55ca05a0ed32f69f63bbe708568df5ad62d938da0e34b515d601bb966d32d40"
+      end
+    end
   end
 
   def target_archs
@@ -88,12 +106,11 @@ class MingwW64 < Formula
         --with-mpfr=#{Formula["mpfr"].opt_prefix}
         --with-mpc=#{Formula["libmpc"].opt_prefix}
         --with-isl=#{Formula["isl"].opt_prefix}
+        --with-zstd=no
         --disable-multilib
         --disable-nls
         --enable-threads=posix
       ]
-      # Avoid reference to sed shim
-      args << "SED=/usr/bin/sed"
 
       mkdir "#{buildpath}/gcc/build-#{arch}" do
         system "../configure", *args
@@ -120,8 +137,15 @@ class MingwW64 < Formula
 
       mkdir "mingw-w64-crt/build-#{arch}" do
         system "../configure", *args
-        system "make"
-        system "make", "install"
+        # Resolves "Too many open files in system"
+        # bfd_open failed open stub file dfxvs01181.o: Too many open files in system
+        # bfd_open failed open stub file: dvxvs00563.o: Too many open files in systembfd_open
+        # https://sourceware.org/bugzilla/show_bug.cgi?id=24723
+        # https://sourceware.org/bugzilla/show_bug.cgi?id=23573#c18
+        ENV.deparallelize do
+          system "make"
+          system "make", "install"
+        end
       end
 
       # Build the winpthreads library
@@ -137,6 +161,18 @@ class MingwW64 < Formula
         --prefix=#{arch_dir}/#{target}
       ]
       mkdir "mingw-w64-libraries/winpthreads/build-#{arch}" do
+        system "../configure", *args
+        system "make"
+        system "make", "install"
+      end
+
+      args = %W[
+        --host=#{target}
+        --with-sysroot=#{arch_dir}/#{target}
+        --prefix=#{arch_dir}
+        --program-prefix=#{target}-
+      ]
+      mkdir "mingw-w64-tools/widl/build-#{arch}" do
         system "../configure", *args
         system "make"
         system "make", "install"
@@ -168,9 +204,25 @@ class MingwW64 < Formula
     (testpath/"hello.f90").write <<~EOS
       program hello ; print *, "Hello, world!" ; end program hello
     EOS
+    # https://docs.microsoft.com/en-us/windows/win32/rpc/using-midl
+    (testpath/"example.idl").write <<~EOS
+      [
+        uuid(ba209999-0c6c-11d2-97cf-00c04f8eea45),
+        version(1.0)
+      ]
+      interface MyInterface
+      {
+        const unsigned short INT_ARRAY_LEN = 100;
+
+        void MyRemoteProc(
+            [in] int param1,
+            [out] int outArray[INT_ARRAY_LEN]
+        );
+      }
+    EOS
 
     ENV["LC_ALL"] = "C"
-    ENV.remove_macosxsdk
+    ENV.remove_macosxsdk if OS.mac?
     target_archs.each do |arch|
       target = "#{arch}-w64-mingw32"
       outarch = (arch == "i686") ? "i386" : "x86-64"
@@ -183,6 +235,30 @@ class MingwW64 < Formula
 
       system "#{bin}/#{target}-gfortran", "-o", "test.exe", "hello.f90"
       assert_match "file format pei-#{outarch}", shell_output("#{bin}/#{target}-objdump -a test.exe")
+
+      system "#{bin}/#{target}-widl", "example.idl"
+      assert_predicate testpath/"example_s.c", :exist?, "example_s.c should have been created"
     end
   end
 end
+
+__END__
+diff --git a/binutils/dlltool.c b/binutils/dlltool.c
+index d95bf3f5470..89871510b45 100644
+--- a/binutils/dlltool.c
++++ b/binutils/dlltool.c
+@@ -3992,10 +3992,11 @@ main (int ac, char **av)
+   if (tmp_prefix == NULL)
+     {
+       /* If possible use a deterministic prefix.  */
+-      if (dll_name)
++      if (imp_name || delayimp_name)
+         {
+-          tmp_prefix = xmalloc (strlen (dll_name) + 2);
+-          sprintf (tmp_prefix, "%s_", dll_name);
++          const char *input = imp_name ? imp_name : delayimp_name;
++          tmp_prefix = xmalloc (strlen (input) + 2);
++          sprintf (tmp_prefix, "%s_", input);
+           for (i = 0; tmp_prefix[i]; i++)
+             if (!ISALNUM (tmp_prefix[i]))
+               tmp_prefix[i] = '_';

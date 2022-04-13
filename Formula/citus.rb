@@ -1,28 +1,33 @@
 class Citus < Formula
   desc "PostgreSQL-based distributed RDBMS"
   homepage "https://www.citusdata.com"
-  url "https://github.com/citusdata/citus/archive/v9.5.1.tar.gz"
-  sha256 "60fb578969f8802f37bf81f838a624a2fc2a2268db6cb353f052b80e0312479a"
-  license "AGPL-3.0"
-  head "https://github.com/citusdata/citus.git"
+  url "https://github.com/citusdata/citus/archive/v10.2.5.tar.gz"
+  sha256 "748beaf219163468f0b92bf5315798457f9859a6cd9069a7fd03208d8d231176"
+  license "AGPL-3.0-only"
+  head "https://github.com/citusdata/citus.git", branch: "master"
 
   bottle do
-    cellar :any
-    sha256 "8e8cba73505fd877e3e77d536dce67090df72571b6acab263fd4ad796af6b87f" => :big_sur
-    sha256 "11228b54d868246b82c72c3c36684bc11e82c38c10ccd87cb4be28d1f0e4c9d2" => :arm64_big_sur
-    sha256 "ad2597e41b22636985275aa54a4cda2fc2e00c6b273dde34cb4ee3abada79fc1" => :catalina
-    sha256 "8454d371d5ff6e3191f08a5422752451eb45b5f1100c461f19860b066e681ac9" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "5c1284be900f79340a7deb11cab8ec6ae499ae4d5fb3a353c38af68294f605ee"
+    sha256 cellar: :any,                 arm64_big_sur:  "8d8da700da3660cd9bc01aa509a25c7500e571d6353f0b718504d0307462692b"
+    sha256 cellar: :any,                 monterey:       "aed158c5fc1a817655cf33f8fdf52a4b35735ad81740fd40100e93247c3acad4"
+    sha256 cellar: :any,                 big_sur:        "c081472f3ea377cba1898543bbc45f9fbc750c8a53dd538645b16ccda66ba555"
+    sha256 cellar: :any,                 catalina:       "8d206df19b0d0c30e866571deb14ad101f170e8e5cd6574de218a41a266e7b36"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ed813a71d6e8c6e3c78627707f6bfbf1dd135959f1518748318b956666f62400"
   end
 
+  depends_on "lz4"
   depends_on "postgresql"
   depends_on "readline"
+  depends_on "zstd"
+
+  uses_from_macos "curl"
 
   def install
     ENV["PG_CONFIG"] = Formula["postgresql"].opt_bin/"pg_config"
 
     system "./configure"
 
-    # workaround for https://github.com/Homebrew/homebrew/issues/49948
+    # workaround for https://github.com/Homebrew/legacy-homebrew/issues/49948
     system "make", "libpq=-L#{Formula["postgresql"].opt_lib} -lpq"
 
     # Use stage directory to prevent installing to pg_config-defined dirs,
@@ -30,38 +35,9 @@ class Citus < Formula
     mkdir "stage"
     system "make", "install", "DESTDIR=#{buildpath}/stage"
 
-    bin.install Dir["stage/**/bin/*"]
-    lib.install Dir["stage/**/lib/*"]
-    include.install Dir["stage/**/include/*"]
-    (share/"postgresql/extension").install Dir["stage/**/share/postgresql/extension/*"]
-  end
-
-  test do
-    return if ENV["CI"]
-
-    pg_bin = Formula["postgresql"].opt_bin
-    pg_port = "55561"
-    system "#{pg_bin}/initdb", testpath/"test"
-    pid = fork do
-      exec("#{pg_bin}/postgres",
-           "-D", testpath/"test",
-           "-c", "shared_preload_libraries=citus",
-           "-p", pg_port)
-    end
-
-    begin
-      sleep 2
-
-      count_workers_query = "SELECT COUNT(*) FROM master_get_active_worker_nodes();"
-
-      system "#{pg_bin}/createdb", "-p", pg_port, "test"
-      system "#{pg_bin}/psql", "-p", pg_port, "-d", "test", "--command", "CREATE EXTENSION citus;"
-
-      assert_equal "0", shell_output("#{pg_bin}/psql -p #{pg_port} -d test -Atc" \
-                                     "'#{count_workers_query}'").strip
-    ensure
-      Process.kill 9, pid
-      Process.wait pid
-    end
+    path = File.join("stage", HOMEBREW_PREFIX)
+    lib.install (buildpath/path/"lib").children
+    include.install (buildpath/path/"include").children
+    (share/"postgresql/extension").install (buildpath/path/"share/postgresql/extension").children
   end
 end

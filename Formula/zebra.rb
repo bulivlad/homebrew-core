@@ -1,25 +1,33 @@
 class Zebra < Formula
   desc "Information management system"
-  homepage "https://www.indexdata.com/zebra"
-  url "http://ftp.indexdata.dk/pub/zebra/idzebra-2.2.2.tar.gz"
-  sha256 "513c2bf272e12745d4a7b58599ded0bc1292a84e9dc420a32eb53b6601ae0000"
+  homepage "https://www.indexdata.com/resources/software/zebra/"
+  url "https://ftp.indexdata.com/pub/zebra/idzebra-2.2.3.tar.gz"
+  sha256 "85ade449d161d97df47d4a8910a53a5ea3bd5e3598b6189d86fc8986a8effea4"
   license "GPL-2.0-or-later"
+  revision 1
 
   livecheck do
-    url "https://www.indexdata.com/resources/software/zebra"
-    regex(%r{>Latest:</strong>.*?v?(\d+(?:\.\d+)+)<}i)
+    url "https://ftp.indexdata.com/pub/zebra/"
+    regex(/href=.*?idzebra[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 "3521e4cde145c7ebd38c406d4a0c3a75d8f9154fe8a91ee63c62765befefb5d7" => :big_sur
-    sha256 "68e15eda361139139937655b494e3726b1c9236480ff3ab6e37c8e120b0f2c5f" => :arm64_big_sur
-    sha256 "b78b4ca52c9274c42692d190beb13c9b3709b8cb610831ee04bae42bf1ef4c04" => :catalina
-    sha256 "0c4967b8025621b5c3bc343329a2f01e07292163df9151c1432c70886dc81500" => :mojave
-    sha256 "a7f24384ddd17dda271a6c44a9f2db5f91ba3ee50944fbccc156ca9cd6387b3e" => :high_sierra
+    sha256 arm64_monterey: "cd2e9e694ed1b71aa2ad0cc29b542d24f6760ff31e815c34382d29201e76bc2a"
+    sha256 arm64_big_sur:  "051652cbbe88cff3f1fc2b7fd7b21e67d09f7544b61a689ecde155457fcadb29"
+    sha256 monterey:       "a3cd36cd15f5a012207aed8aaa48fc7b547e16d08e43c35f6c062ae219f9590f"
+    sha256 big_sur:        "554b0d6622e3389395412417585b0d35c7c4abf37369d4c01ab414cdfb181e4c"
+    sha256 catalina:       "42a4a51e46fe3168a7a07628916ad2968ab9831633383ce2dbcefc3033dc8691"
+    sha256 x86_64_linux:   "d14fc965c009ad0a3c9e085e8392f83996c78d4ce1dbafbd2e02c305da832d6c"
   end
 
   depends_on "icu4c"
   depends_on "yaz"
+
+  uses_from_macos "bzip2"
+  uses_from_macos "expat"
+  uses_from_macos "libxml2"
+  uses_from_macos "libxslt"
+  uses_from_macos "zlib"
 
   def install
     system "./configure", "--disable-dependency-tracking",

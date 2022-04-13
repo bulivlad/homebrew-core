@@ -1,8 +1,8 @@
 class Freeciv < Formula
   desc "Free and Open Source empire-building strategy game"
   homepage "http://freeciv.org"
-  url "https://downloads.sourceforge.net/project/freeciv/Freeciv%202.6/2.6.3/freeciv-2.6.3.tar.bz2"
-  sha256 "77432e027557a9eb407dac730ae9810ee172abe37111deb017fe72b8183ff8d1"
+  url "https://downloads.sourceforge.net/project/freeciv/Freeciv%202.6/2.6.6/freeciv-2.6.6.tar.bz2"
+  sha256 "7bcfe5dd3c081122e7cde7cdb24f57c3681d6a9667496faed207a91ac3165811"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -11,10 +11,12 @@ class Freeciv < Formula
   end
 
   bottle do
-    sha256 "57f0a07826b7fa224a79eda88041375d21fcd2787ab57bca311542da278da5a6" => :big_sur
-    sha256 "b32f1d068dac64d037bb4784d1bfe2f3d88801d45395647b46e83e9352428e97" => :arm64_big_sur
-    sha256 "c46864366282e6b626a787e45453f539c3604c334a84326a0c8cc4ab2511e7dd" => :catalina
-    sha256 "287706ed5964b4959c16017e641afe30e0348fd4840e9516525bceeb49ffa8d4" => :mojave
+    sha256 arm64_monterey: "d0cd6013001decd5b74d1ac8d7bba8d6e070bb2c27ed8cce5a41622d13aef267"
+    sha256 arm64_big_sur:  "3cb7282942ed5e1c4b4d7e48cbb3ba57554f597cd77e4a55b57b002102e6c90f"
+    sha256 monterey:       "22fe64446282ce7df3f109ea14322c7f33e28dea831fea3a7e1d7df0cabfa986"
+    sha256 big_sur:        "09cb343f164c953f7c6c44e24fa706f35b64e21ff711a930a10e0c4336ad94bd"
+    sha256 catalina:       "c3a9840643191f575c69eff922381cd713a2e2a7249a05f752edd8e3a4ebf673"
+    sha256 x86_64_linux:   "b481371af3c4dcd5c8ab1a4894b4d2a85d2f4953e8c72de4f757fbb3b9887af8"
   end
 
   head do
@@ -27,6 +29,7 @@ class Freeciv < Formula
   end
 
   depends_on "pkg-config" => :build
+  depends_on "adwaita-icon-theme"
   depends_on "atk"
   depends_on "cairo"
   depends_on "freetype"
@@ -43,7 +46,6 @@ class Freeciv < Formula
 
   uses_from_macos "bzip2"
   uses_from_macos "curl"
-  uses_from_macos "libiconv"
   uses_from_macos "zlib"
 
   def install
@@ -57,6 +59,7 @@ class Freeciv < Formula
       --disable-sdltest
       --disable-sdl2test
       --disable-sdl2framework
+      --enable-client=gtk3.22
       --enable-fcdb=sqlite3
       --prefix=#{prefix}
       --with-readline=#{Formula["readline"].opt_prefix}

@@ -1,20 +1,24 @@
 class Skylighting < Formula
   desc "Flexible syntax highlighter using KDE XML syntax descriptions"
   homepage "https://github.com/jgm/skylighting"
-  url "https://github.com/jgm/skylighting/archive/0.10.2.tar.gz"
-  sha256 "a29dcafef8c421554239124fc56c82c01b3309da0b6ce9430bd8e35fcd2e5cf7"
+  url "https://github.com/jgm/skylighting/archive/0.12.3.tar.gz"
+  sha256 "50126e6589a3507f19bc5ec83a933441c6f61b95fb5754a9d7c400194dceae70"
   license "GPL-2.0-or-later"
-  head "https://github.com/jgm/skylighting.git"
+  head "https://github.com/jgm/skylighting.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "34f08222d7e15af6bd91bfcd04ac8be60c5f67774339e1e18fd9487eaf74f92a" => :big_sur
-    sha256 "6010870086412a61abf05d67707b4563911c9c1fb0374c52069e2434632ae680" => :catalina
-    sha256 "067f75de5cfbfe7bd35a98b50624863ca202615a21f3ff2ca6b2f57543efc41a" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "a6361c56a877edd985d119f47beb2f3373da15308f919f1c09fa365204812573"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f4f674513c229f92cb5ef509c63e8cc1eab96ebf891c559dc0ea63fa0109a260"
+    sha256 cellar: :any_skip_relocation, monterey:       "f6be3405550535352133fbb98008f87b733260af6cada1c34c40f1cef74345f5"
+    sha256 cellar: :any_skip_relocation, big_sur:        "f86128838ce68540a2d67648e100ba3dbbd1f138b693cd6d2367170a27eb37ff"
+    sha256 cellar: :any_skip_relocation, catalina:       "5cf4fa77d96e296388409747439f034b868b93933f7b17c64edbbaa654cf2c2f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2cc48bc6dad6b29a12a42cdf43008f55d3c754a602fd82c87cfeb1e402f15d72"
   end
 
   depends_on "cabal-install" => :build
   depends_on "ghc" => :build
+
+  uses_from_macos "zlib"
 
   def install
     system "cabal", "v2-update"
@@ -26,7 +30,7 @@ class Skylighting < Formula
     mv buildpath/"skylighting.cabal.temp-loc", buildpath/"skylighting/skylighting.cabal"
 
     cd "skylighting" do
-      system bin/"skylighting-extract", *Dir[buildpath/"skylighting-core/xml/*.xml"]
+      system bin/"skylighting-extract", buildpath/"skylighting-core/xml"
     end
     system "cabal", "v2-install", buildpath/"skylighting", "-fexecutable", *std_cabal_v2_args
   end

@@ -1,35 +1,33 @@
 class Rclone < Formula
   desc "Rsync for cloud storage"
   homepage "https://rclone.org/"
-  url "https://github.com/rclone/rclone/archive/v1.53.3.tar.gz"
-  sha256 "46fb317057ada21add1fa683a004e1ad5b2a1523c381f59b40ed1b18f2856ad0"
+  url "https://github.com/rclone/rclone/archive/v1.58.0.tar.gz"
+  sha256 "b3f953a282964d6d73a7278ccb2bb836d9aca855e9dc5fb6f4bc986b0e5656fa"
   license "MIT"
-  revision 1
-  head "https://github.com/rclone/rclone.git"
+  head "https://github.com/rclone/rclone.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "9893c01fd98887fdb8a3f0172aa9f1c0c45772ef66745a035b2d59ed783a5a48" => :big_sur
-    sha256 "892887ded85fbe69da902eb186bfd29d17d6fd5bd2645dfa9d2d9bee5bcd08f4" => :arm64_big_sur
-    sha256 "7e0ac710208b82b5c40da947adebc35a97159d5ef6dae9bb77d5f9e147888a68" => :catalina
-    sha256 "fb4f008464eeec2bc8351ae821109ab762bf67aa604952e5d362288af67d9b46" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "dea3f371a26f95632b961cd76ea814e0c23aceb4921e2878cdbe8161b73a924a"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "30daa088932296311cce7c4cf081318aa4058f3b112c28503a2b7e532ec78dc7"
+    sha256 cellar: :any_skip_relocation, monterey:       "1b3ea62f9c0c08a828671d305e88ee19aaf49b0c0456e1d63066c2fba592306b"
+    sha256 cellar: :any_skip_relocation, big_sur:        "e91e118b3c97dd6c620751956b7b3cd1adf45ffa1467469e24033d286c360a0d"
+    sha256 cellar: :any_skip_relocation, catalina:       "abd890852b01a94e943c98a4375642c332508e6ab011d93318623a09bb67df60"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "471de3a5f330b651047e3fceeee65e8367760f6777156a45b31a6cf6313c5954"
   end
 
   depends_on "go" => :build
 
   def install
-    args = *std_go_args
-    on_macos do
-      args += ["-tags", "brew"]
-    end
-    system "go", "build",
-      "-ldflags", "-s -X github.com/rclone/rclone/fs.Version=v#{version}",
-      *args
+    args = *std_go_args(ldflags: "-s -w -X github.com/rclone/rclone/fs.Version=v#{version}")
+    args += ["-tags", "brew"] if OS.mac?
+    system "go", "build", *args
     man1.install "rclone.1"
     system bin/"rclone", "genautocomplete", "bash", "rclone.bash"
     system bin/"rclone", "genautocomplete", "zsh", "_rclone"
+    system bin/"rclone", "genautocomplete", "fish", "rclone.fish"
     bash_completion.install "rclone.bash" => "rclone"
     zsh_completion.install "_rclone"
+    fish_completion.install "rclone.fish"
   end
 
   def caveats
@@ -40,7 +38,7 @@ class Rclone < Formula
 
   test do
     (testpath/"file1.txt").write "Test!"
-    system "#{bin}/rclone", "copy", testpath/"file1.txt", testpath/"dist"
+    system bin/"rclone", "copy", testpath/"file1.txt", testpath/"dist"
     assert_match File.read(testpath/"file1.txt"), File.read(testpath/"dist/file1.txt")
   end
 end

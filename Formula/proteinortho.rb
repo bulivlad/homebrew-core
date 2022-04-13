@@ -1,16 +1,17 @@
 class Proteinortho < Formula
   desc "Detecting orthologous genes within different species"
   homepage "https://gitlab.com/paulklemm_PHD/proteinortho"
-  url "https://gitlab.com/paulklemm_PHD/proteinortho/-/archive/v6.0.27/proteinortho-v6.0.27.tar.gz"
-  sha256 "bf8a1e6163bfb184db03a2b1210dc94899766e416f3083ca347a5044903c7e6e"
+  url "https://gitlab.com/paulklemm_PHD/proteinortho/-/archive/v6.0.33/proteinortho-v6.0.33.tar.gz"
+  sha256 "332f61eee4ea6f3e27b38e123bb78b5263627fb5a4fd3609502877d8c0af7373"
   license "GPL-3.0-or-later"
 
   bottle do
-    cellar :any
-    sha256 "991bd14386381543bb06a3b4d7288b31e51d0e2944649f853cc1b3733eb1030d" => :big_sur
-    sha256 "24042f356fa58ee7b5bcc2c83badcb10ab644c3c182f9960d89dbb8e46ad0676" => :arm64_big_sur
-    sha256 "f1139517d77eafef09b06652ffd77b4c5c9c478ff1e2d1050d3f01235e2a3efb" => :catalina
-    sha256 "0c8b2794a7bb3b97c897c7bd7f13fb60e62728297f8e8dfd9ec0935d3957d144" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "86d0a6bba939c19be78b655b7fe161e7c2aa51d5535db2b8918def494b70d6ee"
+    sha256 cellar: :any,                 arm64_big_sur:  "ae9faec3141c8ad3f91975208cfe2788bc83d3c80d33171269cb88495f6d457a"
+    sha256 cellar: :any,                 monterey:       "63d12ed4d29984b6bed15047c392fc7e2dad45df827a5631b0cd183725df092c"
+    sha256 cellar: :any,                 big_sur:        "8eef61bed20ff2035788c88088d4e15d3bc6e4f93526de5b4d3df8420a8a2d61"
+    sha256 cellar: :any,                 catalina:       "ab9b48a0acf47a57d7f5d92d1181d67a87b3fb57d5132900d45d666bfff570ac"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "dc69849d15f173ed8145690fe9b1d525c20cbbcbb9d8e3c6110a689f3eaa5fea"
   end
 
   depends_on "diamond"

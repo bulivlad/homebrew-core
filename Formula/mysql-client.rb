@@ -1,30 +1,42 @@
 class MysqlClient < Formula
   desc "Open source relational database management system"
   homepage "https://dev.mysql.com/doc/refman/8.0/en/"
-  url "https://cdn.mysql.com/Downloads/MySQL-8.0/mysql-boost-8.0.22.tar.gz"
-  sha256 "ba765f74367c638d7cd1c546c05c14382fd997669bcd9680278e907f8d7eb484"
+  url "https://cdn.mysql.com/Downloads/MySQL-8.0/mysql-boost-8.0.28.tar.gz"
+  sha256 "6dd0303998e70066d36905bd8fef1c01228ea182dbfbabc6c22ebacdbf8b5941"
+  license "GPL-2.0-only" => { with: "Universal-FOSS-exception-1.0" }
 
   livecheck do
-    url "https://github.com/mysql/mysql-server.git"
-    regex(/^mysql[._-]v?(\d+(?:\.\d+)+)$/i)
+    formula "mysql"
   end
 
   bottle do
-    sha256 "bae5404e9b7f56c094333b0b07085c1c9c85779f69766064f3b282e6f2340cbc" => :big_sur
-    sha256 "87b578ab957fc937198383998026fb87a02de132aa0396a342c10fc55e709146" => :arm64_big_sur
-    sha256 "533b8b6535afa3463f01296e7c66c8c5b059684c2fafd841ba96fe29bfc14d8f" => :catalina
-    sha256 "3facd2969b6da9d1cde0d73a798b121c1a47cf507ed5a655ef8a288b92ddc23a" => :mojave
-    sha256 "fd77cb216f782f15d82a493ab9ec33d533e540027bb65aa406a3db5e134b821a" => :high_sierra
+    sha256 arm64_monterey: "8564876235a72f8e8d695bfef6a004b6240250acbbc364e6504837c944576ff8"
+    sha256 arm64_big_sur:  "e2322749d2d3137cebacbd73d0b5fa3ad6caaeb76be86ab9fa84bdc41851dbd2"
+    sha256 monterey:       "fc037da725fac5450fd5246b0ba2854c963ca90f1b1ebff34f111dc4bcc41a80"
+    sha256 big_sur:        "2a4de24361f2b52fd8cf4f8e3cdaefffaa09643df4253098515cb82fcf2c452d"
+    sha256 catalina:       "06e005e2cf6377a9f28b295f201bec9d52d9c7a9631d84f1d788145687611898"
+    sha256 x86_64_linux:   "03e040526cc6ec6ac2320f9445b63b4d0f6094889d080a696a2560d7b6548f19"
   end
 
   keg_only "it conflicts with mysql (which contains client libraries)"
 
   depends_on "cmake" => :build
+  depends_on "pkg-config" => :build
+  depends_on "libevent"
+  depends_on "libfido2"
   # GCC is not supported either, so exclude for El Capitan.
   depends_on macos: :sierra if DevelopmentTools.clang_build_version < 900
   depends_on "openssl@1.1"
+  depends_on "zstd"
 
   uses_from_macos "libedit"
+  uses_from_macos "zlib"
+
+  on_linux do
+    depends_on "gcc"
+  end
+
+  fails_with gcc: "5"
 
   def install
     # -DINSTALL_* are relative to `CMAKE_INSTALL_PREFIX` (`prefix`)
@@ -40,10 +52,30 @@ class MysqlClient < Formula
       -DINSTALL_MYSQLSHAREDIR=share/mysql
       -DWITH_BOOST=boost
       -DWITH_EDITLINE=system
+      -DWITH_FIDO=system
+      -DWITH_LIBEVENT=system
+      -DWITH_ZLIB=system
+      -DWITH_ZSTD=system
       -DWITH_SSL=yes
       -DWITH_UNIT_TESTS=OFF
       -DWITHOUT_SERVER=ON
     ]
+
+    # Their CMake macros check for `pkg-config` only on Linux and FreeBSD,
+    # so let's set `MY_PKG_CONFIG_EXECUTABLE` and `PKG_CONFIG_*` to make
+    # sure `pkg-config` is found and used.
+    if OS.mac?
+      args += %W[
+        -DMY_PKG_CONFIG_EXECUTABLE=pkg-config
+        -DPKG_CONFIG_FOUND=TRUE
+        -DPKG_CONFIG_VERSION_STRING=#{Formula["pkg-config"].version}
+        -DPKG_CONFIG_EXECUTABLE=#{Formula["pkg-config"].opt_bin}/pkg-config
+      ]
+
+      if ENV["HOMEBREW_SDKROOT"].present?
+        args << "-DPKG_CONFIG_ARGN=--define-variable=homebrew_sdkroot=#{ENV["HOMEBREW_SDKROOT"]}"
+      end
+    end
 
     system "cmake", ".", *std_cmake_args, *args
     system "make", "install"

@@ -3,21 +3,24 @@ class Networkit < Formula
 
   desc "Performance toolkit for large-scale network analysis"
   homepage "https://networkit.github.io"
-  url "https://github.com/networkit/networkit.git",
-      tag:      "7.1",
-      revision: "4c6dcc4367b51005a34221242048609c357ffbd6"
+  url "https://github.com/networkit/networkit/archive/9.1.1.tar.gz"
+  sha256 "0376b3b7b8ba1fefb46549c7dd2cf979237a24708293715b1da92b4da272a742"
   license "MIT"
-  revision 1
 
   bottle do
-    sha256 "23f70cc4fa3dc267391415b12f871ef39e27cca750e2e3a638b9075075ef4314" => :arm64_big_sur
-    sha256 "e9e7a572043c181f4aca4c76099b4d1d15e64108c15f5a85f308e9670a23afe4" => :catalina
-    sha256 "b89291dd82191c1f0723260297b0b95be0a060380dc820cd4041b00a4a48e149" => :mojave
-    sha256 "4c5688263e090b92933eda18a481a6c4de5e30460b1d503148fdc614c0324b2c" => :high_sierra
+    rebuild 1
+    sha256 cellar: :any, arm64_monterey: "dba17aec211b9a8def53232466c251ac398e38a3d1ad3c5d76b0bf11ca144c55"
+    sha256 cellar: :any, arm64_big_sur:  "d158fcf26c6611109a72ff60fc73a8c3546efb824f2ccc6cde0058c111d91952"
+    sha256 cellar: :any, monterey:       "f443a8636f1579826d9793613578d06adef3165773ee1353f32774081f253021"
+    sha256 cellar: :any, big_sur:        "ea766a3afd870e69d1860c4e093ac5cb431a495d9b304d3ba21c032717635213"
+    sha256 cellar: :any, catalina:       "456b7dbc97239bb9f3a9aa4588def29fb16a0c1f021017ad55b61ebcb60a9d72"
   end
 
   depends_on "cmake" => :build
-  depends_on "cython" => :build
+  depends_on "libcython" => :build
+  depends_on "ninja" => :build
+  depends_on "tlx" => :build
+
   depends_on "libnetworkit"
   depends_on "numpy"
   depends_on "python@3.9"
@@ -28,10 +31,11 @@ class Networkit < Formula
     rpath_addons = Formula["libnetworkit"].opt_lib
 
     ENV.prepend_create_path "PYTHONPATH", libexec+"lib/python#{xy}/site-packages/"
-    ENV.append_path "PYTHONPATH", Formula["cython"].opt_libexec/"lib/python#{xy}/site-packages"
+    ENV.append_path "PYTHONPATH", Formula["libcython"].opt_libexec/"lib/python#{xy}/site-packages"
     system Formula["python@3.9"].opt_bin/"python3", "setup.py", "build_ext",
           "--networkit-external-core",
-           "--rpath=@loader_path;#{rpath_addons}"
+          "--external-tlx=#{Formula["tlx"].opt_prefix}",
+          "--rpath=@loader_path;#{rpath_addons}"
     system Formula["python@3.9"].opt_bin/"python3", "setup.py", "install",
            "--single-version-externally-managed",
            "--record=installed.txt",

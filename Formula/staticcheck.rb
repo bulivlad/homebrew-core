@@ -1,23 +1,27 @@
 class Staticcheck < Formula
   desc "State of the art linter for the Go programming language"
   homepage "https://staticcheck.io/"
-  url "https://github.com/dominikh/go-tools/archive/2020.2.tar.gz"
-  sha256 "4e1658dd8f185f29568cd6bdc8943fe58cb7e6b7d62b4b69ef4bcecbc46d4253"
+  url "https://github.com/dominikh/go-tools/archive/2022.1.tar.gz"
+  sha256 "aecfced0299fc70d17fc7d8d8dc87590429081250f03cb4c6bdd378fd50353ab"
   license "MIT"
-  head "https://github.com/dominikh/go-tools.git"
+  head "https://github.com/dominikh/go-tools.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "27241d832369d54e2c75db20d984c841b96519e9474dd74f8e2bc4e92d9d0c41" => :big_sur
-    sha256 "ac3fd9cb21581df6bee190217b4e68af401da99c4a201b540af960505dab0a0b" => :arm64_big_sur
-    sha256 "16379ebcb571ff00903bd0894afc34b4eacf4d7076781afb2711816039c7db23" => :catalina
-    sha256 "7e17edd850f6cf0c49a6c5fabfb10ca3e489f1f33a38595d10de621e5fb13175" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "713b2331e3491b90fded2129d8c8e3e0aece85fa17a294e32276d227ac7c06d2"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "33371bac06520a5c72772dae5ee442fc070946d0a9559d7372584dcebe6f7818"
+    sha256 cellar: :any_skip_relocation, monterey:       "589194bc56d52e1c2d4a069ef1d953b6101644079a5eb55bb1cd8be427173f95"
+    sha256 cellar: :any_skip_relocation, big_sur:        "c4928baae580c74e51a8917207f6a717b6704bf678374971463dc9f9e24fb2c5"
+    sha256 cellar: :any_skip_relocation, catalina:       "bbc1d022792158774f07554e1705ebb2be414665813be279884e1a2efe34cee9"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c101d6ba2c26032cc51cabb2ab1ea67f7513cce233f8925f4c8c483742a55d17"
   end
 
-  depends_on "go"
+  # Bump to 1.18 on the next release.
+  depends_on "go@1.17"
 
   def install
-    system "go", "build", *std_go_args, "./cmd/staticcheck"
+    output = libexec/"bin/staticcheck"
+    system "go", "build", *std_go_args(output: output), "./cmd/staticcheck"
+    (bin/"staticcheck").write_env_script(output, PATH: "$PATH:#{Formula["go@1.17"].opt_bin}")
   end
 
   test do

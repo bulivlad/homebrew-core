@@ -3,25 +3,20 @@ class Scons < Formula
 
   desc "Substitute for classic 'make' tool with autoconf/automake functionality"
   homepage "https://www.scons.org/"
-  url "https://files.pythonhosted.org/packages/ae/a4/2eb8d05b0ac9e168e8ff0681624c123a123c743487e528757c68ea995d20/SCons-4.0.1.tar.gz"
-  mirror "https://downloads.sourceforge.net/project/scons/scons/4.0.1/scons-4.0.1.tar.gz"
-  sha256 "722ed104b5c624ecdc89bd4e02b094d2b14d99d47b5d0501961e47f579a2007c"
-  revision 1
-
-  livecheck do
-    url :stable
-  end
+  url "https://files.pythonhosted.org/packages/64/a1/9dc5c5e43b3d1b1832da34c8ae7b239a8f2847c33509fa0eb011fd8bc1ad/SCons-4.3.0.tar.gz"
+  sha256 "d47081587e3675cc168f1f54f0d74a69b328a2fc90ec4feb85f728677419b879"
+  license "MIT"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "5ebef89fc0bc3ac4b510504e24368a44f926771e61dfa6adb2b0ac29f92e66d7" => :big_sur
-    sha256 "25a6b0372a45596d23dfedd7529b41f57c966eb63b08ae1589298f182e25f5f9" => :arm64_big_sur
-    sha256 "c5051503085ee71b2ca039c0c30d16a1aceb77fd2603735b3e37571b936b9158" => :catalina
-    sha256 "b3fbbbf21fc6198ba87770cc870aa98602a2cf76f2971fb054b7e7dafdcd191c" => :mojave
-    sha256 "337031123eb8835112a41baec030df5d16fcd90944a827d9f9721dd64388d6ef" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "ddbf863043a23a4b42331c2de6ca71bbfdd7a12979a4c43f65694106745d3cb9"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "ddbf863043a23a4b42331c2de6ca71bbfdd7a12979a4c43f65694106745d3cb9"
+    sha256 cellar: :any_skip_relocation, monterey:       "a5d0c147ee550cae094922ce5e46bd0eecb978757ee1131677a233c423c9b909"
+    sha256 cellar: :any_skip_relocation, big_sur:        "a5d0c147ee550cae094922ce5e46bd0eecb978757ee1131677a233c423c9b909"
+    sha256 cellar: :any_skip_relocation, catalina:       "a5d0c147ee550cae094922ce5e46bd0eecb978757ee1131677a233c423c9b909"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1cf0cd49fe6d92410f0f77186223735b224dc6ddf82c877a02e380a9612f2898"
   end
 
-  depends_on "python@3.9"
+  depends_on "python@3.10"
 
   def install
     virtualenv_install_with_resources

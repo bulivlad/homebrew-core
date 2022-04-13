@@ -2,20 +2,15 @@ class RaxmlNg < Formula
   desc "RAxML Next Generation: faster, easier-to-use and more flexible"
   homepage "https://sco.h-its.org/exelixis/web/software/raxml/"
   url "https://github.com/amkozlov/raxml-ng.git",
-      tag:      "1.0.1",
-      revision: "abdd9caff709a73928a8fe06f7934cd442b7a50e"
+      tag:      "1.1.0",
+      revision: "9b8150852c21fd0caa764752797e17382fc03aa0"
   license "AGPL-3.0-or-later"
 
-  livecheck do
-    url :stable
-  end
-
   bottle do
-    cellar :any
-    sha256 "0e6a2372feba1e4db0627fa823d65bb31e83f8da4debf1a0a7a7c47e5283a04d" => :big_sur
-    sha256 "4d7397bf30c609cb53ca946d398d14fadb6e7ade0bfd4b427fb0fd0a6385df95" => :catalina
-    sha256 "2851487308922e7bad8c5c9364cdd81318d2982cd76458b55eeeee8c50e5f693" => :mojave
-    sha256 "0da342f7d906f920117cecdacd93368fcedc88ca6e8b362ebc34697e8d489f2a" => :high_sierra
+    sha256 cellar: :any,                 monterey:     "bc14e35183077c0a9bf381aea75f73d08e9acbf3c02e8285c558c4dc1ea4f42b"
+    sha256 cellar: :any,                 big_sur:      "fff2eeb8aa6e98b22debfb85bbc87ada14144223ca252e5ece4a7197c1771adf"
+    sha256 cellar: :any,                 catalina:     "14a55e52a083ded0b9c9c35778c73303f1d968a9826ac2049457a319ae823c5d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux: "17a1c0ffcb195cdcf3d3ed4aa70f7de5b863452b3139e9b01851a3a25b939ef5"
   end
 
   depends_on "autoconf" => :build
@@ -28,7 +23,7 @@ class RaxmlNg < Formula
   uses_from_macos "bison" => :build
   uses_from_macos "flex" => :build
 
-  resource "example" do
+  resource "homebrew-example" do
     url "https://sco.h-its.org/exelixis/resource/download/hands-on/dna.phy"
     sha256 "c2adc42823313831b97af76b3b1503b84573f10d9d0d563be5815cde0effe0c2"
   end
@@ -48,7 +43,7 @@ class RaxmlNg < Formula
   end
 
   test do
-    testpath.install resource("example")
+    testpath.install resource("homebrew-example")
     system "#{bin}/raxml-ng", "--msa", "dna.phy", "--start", "--model", "GTR"
   end
 end

@@ -1,22 +1,24 @@
 class DnscryptProxy < Formula
   desc "Secure communications between a client and a DNS resolver"
   homepage "https://dnscrypt.info"
-  url "https://github.com/DNSCrypt/dnscrypt-proxy/archive/2.0.45.tar.gz"
-  sha256 "f7aac28c6a60404683d436072b89d18ed3bb309f8d8a95c8e87ad250da190821"
+  url "https://github.com/DNSCrypt/dnscrypt-proxy/archive/2.1.1.tar.gz"
+  sha256 "cc4a2f274ce48c3731ff981e940e6475d912fb356a80481e91725e81d67bde14"
   license "ISC"
-  head "https://github.com/DNSCrypt/dnscrypt-proxy.git"
+  head "https://github.com/DNSCrypt/dnscrypt-proxy.git", branch: "master"
 
   livecheck do
-    url :head
+    url :stable
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "9a58ee4594cc5daa6f82bba96abb581fcad384f6704b11c9c79e17607ad6ca04" => :big_sur
-    sha256 "16c605c0d6830d94931709cac625d8d7085a56bb68336b79c84bf8bbd95ff99e" => :arm64_big_sur
-    sha256 "8e32c49eb1a77f48be69ab8acfa172d1573761e96d0136bc847df6c84f7d8166" => :catalina
-    sha256 "e8c973c0eb72df8b7cb0850c5a7d1d7ced8d811247fc497a631cee612d46e9d0" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "1c5f214e81da7b5f339e8abbe78e386ece9f42c72baf426d13bd08a40cad949c"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "5db483c47f16ed99a01af92ea89aca4270c8146e33ca0aee4e3172b9960ef7f2"
+    sha256 cellar: :any_skip_relocation, monterey:       "aece7d8508b5dcda8746beb38e9d6e854d82f3a5a1231af77479df17e3063beb"
+    sha256 cellar: :any_skip_relocation, big_sur:        "66deed2c2da425b2443ac734e61b83cb55d7298179390b6ea3292fdfdca6f703"
+    sha256 cellar: :any_skip_relocation, catalina:       "fcc6afc722e5b3dc444c99f253d2424f82e3d40daf27524de03bcee09ec69c8e"
+    sha256 cellar: :any_skip_relocation, mojave:         "b83c086949a3fbbe51c4030db4ad3dccc0f4e48ad502eacbe26e4fe4286f4aef"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "974f2bf8c5dae80037aa68da36bb66fcea9571a0fa6ebb586cc262df705e28ec"
   end
 
   depends_on "go" => :build
@@ -56,33 +58,9 @@ class DnscryptProxy < Formula
 
   plist_options startup: true
 
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>KeepAlive</key>
-          <true/>
-          <key>RunAtLoad</key>
-          <true/>
-          <key>ProgramArguments</key>
-          <array>
-            <string>#{opt_sbin}/dnscrypt-proxy</string>
-            <string>-config</string>
-            <string>#{etc}/dnscrypt-proxy.toml</string>
-          </array>
-          <key>UserName</key>
-          <string>root</string>
-          <key>StandardErrorPath</key>
-          <string>/dev/null</string>
-          <key>StandardOutPath</key>
-          <string>/dev/null</string>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run [opt_sbin/"dnscrypt-proxy", "-config", etc/"dnscrypt-proxy.toml"]
+    keep_alive true
   end
 
   test do

@@ -1,20 +1,21 @@
 class Nghttp2 < Formula
   desc "HTTP/2 C Library"
   homepage "https://nghttp2.org/"
-  url "https://github.com/nghttp2/nghttp2/releases/download/v1.42.0/nghttp2-1.42.0.tar.xz"
-  sha256 "c5a7f09020f31247d0d1609078a75efadeccb7e5b86fc2e4389189b1b431fe63"
+  url "https://github.com/nghttp2/nghttp2/releases/download/v1.47.0/nghttp2-1.47.0.tar.gz"
+  sha256 "62f50f0e9fc479e48b34e1526df8dd2e94136de4c426b7680048181606832b7c"
   license "MIT"
-  revision 1
 
   bottle do
-    sha256 "3d0437a63bcc51ec17d456847bcc0a624be2e00755ecc96b8445bc15020ff413" => :big_sur
-    sha256 "b42fa3e6e332f1a4efc34773894606e17e5dcd34c8d12735e83d6464b92af888" => :arm64_big_sur
-    sha256 "ddc63177feae52a5d07ec0f5793a8dcb5a344f0bdd4f4ba0633dacfd8249b0be" => :catalina
-    sha256 "e7a509ec209f20e204f82009b2dec7667e6a28958d018d8f1ee0fefbe4b73999" => :mojave
+    sha256 arm64_monterey: "abe5c740388c37a7157150056054a84658de7d822e8686463a8f47716232417c"
+    sha256 arm64_big_sur:  "99d7e332e396d9b3058c18d8a94c854864ef64201ff9748dad0a4051356f3c17"
+    sha256 monterey:       "b99ff44001abfa58b109928627cb4a2214a11a2415d2ca0c49a0601e4d346664"
+    sha256 big_sur:        "4a5aa98db8472b7aaf97d0646f7a3550bf12ae28aaf45c9c1c1470b9a49c0528"
+    sha256 catalina:       "132ba73b92472714c358b650ef668039b3219df92fd574e93753a23a6b93ccb9"
+    sha256 x86_64_linux:   "a74b684df8a7ad4d908e65d63013a606832c0d20a1793bc6b25d97b8cdaff00d"
   end
 
   head do
-    url "https://github.com/nghttp2/nghttp2.git"
+    url "https://github.com/nghttp2/nghttp2.git", branch: "master"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
@@ -25,6 +26,7 @@ class Nghttp2 < Formula
   depends_on "c-ares"
   depends_on "jemalloc"
   depends_on "libev"
+  depends_on "libnghttp2"
   depends_on "openssl@1.1"
 
   uses_from_macos "libxml2"
@@ -45,6 +47,14 @@ class Nghttp2 < Formula
     # https://github.com/macports/macports-ports/commit/54d83cca9fc0f2ed6d3f873282b6dd3198635891
     inreplace "src/shrpx_client_handler.cc", "return dconn;", "return std::move(dconn);"
 
+    # Don't build nghttp2 library - use the previously built one.
+    inreplace "Makefile.in", /(SUBDIRS =) lib/, "\\1"
+    inreplace Dir["**/Makefile.in"] do |s|
+      # These don't exist in all files, hence audit_result being false.
+      s.gsub!(%r{^(LDADD = )\$[({]top_builddir[)}]/lib/libnghttp2\.la}, "\\1-lnghttp2", false)
+      s.gsub!(%r{\$[({]top_builddir[)}]/lib/libnghttp2\.la}, "", false)
+    end
+
     args = %W[
       --prefix=#{prefix}
       --disable-silent-rules
@@ -63,5 +73,6 @@ class Nghttp2 < Formula
 
   test do
     system bin/"nghttp", "-nv", "https://nghttp2.org"
+    refute_path_exists lib
   end
 end

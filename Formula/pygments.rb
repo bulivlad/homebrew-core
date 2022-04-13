@@ -3,24 +3,21 @@ class Pygments < Formula
 
   desc "Generic syntax highlighter"
   homepage "https://pygments.org/"
-  url "https://files.pythonhosted.org/packages/e1/86/8059180e8217299079d8719c6e23d674aadaba0b1939e25e0cc15dcf075b/Pygments-2.7.4.tar.gz"
-  sha256 "df49d09b498e83c1a73128295860250b0b7edd4c723a32e9bc0d295c7c2ec337"
+  url "https://files.pythonhosted.org/packages/94/9c/cb656d06950268155f46d4f6ce25d7ffc51a0da47eadf1b164bbf23b718b/Pygments-2.11.2.tar.gz"
+  sha256 "4e426f72023d88d03b2fa258de560726ce890ff3b630f88c21cbb8b2503b8c6a"
   license "BSD-2-Clause"
-  head "https://github.com/pygments/pygments.git"
-
-  livecheck do
-    url :stable
-  end
+  head "https://github.com/pygments/pygments.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "ba143cb212e8a0e5065d46784c113d120b620dfc03bf01de940aea49c024b18f" => :big_sur
-    sha256 "a03ce270d1a5bc2b1b0b59b07939f041a433873fb89c3cb48df1d89ef9df8443" => :arm64_big_sur
-    sha256 "9725becf19d65286936b2a260b4c9da4edc17240d7f91b896993393b227f08fd" => :catalina
-    sha256 "60e2749b874ba3bf69c7034d2ecbe00b340f2eae14a5ca5c9362e3f1ea1695ab" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "8946aab517a5db3fc574e647a92a22513333c4731c4ecfa9fa31087b14e71376"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "8946aab517a5db3fc574e647a92a22513333c4731c4ecfa9fa31087b14e71376"
+    sha256 cellar: :any_skip_relocation, monterey:       "1144025d257641b8df2002a0c7c55953d030050d06f8bd2f0cc739d926d993f2"
+    sha256 cellar: :any_skip_relocation, big_sur:        "1144025d257641b8df2002a0c7c55953d030050d06f8bd2f0cc739d926d993f2"
+    sha256 cellar: :any_skip_relocation, catalina:       "1144025d257641b8df2002a0c7c55953d030050d06f8bd2f0cc739d926d993f2"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "afc7ae61ad47ae9bf35739f29ee36e8ea9fdb205ca4e46b706d2d773c083d66a"
   end
 
-  depends_on "python@3.9"
+  depends_on "python@3.10"
 
   def install
     bash_completion.install "external/pygments.bashcomp" => "pygmentize"

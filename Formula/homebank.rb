@@ -1,8 +1,8 @@
 class Homebank < Formula
   desc "Manage your personal accounts at home"
   homepage "http://homebank.free.fr"
-  url "http://homebank.free.fr/public/homebank-5.4.3.tar.gz"
-  sha256 "9222d7ed7cc44fcfff3f1fe20935a1b7fe91bb4d9f90003cb3c6f3b893298d0b"
+  url "http://homebank.free.fr/public/homebank-5.5.4.tar.gz"
+  sha256 "0d0669bca099340ae5c213ea13cb2b93283bfc8a0e4cf7a5902c1829366e5765"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -11,11 +11,12 @@ class Homebank < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 "48cd56a0f840fedc0c6e4943e149da832ed2d0b86f5fef6f09b2da7402e5e656" => :big_sur
-    sha256 "d08ab0fa40f4b94917a8794da31f8c6149df98ba48ef5a49b39511d78d55ffa0" => :arm64_big_sur
-    sha256 "d985498d9c7916903d550cc5871e32c3730878f544aec6fb875d2c22768913ab" => :catalina
-    sha256 "e884c6c2ee8682be2a7895af8b8c001e8d59d8e1c28586302fabcaca622cafd4" => :mojave
+    sha256 arm64_monterey: "dfd2e97743a1d6e885d09896eb670fc544d2ceb3543c1699c5e600952718d0da"
+    sha256 arm64_big_sur:  "248b22f8e95324466e5a30e569276ae9c16accfc83ca1ff9809457b196d24dfa"
+    sha256 monterey:       "e56e97a9790103d68ecb12fe81224420c637ff423c41ad849493c3c71a809281"
+    sha256 big_sur:        "2fd1d508d0d5cd2b6a964f0a7cfb58b13ff9cea16d61744ad335ecc555e87af3"
+    sha256 catalina:       "0ba4929a2d40019f7b160257f49fbf3545313cf716865648eb255e8cf2062418"
+    sha256 x86_64_linux:   "436c0579be3d4d4e937d7c03e3c5bb55d41e8322611a23198af24a837856670b"
   end
 
   depends_on "intltool" => :build
@@ -27,9 +28,15 @@ class Homebank < Formula
   depends_on "gtk+3"
   depends_on "hicolor-icon-theme"
   depends_on "libofx"
-  depends_on "libsoup"
+  depends_on "libsoup@2"
 
   def install
+    if OS.linux?
+      # Needed to find intltool (xml::parser)
+      ENV.prepend_path "PERL5LIB", Formula["intltool"].libexec/"lib/perl5"
+      ENV["INTLTOOL_PERL"] = Formula["perl"].bin/"perl"
+    end
+
     system "./configure", "--disable-dependency-tracking",
                           "--prefix=#{prefix}", "--with-ofx"
     chmod 0755, "./install-sh"

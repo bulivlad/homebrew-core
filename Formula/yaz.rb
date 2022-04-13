@@ -1,41 +1,56 @@
 class Yaz < Formula
   desc "Toolkit for Z39.50/SRW/SRU clients/servers"
-  homepage "https://www.indexdata.com/yaz"
-  url "http://ftp.indexdata.dk/pub/yaz/yaz-5.30.3.tar.gz"
-  sha256 "f0497fd8420574efab4e5738ea3b70787a6e8042f585156baa30bdc1911ba552"
+  homepage "https://www.indexdata.com/resources/software/yaz/"
   license "BSD-3-Clause"
+  revision 2
+
+  stable do
+    url "https://ftp.indexdata.com/pub/yaz/yaz-5.31.1.tar.gz"
+    sha256 "14cc34d19fd1fd27e544619f4c13300f14dc807088a1acc69fcb5c28d29baa15"
+  end
 
   livecheck do
-    url "http://ftp.indexdata.dk/pub/yaz/"
+    url :homepage
     regex(/href=.*?yaz[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    cellar :any
-    sha256 "bae268483a7bf1bbf81bf4930cb34145b1c5172f1e1737f8b07cf220a3566711" => :big_sur
-    sha256 "410d2e4b4dde8c3392375c3b37aedc1911fbd80c389c68d4eae5619c0593a555" => :arm64_big_sur
-    sha256 "3e99cfd562ae262f299752a7d92dbad3f9b67dd37726e90b1109684f0deac7d1" => :catalina
-    sha256 "0fb86a32e27613df4ef17bc76556364a85d220c9d044f6f2c515ca0bb2e94c6a" => :mojave
-    sha256 "a3dd5357b88bd5780a90dc1fb51c12943d3a8ba6ce69073fb262116c9b050b3e" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "923f0919d3e65c3b61ad8f90641db2dbb199b53cd6ecf651add576633e35b67c"
+    sha256 cellar: :any,                 arm64_big_sur:  "c50a90da020887b4a7f6ca986061225ae1493cc1ea5bc0da7c4f5e8cdca54e4b"
+    sha256 cellar: :any,                 monterey:       "d4573e9eba835bde601ad2f3e202844e9267f5514b5f83662d800c552cee1be8"
+    sha256 cellar: :any,                 big_sur:        "ae3de529018e63dda8090880bcd454e3725ca2729b94df67140b8b6ffed0143b"
+    sha256 cellar: :any,                 catalina:       "f867dbc67ba829e5e905ab6d9dec27c3b342873903b6dcbf71404a4e6ebbfeed"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "febd7d4ad3b81e84619eaa27dc033e5756d917e0b2f784f6d260f6ffe08178b0"
   end
 
   head do
-    url "https://github.com/indexdata/yaz.git"
+    url "https://github.com/indexdata/yaz.git", branch: "master"
+
     depends_on "autoconf" => :build
     depends_on "automake" => :build
+    depends_on "docbook-xsl" => :build
     depends_on "libtool" => :build
+
+    uses_from_macos "bison" => :build
+    uses_from_macos "tcl-tk" => :build
   end
 
   depends_on "pkg-config" => :build
+  depends_on "gnutls"
   depends_on "icu4c"
 
   uses_from_macos "libxml2"
+  uses_from_macos "libxslt"
 
   def install
-    system "./buildconf.sh" if build.head?
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}",
-                          "--with-xml2"
+    if build.head?
+      ENV["XML_CATALOG_FILES"] = etc/"xml/catalog"
+      system "./buildconf.sh"
+    end
+    system "./configure", *std_configure_args,
+                          "--with-gnutls",
+                          "--with-xml2",
+                          "--with-xslt"
     system "make", "install"
   end
 

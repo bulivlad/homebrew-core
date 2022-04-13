@@ -1,8 +1,8 @@
 class TraefikAT1 < Formula
   desc "Modern reverse proxy (v1.7)"
   homepage "https://traefik.io/"
-  url "https://github.com/traefik/traefik/releases/download/v1.7.28/traefik-v1.7.28.src.tar.gz"
-  sha256 "1baa2ca726c4eac71931284229b867a7f15cecb41c3ce8df3619502880ab6719"
+  url "https://github.com/traefik/traefik/archive/refs/tags/v1.7.34.tar.gz"
+  sha256 "0f068c2720dadd66ce303863a80d2386a4d13b5475d4219ba3e65b8445c653f2"
   license "MIT"
 
   livecheck do
@@ -11,66 +11,37 @@ class TraefikAT1 < Formula
   end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "2ebc160c9500db7fe90b9f3312a8d43bcdac819a16a4c1e641702b61c3e948a6" => :big_sur
-    sha256 "4225edf0cb5466dd6031cb8bf149c764f8614c0fc97aa799c8271e373268a3f5" => :catalina
-    sha256 "a014d6c20348aab5eaf4a775906bf7b450d89edb16373328840d4f3a3d9e80cb" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "1e31f7d05eef29c95084bfca1f7dae694b56a6926e4810e1d151d7a483c1a93a"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "6e8060b579d2b50e927526da6c8ced95ee5b297a15085e2358651dff21aa41d7"
+    sha256 cellar: :any_skip_relocation, monterey:       "66cc839bf105e161e16aec5b056c5a5c908d7d5fbe2fadb5668614d8c764e783"
+    sha256 cellar: :any_skip_relocation, big_sur:        "95d3b3da8a19aa4cb133c8e5b95b63a957551732c2a81fb4b80015dc84df0237"
+    sha256 cellar: :any_skip_relocation, catalina:       "a1f090529ee3ed1646d872898219662f76d215c5cf7389cb84d4f22e540b7afd"
   end
 
   keg_only :versioned_formula
 
   depends_on "go" => :build
   depends_on "go-bindata" => :build
-  depends_on "node" => :build
+  depends_on "node@14" => :build
   depends_on "yarn" => :build
+  depends_on :macos # Due to Python 2 for node-sass <= 4
 
   def install
-    ENV["GOPATH"] = buildpath
-    (buildpath/"src/github.com/traefik/traefik").install buildpath.children
-
-    cd "src/github.com/traefik/traefik" do
-      cd "webui" do
-        system "yarn", "upgrade"
-        system "yarn", "install"
-        system "yarn", "run", "build"
-      end
-      system "go", "generate"
-      system "go", "build", "-o", bin/"traefik", "./cmd/traefik"
-      prefix.install_metafiles
+    cd "webui" do
+      system "yarn", "upgrade"
+      system "yarn", "install"
+      system "yarn", "run", "build"
     end
+    system "go", "generate"
+    system "go", "build", *std_go_args(output: bin/"traefik", ldflags: "-s -w"), "./cmd/traefik"
   end
 
-  plist_options manual: "traefik"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>KeepAlive</key>
-          <false/>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>ProgramArguments</key>
-          <array>
-            <string>#{opt_bin}/traefik</string>
-            <string>--configfile=#{etc/"traefik/traefik.toml"}</string>
-          </array>
-          <key>EnvironmentVariables</key>
-          <dict>
-          </dict>
-          <key>RunAtLoad</key>
-          <true/>
-          <key>WorkingDirectory</key>
-          <string>#{var}</string>
-          <key>StandardErrorPath</key>
-          <string>#{var}/log/traefik.log</string>
-          <key>StandardOutPath</key>
-          <string>#{var}/log/traefik.log</string>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run [opt_bin/"traefik", "--configfile=#{etc/"traefik/traefik.toml"}"]
+    keep_alive false
+    working_dir var
+    log_path var/"log/traefik.log"
+    error_log_path var/"log/traefik.log"
   end
 
   test do
@@ -90,10 +61,10 @@ class TraefikAT1 < Formula
       end
       sleep 5
       cmd = "curl -sIm3 -XGET http://127.0.0.1:#{http_port}/"
-      assert_match /404 Not Found/m, shell_output(cmd)
+      assert_match "404 Not Found", shell_output(cmd)
       sleep 1
       cmd = "curl -sIm3 -XGET http://localhost:#{web_port}/dashboard/"
-      assert_match /200 OK/m, shell_output(cmd)
+      assert_match "200 OK", shell_output(cmd)
     ensure
       Process.kill(9, pid)
       Process.wait(pid)

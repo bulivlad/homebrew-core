@@ -1,16 +1,18 @@
 class Rain < Formula
   desc "Command-line tool for working with AWS CloudFormation"
   homepage "https://github.com/aws-cloudformation/rain"
-  url "https://github.com/aws-cloudformation/rain/archive/v1.1.1.tar.gz"
-  sha256 "5faf25a87a6fc0fde19edcf2fe6f26c81990da91d13fbf3858b1eb33711b0ebd"
+  url "https://github.com/aws-cloudformation/rain/archive/v1.2.0.tar.gz"
+  sha256 "064bc2b563c9b759d16147f33fe5c64bf0af3640cb4ae543e49615ae17b22e01"
   license "Apache-2.0"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "55f486e76dc98d428be0c746d8dff11e337911fb97236a09a41b9e25d6dfc0b7" => :big_sur
-    sha256 "12c9a02a0092ba5b911ca47a13073c3ac736c369aa3351352370f7a5308a79b5" => :arm64_big_sur
-    sha256 "f3ef06e12e92b1e196bdd77d9b1de8c9568494883ba1c6a24d3201151576920c" => :catalina
-    sha256 "f9ecd6ae894e0f4d8ce92c017fd17c7d6bc1346e9142c34b81bf4ac3b04d54fc" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "b07cdea377e89b93e512473f90965a56f39d1eebacd8cbbd5048035843553348"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "9d734401c46693b663ebb1f7cc070f13b5685a8699a02a92e8c24a61b3f5b367"
+    sha256 cellar: :any_skip_relocation, monterey:       "33582fd6af866524787889bccc1414b9ac9faadf92c3580a2876a6c665156b1f"
+    sha256 cellar: :any_skip_relocation, big_sur:        "5f81d8ad4b04cc8fa7d5594e65fcbc60fe706fa5509bd91baf006d68e252cda9"
+    sha256 cellar: :any_skip_relocation, catalina:       "0f7c618e299a493540330c769eea29de70086ecd71fb904b1d5dd89a5535dee7"
+    sha256 cellar: :any_skip_relocation, mojave:         "ca9c4253ee251bc3b5ecf07b6c2c9e792d987072e736cf85141314d03a8d463b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "48a8082092f8d9a622e5871756804b34cd329b526df6d5c8cbc228df6c044e04"
   end
 
   depends_on "go" => :build

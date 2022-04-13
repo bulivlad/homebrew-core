@@ -1,49 +1,57 @@
 class Arangodb < Formula
   desc "Multi-Model NoSQL Database"
   homepage "https://www.arangodb.com/"
-  url "https://download.arangodb.com/Source/ArangoDB-3.7.6.tar.gz"
-  sha256 "f9ca141e8535f9f40ec1c61d5f132122db100055057146a2cb8275f30e851426"
+  url "https://download.arangodb.com/Source/ArangoDB-3.9.1.tar.bz2"
+  sha256 "afc5dfbe9fb80d2154707520b4c44ad2f5ba22c1f5877228cc0d03d352856721"
   license "Apache-2.0"
-  revision 1
   head "https://github.com/arangodb/arangodb.git", branch: "devel"
 
+  livecheck do
+    url "https://www.arangodb.com/download-major/source/"
+    regex(/href=.*?ArangoDB[._-]v?(\d+(?:\.\d+)+)(-\d+)?\.t/i)
+  end
+
   bottle do
-    sha256 "135d6152a7c4a3ba7ec9e7d96f3808d448ed961faf83ab6ae994f07a3717b1b4" => :big_sur
-    sha256 "73aff6b8ab99cae8b62e3f5d6986f8886fce0b14864eba91440fe4b73fe832f4" => :catalina
-    sha256 "d3454eefc88b685a469284dc3135a87d2d530431e962def0a7da93cc5b1a5f9c" => :mojave
+    sha256 monterey:     "bef5e50944ce80f54858b7940d8196418301df2dd31c13931bcd1d5d1c9da038"
+    sha256 big_sur:      "f3955646005e34c0cfbcf5337a33091a6cb29f7c9cd38901f8977d4e5bf99400"
+    sha256 catalina:     "c43adc42e72f481027b2bd39123d15ac5c411e79863df0619a9a0ea54551a420"
+    sha256 x86_64_linux: "b1bd405e8126572b9f1947d2b86617c12b762af33b01039cb2c4a160b257b9a0"
   end
 
   depends_on "ccache" => :build
   depends_on "cmake" => :build
-  depends_on "go@1.13" => :build
+  depends_on "go@1.17" => :build
   depends_on "python@3.9" => :build
   depends_on macos: :mojave
   depends_on "openssl@1.1"
+
+  on_linux do
+    depends_on "gcc"
+  end
+
+  fails_with gcc: "5"
 
   # the ArangoStarter is in a separate github repository;
   # it is used to easily start single server and clusters
   # with a unified CLI
   resource "starter" do
     url "https://github.com/arangodb-helper/arangodb.git",
-        tag:      "0.14.18",
-        revision: "79c60473bf243f2ea77c33f9cee032fd0696cde4"
+        tag:      "0.15.4",
+        revision: "ed743d2293efd763309f3ba0a1ba6fb68ac4a41a"
   end
 
   def install
-    on_macos do
-      ENV["MACOSX_DEPLOYMENT_TARGET"] = MacOS.version
-    end
+    ENV["MACOSX_DEPLOYMENT_TARGET"] = MacOS.version if OS.mac?
 
     resource("starter").stage do
       ENV["GO111MODULE"] = "on"
       ENV["DOCKERCLI"] = ""
-      system "make", "deps"
       ldflags = %W[
         -s -w
         -X main.projectVersion=#{resource("starter").version}
         -X main.projectBuild=#{Utils.git_head}
       ]
-      system "go", "build", *std_go_args, "-ldflags", ldflags.join(" "), "github.com/arangodb-helper/arangodb"
+      system "go", "build", *std_go_args(ldflags: ldflags), "github.com/arangodb-helper/arangodb"
     end
 
     mkdir "build" do
@@ -83,25 +91,9 @@ class Arangodb < Formula
     EOS
   end
 
-  plist_options manual: "#{HOMEBREW_PREFIX}/opt/arangodb/sbin/arangod"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>KeepAlive</key>
-          <true/>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>Program</key>
-          <string>#{opt_sbin}/arangod</string>
-          <key>RunAtLoad</key>
-          <true/>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run opt_sbin/"arangod"
+    keep_alive true
   end
 
   test do
@@ -117,8 +109,8 @@ class Arangodb < Formula
               "--server.arangod", "#{sbin}/arangod",
               "--server.js-dir", "#{share}/arangodb3/js") do |r, _, pid|
       loop do
-        available = IO.select([r], [], [], 60)
-        assert_not_equal available, nil
+        available = r.wait_readable(60)
+        refute_equal available, nil
 
         line = r.readline.strip
         ohai line

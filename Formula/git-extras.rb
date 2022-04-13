@@ -1,18 +1,17 @@
 class GitExtras < Formula
   desc "Small git utilities"
   homepage "https://github.com/tj/git-extras"
-  url "https://github.com/tj/git-extras/archive/6.1.0.tar.gz"
-  sha256 "7be0b15ee803d76d2c2e8036f5d9db6677f2232bb8d2c4976691ff7ae026a22f"
+  url "https://github.com/tj/git-extras/archive/6.3.0.tar.gz"
+  sha256 "8a218a0c8e10036d5ba14f26b70f994b0d11166b02ef3fed71c593cef026ec3d"
   license "MIT"
-  head "https://github.com/tj/git-extras.git"
+  head "https://github.com/tj/git-extras.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "1ed4aa34fdbb50977413ff1860227d7c66cc339f614ee65fe4b9bbdc82bc224e" => :big_sur
-    sha256 "a26aa6b1ef178b8c5c8a7fb61ec04e5e0b43fdfe9c253703273c2c3536935826" => :arm64_big_sur
-    sha256 "abb85334f41bfa73f650bc138caecf8a35cc0af8951628c97b09d68c30fbbe60" => :catalina
-    sha256 "afe41a9918fd0951a2e2b4badfbb6bca57ca2161d6ef82f452604e1f73154825" => :mojave
-    sha256 "ffc36aced07c7ca6a5e8ccb8b4dbfcdd50742efd780d9a1b668189813a3486cf" => :high_sierra
+    sha256 cellar: :any_skip_relocation, all: "e6d445a34c00d43c1a4804b4b93c34af758c968983779a0781a9ae7bdd0c1882"
+  end
+
+  on_linux do
+    depends_on "util-linux" # for `column`
   end
 
   conflicts_with "git-utils",

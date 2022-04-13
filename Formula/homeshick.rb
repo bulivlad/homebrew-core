@@ -4,12 +4,12 @@ class Homeshick < Formula
   url "https://github.com/andsens/homeshick/archive/v2.0.0.tar.gz"
   sha256 "14a538bfc2e7cb6bfd35c984cdedbf3d3293413a70cc67f685dbfbd33ce64fdd"
   license "MIT"
-  head "https://github.com/andsens/homeshick.git"
+  head "https://github.com/andsens/homeshick.git", branch: "master"
 
-  bottle :unneeded
-
-  conflicts_with "asdf",
-    because: "asdf and homeshick both install files in lib/commands"
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "d29552fb8156450804811f4fb98dc61b13f921cf6fe4227e4d5a8bfd7467da3e"
+  end
 
   def install
     inreplace "bin/homeshick", /^homeshick=.*/, "homeshick=#{opt_prefix}"

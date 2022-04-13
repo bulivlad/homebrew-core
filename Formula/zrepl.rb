@@ -1,30 +1,29 @@
 class Zrepl < Formula
   desc "One-stop ZFS backup & replication solution"
   homepage "https://zrepl.github.io"
-  url "https://github.com/zrepl/zrepl/archive/v0.3.1.tar.gz"
-  sha256 "46c4540c330ec68f30eafa9c44f27bfc04fcac85a2fe54b72b051c73cd11f66d"
+  url "https://github.com/zrepl/zrepl/archive/v0.5.0.tar.gz"
+  sha256 "4acfde9e7a09eca2de3de5c7d2987907ae446b345b69133e4b3c58a99c294465"
   license "MIT"
-  head "https://github.com/zrepl/zrepl.git"
+  head "https://github.com/zrepl/zrepl.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "04ba02a1867bf19002e289edbf40423a3eb1a95fea05ae813b1cff5fc71d3873" => :big_sur
-    sha256 "5b7ea253b2d72f513eeae44b390feed827cb09bed8dfe2df97500e0d269017d8" => :arm64_big_sur
-    sha256 "1314da8c7c65f89c93a17ca3dab945e0132e61a1e5cc2ec83f3e844bb1a475fc" => :catalina
-    sha256 "d4c76f92429aea1e62be4e187f263c478b60ab47bbd739d4c97f97fd3d852dab" => :mojave
-    sha256 "bf399e30a67a4cab316128ef33b9e1349bb51a32a0c6befeecb79ef2837c22b5" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "0c8d9fd289790fce71ff766f4ba508841b26b07c9646c86c0f58d934b434a98a"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "91da92f9974cacb35d64a0d84c20c6a02eb5c5ebdfc879bff968c883177e3298"
+    sha256 cellar: :any_skip_relocation, monterey:       "36ad9cad7ba5fdabf65461dd637a4cb05028a93c332b440d7f95409067d89dce"
+    sha256 cellar: :any_skip_relocation, big_sur:        "9a54101a9d020f333e5183d372ffbd743ffc0a702cd59f9abc284d2fd2890aa8"
+    sha256 cellar: :any_skip_relocation, catalina:       "a4369b90960452b045f6d3879a2177c540fa3e42a6d18b3a567240c92c2a4772"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a615f406414dd1eed10a32de0cdae83f74b13de612ac0103248f0639ea962f43"
   end
 
   depends_on "go" => :build
 
-  resource "sample_config" do
+  resource "homebrew-sample_config" do
     url "https://raw.githubusercontent.com/zrepl/zrepl/master/config/samples/local.yml"
     sha256 "f27b21716e6efdc208481a8f7399f35fd041183783e00c57f62b3a5520470c05"
   end
 
   def install
-    system "go", "build", *std_go_args,
-      "-ldflags", "-X github.com/zrepl/zrepl/version.zreplVersion=#{version}"
+    system "go", "build", *std_go_args(ldflags: "-s -w -X github.com/zrepl/zrepl/version.zreplVersion=#{version}")
   end
 
   def post_install
@@ -33,42 +32,14 @@ class Zrepl < Formula
     (etc/"zrepl").mkpath
   end
 
-  plist_options startup: true, manual: "sudo zrepl daemon"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
-      "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>EnvironmentVariables</key>
-          <dict>
-            <key>PATH</key>
-            <string>/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:#{HOMEBREW_PREFIX}/bin</string>
-          </dict>
-          <key>KeepAlive</key>
-          <true/>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>ProgramArguments</key>
-          <array>
-            <string>#{opt_bin}/zrepl</string>
-            <string>daemon</string>
-          </array>
-          <key>RunAtLoad</key>
-          <true/>
-          <key>StandardErrorPath</key>
-          <string>#{var}/log/zrepl/zrepl.err.log</string>
-          <key>StandardOutPath</key>
-          <string>#{var}/log/zrepl/zrepl.out.log</string>
-          <key>ThrottleInterval</key>
-          <integer>30</integer>
-          <key>WorkingDirectory</key>
-          <string>#{var}/run/zrepl</string>
-        </dict>
-      </plist>
-    EOS
+  plist_options startup: true
+  service do
+    run [opt_bin/"zrepl", "daemon"]
+    keep_alive true
+    working_dir var/"run/zrepl"
+    log_path var/"log/zrepl/zrepl.out.log"
+    error_log_path var/"log/zrepl/zrepl.err.log"
+    environment_variables PATH: std_service_path_env
   end
 
   test do

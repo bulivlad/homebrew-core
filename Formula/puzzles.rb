@@ -2,10 +2,11 @@ class Puzzles < Formula
   desc "Collection of one-player puzzle games"
   homepage "https://www.chiark.greenend.org.uk/~sgtatham/puzzles/"
   # Extract https://www.chiark.greenend.org.uk/~sgtatham/puzzles/puzzles.tar.gz to get the version number
-  url "https://www.chiark.greenend.org.uk/~sgtatham/puzzles/puzzles-20201208.84cb4c6.tar.gz"
-  version "20201208"
-  sha256 "fd49aabdd7c7e521c990991dab59700a40719cca172113ac8df693afe11d284d"
-  head "https://git.tartarus.org/simon/puzzles.git"
+  url "https://www.chiark.greenend.org.uk/~sgtatham/puzzles/puzzles-20220128.c43a34f.tar.gz"
+  version "20220128"
+  sha256 "4b1855c1b209f7534a73a49319668b071cec273db5b14e274b4909403a09d9b7"
+  license "MIT"
+  head "https://git.tartarus.org/simon/puzzles.git", branch: "main"
 
   # There's no directory listing page and the homepage only lists an unversioned
   # tarball. The Git repository doesn't report any tags when we use that. The
@@ -17,25 +18,41 @@ class Puzzles < Formula
   end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "40e28c1005919ab7dcbb215f5d51abbca00297816e0a4b170f4e0410d17cb713" => :big_sur
-    sha256 "9b1eca473055fc6962f69daa3cb7367262e9dadf2a01e3223e1a2e7aff956b38" => :arm64_big_sur
-    sha256 "ecdd353296ae643d50a67f5abbdac3d878ab3bc4fcb044b7a9d38b39ac281f43" => :catalina
-    sha256 "aaf4ab9bb3026b8749235052b2f82eb7fb3f4eb8ad4ff418ebe35256f0421d99" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "3cb08278a9c56ec786cf491586b6d61e64da5f949e399f8a521850eb9d97d342"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "e275675cd3317ffb62a3f732a616a9cf5804bf7153d459c98dffbe17d1a68370"
+    sha256 cellar: :any_skip_relocation, monterey:       "96afa8ad22ca624e61cdf94f1b41ee72ab65511227dd220431f4ef2e0eff9f24"
+    sha256 cellar: :any_skip_relocation, big_sur:        "6069ee1bb9bbf6cd335188dbe9e74ab5b5459131218dcce315e0da1d63643b3d"
+    sha256 cellar: :any_skip_relocation, catalina:       "c9c04fd4debab2bc34d2f0c77b39d57630f2a4cfc04c13c367dca44e089ec837"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "98ea7bc7167b2325d4b3b4cd2718b9b03aa6f27c48a8aba15a711d53db445f76"
   end
 
-  depends_on "halibut"
+  depends_on "cmake" => :build
+  depends_on "halibut" => :build
+
+  on_linux do
+    depends_on "imagemagick" => :build
+    depends_on "pkg-config" => :build
+    depends_on "cairo"
+    depends_on "gdk-pixbuf"
+    depends_on "glib"
+    depends_on "gtk+3"
+    depends_on "pango"
+  end
 
   def install
-    # Do not build for i386
-    inreplace "mkfiles.pl", /@osxarchs = .*/, "@osxarchs = ('x86_64');"
+    system "cmake", ".", *std_cmake_args
+    system "make", "install"
 
-    system "perl", "mkfiles.pl"
-    system "make", "-d", "-f", "Makefile.osx", "all"
-    prefix.install "Puzzles.app"
+    bin.write_exec_script prefix/"Puzzles.app/Contents/MacOS/Puzzles" if OS.mac?
   end
 
   test do
-    assert_predicate prefix/"Puzzles.app/Contents/MacOS/Puzzles", :executable?
+    if OS.mac?
+      assert_predicate prefix/"Puzzles.app/Contents/MacOS/Puzzles", :executable?
+    else
+      return if ENV["HOMEBREW_GITHUB_ACTIONS"]
+
+      assert_match "Mines, from Simon Tatham's Portable Puzzle Collection", shell_output(bin/"mines")
+    end
   end
 end

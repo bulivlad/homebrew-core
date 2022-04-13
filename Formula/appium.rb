@@ -3,62 +3,40 @@ require "language/node"
 class Appium < Formula
   desc "Automation for Apps"
   homepage "https://appium.io/"
-  url "https://registry.npmjs.org/appium/-/appium-1.20.1.tgz"
-  sha256 "fc8b14e7cba02a7fbb61aeead75fe2494a011917bdc118c9a31cb4a0d88ef58f"
+  url "https://registry.npmjs.org/appium/-/appium-1.22.3.tgz"
+  sha256 "74d9fbac66e08d9c3b0fde7f4deaa42e1f070167f0508e2891fad28558147fd6"
   license "Apache-2.0"
-  head "https://github.com/appium/appium.git"
-
-  livecheck do
-    url :stable
-  end
+  head "https://github.com/appium/appium.git", branch: "master"
 
   bottle do
-    cellar :any
-    sha256 "6b4d5aa2f937e6263046ac7f2923f649e14d532cbe3351e52f9f9fb57a122665" => :big_sur
-    sha256 "a5e4dd0acc061aef5be260833da11d911fde8d8892318cddba696f04430dd10b" => :arm64_big_sur
-    sha256 "7017a9ddd3be7a200fc57eba2827a57e0e4b8c33a68136c5ca282393020b2dfd" => :catalina
-    sha256 "b9bc4a7b8d2a4a7d997416eeafbb402b220f48694c891fcc863313321e59cc58" => :mojave
+    sha256                               arm64_monterey: "5b71cfdfa29c2bc98785b485fc0b279753125d9af2e9bf9bbc5e4d7f8d9ce4f8"
+    sha256                               arm64_big_sur:  "e2f7fdf6d4c72380fd43936143660911c408b98542d0e033b3a2cbb20d6e1fab"
+    sha256                               monterey:       "854d9cf2275384e65781c8201af16f3a6ce0ddea25fb0f12d2999fc09438c018"
+    sha256                               big_sur:        "698fe344433d98af374558688ea665921fb7d74f09c51ac61d5739fb0fcc467a"
+    sha256                               catalina:       "9fd553fc9f5957b5cd8bc1c1892fcb9dfcff89571dfe8af04a70c752a0641a1f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8b231d0004b0f8d6bb85da28e0d5181c496ee38b015a1bcbff992c49d24c851f"
   end
 
   depends_on "node"
 
   def install
-    system "npm", "install", *Language::Node.std_npm_install_args(libexec)
+    system "npm", "install", *Language::Node.std_npm_install_args(libexec), "--chromedriver-skip-install"
     bin.install_symlink Dir["#{libexec}/bin/*"]
+
+    # Delete obsolete module appium-ios-driver, which installs universal binaries
+    rm_rf libexec/"lib/node_modules/appium/node_modules/appium-ios-driver"
+
+    # Replace universal binaries with native slices
+    deuniversalize_machos
   end
 
-  plist_options manual: "appium"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>KeepAlive</key>
-          <true/>
-          <key>RunAtLoad</key>
-          <true/>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>ProgramArguments</key>
-          <array>
-            <string>#{bin}/appium</string>
-          </array>
-          <key>EnvironmentVariables</key>
-          <dict>
-            <key>PATH</key>
-            <string>#{HOMEBREW_PREFIX}/bin:#{HOMEBREW_PREFIX}/sbin:/usr/bin:/bin:/usr/sbin:/sbin</string>
-          </dict>
-          <key>WorkingDirectory</key>
-          <string>#{var}</string>
-          <key>StandardErrorPath</key>
-          <string>#{var}/log/appium-error.log</string>
-          <key>StandardOutPath</key>
-          <string>#{var}/log/appium.log</string>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run opt_bin/"appium"
+    environment_variables PATH: std_service_path_env
+    keep_alive true
+    error_log_path var/"log/appium-error.log"
+    log_path var/"log/appium.log"
+    working_dir var
   end
 
   test do

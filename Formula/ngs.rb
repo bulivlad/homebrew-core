@@ -1,16 +1,18 @@
 class Ngs < Formula
   desc "Powerful programming language and shell designed specifically for Ops"
   homepage "https://ngs-lang.org/"
-  url "https://github.com/ngs-lang/ngs/archive/v0.2.10.tar.gz"
-  sha256 "361a36614a56bd7cb2cb0f4aa16addfefde478f9d2cbc1838eee3969262868c2"
-  license "GPL-3.0"
-  head "https://github.com/ngs-lang/ngs.git"
+  url "https://github.com/ngs-lang/ngs/archive/v0.2.13.tar.gz"
+  sha256 "7648761edb3695292d3289b91f9644c204d42269b8af697c765707ce192e45b5"
+  license "GPL-3.0-only"
+  head "https://github.com/ngs-lang/ngs.git", branch: "master"
 
   bottle do
-    cellar :any
-    sha256 "45a732ac098d7e33c9152e13d31be724a1dd25735aefde86b683b528000dd118" => :big_sur
-    sha256 "cf1ba2c19cbbb3491079aa81e61ed6c23ba6033b1196d8105c45ac290d893971" => :catalina
-    sha256 "66c7eb7fcc89ed96624dd220b4cf8988897d4a65b4760349d00231d9c9aadecb" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "1ef58ca0af08ba7b8e30568dc89329ca2d7dde56b1f617c7ea761e648d5943ff"
+    sha256 cellar: :any,                 arm64_big_sur:  "479155bbdc08c74555033cb3399499e8a483dca09eb317d9f0440a040f35941d"
+    sha256 cellar: :any,                 monterey:       "c2d37bb8bf811e88ef63b977c15983f9ef7ca5111e91e5a9e1433a41b487ec22"
+    sha256 cellar: :any,                 big_sur:        "8fc41ede0fb6966d1825eb40db7eb4b51e1e87adab1b53d2104581da18abd6b8"
+    sha256 cellar: :any,                 catalina:       "020d1e3143db15da54baa7e0a01be63e238ba5f6aec3b11ed7dd69c5651679d9"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "358aff5f12a275ad72cb474f000ce798c5af3d529c3573af69fdadda0098c257"
   end
 
   depends_on "cmake" => :build

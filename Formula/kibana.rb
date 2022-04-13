@@ -1,20 +1,23 @@
 class Kibana < Formula
   desc "Analytics and search dashboard for Elasticsearch"
   homepage "https://www.elastic.co/products/kibana"
+  # NOTE: Do not bump version to one with a non-open-source license
   url "https://github.com/elastic/kibana.git",
       tag:      "v7.10.2",
       revision: "a0b793698735eb1d0ab1038f8e5d7a951524e929"
   license "Apache-2.0"
-  head "https://github.com/elastic/kibana.git"
+  head "https://github.com/elastic/kibana.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "c218ab10fca2ebdddd11ab27326d0a6d0530a7f26bc2adc26d1751e4326b0198" => :big_sur
-    sha256 "c1ee01e41c34677dba144152142808d469db2855658fdd3e4fcafbae77a10774" => :catalina
-    sha256 "fb818924d852b07ab0417e8ff52899400b98f25bd24714f77a8c472224269690" => :mojave
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "308f92ff1e8455e9521c07b3d18d6d8f15b0cf107754620971e6346cfbb39b0e"
   end
 
-  depends_on "python@3.9" => :build
+  # elasticsearch will be relicensed before v7.11.
+  # https://www.elastic.co/blog/licensing-change
+  deprecate! date: "2021-01-14", because: "is switching to an incompatible license"
+
+  depends_on "python@3.10" => :build
   depends_on "yarn" => :build
   depends_on "node@10"
 

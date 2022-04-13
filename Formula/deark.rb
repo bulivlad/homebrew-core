@@ -1,8 +1,8 @@
 class Deark < Formula
   desc "File conversion utility for older formats"
   homepage "https://entropymine.com/deark/"
-  url "https://entropymine.com/deark/releases/deark-1.5.7.tar.gz"
-  sha256 "b50ff49d13cfa3621721bac8c9af05e3ccb091852ddee0bc2e06a05e43d2ee9c"
+  url "https://entropymine.com/deark/releases/deark-1.6.0.tar.gz"
+  sha256 "6bbd5ea6ede16427b26604b08143155eb31778cfd6b4f714019256dc0f2856e6"
   license "MIT"
 
   livecheck do
@@ -11,11 +11,12 @@ class Deark < Formula
   end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "58be36b00198b12edb3ee670a9dd664ce7383fa3e3c439d94905a8b55a24d650" => :big_sur
-    sha256 "1f35652e63074f3e95a766508b3ce264b3e7e5208196124224f9a77768ec059a" => :arm64_big_sur
-    sha256 "191a4f3431f5c0f937e100249cb6ca24e95813562d45d292afcbd5b824ce6503" => :catalina
-    sha256 "dc7c1e91110744973866610fb65368d2b7039562c889e449a5035c28691f1a6b" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "3be4c0c672bca447524ccc2366ca53ea690e28fb1761d8a53ba3620a19e8812a"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "1b3a9ad3e460f95c8978609d854843693c541fac952df478ef45da434e35f5ee"
+    sha256 cellar: :any_skip_relocation, monterey:       "ad91840a06cc9519372eecab073fc374d5391d0fdec7057130b66abdee9a1673"
+    sha256 cellar: :any_skip_relocation, big_sur:        "bdb4a6890ac0a7d66ba07b00d04602dc260f7f1be8bd42fc46f2a0eb4081a84e"
+    sha256 cellar: :any_skip_relocation, catalina:       "a1a7cf1e6730e266d3a5673424d81ff1d812011590e2a332113fde131cb75906"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "26784ef0fae8fdd23fb492beb743d25d78238efd2badf76e2c8fd7607a723bb7"
   end
 
   def install

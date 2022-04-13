@@ -2,35 +2,35 @@ class Osc < Formula
   include Language::Python::Virtualenv
 
   desc "Command-line interface to work with an Open Build Service"
-  homepage "https://github.com/openSUSE/osc"
-  url "https://github.com/openSUSE/osc/archive/0.171.0.tar.gz"
-  sha256 "e824480c1c5811b05ea18236cd13164a15f7bcf17df929b43ed0617cfcb60f80"
-  license "GPL-2.0"
-  head "https://github.com/openSUSE/osc.git"
+  homepage "https://openbuildservice.org"
+  url "https://github.com/openSUSE/osc/archive/0.176.0.tar.gz"
+  sha256 "9cef44e1c27e423f33c3b03dbfa74433042cce063ffbbc5ead82c74dac9917b2"
+  license "GPL-2.0-or-later"
+  head "https://github.com/openSUSE/osc.git", branch: "master"
 
   bottle do
-    cellar :any
-    sha256 "ce00021e980c530d2b3fccb16698f2869462bb59fd7b054b92a95024565ec840" => :big_sur
-    sha256 "92515d809578b1cf136cc46dfdbde614179c68fdb58b12b619cbd5a6c3dd956a" => :arm64_big_sur
-    sha256 "bf7953f981826e73bd4be7ef9b1e8d4127afebd95febe9659a1b0f10a389e9a6" => :catalina
-    sha256 "6b55d18a07e128e2811a8c3c8d8bceed67201a4761977903b68780e8fc405225" => :mojave
-    sha256 "b5438d36082a8d13b22de3c7a4f67399ff8899707658e9146af73e8c572bda6c" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "2ab27f937fc3bcc9235d7ffcaec76b1cf12ff368f0f0e7f1cc9d73b79a5c5db2"
+    sha256 cellar: :any,                 arm64_big_sur:  "df09bfb5277f1d115dfe753afb1ac4e667f7164802b17ef0ee75564e526a6f80"
+    sha256 cellar: :any,                 monterey:       "15fce4e0db6c44a54239945b86c1c4343a9394ba742d9597c278e6bdc11d5dde"
+    sha256 cellar: :any,                 big_sur:        "1fc999d3f4b04721d465205df8ae42d75c5a40cff42dd31e13ac1d9b6425f9a5"
+    sha256 cellar: :any,                 catalina:       "99f95721962321eb11cfd07e53a23187fc40b2f170561959c4a7190b2cfac94d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b8f423fbc8ca7b67644cecf42d744e90f552ae9744aa39ffc1164026e78b1843"
   end
 
   depends_on "swig" => :build
   depends_on "openssl@1.1"
-  depends_on "python@3.9"
+  depends_on "python@3.10"
 
   uses_from_macos "curl"
 
   resource "chardet" do
-    url "https://files.pythonhosted.org/packages/fc/bb/a5768c230f9ddb03acc9ef3f0d4a3cf93462473795d18e9535498c8f929d/chardet-3.0.4.tar.gz"
-    sha256 "84ab92ed1c4d4f16916e05906b6b75a6c0fb5db821cc65e70cbd64a3e2a5eaae"
+    url "https://files.pythonhosted.org/packages/ee/2d/9cdc2b527e127b4c9db64b86647d567985940ac3698eeabc7ffaccb4ea61/chardet-4.0.0.tar.gz"
+    sha256 "0d6f53a15db4120f2b08c94f11e7d93d2c911ee118b6b30a04ec3ee8310179fa"
   end
 
   resource "M2Crypto" do
-    url "https://files.pythonhosted.org/packages/ff/df/84609ed874b5e6fcd3061a517bf4b6e4d0301f553baf9fa37bef2b509797/M2Crypto-0.36.0.tar.gz"
-    sha256 "1542c18e3ee5c01db5031d0b594677536963e3f54ecdf5315aeecb3a595b4dc1"
+    url "https://files.pythonhosted.org/packages/2c/52/c35ec79dd97a8ecf6b2bbd651df528abb47705def774a4a15b99977274e8/M2Crypto-0.38.0.tar.gz"
+    sha256 "99f2260a30901c949a8dc6d5f82cd5312ffb8abc92e76633baf231bbbcb2decb"
   end
 
   def install

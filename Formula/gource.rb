@@ -1,17 +1,17 @@
 class Gource < Formula
   desc "Version Control Visualization Tool"
   homepage "https://github.com/acaudwell/Gource"
-  url "https://github.com/acaudwell/Gource/releases/download/gource-0.51/gource-0.51.tar.gz"
-  sha256 "19a3f888b1825aa7ed46f52cebce5012e3c62439e3d281102f21814c7a58e79a"
-  license "GPL-3.0"
-  revision 1
+  url "https://github.com/acaudwell/Gource/releases/download/gource-0.52/gource-0.52.tar.gz"
+  sha256 "92e713291936cc4688b6d3d52868f4cca4263c2efec9b3848086e93cd9935e08"
+  license "GPL-3.0-or-later"
 
   bottle do
-    sha256 "bea0be45970ab69265303255911c279c2a739de3a8fd858e60ad18f1465cfc0f" => :big_sur
-    sha256 "82302ee7b3e01da62323d61a452fc81e5ec4fb62c2a04c8856e2f72373bf52cc" => :arm64_big_sur
-    sha256 "544380bd35795b5a809d536b6458b9e4a0f8fc940f36f6f8e54255091aa98250" => :catalina
-    sha256 "a603e1573f244abd8bc2a8963538ca6da27fbff90e68666e752678159c215baa" => :mojave
-    sha256 "9e1ed79145083e62e52f6416b08d0d80c778cae6a8ba83808fb17f841cd6c136" => :high_sierra
+    sha256 arm64_monterey: "1c73e63e38f78e848e9f3dbc4ee48c80eff0ca1c9c455bc871dbefa7ce9b05b1"
+    sha256 arm64_big_sur:  "5391072ce69057a19ba0270f3a174bbcf6ea3b87eb8a27f9c3338e9ed96c6b55"
+    sha256 monterey:       "e00886c4c8d3e3c024086da0811c629c4212a2bd28e3a43014a231a7d2980e68"
+    sha256 big_sur:        "0b3f32ffa9b3e5277fb860059121dd35e57cab39c859cec20ffa687648a4b8bd"
+    sha256 catalina:       "aca0d1acc8d793b57d1d9b1eaf0e23eff007168dfee847fd47ee5f6d741714a9"
+    sha256 x86_64_linux:   "48c6dbf70ab1ad72876b5806ca745e62762d12d3f894d7ecd9f8f22bbd43316e"
   end
 
   head do
@@ -28,7 +28,7 @@ class Gource < Formula
   depends_on "freetype"
   depends_on "glew"
   depends_on "libpng"
-  depends_on "pcre"
+  depends_on "pcre2"
   depends_on "sdl2"
   depends_on "sdl2_image"
 
@@ -36,6 +36,7 @@ class Gource < Formula
     # clang on Mt. Lion will try to build against libstdc++,
     # despite -std=gnu++0x
     ENV.libcxx
+    ENV.append "LDFLAGS", "-pthread" if OS.linux?
 
     system "autoreconf", "-f", "-i" if build.head?
 

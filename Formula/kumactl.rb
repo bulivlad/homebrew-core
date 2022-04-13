@@ -1,29 +1,44 @@
 class Kumactl < Formula
   desc "Kuma control plane command-line utility"
   homepage "https://kuma.io/"
-  url "https://github.com/kumahq/kuma/archive/1.0.5.tar.gz"
-  sha256 "ce9c56e730d0b2f76fcb6113677df60a84680eb05edaf5cadf956841410a52dc"
+  url "https://github.com/kumahq/kuma/archive/1.6.0.tar.gz"
+  sha256 "5dfd6c561a0b3e190868df00f4ec4aa93a9ba159cabe982b98b20c5c0c5df6aa"
   license "Apache-2.0"
 
+  livecheck do
+    url :stable
+    strategy :github_latest
+  end
+
   bottle do
-    cellar :any_skip_relocation
-    sha256 "1c92206e6346115583e560a14865d42d69ea1b476d6277a9bfe847299c9984bc" => :big_sur
-    sha256 "53d8dc29d8607548f4b8d777eefd540ab30bdd0e12841f5ba8d7437b1952c797" => :catalina
-    sha256 "ded463d59dbfa8e4661dbcf73b2d855de3aee49414c70bbac2b1492d979375f3" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "431e4143042fc3f8282fea7c28d908172a767f6115b236c00d8d19d744d32efe"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "e2e93ba62d3ef2edfe16b3e6efa9f7dff9164ecb866c735f2f2ac38c88bfc71a"
+    sha256 cellar: :any_skip_relocation, monterey:       "fd1d4cdc2ab6035a9525aa8d491bcef64373efb2b159ef20ae0cb427f2efebd8"
+    sha256 cellar: :any_skip_relocation, big_sur:        "68517bebe15442c24691e63d2aba4fce2ca5cad73fc168dee01807b70d443804"
+    sha256 cellar: :any_skip_relocation, catalina:       "ee185641e1e05f717ccd18825514f72aca1db198578f920ec29581a7af6d4541"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "948fc00a865eaaa7986cf930fbb8c8fed192926016c761c89a7bf0b2ffe7b9cd"
   end
 
   depends_on "go" => :build
 
   def install
-    srcpath = buildpath/"src/kuma.io/kuma"
-    outpath = srcpath/"build/artifacts-darwin-amd64/kumactl"
-    srcpath.install buildpath.children
+    ldflags = %W[
+      -s -w
+      -X github.com/kumahq/kuma/pkg/version.version=#{version}
+      -X github.com/kumahq/kuma/pkg/version.gitTag=#{version}
+      -X github.com/kumahq/kuma/pkg/version.buildDate=#{time.strftime("%F")}
+    ]
 
-    cd srcpath do
-      system "make", "build/kumactl", "BUILD_INFO_VERSION=#{version}"
-      prefix.install_metafiles
-      bin.install outpath/"kumactl"
-    end
+    system "go", "build", *std_go_args(ldflags: ldflags), "./app/kumactl"
+
+    output = Utils.safe_popen_read("#{bin}/kumactl", "completion", "bash")
+    (bash_completion/"kumactl").write output
+
+    output = Utils.safe_popen_read("#{bin}/kumactl", "completion", "zsh")
+    (zsh_completion/"_kumactl").write output
+
+    output = Utils.safe_popen_read("#{bin}/kumactl", "completion", "fish")
+    (fish_completion/"kumactl.fish").write output
   end
 
   test do

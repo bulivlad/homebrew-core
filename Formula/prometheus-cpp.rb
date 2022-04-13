@@ -2,18 +2,18 @@ class PrometheusCpp < Formula
   desc "Prometheus Client Library for Modern C++"
   homepage "https://github.com/jupp0r/prometheus-cpp"
   url "https://github.com/jupp0r/prometheus-cpp.git",
-      tag:      "v0.11.0",
-      revision: "bb017ec15a824d3301845a1274b4b46a01d6d871",
-      shallow:  false
+      tag:      "v1.0.0",
+      revision: "4ea303fa66e4c26dc4df67045fa0edf09c2f3077"
   license "MIT"
-  head "https://github.com/jupp0r/prometheus-cpp.git"
+  head "https://github.com/jupp0r/prometheus-cpp.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "f3881dde4616cd5c5f840b25e5b99f1350f4105fe685c068eb91c582f9eb816b" => :big_sur
-    sha256 "d60d427eb5c81eb3816253c30bdb81ec20abf8ae839f001a77340a92b2f5f740" => :arm64_big_sur
-    sha256 "bb1e958b203392f2af6de4a5897473ecb4e46bf9125a7317e6987abdd1b2dbf3" => :catalina
-    sha256 "cd9c05bd7cdce396324d8390cbf1ada2d34afc3f7d97189f75e4ad530a005342" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "87d558548dd4ad4d524b4258aab438e67b85d8ada77e5a3454c8763ca7cd4fb0"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "e2166b03d24bd56a20e415db89ffecffa621908f39a04ee701cc9fd02ac7ecd9"
+    sha256 cellar: :any_skip_relocation, monterey:       "0b903d8b4abab0c2862a88ef7216c1e8d6ac8f002a0e2cc67db64690825ad908"
+    sha256 cellar: :any_skip_relocation, big_sur:        "d18c21cde436b1689154d821062bd879c9c8eb35170bb0222040dc53a02329f2"
+    sha256 cellar: :any_skip_relocation, catalina:       "e245520c33f7a4fbebac3a38899f21f3e1114c62d73e5bdbd043435c3c0efa14"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "252bfd884db18a5b743270fb5d51ef1450c5b4d153223d45b5df75efaaf24fc9"
   end
 
   depends_on "cmake" => :build
@@ -27,7 +27,7 @@ class PrometheusCpp < Formula
 
   test do
     (testpath/"test.cpp").write <<~EOS
-      #include <prometheus/Registry.h>
+      #include <prometheus/registry.h>
       int main() {
         prometheus::Registry reg;
         return 0;

@@ -1,23 +1,33 @@
 class Ezstream < Formula
   desc "Client for Icecast streaming servers"
   homepage "https://icecast.org/ezstream/"
-  url "https://downloads.xiph.org/releases/ezstream/ezstream-1.0.1.tar.gz"
-  sha256 "fc4bf494897a8b1cf75dceefb1eb22ebd36967e5c3b5ce2af9858dbb94cf1157"
+  url "https://downloads.xiph.org/releases/ezstream/ezstream-1.0.2.tar.gz", using: :homebrew_curl
+  mirror "https://ftp.osuosl.org/pub/xiph/releases/ezstream/ezstream-1.0.2.tar.gz"
+  sha256 "11de897f455a95ba58546bdcd40a95d3bda69866ec5f7879a83b024126c54c2a"
   license "GPL-2.0-only"
-  head "https://gitlab.xiph.org/xiph/ezstream.git"
 
   livecheck do
-    url "https://downloads.xiph.org/releases/ezstream/"
+    url "https://ftp.osuosl.org/pub/xiph/releases/ezstream/?C=M&O=D"
     regex(/href=.*?ezstream[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    cellar :any
-    rebuild 1
-    sha256 "6e4ae956fd62819bb7417528bd7e30c8b95bcbdc313c786d42b41e506ac51667" => :big_sur
-    sha256 "3f4febc102766cc55bbb02e099e2b1d111c159ef8e751409f10788e3fbcad335" => :arm64_big_sur
-    sha256 "f8ac059c41ccbe5e3f5ec47460cdd52b45c7bc4b3ef9f94fbbb371f26b220549" => :catalina
-    sha256 "78ccfbc94038fa03dba4badfc46bfa607154845dbf0b9c5f11066dc6cd013697" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "22efe55635691409ca6c53eda5be73a7667c8ca59f0076b46380b67e663f5283"
+    sha256 cellar: :any,                 arm64_big_sur:  "188838a38d3573fc77ffd5684e0e7759b24d550ffdd895243425e13c29e038c2"
+    sha256 cellar: :any,                 monterey:       "07ec03e5e37aee0593f5d9121b9bc0ccb071df6c5ee520fc619991820ca90f31"
+    sha256 cellar: :any,                 big_sur:        "fbfe1082559a1313ee3ff071ad35866fb20d5fb360fbfc634fbf85ac48c3e94d"
+    sha256 cellar: :any,                 catalina:       "2854c21def8d7e97747aeca5e856833d17780698739e581a192059c58f50ffa2"
+    sha256 cellar: :any,                 mojave:         "cfc4088a51cdcb0a586ee2a796d5a515d89007bebfae0f7bfd6b2a4c7a2c13f5"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f0c88f43345c0ebb3eca025869b579fa86820e12268fdb0e79d77fa2ee16a296"
+  end
+
+  head do
+    url "https://gitlab.xiph.org/xiph/ezstream.git", branch: "develop"
+
+    depends_on "autoconf" => :build
+    depends_on "automake" => :build
+    depends_on "gettext" => :build
+    depends_on "libtool" => :build
   end
 
   depends_on "check" => :build
@@ -35,9 +45,8 @@ class Ezstream < Formula
   end
 
   def install
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--prefix=#{prefix}"
+    system "autoreconf", "--verbose", "--install", "--force" if build.head?
+    system "./configure", *std_configure_args
     system "make", "install"
   end
 

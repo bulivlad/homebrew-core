@@ -1,10 +1,10 @@
 class Asio < Formula
   desc "Cross-platform C++ Library for asynchronous programming"
   homepage "https://think-async.com/Asio"
-  url "https://downloads.sourceforge.net/project/asio/asio/1.18.1%20%28Stable%29/asio-1.18.1.tar.bz2"
-  sha256 "4af9875df5497fdd507231f4b7346e17d96fc06fe10fd30e2b3750715a329113"
+  url "https://downloads.sourceforge.net/project/asio/asio/1.22.1%20%28Stable%29/asio-1.22.1.tar.bz2"
+  sha256 "6874d81a863d800ee53456b1cafcdd1abf38bbbf54ecf295056b053c0d7115ce"
   license "BSL-1.0"
-  head "https://github.com/chriskohlhoff/asio.git"
+  head "https://github.com/chriskohlhoff/asio.git", branch: "master"
 
   livecheck do
     url :stable
@@ -12,17 +12,22 @@ class Asio < Formula
   end
 
   bottle do
-    cellar :any
-    rebuild 1
-    sha256 "9cf6b9d1a1cc605977a853af92d5fd65a21f20a6128126ad19d8cceabc766a4b" => :big_sur
-    sha256 "f335dcfcae4e9345a6510d06cafe8884a8368a43368d52e53f95e1ca6bb8699c" => :arm64_big_sur
-    sha256 "a3eec5329a66d0e7017f407d653adc6234f09f20de691cb4290a5f1ca16c6c94" => :catalina
-    sha256 "1cbf161c11f1f4863d39d190d61a6c8efc0cdb2932c3763df7ff1111c480aaae" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "b3ea7931fb9e539f59bbf21f4647268487036aace40cda956d08507fe87bb90b"
+    sha256 cellar: :any,                 arm64_big_sur:  "5a8c945335115a2da264ec74162e57a5d92f4064544899c4df375a3cabc5e06a"
+    sha256 cellar: :any,                 monterey:       "98f1add58eeb5d6eb9d886781ef62dd0b6572dd8252252acdaa2bc1d3674c875"
+    sha256 cellar: :any,                 big_sur:        "dc03f2f6433eadeb86832d94a241c36a5be0eb23afde03644a11a62403a9b795"
+    sha256 cellar: :any,                 catalina:       "7c8ae5863a8abf20d8d811ec943c8bff0e702b7dc4e79ebbab9310bcc7a99e44"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "723acb5f60519bdc4426ac9d6e4e5689f94c794b615b6f71759d26eda1385df1"
   end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "openssl@1.1"
+
+  # Tarball is missing `src/examples/cpp20`, which causes error:
+  # config.status: error: cannot find input file: `src/examples/cpp20/Makefile.in'
+  # TODO: Remove in the next release
+  patch :DATA
 
   def install
     ENV.cxx11
@@ -52,10 +57,21 @@ class Asio < Formula
     end
     sleep 1
     begin
-      assert_match /404 Not Found/, shell_output("curl http://127.0.0.1:#{port}")
+      assert_match "404 Not Found", shell_output("curl http://127.0.0.1:#{port}")
     ensure
       Process.kill 9, pid
-      Process.wait pid
     end
   end
 end
+
+__END__
+diff --git a/configure.ac b/configure.ac
+index 56365c2..84045ba 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -241,4 +241,4 @@ AC_OUTPUT([
+   src/examples/cpp11/Makefile
+   src/examples/cpp14/Makefile
+   src/examples/cpp17/Makefile
+-  src/examples/cpp20/Makefile])
++])

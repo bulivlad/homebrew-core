@@ -1,8 +1,8 @@
 class Gphoto2 < Formula
   desc "Command-line interface to libgphoto2"
   homepage "http://www.gphoto.org/"
-  url "https://downloads.sourceforge.net/project/gphoto/gphoto/2.5.26/gphoto2-2.5.26.tar.bz2"
-  sha256 "7653213b05329c1dc2779efea3eff00504e12011436587aedc9aaa1e8665ab2f"
+  url "https://downloads.sourceforge.net/project/gphoto/gphoto/2.5.28/gphoto2-2.5.28.tar.bz2"
+  sha256 "2a648dcdf12da19e208255df4ebed3e7d2a02f905be4165f2443c984cf887375"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -11,16 +11,17 @@ class Gphoto2 < Formula
   end
 
   bottle do
-    cellar :any
-    sha256 "f78b5393c2d68ce33d628f59222612882fe93738ecbeffe76c2de4abccc3c296" => :big_sur
-    sha256 "d268212bc96bdcd3df5f6cc289d7f62d9ad20ac0db6b2e5ca338c54b8e4b198f" => :arm64_big_sur
-    sha256 "c4c42c50ee8bddf1a6b930f0eed9165a9e45ef1fb92476616833726b002ab077" => :catalina
-    sha256 "3b0f309d8d21165b945bb2c22a29f55396cf345a3f9255bc143ab4020fae5442" => :mojave
-    sha256 "a5c57a8b09c87b31c07cd3dea6ca6c859486c55268aa9745df740b1ac52368b2" => :high_sierra
+    sha256 arm64_monterey: "dfa88233cd6f19fa4317407ee9fd9bec7ba29524f66cb326541f7c685b02cb93"
+    sha256 arm64_big_sur:  "c047e8979df7d2de5fa711166560211822e4b9a52a40de6c8ba8a45aacbe9411"
+    sha256 monterey:       "fc8138f5c4bda70622bac1ecc35ec7871559cec84e3a301f3013b9c251367375"
+    sha256 big_sur:        "64019eb4a79953685898a72cdd9fd14c2b0f601cb8afdb34be027db10eca3ef2"
+    sha256 catalina:       "876e98081384c688eaab6338ff473370915a5c972703c4f72724e4c86d480ca6"
+    sha256 x86_64_linux:   "0a95b46e7d23af104359817145b5e660483440048ea7aa94e251d92e6dc3fc86"
   end
 
   depends_on "pkg-config" => :build
   depends_on "jpeg"
+  depends_on "libexif"
   depends_on "libgphoto2"
   depends_on "popt"
   depends_on "readline"

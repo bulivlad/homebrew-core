@@ -1,25 +1,21 @@
 class Gnuplot < Formula
   desc "Command-driven, interactive function plotting"
   homepage "http://www.gnuplot.info/"
-  url "https://downloads.sourceforge.net/project/gnuplot/gnuplot/5.4.1/gnuplot-5.4.1.tar.gz"
-  sha256 "6b690485567eaeb938c26936e5e0681cf70c856d273cc2c45fabf64d8bc6590e"
+  url "https://downloads.sourceforge.net/project/gnuplot/gnuplot/5.4.3/gnuplot-5.4.3.tar.gz"
+  sha256 "51f89bbab90f96d3543f95235368d188eb1e26eda296912256abcd3535bd4d84"
   license "gnuplot"
-  revision 1
-
-  livecheck do
-    url :stable
-  end
 
   bottle do
-    rebuild 1
-    sha256 "9a9db26ab2b8537521d4ff508d4797c8535434ddd34748ab4044867d8eef65a0" => :big_sur
-    sha256 "72a503fc93c60629c22d4f286d45365037d792d76c2f7ff8a76e6469641b0cc7" => :arm64_big_sur
-    sha256 "1de9920502210ab56fbedc9bf4025ab8f0c88d164f022a1e767863f64b6e9954" => :catalina
-    sha256 "19ed248f7d406ade2e6fd1faa28069878cd5b2a0b73911d735289478faaab8c3" => :mojave
+    sha256 arm64_monterey: "eb85e735b54d3525eebc7e9023e35e0265633a189a0a7a28eb67d923c2672503"
+    sha256 arm64_big_sur:  "4458590e1c71fee35fe0324b964a984fa2332a91b4bb0dc2af4c1ef4b55c3b63"
+    sha256 monterey:       "4f84ad58c448e94fe7670189cdbf554eb1c88a8642dc312fe7dbd13c71097ada"
+    sha256 big_sur:        "fdf18f8bd7001fe7f05e049e0b953b080c6fdcbf7e3e17a39b4645528bb397ca"
+    sha256 catalina:       "b84af4fca336fe10b6447fe7307b56f526784aee1288c6de508019f4eb2bad83"
+    sha256 x86_64_linux:   "04affc7a3e9b83f0c6a7a5e12bc39bf8d4493debadf635a394229f1ed412d475"
   end
 
   head do
-    url "https://git.code.sf.net/p/gnuplot/gnuplot-main.git"
+    url "https://git.code.sf.net/p/gnuplot/gnuplot-main.git", branch: "master"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
@@ -31,8 +27,14 @@ class Gnuplot < Formula
   depends_on "libcerf"
   depends_on "lua"
   depends_on "pango"
-  depends_on "qt"
+  depends_on "qt@5"
   depends_on "readline"
+
+  on_linux do
+    depends_on "gcc"
+  end
+
+  fails_with gcc: "5"
 
   def install
     # Qt5 requires c++11 (and the other backends do not care)

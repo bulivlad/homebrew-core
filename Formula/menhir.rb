@@ -1,15 +1,17 @@
 class Menhir < Formula
   desc "LR(1) parser generator for the OCaml programming language"
   homepage "http://cristal.inria.fr/~fpottier/menhir"
-  url "https://gitlab.inria.fr/fpottier/menhir/-/archive/20201216/menhir-20201216.tar.bz2"
-  sha256 "bb9f2755e66b2a2bd60dc5eae979b9f56a119d45c892a1c6145f998b7467b59e"
+  url "https://gitlab.inria.fr/fpottier/menhir/-/archive/20220210/menhir-20220210.tar.bz2"
+  sha256 "767d7dfb1ed0d85cb19d5aef38912846b50df36751be558b0af342ccab0b1b47"
   license "GPL-3.0-or-later"
 
   bottle do
-    cellar :any
-    sha256 "2489afadf591e3052f81fc9219911e4c6d466d4933ea2a9fd44032f571e1abe4" => :big_sur
-    sha256 "b5a6e90d021aa79d5b1b3f270bc4773b9fb06070c14ca1145b8ea04996ff7e8f" => :catalina
-    sha256 "4d932e5fd011872bdc738b62ea7972a3ca6352aa5b7f74b59c3a5a3f9d4bea3e" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "034b3aeab807e0f5c9b61b1ac62937cab695e39c3cf9f6cd3b024687ff963822"
+    sha256 cellar: :any,                 arm64_big_sur:  "b5cf9ea01bd4ef559ce640dddf2bbc4602b9e5726d2d1d198a9a6a41d78f631f"
+    sha256 cellar: :any,                 monterey:       "25465835b11b2d3aa42a82587acebb885b8d6c9329fb4d78d746964bbf1d757b"
+    sha256 cellar: :any,                 big_sur:        "a7e520e7f276a33543b8b267b8f66bdd9173c627ae2d25c49012ee2d6e690848"
+    sha256 cellar: :any,                 catalina:       "d5d243ea886ec400aa0eb78576fa3879e991e1265b52abf408cc02034efe4e3e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7e6da4390a6dcf83abd5bcfe897946de7f7dd0a7a30ebe5f2eb08a7a32b521be"
   end
 
   depends_on "dune" => :build

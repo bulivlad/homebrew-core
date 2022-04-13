@@ -1,9 +1,10 @@
 class Netdata < Formula
   desc "Diagnose infrastructure problems with metrics, visualizations & alarms"
   homepage "https://netdata.cloud/"
-  url "https://github.com/netdata/netdata/releases/download/v1.28.0/netdata-v1.28.0.tar.gz"
-  sha256 "44801e240b1883a98d203156397cc8d9232492f3136891e61074e2e7facbf1a8"
+  url "https://github.com/netdata/netdata/releases/download/v1.33.1/netdata-v1.33.1.tar.gz"
+  sha256 "20ba8695d87187787b27128ac3aab9b09aa29ca6b508c48542e0f7d50ec9322b"
   license "GPL-3.0-or-later"
+  revision 1
 
   livecheck do
     url :stable
@@ -11,10 +12,12 @@ class Netdata < Formula
   end
 
   bottle do
-    sha256 "b82d22e73700e96436551a9119415dbd74ef096b1be7a3e98dbbeb00b04a19a6" => :big_sur
-    sha256 "2ee333bffcc8ee2bd1e3cfd4eab8ebb9791588a195991448a5a3d7eb7da8e0ed" => :arm64_big_sur
-    sha256 "a0a0e076fbf393299fd7c5f4775bdbf449d5e8d393f4b456c8d617219cc83aef" => :catalina
-    sha256 "944a5e4a9de241e57f91d8cf3007752e4cc27df9a364e1b38d42fe24eed306d9" => :mojave
+    sha256 arm64_monterey: "99fe18d02520bd4d98edb3ab5f13f6c360807353f9f719c4938c0bca7a3eb8ba"
+    sha256 arm64_big_sur:  "44cd4f5a1e474cc3e627aa5e8b07fe6b9eb3660989bb78ca2f015ba0c6c6e840"
+    sha256 monterey:       "8e142f1e3da647eae19e863410b7cc6b7ca8a4752df391e5365537dc2a410b7a"
+    sha256 big_sur:        "4a030f49688af224874bf982367eaddc4efe95301c1d7cd682922ae1c50fe447"
+    sha256 catalina:       "c3424bb2d6fa1889cabdf01dfd0923f04ea7327d82d08e8a407b6368c3b6f9e5"
+    sha256 x86_64_linux:   "5bc8cc2c6ae756f15f3f65e7c26d298a247144c75cee2a01250b7960d18b1772"
   end
 
   depends_on "autoconf" => :build
@@ -24,6 +27,13 @@ class Netdata < Formula
   depends_on "libuv"
   depends_on "lz4"
   depends_on "openssl@1.1"
+  depends_on "protobuf-c"
+
+  uses_from_macos "zlib"
+
+  on_linux do
+    depends_on "util-linux"
+  end
 
   resource "judy" do
     url "https://downloads.sourceforge.net/project/judy/judy/Judy-1.0.5/Judy-1.0.5.tar.gz"
@@ -50,18 +60,26 @@ class Netdata < Formula
     ENV.append "LDFLAGS", "-L#{judyprefix}/lib"
 
     system "autoreconf", "-ivf"
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}",
-                          "--sysconfdir=#{etc}",
-                          "--localstatedir=#{var}",
-                          "--libexecdir=#{libexec}",
-                          "--with-math",
-                          "--with-zlib",
-                          "--enable-dbengine",
-                          "--with-user=netdata",
-                          "UUID_CFLAGS=-I/usr/include",
-                          "UUID_LIBS=-lc"
+    args = %W[
+      --disable-dependency-tracking
+      --disable-silent-rules
+      --prefix=#{prefix}
+      --sysconfdir=#{etc}
+      --localstatedir=#{var}
+      --libexecdir=#{libexec}
+      --with-math
+      --with-zlib
+      --enable-dbengine
+      --with-user=netdata
+    ]
+    if OS.mac?
+      args << "UUID_LIBS=-lc"
+      args << "UUID_CFLAGS=-I/usr/include"
+    else
+      args << "UUID_LIBS=-luuid"
+      args << "UUID_CFLAGS=-I#{Formula["util-linux"].opt_include}"
+    end
+    system "./configure", *args
     system "make", "clean"
     system "make", "install"
 
@@ -80,28 +98,9 @@ class Netdata < Formula
     (var/"netdata").mkpath
   end
 
-  plist_options manual: "#{HOMEBREW_PREFIX}/sbin/netdata -D"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>RunAtLoad</key>
-          <true/>
-          <key>ProgramArguments</key>
-          <array>
-              <string>#{opt_sbin}/netdata</string>
-              <string>-D</string>
-          </array>
-          <key>WorkingDirectory</key>
-          <string>#{var}</string>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run [opt_sbin/"netdata", "-D"]
+    working_dir var
   end
 
   test do

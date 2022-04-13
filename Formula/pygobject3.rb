@@ -1,22 +1,19 @@
 class Pygobject3 < Formula
   desc "GNOME Python bindings (based on GObject Introspection)"
   homepage "https://wiki.gnome.org/Projects/PyGObject"
-  url "https://download.gnome.org/sources/pygobject/3.38/pygobject-3.38.0.tar.xz"
-  sha256 "0372d1bb9122fc19f500a249b1f38c2bb67485000f5887497b4b205b3e7084d5"
+  url "https://download.gnome.org/sources/pygobject/3.42/pygobject-3.42.0.tar.xz"
+  sha256 "9b12616e32cfc792f9dc841d9c472a41a35b85ba67d3a6eb427e307a6fe4367b"
   license "LGPL-2.1-or-later"
   revision 1
 
-  livecheck do
-    url :stable
-  end
-
   bottle do
-    cellar :any
-    sha256 "d9eb35a72a4970c2c6c537b7b8938f9147390a2cd4027d33bb119417c5693aa1" => :big_sur
-    sha256 "7b65e09a52672b0b31ebeb73308d25adae46baf3d0a7d544da0c3a50617d90c4" => :arm64_big_sur
-    sha256 "e4e592579b949b2b7df8cbd3b3956d3ee285054a4c1e3ecfbc9647a4e9bcf24e" => :catalina
-    sha256 "6c7132a187cc3cd7885d980b449022ca20d458e1657007000e471234f0504bed" => :mojave
-    sha256 "6f26840f9ae7c64ce17121d9ae60690447eb58269099fc96ed488308c755c8ac" => :high_sierra
+    sha256 cellar: :any, arm64_monterey: "a5589e885345d3680de0c7f4a93fb13940bb2ccb3615bcc28ecf98e8edf72f70"
+    sha256 cellar: :any, arm64_big_sur:  "435f6c7f01bcba010ceb53edf6ca9df8a31fffebf239d91a217e38d823c6f3fa"
+    sha256 cellar: :any, monterey:       "0de11a74ba9e4783a5009ed99fc0939b69a48490b60c15ecdd73eeffae1da3d6"
+    sha256 cellar: :any, big_sur:        "f9f1c60b23478993fc7ad3df87314c44dd172bcce440c4fccaf4222849834541"
+    sha256 cellar: :any, catalina:       "44bee3904b07d3e6bf3866e0e4de6ed4f4bfb0641a781e132a6d2c52de38332c"
+    sha256 cellar: :any, mojave:         "1d4bdcfee7b2dac4300170e7f9cb5d94ae27b35b7127e5f7d9972b89f9130dfc"
+    sha256               x86_64_linux:   "a34ce5794cfd73a3ac9864260aec1525b96967b9859a19286a884270b35afede"
   end
 
   depends_on "meson" => :build

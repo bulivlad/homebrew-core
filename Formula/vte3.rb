@@ -1,31 +1,39 @@
 class Vte3 < Formula
   desc "Terminal emulator widget used by GNOME terminal"
   homepage "https://developer.gnome.org/vte/"
-  url "https://download.gnome.org/sources/vte/0.62/vte-0.62.1.tar.xz"
-  sha256 "c369e87c0c8284e09109d0a9aac821f543558f51c0cb9c7acfff3df64153308d"
+  url "https://download.gnome.org/sources/vte/0.64/vte-0.64.2.tar.xz"
+  sha256 "2b3c820b65a667c1d8859ba20478be626d1519cc3159dac25f703330c6d07e18"
   license "LGPL-2.0-or-later"
-
-  livecheck do
-    url :stable
-  end
+  revision 1
 
   bottle do
-    sha256 "648845b96b5175bc135671b5d6812871973344baaf988634e1fb79e45df22bb8" => :big_sur
-    sha256 "71191ecd93f71207adf8198d4a7c60dc3e01ae09fe1296254370d2a0fa1c72a1" => :arm64_big_sur
-    sha256 "682bd63b12521e701f58b13f72f0a9f3449314670320e491b06d437de309daff" => :catalina
-    sha256 "617d21b21c0ffc0d53dea2ca5dc4ebf796afc9e3f0a46fc0c85ef9a01b2d6e28" => :mojave
+    sha256 arm64_monterey: "be757081c2174226aa18516a2eed57c1c2ab3e7d408c4ab7102a4e0f6e49b26b"
+    sha256 arm64_big_sur:  "0f8661eb1bb60e68bbdf2a1122ec0e6bcfa9cae381aa0bddc1f61a7dde99297b"
+    sha256 monterey:       "ac5105d4bc7b44d5abdd4b94f9b84329a3ba0df5cefe61c1a1b9b7dc9f2f79ce"
+    sha256 big_sur:        "6438e66d85eb28ce8c416d12d84e1b8565dcd705391e68ef9afb19d69da34f7b"
+    sha256 catalina:       "a6880f4a6a268fc1addb351181db918813af21a5327422013e07b3df068f45c6"
+    sha256 x86_64_linux:   "58eb40e41c86211778da9b44dcf9c9f40a9eb255bc56bbbc516d6d50ed0e001a"
   end
 
   depends_on "gobject-introspection" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
   depends_on "pkg-config" => :build
+  depends_on "vala" => :build
   depends_on "gettext"
   depends_on "gnutls"
   depends_on "gtk+3"
+  depends_on "icu4c"
   depends_on macos: :mojave
   depends_on "pcre2"
-  depends_on "vala"
+
+  on_linux do
+    depends_on "linux-headers@4.15" => :build
+    depends_on "gcc" # for C++17
+    depends_on "systemd"
+  end
+
+  fails_with gcc: "5"
 
   # submitted upstream as https://gitlab.gnome.org/tschoonj/vte/merge_requests/1
   patch :DATA
@@ -118,9 +126,7 @@ class Vte3 < Formula
       -lvte-2.91
       -lz
     ]
-    on_macos do
-      flags << "-lintl"
-    end
+    flags << "-lintl" if OS.mac?
     system ENV.cc, "test.c", "-o", "test", *flags
     system "./test"
   end

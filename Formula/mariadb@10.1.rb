@@ -1,21 +1,21 @@
 class MariadbAT101 < Formula
   desc "Drop-in replacement for MySQL"
   homepage "https://mariadb.org/"
-  url "https://downloads.mariadb.org/f/mariadb-10.1.48/source/mariadb-10.1.48.tar.gz"
+  url "https://downloads.mariadb.com/MariaDB/mariadb-10.1.48/source/mariadb-10.1.48.tar.gz"
   sha256 "069d58b1e2c06bb1e6c31249eda34138f41fb8ae3dec7ecaeba8035812c87cf9"
   license "GPL-2.0-only"
 
   bottle do
     rebuild 1
-    sha256 "589a7ef3e92f6dc2d4c5e5db501286a839b747a37b454bdd81231a4ed7531a43" => :big_sur
-    sha256 "fcc29400068999b2b5126af489d88dcc4af98169b9132d6aeb99876247b1a412" => :catalina
-    sha256 "f568cbdbc7a6f86d08251456e6eb4d22e16c065a68865ce83b7c2c1f0d2b61f6" => :mojave
+    sha256 big_sur:  "589a7ef3e92f6dc2d4c5e5db501286a839b747a37b454bdd81231a4ed7531a43"
+    sha256 catalina: "fcc29400068999b2b5126af489d88dcc4af98169b9132d6aeb99876247b1a412"
+    sha256 mojave:   "f568cbdbc7a6f86d08251456e6eb4d22e16c065a68865ce83b7c2c1f0d2b61f6"
   end
 
   keg_only :versioned_formula
 
   # See: https://mariadb.com/kb/en/changes-improvements-in-mariadb-101/
-  deprecate! date: "2020-10-01", because: :unsupported
+  disable! date: "2022-01-01", because: :unsupported
 
   depends_on "cmake" => :build
   depends_on "pkg-config" => :build
@@ -24,6 +24,10 @@ class MariadbAT101 < Formula
 
   uses_from_macos "bzip2"
   uses_from_macos "ncurses"
+
+  on_linux do
+    depends_on "linux-pam"
+  end
 
   def install
     # Set basedir and ldata so that mysql_install_db can find the server
@@ -63,7 +67,7 @@ class MariadbAT101 < Formula
     system "make", "install"
 
     # Avoid references to the Homebrew shims directory
-    inreplace bin/"mysqlbug", HOMEBREW_SHIMS_PATH/"mac/super/", ""
+    inreplace bin/"mysqlbug", "#{Superenv.shims_path}/", ""
 
     # Fix my.cnf to point to #{etc} instead of /etc
     (etc/"my.cnf.d").mkpath
@@ -111,10 +115,12 @@ class MariadbAT101 < Formula
   end
 
   def post_install
-    return if ENV["CI"]
-
     # Make sure the var/mysql directory exists
     (var/"mysql").mkpath
+
+    # Don't initialize database, it clashes when testing other MySQL-like implementations.
+    return if ENV["HOMEBREW_GITHUB_ACTIONS"]
+
     unless File.exist? "#{var}/mysql/mysql/user.frm"
       ENV["TMPDIR"] = nil
       system "#{bin}/mysql_install_db", "--verbose", "--user=#{ENV["USER"]}",

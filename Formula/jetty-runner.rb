@@ -1,9 +1,9 @@
 class JettyRunner < Formula
   desc "Use Jetty without an installed distribution"
   homepage "https://www.eclipse.org/jetty/"
-  url "https://search.maven.org/remotecontent?filepath=org/eclipse/jetty/jetty-runner/9.4.35.v20201120/jetty-runner-9.4.35.v20201120.jar"
-  version "9.4.35.v20201120"
-  sha256 "3cc3aa790df98e8d8fbfe68244fc04150242fa9056972de559f0047e97730103"
+  url "https://search.maven.org/remotecontent?filepath=org/eclipse/jetty/jetty-runner/9.4.46.v20220331/jetty-runner-9.4.46.v20220331.jar"
+  version "9.4.46.v20220331"
+  sha256 "35db59f2352625de1b549935b242d202e8364e7a1a6031ebfa17c1e5e24bc203"
   license any_of: ["Apache-2.0", "EPL-1.0"]
 
   livecheck do
@@ -11,7 +11,9 @@ class JettyRunner < Formula
     regex(/href=.*?jetty-distribution[._-]v?(\d+(?:\.\d+)+(?:\.v\d+)?)\.t/i)
   end
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any_skip_relocation, all: "441f4f729878e226233baf58c4810c7b26cf18a59eaa976eca3ea53c404f5255"
+  end
 
   depends_on "openjdk"
 
@@ -28,7 +30,7 @@ class JettyRunner < Formula
     pid = fork do
       exec "#{bin}/jetty-runner --port #{port} test.war"
     end
-    sleep 5
+    sleep 10
 
     begin
       output = shell_output("curl -I http://localhost:#{port}")

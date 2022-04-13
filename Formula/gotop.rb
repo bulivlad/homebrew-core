@@ -1,30 +1,38 @@
 class Gotop < Formula
   desc "Terminal based graphical activity monitor inspired by gtop and vtop"
   homepage "https://github.com/xxxserxxx/gotop"
-  url "https://github.com/xxxserxxx/gotop/archive/v4.0.1.tar.gz"
-  sha256 "38a34543ed828ed8cedd93049d9634c2e578390543d4068c19f0d0c20aaf7ba0"
+  url "https://github.com/xxxserxxx/gotop/archive/v4.1.3.tar.gz"
+  sha256 "c0a02276e718b988d1220dc452063759c8634d42e1c01a04c021486c1e61612d"
   license "BSD-3-Clause"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "398d3e2e32c2d59d08a36086f625c5fe5e3cf94c518e6a5dc1d3a90ea9edc49f" => :big_sur
-    sha256 "5a61acb05457b28a32d342fc75376785873ec8f9fd73209f079550051851ea54" => :catalina
-    sha256 "c758b1001a0de9af2572871c05cd3ec78341e31e2e870a9a147cea493f85baa6" => :mojave
-    sha256 "194a6ee2f9ab9922b23a91d8868ac7802f611f238d56d10c79da4c9263a9afa4" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "7580ba306a6bf56a4a40da70c0afa157d4ebf6572f64161e67d281a8ebf4357f"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "557c44142c91a5fe28a7af8b51e765dd53b578c6e3d9f8574bafc5199fd1a081"
+    sha256 cellar: :any_skip_relocation, monterey:       "ea38313cce0eceb5ad7b6fe59fdee06339e94077a4d52016ad3cd85e11957c38"
+    sha256 cellar: :any_skip_relocation, big_sur:        "58d98a1062f1f11090072f7b51870bfb013034ad8fe40c98cf891f76c39ce1ae"
+    sha256 cellar: :any_skip_relocation, catalina:       "318b906ab5b5239d105a3acc6d5bd9a28bea876d1938de5b43add11395880a55"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4311e6151f0613eae23fd73f9f2b9cf3a26d4968693e1b494ee7231bc464457d"
   end
 
   depends_on "go" => :build
 
   def install
-    time = `date +%Y%m%dT%H%M%S`.chomp
-    system "go", "build", *std_go_args, "-ldflags",
-           "-X main.Version=#{version} -X main.BuildDate=#{time}", "./cmd/gotop"
+    ldflags = %W[
+      -X main.Version=#{version}
+      -X main.BuildDate=#{time.strftime("%Y%m%dT%H%M%S")}
+    ]
+    system "go", "build", *std_go_args(ldflags: ldflags), "./cmd/gotop"
   end
 
   test do
     assert_match version.to_s, shell_output("#{bin}/gotop --version").chomp
 
     system bin/"gotop", "--write-config"
-    assert_predicate testpath/"Library/Application Support/gotop/gotop.conf", :exist?
+    conf_path = if OS.mac?
+      "Library/Application Support/gotop/gotop.conf"
+    else
+      ".config/gotop/gotop.conf"
+    end
+    assert_predicate testpath/conf_path, :exist?
   end
 end

@@ -1,17 +1,17 @@
 class Gopass < Formula
   desc "Slightly more awesome Standard Unix Password Manager for Teams"
   homepage "https://github.com/gopasspw/gopass"
-  url "https://github.com/gopasspw/gopass/releases/download/v1.11.0/gopass-1.11.0.tar.gz"
-  sha256 "f2a9decff293fff9dda0907a0511ac01425f31a93b8feda379b0e9d053af8f68"
+  url "https://github.com/gopasspw/gopass/releases/download/v1.14.0/gopass-1.14.0.tar.gz"
+  sha256 "832aabe92da82216b77af5745e10d24a4edbd50afcfc85b5ef2221353ca3cab7"
   license "MIT"
-  head "https://github.com/gopasspw/gopass.git"
+  head "https://github.com/gopasspw/gopass.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "c31ac893183875bcc18fe9e6b5d7dc3d17b2ae5c7a08003ae89d6d376210718a" => :big_sur
-    sha256 "7fc7647c0acc4926b64323f33bde8ab45a5ef27726ba28ef7f9a6547e2d8855b" => :arm64_big_sur
-    sha256 "ece67ff90db85385a0a86391daa08cae2d164198949874ef94b61cf69a198547" => :catalina
-    sha256 "9496cccc95ce43ffa04d153ec36cb22d8a3e3f7c1ac3380d633421ef034b4640" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "dfec55ef0e25dd099968015b388040ed66aa08dd6cda14a9543378e1f135428c"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "d85290e894034c48b37e68fb535ef6d7e704d8189ee85829482f2bf65fcdefae"
+    sha256 cellar: :any_skip_relocation, monterey:       "e06660691da28415d7196ed68023f17ca81f20066428ca3d2d435d5540f46edf"
+    sha256 cellar: :any_skip_relocation, big_sur:        "73fa712790bcabf1bbac670860b62c3cdd8fb68fde77b4294578c5a5e1280e6e"
+    sha256 cellar: :any_skip_relocation, catalina:       "ba6ba6de4cb9a7595ec441f1ea4a956c4457536700eb5a98bd24c990f1b7ee9d"
   end
 
   depends_on "go" => :build
@@ -22,18 +22,12 @@ class Gopass < Formula
   end
 
   def install
-    ENV["GOBIN"] = bin
+    system "make", "install", "PREFIX=#{prefix}/"
 
-    system "go", "install", "-ldflags", "-s -w -X main.version=#{version}", "./..."
-
-    output = Utils.safe_popen_read({ "SHELL" => "bash" }, "#{bin}/gopass", "completion", "bash")
-    (bash_completion/"gopass").write output
-
-    output = Utils.safe_popen_read({ "SHELL" => "zsh" }, "#{bin}/gopass", "completion", "zsh")
-    (zsh_completion/"_gopass").write output
-
-    output = Utils.safe_popen_read({ "SHELL" => "fish" }, "#{bin}/gopass", "completion", "fish")
-    (fish_completion/"gopass.fish").write output
+    bash_completion.install "bash.completion" => "gopass.bash"
+    fish_completion.install "fish.completion" => "gopass.fish"
+    zsh_completion.install "zsh.completion" => "_gopass"
+    man1.install "gopass.1"
   end
 
   test do

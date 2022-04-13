@@ -6,31 +6,21 @@ class Asimov < Formula
   license "MIT"
   head "https://github.com/stevegrunwell/asimov.git", branch: "develop"
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any_skip_relocation, all: "241f2672b244e0f6913abab7ab03d52d2f757d9bf1d384f79e880753e0ade64d"
+  end
 
   def install
     bin.install buildpath/"asimov"
   end
 
-  plist_options startup: true, manual: "asimov"
+  plist_options startup: true
 
   # Asimov will run in the background on a daily basis
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-          <dict>
-              <key>Label</key>
-              <string>#{plist_name}</string>
-              <key>Program</key>
-              <string>#{opt_bin}/asimov</string>
-              <key>StartInterval</key>
-              <!-- 24 hours = 60 * 60 * 24 -->
-              <integer>86400</integer>
-          </dict>
-      </plist>
-    EOS
+  service do
+    run opt_bin/"asimov"
+    run_type :interval
+    interval 86400 # 24 hours = 60 * 60 * 24
   end
 
   test do

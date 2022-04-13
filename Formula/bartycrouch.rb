@@ -2,20 +2,20 @@ class Bartycrouch < Formula
   desc "Incrementally update/translate your Strings files"
   homepage "https://github.com/Flinesoft/BartyCrouch"
   url "https://github.com/Flinesoft/BartyCrouch.git",
-      tag:      "4.3.2",
-      revision: "35b819cb7575583c74a4d13ca4a91d829d1b8a7c"
+      tag:      "4.10.2",
+      revision: "8e12d831b2cb84c05c94a715815139e76f6a7b64"
   license "MIT"
-  head "https://github.com/Flinesoft/BartyCrouch.git"
+  head "https://github.com/Flinesoft/BartyCrouch.git", branch: "main"
 
   bottle do
-    cellar :any_skip_relocation
-    rebuild 1
-    sha256 "bb05255e27f2f4f8248374e390aac3c0f721b328ca8afd137f9f0aac17fd7e30" => :big_sur
-    sha256 "c4425d05d4901ffab03c87991cf6af51efe85f7382c22eb1517b22f2f466ae0e" => :arm64_big_sur
-    sha256 "71c4a6bf3106632f4cc5191a473d4dad66f2b86090fe52548a29b4775517b67e" => :catalina
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "9cc3772fc61860a1a5f0013f9b7cfc214545dc7815e0759df68c3764885327ee"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "22c833293a3638f2fc037b8d3acde3d9470422bcd18f7d932f048f3f56d2b88f"
+    sha256 cellar: :any_skip_relocation, monterey:       "7fd5de567eda72492d0ad8488c76530a9e1ebc3770710ecb17ba2047310da247"
+    sha256 cellar: :any_skip_relocation, big_sur:        "97f91089d2c485d33fa7becac46b1f5d9d102da5c9c58233d2a2ca85524eaab5"
   end
 
-  depends_on xcode: ["12.0", :build]
+  depends_on xcode: ["12.5", :build]
+  depends_on :macos
 
   def install
     system "make", "install", "prefix=#{prefix}"
@@ -38,7 +38,7 @@ class Bartycrouch < Formula
     EOS
 
     system bin/"bartycrouch", "update"
-    assert_match /"oldKey" = "/, File.read("en.lproj/Localizable.strings")
-    assert_match /"test" = "/, File.read("en.lproj/Localizable.strings")
+    assert_match '"oldKey" = "', File.read("en.lproj/Localizable.strings")
+    assert_match '"test" = "', File.read("en.lproj/Localizable.strings")
   end
 end

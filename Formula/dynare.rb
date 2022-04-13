@@ -1,16 +1,19 @@
 class Dynare < Formula
   desc "Platform for economic models, particularly DSGE and OLG models"
   homepage "https://www.dynare.org/"
-  url "https://www.dynare.org/release/source/dynare-4.5.7.tar.xz"
-  sha256 "9224ec5279d79d55d91a01ed90022e484f66ce93d56ca6d52933163f538715d4"
+  url "https://www.dynare.org/release/source/dynare-5.1.tar.xz"
+  sha256 "269b2b52d9e7af0bf06041b48e730dd5c2fb89577bed24ad5e4b51e0dca9dbbe"
   license "GPL-3.0-or-later"
-  revision 16
+
+  livecheck do
+    url "https://www.dynare.org/download/"
+    regex(/href=.*?dynare[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
 
   bottle do
-    cellar :any
-    sha256 "82f10ec400a45d52308681a31da463f233158f3a73a7ec51da4bfbe322fb2ae8" => :big_sur
-    sha256 "ce1fca3d77fe15fb198a3610524f3b0210f57b6757ba36f171705060ee8d1074" => :catalina
-    sha256 "da202eccfc7d8235160d974ebe88021d10efd5be016fd0d78f77c2837e6f6fd3" => :mojave
+    sha256 cellar: :any, monterey: "915f40e0b755b62fa6922ca3edcb25b18bdcd1736ac9aedde6ef5a6ff41f60a8"
+    sha256 cellar: :any, big_sur:  "c4633427be90b103aea09cf569e42698fc88f02377e49d2e4a7556b6c92001f3"
+    sha256 cellar: :any, catalina: "04ef765f6560ccd3d8c69beb792a080a601da75506919da93f47a7a5d485b7cd"
   end
 
   head do
@@ -25,7 +28,7 @@ class Dynare < Formula
   depends_on "boost" => :build
   depends_on "cweb" => :build
   depends_on "fftw"
-  depends_on "gcc" # for gfortran
+  depends_on "gcc"
   depends_on "gsl"
   depends_on "hdf5"
   depends_on "libmatio"
@@ -34,9 +37,19 @@ class Dynare < Formula
   depends_on "openblas"
   depends_on "suite-sparse"
 
+  resource "io" do
+    url "https://octave.sourceforge.io/download.php?package=io-2.6.4.tar.gz", using: :nounzip
+    sha256 "a74a400bbd19227f6c07c585892de879cd7ae52d820da1f69f1a3e3e89452f5a"
+  end
+
   resource "slicot" do
     url "https://deb.debian.org/debian/pool/main/s/slicot/slicot_5.0+20101122.orig.tar.gz"
     sha256 "fa80f7c75dab6bfaca93c3b374c774fd87876f34fba969af9133eeaea5f39a3d"
+  end
+
+  resource "statistics" do
+    url "https://octave.sourceforge.io/download.php?package=statistics-1.4.3.tar.gz", using: :nounzip
+    sha256 "9801b8b4feb26c58407c136a9379aba1e6a10713829701bb3959d9473a67fa05"
   end
 
   def install
@@ -52,18 +65,27 @@ class Dynare < Formula
       (buildpath/"slicot/lib").install "libslicot_pic.a", "libslicot64_pic.a"
     end
 
+    # GCC is the only compiler supported by upstream
+    # https://git.dynare.org/Dynare/dynare/-/blob/master/README.md#general-instructions
+    gcc = Formula["gcc"]
+    gcc_major_ver = gcc.any_installed_version.major
+    ENV["CC"] = Formula["gcc"].opt_bin/"gcc-#{gcc_major_ver}"
+    ENV["CXX"] = Formula["gcc"].opt_bin/"g++-#{gcc_major_ver}"
+    ENV.append "LDFLAGS", "-static-libgcc"
+
     system "autoreconf", "-fvi" if build.head?
     system "./configure", "--disable-debug",
                           "--disable-dependency-tracking",
                           "--disable-silent-rules",
                           "--prefix=#{prefix}",
+                          "--disable-doc",
                           "--disable-matlab",
-                          "--with-slicot=#{buildpath}/slicot",
                           "--with-boost=#{Formula["boost"].prefix}",
-                          "--disable-doc"
+                          "--with-gsl=#{Formula["gsl"].prefix}",
+                          "--with-matio=#{Formula["libmatio"].prefix}",
+                          "--with-slicot=#{buildpath}/slicot"
+
     # Octave hardcodes its paths which causes problems on GCC minor version bumps
-    gcc = Formula["gcc"]
-    gcc_major_ver = gcc.any_installed_version.major
     flibs = "-L#{gcc.lib}/gcc/#{gcc_major_ver} -lgfortran -lquadmath -lm"
     system "make", "install", "FLIBS=#{flibs}"
   end
@@ -76,8 +98,22 @@ class Dynare < Formula
   end
 
   test do
+    ENV.cxx11
+
+    statistics = resource("statistics")
+    io = resource("io")
+    testpath.install statistics, io
+
     cp lib/"dynare/examples/bkk.mod", testpath
-    system Formula["octave"].opt_bin/"octave", "--no-gui", "-H", "--path",
-           "#{lib}/dynare/matlab", "--eval", "dynare bkk.mod console"
+
+    (testpath/"dyn_test.m").write <<~EOS
+      pkg prefix #{testpath}/octave
+      pkg install io-#{io.version}.tar.gz
+      pkg install statistics-#{statistics.version}.tar.gz
+      dynare bkk.mod console
+    EOS
+
+    system Formula["octave"].opt_bin/"octave", "--no-gui",
+           "-H", "--path", "#{lib}/dynare/matlab", "dyn_test.m"
   end
 end

@@ -2,35 +2,40 @@ class ChartTesting < Formula
   desc "Testing and linting Helm charts"
   homepage "https://github.com/helm/chart-testing"
   url "https://github.com/helm/chart-testing.git",
-      tag:      "v3.3.1",
-      revision: "71d0e1e82c5c8b66ce4d9704426dc13b7075829d"
+      tag:      "v3.5.1",
+      revision: "c891fb09f2c5ba548574c4bcf31229755a94e711"
   license "Apache-2.0"
-  head "https://github.com/helm/chart-testing.git"
+  head "https://github.com/helm/chart-testing.git", branch: "main"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "eafbb9e075ec41b2ea96b341173a286be38928eac51dc8b24796c45ace00a6a1" => :big_sur
-    sha256 "fedd5373948e1ddd30e95f903a29d7173f069660ec4b0bed91f7ce8bf9d3ef40" => :catalina
-    sha256 "ef933f0c425753b905cee3d9a66be61e58c1bf4e31fca67b2ade2daed2a1642a" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "5c225372eb15f1546f8e5d8f5a5c2a0035955b2edbf378efad954a02c4da5126"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "1e2fb6c62d017c6167d205750558782fa871b75c0aee709834e8f6e6a340ac4d"
+    sha256 cellar: :any_skip_relocation, monterey:       "ae47595638dca3841e79d924f13ea079f5c958052b3e43aa7afdb1efbdff34fe"
+    sha256 cellar: :any_skip_relocation, big_sur:        "39682e0b4f25506ad93e8a50bb6d178e8ae2c68f9328fa601903362b70682163"
+    sha256 cellar: :any_skip_relocation, catalina:       "8f117ec2933662d8c49df81381e6ced2dc0f16e78bf4f6f6a3bc2bd440bbfaaf"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8e2409b0aeab320b9841aa346b451832ed6619013fb920a2e516baa88534b4c7"
   end
 
   depends_on "go" => :build
   depends_on "helm" => :test
   depends_on "yamllint" => :test
+  depends_on "yamale"
 
   def install
+    # Fix default search path for configuration files, needed for ARM
+    inreplace "pkg/config/config.go", "/usr/local/etc", etc
     ldflags = %W[
       -X github.com/helm/chart-testing/v#{version.major}/ct/cmd.Version=#{version}
       -X github.com/helm/chart-testing/v#{version.major}/ct/cmd.GitCommit=#{Utils.git_head}
-      -X github.com/helm/chart-testing/v#{version.major}/ct/cmd.BuildDate=#{Date.today}
-    ].join(" ")
-    system "go", "build", *std_go_args, "-ldflags", ldflags, "-o", bin/"ct", "./ct/main.go"
+      -X github.com/helm/chart-testing/v#{version.major}/ct/cmd.BuildDate=#{time.strftime("%F")}
+    ]
+    system "go", "build", *std_go_args(output: bin/"ct", ldflags: ldflags), "./ct/main.go"
     etc.install "etc" => "ct"
   end
 
   test do
     assert_match "Lint and test", shell_output("#{bin}/ct --help")
-    assert_match /Version:\s+#{version}/, shell_output("#{bin}/ct version")
+    assert_match(/Version:\s+#{version}/, shell_output("#{bin}/ct version"))
 
     # Lint an empty Helm chart that we create with `helm create`
     system "helm", "create", "testchart"

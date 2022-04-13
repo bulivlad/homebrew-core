@@ -1,16 +1,18 @@
 class Argo < Formula
   desc "Get stuff done with container-native workflows for Kubernetes"
   homepage "https://argoproj.io"
-  url "https://github.com/argoproj/argo.git",
-      tag:      "v2.12.4",
-      revision: "f97bef5d00361f3d1cbb8574f7f6adf632673008"
+  url "https://github.com/argoproj/argo-workflows.git",
+      tag:      "v3.3.1",
+      revision: "3d606939dcc78d22ff5fa1401703c619639d019f"
   license "Apache-2.0"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "4896078ec42a384bcaf6aaa4550d3ade42705f9f00b2b9d54621d761af2a1e8a" => :big_sur
-    sha256 "00a3e7be8c6d89c5b83b845c898d19f36dac52be482c6a29cf87710c5dd38469" => :catalina
-    sha256 "1786b2764ea195d453a4edf1f534d85c753a676a029652f33c0912a093c2db3e" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "49fa62c3cd629e66ce4f2178fdac085e320a3bd00be8f17c829b0090fcf67690"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "e829e3ca3d29df1d0508ae8d6fc128f1f848274f50489def2e5c503424f4d559"
+    sha256 cellar: :any_skip_relocation, monterey:       "09ffc099faaec34b08205cc67d952f26949a2717c1d562bc6a6572f563fb7f48"
+    sha256 cellar: :any_skip_relocation, big_sur:        "4577bb26180711b44ae9b9400015d5b81fbf9430ca1fffc36191a6df9c6f2f6c"
+    sha256 cellar: :any_skip_relocation, catalina:       "79b90dd5722c1089e07fecf34270949b647a9fd066c4713b7d938b6675cc7877"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2d070beb612b8a848e070af0b5b1808391d72ca0055d4a2733984faa565c0d01"
   end
 
   depends_on "go" => :build
@@ -37,6 +39,6 @@ class Argo < Formula
     # Since it is an empty file we expect it to be invalid
     touch testpath/"kubeconfig"
     assert_match "invalid configuration",
-      shell_output("#{bin}/argo lint --kubeconfig ./kubeconfig 2>&1", 1)
+      shell_output("#{bin}/argo lint --kubeconfig ./kubeconfig ./kubeconfig 2>&1", 1)
   end
 end

@@ -1,21 +1,22 @@
 class Immudb < Formula
   desc "Lightweight, high-speed immutable database"
   homepage "https://www.codenotary.io"
-  url "https://github.com/codenotary/immudb/archive/v0.9.0.tar.gz"
-  sha256 "28c2ea31eaac4401c4b92290d4d3e16ac7c196aaed1aa065d71b211d306ed398"
+  url "https://github.com/codenotary/immudb/archive/v1.2.2.tar.gz"
+  sha256 "ed99ed58beb089a7d8eabc0853cd9644b23ea5fcc59aa2a29608335ce09b3eec"
   license "Apache-2.0"
 
   livecheck do
     url :stable
-    regex(/^v?(\d+(?:\.\d+)+)$/i)
+    strategy :github_latest
   end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "5f67d609e5ef9723a80719d36ad0893d282cfa1788d7e145945bfe52f34ce271" => :big_sur
-    sha256 "67fbddb2bb4c218f87ae0ab0f3d13d97b59b726674edea63227b3cf5cbab7db2" => :arm64_big_sur
-    sha256 "e6c40015f44470c6a2845f67f267e2f61c5a0ca67423178edb7df150d175aaf0" => :catalina
-    sha256 "6d9b56699399cea98af56a35e376262b223f264a2c04fe7e7a8b05eeda043d59" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "4058dbcf9ad539dffa3233c1011e60fe42fe663d1945921a1a25bc521e33b6f8"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "ad07b54822ae7fd4ea1f6e75d813513b5e6cbddba71ac6ce625528abf604cf98"
+    sha256 cellar: :any_skip_relocation, monterey:       "f4d1988a3e8609ebd6e0a2199ff7f6257d32b58818497403a8a7516dce8d477b"
+    sha256 cellar: :any_skip_relocation, big_sur:        "2b2da7f36c75d8ccf86286e810ce65bf8c51a08a2865e48dc777cf4b1a5aeb4f"
+    sha256 cellar: :any_skip_relocation, catalina:       "c473c5b400625b33e1740ffc4ca6a8a5efabb84f373f0463bc8f0971a91a8767"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "eca747d1e87572ad7e58a9d67289e6a69d72da32d3d7e88c2d8f29b51b438d0a"
   end
 
   depends_on "go" => :build
@@ -25,17 +26,27 @@ class Immudb < Formula
     bin.install %w[immudb immuclient immuadmin]
   end
 
+  def post_install
+    (var/"immudb").mkpath
+  end
+
+  service do
+    run opt_bin/"immudb"
+    keep_alive true
+    error_log_path var/"log/immudb.log"
+    log_path var/"log/immudb.log"
+    working_dir var/"immudb"
+  end
+
   test do
-    immudb_port = free_port
+    port = free_port
 
     fork do
-      exec bin/"immudb", "--auth=false", "-p", immudb_port.to_s
+      exec bin/"immudb", "--port=#{port}"
     end
     sleep 3
 
-    system bin/"immuclient", "safeset", "hello", "world", "-p", immudb_port.to_s
-    assert_match "world", shell_output("#{bin}/immuclient safeget hello -p #{immudb_port}")
-
-    assert_match "OK", shell_output("#{bin}/immuadmin status -p #{immudb_port}")
+    assert_match "immuclient", shell_output("#{bin}/immuclient version")
+    assert_match "immuadmin", shell_output("#{bin}/immuadmin version")
   end
 end

@@ -3,21 +3,15 @@ class Ddgr < Formula
 
   desc "DuckDuckGo from the terminal"
   homepage "https://github.com/jarun/ddgr"
-  url "https://github.com/jarun/ddgr/archive/v1.9.tar.gz"
-  sha256 "3dfe82fab649f1cec904a1de63f78692be329a3b6928c1615f22c76f6e21c36f"
-  license "GPL-3.0"
-  revision 1
+  url "https://github.com/jarun/ddgr/archive/v2.0.tar.gz"
+  sha256 "7e46430b0a8c479a5feca832adb73f2f09804bf603dedc50f4cf2e1da4c75f88"
+  license "GPL-3.0-or-later"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "a4d85046d345c5bd1dbb2a5368cef631ac4eef8dfbf3f365019d90da7f31c54a" => :big_sur
-    sha256 "514088d8485c7943c2c4a34654147bc357d0cd1b797cc80b455ec0212ae7d226" => :arm64_big_sur
-    sha256 "2e072910ed4e40203156efec17ffd926142f1dcbe452ee975f7bda67bf658e67" => :catalina
-    sha256 "e790e6a0175047496f3b81e1226e4e55a1047c9b070dd18ffcd6825d17e840dd" => :mojave
-    sha256 "57266892ebb4fe452b375f06ad756426eecbe7f144e4c6b79673cfce289d34fc" => :high_sierra
+    sha256 cellar: :any_skip_relocation, all: "07a4fd32509977d6693b129ed28e24a20e52dd44548e9060c28f5e588afbfa40"
   end
 
-  depends_on "python@3.9"
+  depends_on "python@3.10"
 
   def install
     rewrite_shebang detected_python_shebang, "ddgr"

@@ -1,16 +1,18 @@
 class Giza < Formula
   desc "Scientific plotting library for C/Fortran built on cairo"
   homepage "https://danieljprice.github.io/giza/"
-  url "https://downloads.sourceforge.net/project/giza/v1.1.0/giza-1.1.0.tar.gz"
-  sha256 "69f6b8187574eeb66ec3c1edadf247352b0ffebc6fc6ffbb050bafd324d3e300"
+  url "https://github.com/danieljprice/giza/archive/v1.3.2.tar.gz"
+  sha256 "080b9d20551bc6c6a779b1148830d0e89314c9a78c5a934f9ec8f02e8e541372"
   license "GPL-2.0-or-later"
+  head "https://github.com/danieljprice/giza.git", branch: "master"
 
   bottle do
-    cellar :any
-    sha256 "7a485d9f66a4b57eadf001fe38219c52b95ddd097830a02cdc3356b2e435765d" => :big_sur
-    sha256 "4f8cdbde732c7a01b43daac9e9970911458af323b9ecf82e8f64264e1d04464c" => :arm64_big_sur
-    sha256 "4651e890ce15036cb2e8862a5c72d56201be4cfc345f7f66d95aa3fd452b6615" => :catalina
-    sha256 "3bfd5ff70ee646773ac6d799c3bd5865a9ab689833ca1f484a6402fa9443b105" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "44a56e84ca807f58adaf6eaa3468a0d5def6e53baa7ef5a93271ed810cc80ff0"
+    sha256 cellar: :any,                 arm64_big_sur:  "3e792b9f7c3182e6c267abab3dcfa5a388694525d8b5acbf2cb74d693ab6d7ee"
+    sha256 cellar: :any,                 monterey:       "150ab9f0eaaf53728c0564019ab871834aed555ad242144a5f0305596c4678e5"
+    sha256 cellar: :any,                 big_sur:        "ac9a2190b49adb41fbb79fee29283581826b484f7609edaac604712420a9e585"
+    sha256 cellar: :any,                 catalina:       "ff67af5b932fb77e023dab9934f4b45059bf218a985d14d9faff9e2938e38e7d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "af77879b955403d702200385e26cb3689f7aaf0d4cdc7007575637524c17bc26"
   end
 
   depends_on "pkg-config" => :build
@@ -44,20 +46,25 @@ class Giza < Formula
     test_dir = "#{prefix}/test/C"
     cp_r test_dir, testpath
 
-    on_macos do
-      ENV["CC"] = "#{Formula["gcc"].bin}/gcc-10"
-    end
-
     flags = %W[
       -I#{include}
+      -I#{Formula["cairo"].opt_include}/cairo
       -L#{lib}
+      -L#{Formula["libx11"].opt_lib}
+      -L#{Formula["cairo"].opt_lib}
+      -lX11
+      -lcairo
       -lgiza
     ]
 
-    testfiles = Dir.children("#{testpath}/C")
-
-    testfiles.first(5).each do |file|
-      system ENV.cc, "C/#{file}", *flags
+    %w[
+      test-XOpenDisplay.c
+      test-cairo-xw.c
+      test-giza-xw.c
+      test-rectangle.c
+      test-window.c
+    ].each do |file|
+      system ENV.cc, testpath/"C"/file, *flags
     end
   end
 end

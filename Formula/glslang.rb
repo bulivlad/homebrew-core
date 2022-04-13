@@ -1,8 +1,9 @@
 class Glslang < Formula
   desc "OpenGL and OpenGL ES reference compiler for shading languages"
   homepage "https://www.khronos.org/opengles/sdk/tools/Reference-Compiler/"
-  url "https://github.com/KhronosGroup/glslang/archive/8.13.3743.tar.gz"
-  sha256 "639ebec56f1a7402f2fa094469a5ddea1eceecfaf2e9efe361376a0f73a7ee2f"
+  url "https://github.com/KhronosGroup/glslang/archive/11.9.0.tar.gz"
+  sha256 "d5744adba19eef9ad3d73f524226b39fec559d94cb582cd442e3c5de930004b2"
+  license all_of: ["BSD-3-Clause", "GPL-3.0-or-later", "MIT", "Apache-2.0"]
   head "https://github.com/KhronosGroup/glslang.git"
 
   livecheck do
@@ -11,15 +12,16 @@ class Glslang < Formula
   end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "770b8efbe5dfe0112ff68dcc70e27d456089a167ad50f0cf710805da60dd126e" => :big_sur
-    sha256 "b2fed640a79567039b2f90735bec3acd3754c6f8666c0d875e722f08a2e443d1" => :arm64_big_sur
-    sha256 "9db9f4d0af3d3945270e3fcfbb2e502f377f15d76810facf80862093a18b7a5d" => :catalina
-    sha256 "24e6cb49dac7d598a0d12e055a67cd036196eb8cfb7f688b58240219e1a144b9" => :mojave
-    sha256 "02af3328d6edf389d340d0c106c4366f575e5abf8db478e6b5c6fc99111b2c2c" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "9bc7e69b382cd909ad211e53996b9e45f31b776f369de4f80ff2ddd8b3506479"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "aee6accfc43b01ff82a6846967745e40ee6a55624b7a658e58d85d3cb2c7fc2e"
+    sha256 cellar: :any_skip_relocation, monterey:       "cc6d5b07febfdf260c09dc2b3b5679d666ad7ce66ca0903d3f27e4464d19d793"
+    sha256 cellar: :any_skip_relocation, big_sur:        "6bb91a121866b43c730066d23713dec3c7192dfa0d08f5b9338950009608c267"
+    sha256 cellar: :any_skip_relocation, catalina:       "731aaa2823df30f9ffb32697487247770705b588050c3e547471d263b24ee94a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5a91b542709e475772a5f101912e528304137c3d1421c8a1d4fbcb1e91af74e1"
   end
 
   depends_on "cmake" => :build
+  depends_on "python@3.10" => :build
 
   def install
     args = %w[

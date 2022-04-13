@@ -1,22 +1,18 @@
 class Libpulsar < Formula
   desc "Apache Pulsar C++ library"
   homepage "https://pulsar.apache.org/"
-  url "https://www.apache.org/dyn/closer.lua?path=pulsar/pulsar-2.7.0/apache-pulsar-2.7.0-src.tar.gz"
-  mirror "https://archive.apache.org/dist/pulsar/pulsar-2.7.0/apache-pulsar-2.7.0-src.tar.gz"
-  sha256 "f1e8168b7f2b8bfc06c84f743eb4f3dfa5f8f376f087c5ef1532f998cf56bab4"
+  url "https://www.apache.org/dyn/closer.lua?path=pulsar/pulsar-2.9.2/apache-pulsar-2.9.2-src.tar.gz"
+  mirror "https://archive.apache.org/dist/pulsar/pulsar-2.9.2/apache-pulsar-2.9.2-src.tar.gz"
+  sha256 "66cf22136488aabe443d92284fbb3edb15e1b9d8a64cf498b36236f75af29bbc"
   license "Apache-2.0"
-  revision 1
-
-  livecheck do
-    url :stable
-  end
 
   bottle do
-    cellar :any
-    sha256 "e641637fb28781ecb290b663f0d0f9225827cb143888f0e76ff00b4993c84580" => :big_sur
-    sha256 "2c7fb02b322cb489bd130f7d4fe768852ee1722957ba114397f8b92e76b76c31" => :arm64_big_sur
-    sha256 "72d86995890d36d173f7dc6c1b3de98cc5b06ed13a5221c18e615a6a77a30e98" => :catalina
-    sha256 "38188abb88dcbb062a867cd59a2354d0171b7962ec5ac32f61e4ef399e397782" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "2c790f4f6d48393ee7412f46fd5aeb5ad5cf1499e6e1238304331d7d4f0e61ee"
+    sha256 cellar: :any,                 arm64_big_sur:  "240ff43c945d8924f2c70f431394b3b67d5cfcdc471943107e903d5ca3a5c899"
+    sha256 cellar: :any,                 monterey:       "36da8308922c41cc7fe68b3264e3bcca2f57fa24e2512710ae0d4ce523bd2612"
+    sha256 cellar: :any,                 big_sur:        "2b938019bc7c4aefb3303fcce3778db1f258ec788175a435a8c4c3d402660abd"
+    sha256 cellar: :any,                 catalina:       "ca5067a26b804426502b36d1fed0426775822d1ba4cea2bf737579838b889fec"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "fa623560cf7af0b68e32a3ab29047b4db23255a00119c72b87cfa27c05407c4b"
   end
 
   depends_on "cmake" => :build
@@ -26,6 +22,8 @@ class Libpulsar < Formula
   depends_on "protobuf"
   depends_on "snappy"
   depends_on "zstd"
+
+  uses_from_macos "curl"
 
   def install
     cd "pulsar-client-cpp" do
@@ -49,7 +47,8 @@ class Libpulsar < Formula
         return 0;
       }
     EOS
-    system ENV.cxx, "test.cc", "-L#{lib}", "-lpulsar", "-o", "test"
+
+    system ENV.cxx, "-std=gnu++11", "test.cc", "-L#{lib}", "-lpulsar", "-o", "test"
     system "./test"
   end
 end

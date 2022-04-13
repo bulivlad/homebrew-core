@@ -1,29 +1,30 @@
 class Libgweather < Formula
   desc "GNOME library for weather, locations and timezones"
   homepage "https://wiki.gnome.org/Projects/LibGWeather"
-  url "https://download.gnome.org/sources/libgweather/3.36/libgweather-3.36.1.tar.xz"
-  sha256 "de2709f0ee233b20116d5fa9861d406071798c4aa37830ca25f5ef2c0083e450"
-  revision 2
-
-  livecheck do
-    url :stable
-  end
+  url "https://download.gnome.org/sources/libgweather/40/libgweather-40.0.tar.xz"
+  sha256 "ca4e8f2a4baaa9fc6d75d8856adb57056ef1cd6e55c775ba878ae141b6276ee6"
+  license all_of: ["GPL-2.0-or-later", "LGPL-2.1-or-later"]
+  revision 1
 
   bottle do
-    sha256 "fbed23f116de31b6c729671e719bb88246ed66007f779fef5289be3519de3223" => :big_sur
-    sha256 "ea89b381f0cb180a44a1ab0d106693a8874fb785221cc6840092da07ed4960ec" => :arm64_big_sur
-    sha256 "46c6e704f4d42d0032888a87cd2d0ce2fd2ce0a9b8027123976857d242c1b0f3" => :catalina
-    sha256 "b8db1057908c9723c708b919330b9a58cdbdb9e6a6c7b053242fb8c965171eff" => :mojave
-    sha256 "267bff5a8951012a4df193baed3816552028de9c44ae26d977e932a75a655d88" => :high_sierra
+    rebuild 1
+    sha256 arm64_big_sur: "b13c7715d841a75ea106450bf14df81648725829b8142a4723ee155901ab8998"
+    sha256 monterey:      "281f8f7f0e9e5ef0c44239f0f404888a61934c8051000293b9ad5a61d92dc4e7"
+    sha256 big_sur:       "c8b80b40fde5432a83885430d0791147ec594e1849420416b47eaa521e679044"
+    sha256 catalina:      "7eb0152cd6f73075a4516f4bf4125417d61a0197cb46d764789d365d9fb4f284"
+    sha256 x86_64_linux:  "22842026d482f9e95bcd2131104c2dce4937eab9d3f48b3319a0f208b6e4e329"
   end
 
   depends_on "gobject-introspection" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
   depends_on "pkg-config" => :build
+  depends_on "pygobject3" => :build
   depends_on "geocode-glib"
   depends_on "gtk+3"
-  depends_on "libsoup"
+  depends_on "libsoup@2"
+
+  uses_from_macos "libxml2"
 
   def install
     ENV["DESTDIR"] = "/"
@@ -60,7 +61,7 @@ class Libgweather < Formula
     harfbuzz = Formula["harfbuzz"]
     libepoxy = Formula["libepoxy"]
     libpng = Formula["libpng"]
-    libsoup = Formula["libsoup"]
+    libsoup = Formula["libsoup@2"]
     pango = Formula["pango"]
     pixman = Formula["pixman"]
     flags = %W[
@@ -100,10 +101,10 @@ class Libgweather < Formula
       -lgobject-2.0
       -lgtk-3
       -lgweather-3
-      -lintl
       -lpango-1.0
       -lpangocairo-1.0
     ]
+    flags << "-lintl" if OS.mac?
     system ENV.cc, "-DGWEATHER_I_KNOW_THIS_IS_UNSTABLE=1", "test.c", "-o", "test", *flags
     system "./test"
   end

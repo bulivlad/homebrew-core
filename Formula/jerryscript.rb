@@ -1,18 +1,19 @@
 class Jerryscript < Formula
   desc "Ultra-lightweight JavaScript engine for the Internet of Things"
   homepage "https://jerryscript.net"
-  url "https://github.com/jerryscript-project/jerryscript/archive/v2.3.0.tar.gz"
-  sha256 "75f039f2e7eb55e3ce5d48fd6f9c4e8ec643a94654070125a6d76a906218e0fa"
+  url "https://github.com/jerryscript-project/jerryscript/archive/v2.4.0.tar.gz"
+  sha256 "5850947c23db6fbce032d15560551408ab155b16a94a7ac4412dc3bb85762d2d"
   license "Apache-2.0"
-  head "https://github.com/jerryscript-project/jerryscript.git"
+  head "https://github.com/jerryscript-project/jerryscript.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "3242e1c2c1490eda68d6cd82c83c2173285a84356d3c2c5d16fb2dcd1e07f577" => :big_sur
-    sha256 "ad2ad8226a865b0417ed391f360a1a45f710325246d2c64c4013bc443335e4be" => :arm64_big_sur
-    sha256 "30cce6deddb3cd879374dd6e80fc0a7ec7fcf32aa5b940713c60ee520b9b030a" => :catalina
-    sha256 "aecaf8cb9cc69ed2ac8694691f3f8b40b16fe72ce30f1a571244aa9cbe0c0591" => :mojave
-    sha256 "8c9890bfc739d8903d493316d3d1e258f6883d15115d247a8493aa259823cf47" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "d9fc5ed6b4d4694e46177bad3a5b3b8b6542e088224e10a4797e7bff39313077"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "cf6ac8f80cc4c6b10bd27113e49727d31cd6f8237e55362bd5fc6cb10fdfa9b8"
+    sha256 cellar: :any_skip_relocation, monterey:       "fd07174dc19c1dc678c26de054b08b55cb4e0e5b425aed223a2f3c27bafece47"
+    sha256 cellar: :any_skip_relocation, big_sur:        "b7884dc63baf21ca21f882e25f93397f0478dba8e0c4728a7efc7bfb198673ff"
+    sha256 cellar: :any_skip_relocation, catalina:       "e6e1907eb1af3d6aab2f3447a0aa2e6c709ebb040d6198fefa7c12a1e256b8bd"
+    sha256 cellar: :any_skip_relocation, mojave:         "c091f4246186278785265a7c378f2cd37db337d4c9419afc8348bcdd4d74e8ab"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b0756095b89bd3051bf0c8bfb38b6dc8070b9eabe707afe77afe85698a69ad75"
   end
 
   depends_on "cmake" => :build
@@ -56,7 +57,7 @@ class Jerryscript < Formula
       }
     EOS
     system ENV.cc, "test.c", "-o", "test", "-I#{include}", "-L#{lib}",
-                   "-ljerry-core", "-ljerry-port-default", "-ljerry-ext"
+                   "-ljerry-core", "-ljerry-port-default", "-ljerry-ext", "-lm"
     assert_equal "1 + 2 = 3", shell_output("./test").strip, "JerryScript can add number"
   end
 end

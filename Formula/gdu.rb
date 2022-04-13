@@ -1,22 +1,35 @@
 class Gdu < Formula
   desc "Disk usage analyzer with console interface written in Go"
   homepage "https://github.com/dundee/gdu"
-  url "https://github.com/dundee/gdu/archive/v2.3.0.tar.gz"
-  sha256 "bd5e08dfbbb2ed4c1ba6c960365f34d916e913030e94d3f0515fedafa9a2c8bf"
+  url "https://github.com/dundee/gdu/archive/v5.13.2.tar.gz"
+  sha256 "f4f237f6da470599f6393591282cfd67922a963325859a939ca40ba7e18024a8"
   license "MIT"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "bc4c9da50185f14b57de86be129ec81b2be814e086f5b492026f9ab8f51b8551" => :big_sur
-    sha256 "a9f9c285d26750b892b894060fbf4f6d74751ce34314c29b2730b39c7f79d717" => :arm64_big_sur
-    sha256 "f6fb43e2c981ba04ca7d1a9f77da8ae34071da5dfdd9d056b014f7644f1011b9" => :catalina
-    sha256 "d331cb29ff59a6ff7fc48a0a8787b7807b8b8b784f16a5fb4e620e2316bacb30" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "c3f4187d556d95071a2a0bd948fe50b299f18687fea51d4be2510cf7841cf1ef"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "8d22f3fbbf7a5487facdc7dfa31d0a2b608fd8c598c31547b7cb20399befc78a"
+    sha256 cellar: :any_skip_relocation, monterey:       "727cdaf579987f813180420ccec231b9818eb99f3f76570d873a69cd7d911c9c"
+    sha256 cellar: :any_skip_relocation, big_sur:        "0b5a68c973b81e018afea34bee01ff70b30dc87b10981401c91206642d07da58"
+    sha256 cellar: :any_skip_relocation, catalina:       "04ecd763ca8d284823854352fbb7781cea5799c9f2e749cf5bfeaacf20e83806"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1d4d9a2f6b59272249586431b76dde3df9ea8627ab56f2c3d0f20e33d9c47581"
   end
 
   depends_on "go" => :build
 
+  conflicts_with "coreutils", because: "both install `gdu` binaries"
+
   def install
-    system "go", "build", *std_go_args, "-ldflags", "-s -w -X main.AppVersion=v#{version}"
+    user = Utils.safe_popen_read("id", "-u", "-n")
+    major = version.major
+
+    ldflags = %W[
+      -s -w
+      -X "github.com/dundee/gdu/v#{major}/build.Version=v#{version}"
+      -X "github.com/dundee/gdu/v#{major}/build.Time=#{time}"
+      -X "github.com/dundee/gdu/v#{major}/build.User=#{user}"
+    ]
+
+    system "go", "build", *std_go_args(ldflags: ldflags), "./cmd/gdu"
   end
 
   test do
@@ -26,6 +39,6 @@ class Gdu < Formula
 
     assert_match version.to_s, shell_output("#{bin}/gdu -v")
     assert_match "colorized", shell_output("#{bin}/gdu --help 2>&1")
-    assert_match "5 B file1", shell_output("#{bin}/gdu -non-interactive -no-progress #{testpath}/test_dir 2>&1")
+    assert_match "4.0 KiB file1", shell_output("#{bin}/gdu --non-interactive --no-progress #{testpath}/test_dir 2>&1")
   end
 end

@@ -1,26 +1,29 @@
 class LibxmlxxAT5 < Formula
   desc "C++ wrapper for libxml"
   homepage "https://libxmlplusplus.sourceforge.io/"
-  url "https://download.gnome.org/sources/libxml++/5.0/libxml++-5.0.0.tar.xz"
-  sha256 "3d716f522d380ba3a78458d8994cb1ce2b618f6a2026bce63ca5c86baef3b874"
+  url "https://download.gnome.org/sources/libxml++/5.0/libxml++-5.0.1.tar.xz"
+  sha256 "15c38307a964fa6199f4da6683a599eb7e63cc89198545b36349b87cf9aa0098"
   license "LGPL-2.1-or-later"
 
   livecheck do
     url :stable
+    regex(/libxml\+\+[._-]v?(5\.([0-8]\d*?)?[02468](?:\.\d+)*?)\.t/i)
   end
 
   bottle do
-    cellar :any
-    sha256 "8697b990d62b29042b6069511565b2bc747cb59e691e731648e4008f7b8456ec" => :big_sur
-    sha256 "51de5f7cf3c4d7862e3cf63b887b16380a19e714f4d4b7740cf5f8592b695d0e" => :arm64_big_sur
-    sha256 "bcab4e7bccfe864a6d5aa76583016cfa2a52d9c9ba9686c84a44581a85534f86" => :catalina
-    sha256 "0fd223ce92fb3a1ffc9f5923506badfbf989656afaca2ca8a10d507e4733aa60" => :mojave
+    rebuild 1
+    sha256 cellar: :any, arm64_monterey: "cdae1a5b5a898578afa753d6fb3fbafa413d07fbf2d8367ae3559dbd0eb9b066"
+    sha256 cellar: :any, arm64_big_sur:  "04df228902b1127ce69db14966e48302294c8c903ac0cad3ba7d43d8af123855"
+    sha256 cellar: :any, monterey:       "782cb6730ec7ea3dc20055d0addc043b014188926a5a7f6d6eaef521cb10fb06"
+    sha256 cellar: :any, big_sur:        "a97fc98cc632deba48754e35a3ef6a065b720ebd24c93aa5b4e9f490e54f956f"
+    sha256 cellar: :any, catalina:       "29587d375cdc89d559f90a4dcbe1dab535869dd5e3a04847f3fce23b831c2bac"
+    sha256               x86_64_linux:   "c5e82519eaedf123b7d33e71a7ea7d36b5d44b730ee88189cd1f1055faa4ab33"
   end
 
   depends_on "meson" => :build
   depends_on "ninja" => :build
   depends_on "pkg-config" => [:build, :test]
-  depends_on "python@3.9" => :build
+  depends_on "python@3.10" => :build
 
   uses_from_macos "libxml2"
 

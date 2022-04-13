@@ -1,18 +1,17 @@
 class Py3cairo < Formula
   desc "Python 3 bindings for the Cairo graphics library"
   homepage "https://cairographics.org/pycairo/"
-  url "https://github.com/pygobject/pycairo/releases/download/v1.20.0/pycairo-1.20.0.tar.gz"
-  sha256 "5695a10cb7f9ae0d01f665b56602a845b0a8cb17e2123bfece10c2e58552468c"
+  url "https://github.com/pygobject/pycairo/releases/download/v1.21.0/pycairo-1.21.0.tar.gz"
+  sha256 "251907f18a552df938aa3386657ff4b5a4937dde70e11aa042bc297957f4b74b"
   license any_of: ["LGPL-2.1-only", "MPL-1.1"]
-  revision 1
 
   bottle do
-    cellar :any
-    sha256 "049d508d2797fd41cc9a0cf8cf8319bb667716ea378d5f60a98972e0ef2c6f05" => :big_sur
-    sha256 "7ae376cf57b7dbe9725a196c440739c6b26d53c73ceedc181914f34a862b976c" => :arm64_big_sur
-    sha256 "00bfdfca9a8665250cfc9d4f8c8eb96c0b4fd89676be20ed93b7846878c1b129" => :catalina
-    sha256 "f36dfa15e2516165595fb12892f8ed3490cb1be28c5e51212746c54de7ac0223" => :mojave
-    sha256 "0b82f9de10293fd7eb028ccb5d61dff9dd6b934376c9badde21a516b8fabcc24" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "8e3a08d98747e940a973e78b4ed55c4a1111ab87e7e7bf342951cb4b9bc86886"
+    sha256 cellar: :any,                 arm64_big_sur:  "e4ae24c8dda0f86ac318702306e51838ed3bdeb9f75ac4934683dd33d849e38f"
+    sha256 cellar: :any,                 monterey:       "0c6cd6baa4cc9d42d050006af7a730c31c8ce1b8467c8f9a71235290f0173280"
+    sha256 cellar: :any,                 big_sur:        "a9ef02e15a1c709248dc9dd3521f83927e34101bde0efb02d31647648570e033"
+    sha256 cellar: :any,                 catalina:       "1f493adc9999e0f08d65790a7a92157caa52d77a1334ed3ea5b9366d347d2559"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ab3fee24d9db4323c74d0d1244b2c66f59c36f2f3fd8b1bbe02a8f4156babe7c"
   end
 
   depends_on "pkg-config" => :build

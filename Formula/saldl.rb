@@ -1,46 +1,48 @@
 class Saldl < Formula
   desc "CLI downloader optimized for speed and early preview"
   homepage "https://saldl.github.io/"
-  url "https://github.com/saldl/saldl/archive/v40.tar.gz"
-  sha256 "1cb7950848517fb82ec39561bf36c8cbc0a0caf8fa85355a5b76cac0281346ce"
+  url "https://github.com/saldl/saldl/archive/v41.tar.gz"
+  sha256 "fc9980922f1556fd54a8c04fd671933fdc5b1e6847c1493a5fec89e164722d8e"
   license "AGPL-3.0"
-  revision 1
-  head "https://github.com/saldl/saldl.git", shallow: false
+  head "https://github.com/saldl/saldl.git", branch: "master"
 
   bottle do
-    cellar :any
-    sha256 "98f348fdc98c856bce1374e98a0ec917584d2e760af3140429b7e49bcbef5912" => :big_sur
-    sha256 "b1c1dda8876efb75dde244cd94a70fcb3246b1d8d8818d2d5d83521e5bb4eb96" => :arm64_big_sur
-    sha256 "2b377713f93e2cd853b9ef6a31a881215cffe3a35416309af31a13648cbf6f7d" => :catalina
-    sha256 "7fd875e38f9506d4ca5cca0e14815cea29ba40bf61385f53f93c8a587d5b50d3" => :mojave
-    sha256 "1c2f3b014669b8a19a1f3be6f654d8c438e62d5ed64e2c72b4f54a33e0f67b88" => :high_sierra
-    sha256 "7fbb71dbced4c48d0586f5f58fd4d64b87b39f4e3f78ad1188f11edb7c4af9a5" => :sierra
+    sha256 cellar: :any,                 arm64_monterey: "7d946fb405f3e50a3bd407a5deb8d1dc1c71094cd5092d9a314385e0165d446b"
+    sha256 cellar: :any,                 arm64_big_sur:  "2b965040a5e53c33801a86f8090a3339b8967903b1a11c3cc5b8bfca9e9de33c"
+    sha256 cellar: :any,                 monterey:       "bf33da07c23b69e41cdc44c0bcef25625128da44e134ac0f3417bd60fe67801e"
+    sha256 cellar: :any,                 big_sur:        "787ac1c4f96155b215ebc0eb06b6fbb404ac4dcca1cd88670c127ec1d504d709"
+    sha256 cellar: :any,                 catalina:       "9ac9aaa7e2882bcdb821c33c5bf7013b2ba1221242c1ad7d3da4e85d8febb324"
+    sha256 cellar: :any,                 mojave:         "3384921f2669ccb3e6021260c81b9494165ddf32f8f69dc0d4196910d4afe6be"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "fb7e3c46f755bb77b11ca1d5e0800e4e0e6e7a2660f2cc27b23922dc8186ae64"
   end
 
   depends_on "asciidoc" => :build
   depends_on "docbook-xsl" => :build
   depends_on "pkg-config" => :build
+  depends_on "python@3.10" => :build
   depends_on "curl" # curl >= 7.55 is required
   depends_on "libevent"
+
+  uses_from_macos "libxslt"
 
   def install
     ENV.refurbish_args
 
     # a2x/asciidoc needs this to build the man page successfully
-    ENV["XML_CATALOG_FILES"] = "#{etc}/xml/catalog"
+    ENV["XML_CATALOG_FILES"] = etc/"xml/catalog"
 
     args = ["--prefix=#{prefix}"]
 
     # head uses git describe to acquire a version
     args << "--saldl-version=v#{version}" unless build.head?
 
-    system "./waf", "configure", *args
-    system "./waf", "build"
-    system "./waf", "install"
+    system "python3", "./waf", "configure", *args
+    system "python3", "./waf", "build"
+    system "python3", "./waf", "install"
   end
 
   test do
-    system "#{bin}/saldl", "https://brew.sh/index.html"
+    system bin/"saldl", "https://brew.sh/index.html"
     assert_predicate testpath/"index.html", :exist?
   end
 end

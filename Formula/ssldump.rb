@@ -13,12 +13,14 @@ class Ssldump < Formula
   end
 
   bottle do
-    cellar :any
     rebuild 1
-    sha256 "27b04d713522d2937232b457ee32a2293cc9c633acee5efc147ae3fa84741da2" => :big_sur
-    sha256 "51fc5984a5f7dbef4c4299458e60a8ebdbe88d69c3422a8883863fafa63b9854" => :arm64_big_sur
-    sha256 "4f05ecf010a75b92ce19c9889759484f7f4e337e2659516be3c87fe02d99c9ed" => :catalina
-    sha256 "3c9186ee97ff509fd83a0e81acc06e621d50701bcf94e15ce61e4edbbb1b9796" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "4e68e15e5fd410822495680f04ce90f9c45b462ebdc5512c8c49b51bbc4bfd40"
+    sha256 cellar: :any,                 arm64_big_sur:  "51fc5984a5f7dbef4c4299458e60a8ebdbe88d69c3422a8883863fafa63b9854"
+    sha256 cellar: :any,                 monterey:       "74dd546d763c9bda4fd915e6b60cd24c333c0f3aa9dacd258b473dafa04b0277"
+    sha256 cellar: :any,                 big_sur:        "27b04d713522d2937232b457ee32a2293cc9c633acee5efc147ae3fa84741da2"
+    sha256 cellar: :any,                 catalina:       "4f05ecf010a75b92ce19c9889759484f7f4e337e2659516be3c87fe02d99c9ed"
+    sha256 cellar: :any,                 mojave:         "3c9186ee97ff509fd83a0e81acc06e621d50701bcf94e15ce61e4edbbb1b9796"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "101d9148eb4db18bc3993815a813ae25ba23f5babaa7c67a3db739ca40f77e87"
   end
 
   depends_on "autoconf" => :build
@@ -72,10 +74,10 @@ __END__
  static char *RCSSTRING="$Id: pcap-snoop.c,v 1.14 2002/09/09 21:02:58 ekr Exp $";
 
 -
-+#include <net/bpf.h>
  #include <pcap.h>
  #include <unistd.h>
 -#include <net/bpf.h>
++#include <pcap-bpf.h>
  #ifndef _WIN32
  #include <sys/param.h>
  #endif

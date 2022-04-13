@@ -1,20 +1,18 @@
 class Pandoc < Formula
   desc "Swiss-army knife of markup format conversion"
   homepage "https://pandoc.org/"
-  url "https://hackage.haskell.org/package/pandoc-2.11.3.2/pandoc-2.11.3.2.tar.gz"
-  sha256 "79c747edc1a229127bcbfb898431e7bc4901b0de9b741effeed8e9cb133494dc"
+  url "https://hackage.haskell.org/package/pandoc-2.18/pandoc-2.18.tar.gz"
+  sha256 "d4d354781d76edc56039d11aa5d83a434fe793158823a9ce2e0b9897886ae609"
   license "GPL-2.0-or-later"
-  head "https://github.com/jgm/pandoc.git"
-
-  livecheck do
-    url :stable
-  end
+  head "https://github.com/jgm/pandoc.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "a28331398b1a4f5d9bb7d69ad26873a631ac1e7fd21340557203c753d2cb9ebd" => :big_sur
-    sha256 "659efbfcc719ee51465ac4f5045eb2f4b8aff89e4eebdeb07663b4cbd2deeecf" => :catalina
-    sha256 "fc024d2d3d8aba91bd4e7c5f0650e09080086c380fadee566ec7c3889b5909c3" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "9411a015436638767a62eefe22891228dfc00ee5ab3d1469637f65a83bf07f3b"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "77318c0209980baad255423e1eefbef40d696be949770be3d189554bffab3d64"
+    sha256 cellar: :any_skip_relocation, monterey:       "2c975ede0463a4135548342e436d073a724c3643186a1daa6417855261f5407b"
+    sha256 cellar: :any_skip_relocation, big_sur:        "87fcbed2bd56b65fd815197048e4926abeed631e35dc4770b9b3a1e3049eb285"
+    sha256 cellar: :any_skip_relocation, catalina:       "79354a16ef3a9ab20d9911f97cce261a039ad5109bd2f134c96e0febdf5414be"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f5925683a5d57816ea6da9eed054063fa3cba5863282c912162622d56e1c53d6"
   end
 
   depends_on "cabal-install" => :build
@@ -38,7 +36,8 @@ class Pandoc < Formula
     EOS
     expected_html = <<~EOS
       <h1 id="homebrew">Homebrew</h1>
-      <p>A package manager for humans. Cats should take a look at Tigerbrew.</p>
+      <p>A package manager for humans. Cats should take a look at
+      Tigerbrew.</p>
     EOS
     assert_equal expected_html, pipe_output("#{bin}/pandoc -f markdown -t html5", input_markdown)
   end

@@ -1,21 +1,24 @@
 class Pidgin < Formula
   desc "Multi-protocol chat client"
   homepage "https://pidgin.im/"
-  url "https://downloads.sourceforge.net/project/pidgin/Pidgin/2.14.1/pidgin-2.14.1.tar.bz2"
-  sha256 "f132e18d551117d9e46acce29ba4f40892a86746c366999166a3862b51060780"
+  url "https://downloads.sourceforge.net/project/pidgin/Pidgin/2.14.8/pidgin-2.14.8.tar.bz2"
+  sha256 "3f8085c0211c4ca1ba9f8a03889b3d60738432c1673b57b0086070ef6e094cca"
   license "GPL-2.0-or-later"
-  revision 1
 
   livecheck do
-    url :stable
-    regex(%r{url=.*?/pidgin[._-]v?(\d+(?:\.\d+)+)\.t}i)
+    url "https://sourceforge.net/projects/pidgin/files/Pidgin/"
+    regex(%r{href=.*?/v?(\d+(?:\.\d+)+)/?["' >]}i)
+    strategy :page_match
   end
 
   bottle do
-    sha256 "ffbc6daf100dda1b80d898692dd77dbde42fe5223e74316252bed2173197f2ed" => :big_sur
-    sha256 "d8ecf79354ce2ec2c060b58305743452f40e148a72ba5d72612b0f018ab00144" => :arm64_big_sur
-    sha256 "c5dc52dceddf5a7084b84b3c9515a0d08149f934420a08b12bc7f89ed4b7afe0" => :catalina
-    sha256 "14c679b8cca37387b9ca473d09b24fa89b61986bef017f94733a58a4fd97d069" => :mojave
+    sha256 arm64_monterey: "6d599427835355c185246b8280881ec639fd76b6a29b303fb88138bb468aacad"
+    sha256 arm64_big_sur:  "c848ea93d573f4104a7a7edf23c41d159ac5070e36f08d84e14d65af4a5a3bef"
+    sha256 monterey:       "8bdf97ea93acf5243579d8138ffcd76b8c426cc2d38440e895ec6993d9b52d65"
+    sha256 big_sur:        "309a8ac7ee4e09f884ad79985d23895d77ddec13197a71ed764f73f9984d9175"
+    sha256 catalina:       "fbea5ba3a0051d76282289dadc36ec61d0c466aa1dda6358ccae7a8f12f48b42"
+    sha256 mojave:         "10159d6af23b8603b31160d0eba5dd689693e1cf8a6486e032ee0fc34dbbc703"
+    sha256 x86_64_linux:   "b3de7c6a27275ddd49e8e827b018b62b0663e77eb9bd58db6eb1a6c1ad162b2f"
   end
 
   depends_on "intltool" => :build
@@ -30,6 +33,16 @@ class Pidgin < Formula
   depends_on "libotr"
   depends_on "pango"
 
+  uses_from_macos "cyrus-sasl"
+  uses_from_macos "ncurses"
+  uses_from_macos "perl"
+  uses_from_macos "tcl-tk"
+
+  on_linux do
+    depends_on "libsm"
+    depends_on "libxscrnsaver"
+  end
+
   # Finch has an equal port called purple-otr but it is a NIGHTMARE to compile
   # If you want to fix this and create a PR on Homebrew please do so.
   resource "pidgin-otr" do
@@ -38,6 +51,8 @@ class Pidgin < Formula
   end
 
   def install
+    ENV.prepend "PERL5LIB", Formula["intltool"].libexec/"lib/perl5" unless OS.mac?
+
     args = %W[
       --disable-debug
       --disable-dependency-tracking
@@ -52,10 +67,21 @@ class Pidgin < Formula
       --disable-meanwhile
       --disable-vv
       --enable-gnutls=yes
-      --with-tclconfig=#{MacOS.sdk_path}/System/Library/Frameworks/Tcl.framework
-      --with-tkconfig=#{MacOS.sdk_path}/System/Library/Frameworks/Tk.framework
-      --without-x
     ]
+
+    args += if OS.mac?
+      %W[
+        --with-tclconfig=#{MacOS.sdk_path}/System/Library/Frameworks/Tcl.framework
+        --with-tkconfig=#{MacOS.sdk_path}/System/Library/Frameworks/Tk.framework
+        --without-x
+      ]
+    else
+      %W[
+        --with-tclconfig=#{Formula["tcl-tk"].opt_lib}
+        --with-tkconfig=#{Formula["tcl-tk"].opt_lib}
+        --with-ncurses-headers=#{Formula["ncurses"].opt_include}
+      ]
+    end
 
     ENV["ac_cv_func_perl_run"] = "yes" if MacOS.version == :high_sierra
 

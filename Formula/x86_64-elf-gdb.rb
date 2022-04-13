@@ -1,50 +1,62 @@
 class X8664ElfGdb < Formula
-  desc "GNU debugger for i386-elf cross development"
+  desc "GNU debugger for x86_64-elf cross development"
   homepage "https://www.gnu.org/software/gdb/"
-  url "https://ftp.gnu.org/gnu/gdb/gdb-10.1.tar.xz"
-  mirror "https://ftpmirror.gnu.org/gdb/gdb-10.1.tar.xz"
-  sha256 "f82f1eceeec14a3afa2de8d9b0d3c91d5a3820e23e0a01bbb70ef9f0276b62c0"
+  # Please add to synced_versions_formulae.json once version synced with gdb
+  url "https://ftp.gnu.org/gnu/gdb/gdb-11.2.tar.xz"
+  mirror "https://ftpmirror.gnu.org/gdb/gdb-11.2.tar.xz"
+  sha256 "1497c36a71881b8671a9a84a0ee40faab788ca30d7ba19d8463c3cc787152e32"
   license "GPL-3.0-or-later"
-  head "https://sourceware.org/git/binutils-gdb.git"
+  head "https://sourceware.org/git/binutils-gdb.git", branch: "master"
 
   livecheck do
-    url :stable
+    formula "gdb"
   end
 
   bottle do
-    sha256 "d9c893cd48502f675e5ccfbf139c70dc811683ff8427ee12053af00d63800d4b" => :big_sur
-    sha256 "922a0ed485b4ff144fcf876db7c50465e1a60566b9ea1ee25b57bd356f159a59" => :arm64_big_sur
-    sha256 "fc5398cdb8a918f3e0153c3467074145e69112fd42866c3dc8fee5a66869e8da" => :catalina
-    sha256 "7f6d20cc6f1d7f23834614f2f159d8438732e31bb3375c380d64e8dd010232c1" => :mojave
-    sha256 "bc725f791779a9400ab2b11d485ebba7e71aced9e6cef3365db614dbb273205c" => :high_sierra
+    sha256 arm64_monterey: "d081898aa072d34c2f85aba2c8c503a6800b5c4969158082ff4baa2ecd59c35d"
+    sha256 arm64_big_sur:  "e50a7058eaf366351945bac53ab80ddd65aa442a070a7d6e03f643dc29d4fafb"
+    sha256 monterey:       "488cccc9ca21e3a00578a0be4d391883f77f5ec3a438cad4102bac1c894cbd9f"
+    sha256 big_sur:        "2abc758f2d837187ed5a8e74a1de4280a9911096d5af62d02eb7f3c8c33a2b1d"
+    sha256 catalina:       "552b184fb25e04d6ec7496b0677cf68d40733ac4c839b64fb46128a8907e5505"
+    sha256 x86_64_linux:   "759522a7eac37bde17932a7ae8112deab7aeca42763cc5323f81cabd92b5f068"
   end
 
-  depends_on "python@3.9"
+  depends_on "x86_64-elf-gcc" => :test
+  depends_on "gmp"
+  depends_on "python@3.10"
   depends_on "xz"
 
-  conflicts_with "gdb", because: "both install include/gdb, share/gdb and share/info"
-  conflicts_with "i386-elf-gdb", because: "both install include/gdb, share/gdb and share/info"
+  uses_from_macos "zlib"
 
   def install
+    target = "x86_64-elf"
     args = %W[
-      --target=x86_64-elf
+      --target=#{target}
       --prefix=#{prefix}
+      --datarootdir=#{share}/#{target}
+      --includedir=#{include}/#{target}
+      --infodir=#{info}/#{target}
+      --mandir=#{man}
       --disable-debug
       --disable-dependency-tracking
       --with-lzma
-      --with-python=#{Formula["python@3.9"].opt_bin}/python3
+      --with-python=#{which("python3")}
+      --with-system-zlib
       --disable-binutils
     ]
 
     mkdir "build" do
       system "../configure", *args
+      ENV.deparallelize # Error: common/version.c-stamp.tmp: No such file or directory
       system "make"
-
       system "make", "install-gdb"
     end
   end
 
   test do
-    system "#{bin}/x86_64-elf-gdb", "#{bin}/x86_64-elf-gdb", "-configuration"
+    (testpath/"test.c").write "void _start(void) {}"
+    system "#{Formula["x86_64-elf-gcc"].bin}/x86_64-elf-gcc", "-g", "-nostdlib", "test.c"
+    assert_match "Symbol \"_start\" is a function at address 0x",
+          shell_output("#{bin}/x86_64-elf-gdb -batch -ex 'info address _start' a.out")
   end
 end

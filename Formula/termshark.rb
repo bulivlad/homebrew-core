@@ -1,15 +1,18 @@
 class Termshark < Formula
   desc "Terminal UI for tshark, inspired by Wireshark"
   homepage "https://termshark.io"
-  url "https://github.com/gcla/termshark/archive/v2.2.0.tar.gz"
-  sha256 "deefdb0b65e5d5b97c305cf280770724542f8dd122502f616e394c62c91db0c4"
+  url "https://github.com/gcla/termshark/archive/v2.3.0.tar.gz"
+  sha256 "8e2a22534773b1ab0ce4327e929bbbe413d3695bab2d55c985d1f61961698610"
   license "MIT"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "c596db102b072f39e1e61c41ac2d09d616f65bc4e3b7a8ca6d0648c8a93f9808" => :big_sur
-    sha256 "0422a97e0be00df3518156332b95051687c24b53fbff5946f814fd5c6f96f5da" => :catalina
-    sha256 "f0c8ee7fdb686c2bfc788bc661d0e190af1146ebcc0960365369ad764e0ce4d2" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "bf549bc000877e1862c26ed6d3a1f466c09bc48fcb4488f6fe464738c717c986"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "9fc25d8ee00903f6f3ce91d3cde70c12dc636d51050f938f2230a1bb6eaabbba"
+    sha256 cellar: :any_skip_relocation, monterey:       "6da8cd2b25fecd0edbac43ee4cc688932f46212624735c4cb655e76b7276d690"
+    sha256 cellar: :any_skip_relocation, big_sur:        "4e8111a7730d4d042b4654689d0baa4e1cec23c658fc75f62f552d5d7f553843"
+    sha256 cellar: :any_skip_relocation, catalina:       "8dc2114b14d2738361021fef34e5069de185371c5828c1528fe7fbd3a5543aec"
+    sha256 cellar: :any_skip_relocation, mojave:         "a665f8f658b7699ff18acf7a8ac29658a90b694d368438fb7082b068d0ae426c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3502b76bdc682ba2dea3ec1fc463c52e087ea5f9a390a0e26314d7e5402ca869"
   end
 
   depends_on "go" => :build
@@ -63,9 +66,7 @@ class Termshark < Formula
     packet += [0x6d, 0x2e, 0x31, 0x00, 0x6f, 0x63, 0x74, 0x65]
     packet += [0x74, 0x00]
 
-    File.open("#{HOMEBREW_TEMP}/termshark-test.pcap", "w+") do |f|
-      f.write(packet.pack("C*"))
-    end
+    File.write("#{HOMEBREW_TEMP}/termshark-test.pcap", packet.pack("C*"))
 
     # Rely on exit code of grep - if termshark works correctly, it will
     # detect stdout is not a tty, defer to tshark and display the grepped IP.
@@ -81,7 +82,7 @@ class Termshark < Formula
     # seconds to provide ample time for termshark to load the pcap (there is
     # no external mechanism to tell when the load is complete).
     testcmds = [
-      "{ sleep 5s ; echo q ; echo ; } | ",
+      "{ sleep 5 ; echo q ; echo ; } | ",
       "socat - EXEC:'sh -c \\\"",
       "stty rows 50 cols 80 && ",
       "TERM=xterm ",

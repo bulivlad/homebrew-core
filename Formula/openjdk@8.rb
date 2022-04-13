@@ -1,42 +1,51 @@
 class OpenjdkAT8 < Formula
   desc "Development kit for the Java programming language"
   homepage "https://openjdk.java.net/"
-  url "https://openjdk-sources.osci.io/openjdk8/openjdk8u275-ga.tar.xz"
-  version "1.8.0+275"
-  sha256 "6a83e8bd8caebf5dc8989a22925ac5598c9edb2ba8dcfad7472a5ff99a14c0e7"
+  url "https://openjdk-sources.osci.io/openjdk8/openjdk8u322-ga.tar.xz"
+  version "1.8.0+322"
+  sha256 "e1ce7fc5def4446ca62df355f70548b2deb53fdcad548b0b3550ceaa96395247"
   license "GPL-2.0-only"
 
   bottle do
-    cellar :any
-    sha256 "b37ae302878e8bdbfaaa9eb085c7315bef27c09fee834c1e43a7540b2b986d5a" => :big_sur
-    sha256 "85e18d44283b8c93a7065d2dd40540278607ff6d6fdf3e460cdbf5886c051c4b" => :catalina
-    sha256 "b8893a1e645893395f767b21c947ab5669093f3b60c47a3c423a358aeeb024f8" => :mojave
-    sha256 "384c545a8e63a4535ed6999d046f02d25206a72d2925489cba818c63df3e2e37" => :high_sierra
+    sha256 cellar: :any,                 monterey:     "2fe2f45f60039781d805766bce7cf91f35fdd7e816ab45a3f9421c35c72ee0ad"
+    sha256 cellar: :any,                 big_sur:      "8969ae63046dffea04c92479627a6b605f2f05039c58aa9f88cac36e1be2159b"
+    sha256 cellar: :any,                 catalina:     "00f033ef2901ecf05c7a0f3aac5c7d877883e61222d463913eb9d274c3a24526"
+    sha256 cellar: :any_skip_relocation, x86_64_linux: "1c8bedf5c49dc837b0f54917bf0aec58287334d20e887150970cefd42b698c11"
   end
 
   keg_only :versioned_formula
 
   depends_on "autoconf" => :build
+  depends_on "gawk" => :build if MacOS.version > :big_sur
   depends_on "pkg-config" => :build
   depends_on "freetype"
+
+  on_linux do
+    depends_on "alsa-lib"
+    depends_on "cups"
+    depends_on "fontconfig"
+    depends_on "libx11"
+    depends_on "libxext"
+    depends_on "libxrandr"
+    depends_on "libxrender"
+    depends_on "libxt"
+    depends_on "libxtst"
+    depends_on "unzip"
+    depends_on "zip"
+
+    ignore_missing_libraries %w[libjvm.so libawt_xawt.so]
+  end
 
   # Oracle doesn't serve JDK 7 downloads anymore, so use Zulu JDK 7 for bootstrapping.
   resource "boot-jdk" do
     on_macos do
-      url "https://cdn.azul.com/zulu/bin/zulu7.42.0.13-ca-jdk7.0.282-macosx_x64.tar.gz"
-      sha256 "37767a8ec40ff63dd43020365cf6c3e95841213cfe73aaa04ee0cffca779b2e7"
+      url "https://cdn.azul.com/zulu/bin/zulu7.50.0.11-ca-jdk7.0.322-macosx_x64.tar.gz"
+      sha256 "085af056bfa3cbba63992a388c4eadebb1e3ae6f88822bee17520488592d7726"
     end
     on_linux do
-      url "https://cdn.azul.com/zulu/bin/zulu7.42.0.13-ca-jdk7.0.282-linux_x64.tar.gz"
-      sha256 "38ec78e7f41f9130cecce5c8c9963d066f7deee5b3ba4dfcca32e197fd933bf9"
+      url "https://cdn.azul.com/zulu/bin/zulu7.50.0.11-ca-jdk7.0.322-linux_x64.tar.gz"
+      sha256 "68ac226429904f208a9b873898d2aa6fce3c900c4da8304d589d0b753634bb10"
     end
-  end
-
-  # Apply this upstreamed patch to build on newer Xcode.
-  # https://github.com/AdoptOpenJDK/openjdk-jdk8u/pull/10
-  patch do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/9976a857d574de2927c580f1f61bcd647fb795fe/openjdk%408/xcode.patch"
-    sha256 "f59a82f2e83c97a7496ba71c811ee0849d7df6b45e32fb3da0f0078386eebd80"
   end
 
   def install
@@ -55,35 +64,59 @@ class OpenjdkAT8 < Formula
     inreplace "hotspot/make/bsd/makefiles/saproc.make",
               '-isysroot "$(SDKPATH)" -iframework"$(SDKPATH)/System/Library/Frameworks"', ""
 
-    # Fix macOS version detection. After 10.10 this was changed to a 6 digit number,
-    # but this Makefile was written in the era of 4 digit numbers.
-    inreplace "hotspot/make/bsd/makefiles/gcc.make" do |s|
-      s.gsub! "$(subst .,,$(MACOSX_VERSION_MIN))", ENV["HOMEBREW_MACOS_VERSION_NUMERIC"]
-      s.gsub! "MACOSX_VERSION_MIN=10.7.0", "MACOSX_VERSION_MIN=#{MacOS.version}"
+    if OS.mac?
+      # Fix macOS version detection. After 10.10 this was changed to a 6 digit number,
+      # but this Makefile was written in the era of 4 digit numbers.
+      inreplace "hotspot/make/bsd/makefiles/gcc.make" do |s|
+        s.gsub! "$(subst .,,$(MACOSX_VERSION_MIN))", ENV["HOMEBREW_MACOS_VERSION_NUMERIC"]
+        s.gsub! "MACOSX_VERSION_MIN=10.7.0", "MACOSX_VERSION_MIN=#{MacOS.version}"
+      end
+
+      # Fix Xcode 13 detection.
+      inreplace "common/autoconf/toolchain.m4",
+                "if test \"${XC_VERSION_PARTS[[0]]}\" != \"6\"",
+                "if test \"${XC_VERSION_PARTS[[0]]}\" != \"13\""
     end
 
-    # Fix to permit building with Xcode 12
-    inreplace "common/autoconf/toolchain.m4",
-              '"${XC_VERSION_PARTS[[0]]}" != "4"',
-              '"${XC_VERSION_PARTS[[0]]}" != "12"'
+    if OS.linux?
+      # Fix linker errors on brewed GCC
+      inreplace "common/autoconf/flags.m4", "-Xlinker -O1", ""
+      inreplace "hotspot/make/linux/makefiles/gcc.make", "-Xlinker -O1", ""
+    end
 
-    args = %W[--with-boot-jdk-jvmargs=#{java_options}
-              --with-boot-jdk=#{boot_jdk}
-              --with-debug-level=release
-              --with-jvm-variants=server
-              --with-milestone=fcs
-              --with-native-debug-symbols=none
-              --with-toolchain-type=clang
-              --with-update-version=#{update}]
+    args = %W[
+      --with-boot-jdk-jvmargs=#{java_options}
+      --with-boot-jdk=#{boot_jdk}
+      --with-debug-level=release
+      --with-conf-name=release
+      --with-jvm-variants=server
+      --with-milestone=fcs
+      --with-native-debug-symbols=none
+      --with-update-version=#{update}
+      --with-vendor-bug-url=#{tap.issues_url}
+      --with-vendor-name=#{tap.user}
+      --with-vendor-url=#{tap.issues_url}
+      --with-vendor-vm-bug-url=#{tap.issues_url}
+    ]
 
-    # Work around SDK issues with JavaVM framework.
-    if MacOS.version <= :catalina
-      sdk_path = MacOS::CLT.sdk_path(MacOS.version)
-      ENV["SDKPATH"] = ENV["SDKROOT"] = sdk_path
-      javavm_framework_path = sdk_path/"System/Library/Frameworks/JavaVM.framework/Frameworks"
-      args += %W[--with-extra-cflags=-F#{javavm_framework_path}
-                 --with-extra-cxxflags=-F#{javavm_framework_path}
-                 --with-extra-ldflags=-F#{javavm_framework_path}]
+    if OS.mac?
+      args << "--with-toolchain-type=clang"
+
+      # Work around SDK issues with JavaVM framework.
+      if MacOS.version <= :catalina
+        sdk_path = MacOS::CLT.sdk_path(MacOS.version)
+        ENV["SDKPATH"] = ENV["SDKROOT"] = sdk_path
+        javavm_framework_path = sdk_path/"System/Library/Frameworks/JavaVM.framework/Frameworks"
+        args += %W[--with-extra-cflags=-F#{javavm_framework_path}
+                   --with-extra-cxxflags=-F#{javavm_framework_path}
+                   --with-extra-ldflags=-F#{javavm_framework_path}]
+      end
+    else
+      args += %W[--with-toolchain-type=gcc
+                 --x-includes=#{HOMEBREW_PREFIX}/include
+                 --x-libraries=#{HOMEBREW_PREFIX}/lib
+                 --with-cups=#{HOMEBREW_PREFIX}
+                 --with-fontconfig=#{HOMEBREW_PREFIX}]
     end
 
     chmod 0755, %w[configure common/autoconf/autogen.sh]
@@ -92,20 +125,32 @@ class OpenjdkAT8 < Formula
     system "./configure", *args
 
     ENV["MAKEFLAGS"] = "JOBS=#{ENV.make_jobs}"
-    system "make", "images"
+    system "make", "bootcycle-images", "CONF=release"
 
-    jdk = Dir["build/*/images/j2sdk-bundle/*"].first
-    libexec.install jdk => "openjdk.jdk"
-    bin.install_symlink Dir["#{libexec}/openjdk.jdk/Contents/Home/bin/*"]
-    include.install_symlink Dir["#{libexec}/openjdk.jdk/Contents/Home/include/*.h"]
-    include.install_symlink Dir["#{libexec}/openjdk.jdk/Contents/Home/include/darwin/*.h"]
+    cd "build/release/images" do
+      jdk = libexec
+
+      if OS.mac?
+        libexec.install Dir["j2sdk-bundle/*"].first => "openjdk.jdk"
+        jdk /= "openjdk.jdk/Contents/Home"
+      else
+        libexec.install Dir["j2sdk-image/*"]
+      end
+
+      bin.install_symlink Dir[jdk/"bin/*"]
+      include.install_symlink Dir[jdk/"include/*.h"]
+      include.install_symlink Dir[jdk/"include/*/*.h"]
+      man1.install_symlink Dir[jdk/"man/man1/*"]
+    end
   end
 
   def caveats
-    <<~EOS
-      For the system Java wrappers to find this JDK, symlink it with
-        sudo ln -sfn #{opt_libexec}/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-8.jdk
-    EOS
+    on_macos do
+      <<~EOS
+        For the system Java wrappers to find this JDK, symlink it with
+          sudo ln -sfn #{opt_libexec}/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-8.jdk
+      EOS
+    end
   end
 
   test do

@@ -1,18 +1,15 @@
 class Fileicon < Formula
   desc "macOS CLI for managing custom icons for files and folders"
   homepage "https://github.com/mklement0/fileicon"
-  url "https://github.com/mklement0/fileicon/archive/v0.2.4.tar.gz"
-  sha256 "c7a2996bf41b5cdd8d3a256f2b97724775c711a1a413fd53b43409ef416db35a"
+  url "https://github.com/mklement0/fileicon/archive/v0.3.1.tar.gz"
+  sha256 "3ccc1c65afa39f41c5e63a923128ec41d4fba911b22142cc5f578bccd9b96d03"
   license "MIT"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "1ea828e58968967a95fdf3ece8ffa79b4bbe5b984e942c6db50119e4befb1b8d" => :big_sur
-    sha256 "74fd8797923e791df971d389dd62649a8717a60fa6108677bec35628a8216fab" => :arm64_big_sur
-    sha256 "154c80c94f29f209b78252e71d914647a8300c66c02acda672b8574e8e704e92" => :catalina
-    sha256 "154c80c94f29f209b78252e71d914647a8300c66c02acda672b8574e8e704e92" => :mojave
-    sha256 "154c80c94f29f209b78252e71d914647a8300c66c02acda672b8574e8e704e92" => :high_sierra
+    sha256 cellar: :any_skip_relocation, all: "04506e64f0255d1ba3f8a9f694987b79837ed907a4963a812b1cc5a13cbcfbd2"
   end
+
+  depends_on :macos
 
   def install
     bin.install "bin/fileicon"
@@ -24,6 +21,6 @@ class Fileicon < Formula
     system bin/"fileicon", "set", testpath, icon
     assert_predicate testpath/"Icon\r", :exist?
     stdout = shell_output "#{bin}/fileicon test #{testpath}"
-    assert_include stdout, "HAS custom icon: '#{testpath}'"
+    assert_includes stdout, "HAS custom icon: '#{testpath}'"
   end
 end

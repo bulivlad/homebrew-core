@@ -1,26 +1,25 @@
 class Kind < Formula
   desc "Run local Kubernetes cluster in Docker"
   homepage "https://kind.sigs.k8s.io/"
-  url "https://github.com/kubernetes-sigs/kind/archive/v0.9.0.tar.gz"
-  sha256 "c154289659a7ef30b301a0787ecfa2e08edaada6059bf5acefe9f3be1e026381"
+  url "https://github.com/kubernetes-sigs/kind/archive/v0.12.0.tar.gz"
+  sha256 "cd1d09921b3c8a0f58c6423e5706be0c6e556f0c3d2b9e62f42be59263b209bb"
   license "Apache-2.0"
-  head "https://github.com/kubernetes-sigs/kind.git"
+  head "https://github.com/kubernetes-sigs/kind.git", branch: "main"
 
   bottle do
-    cellar :any_skip_relocation
-    rebuild 1
-    sha256 "e40a2343bf999585fa4fcb1a1e9b801427e921c098fc3f7e3026c071a0e72520" => :big_sur
-    sha256 "dc44080f2aa9eed1d51e4ea8e9dcf1a418a36fee88327b7a9770ee24dc3c2787" => :arm64_big_sur
-    sha256 "e5ba99b5f14711e0dcb121a992d74c5ee6c6b0468b27e5200bf796d4987e13c0" => :catalina
-    sha256 "d52a780ad6af93a2a7c480a41c5178a461b9966ddc1adb66adde8ff3bce15238" => :mojave
-    sha256 "423ea750ae8589d1a199847f746d8e9b5b1f1d81ceff3a9dab2d63f161532588" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "544f1036a81b47d91b8ad81360fde3c063a4add7d50977f90992c9cada3eeaf8"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "d2a2b35caeebe678726302b67ab3e1f72440baad3b3d2faf7150ffcf834c0223"
+    sha256 cellar: :any_skip_relocation, monterey:       "eb73ee98fae1727acc28ed0dbc86ad6c6ee1178c84f43c25402e1fc71f97d189"
+    sha256 cellar: :any_skip_relocation, big_sur:        "65f176fbfc2d8af2612cb8d92f5f89575a821fa4f08abe1bb565c8f8a5beaddb"
+    sha256 cellar: :any_skip_relocation, catalina:       "78e39031c372fe01a862f80e64f245cdbf221ba3c9606f690d6d9e8bbe7446c7"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9d565d46ce69dfa673243aa998ba4936a4f575e10f33b2877940f6bb7fdba00f"
   end
 
   depends_on "go" => :build
+  depends_on "docker" => :test
 
   def install
-    system "go", "build", "-o", bin/"kind"
-    prefix.install_metafiles
+    system "go", "build", *std_go_args
 
     # Install bash completion
     output = Utils.safe_popen_read("#{bin}/kind", "completion", "bash")
@@ -36,8 +35,10 @@ class Kind < Formula
   end
 
   test do
+    ENV["DOCKER_HOST"] = "unix://#{testpath}/invalid.sock"
+
     # Should error out as creating a kind cluster requires root
     status_output = shell_output("#{bin}/kind get kubeconfig --name homebrew 2>&1", 1)
-    assert_match "failed to list clusters", status_output
+    assert_match "Cannot connect to the Docker daemon", status_output
   end
 end

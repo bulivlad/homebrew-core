@@ -1,16 +1,17 @@
 class Diamond < Formula
   desc "Accelerated BLAST compatible local sequence aligner"
   homepage "https://www.wsi.uni-tuebingen.de/lehrstuehle/algorithms-in-bioinformatics/software/diamond/"
-  url "https://github.com/bbuchfink/diamond/archive/v2.0.6.tar.gz"
-  sha256 "4231f6ed75191fc9757f22b60f9068f4b4412918bf2e8c37367880d189667f80"
+  url "https://github.com/bbuchfink/diamond/archive/v2.0.14.tar.gz"
+  sha256 "3eaef2b957e4ba845eac27a2ca3249aae4259ff1fe0ff5a21b094481328fdc53"
   license "GPL-3.0-or-later"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "f70e5557c3015df2accd59a310f8d71594b6d01876f2b44168dd4feb6902dd25" => :big_sur
-    sha256 "26f4a5bca093868765c8091b4062011a4f9e5189e0d1a1959091fc9c6a158fa9" => :arm64_big_sur
-    sha256 "d1683829029ac914c498b89fba6b09575938dfb5d5eafbbcf4a39a11557f7c11" => :catalina
-    sha256 "38bb582b25980f7303ba643c8d1a889ba47fd7992679744557016c38739d65d9" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "b25c5a7ba1e13f49d35da8b4900cb32cd0c2f7b4fe50c817c13d8b3e34f0ca60"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "ab37a61dbad817a0e4dca0310e0473420fde013ffc15f7af5725cde4be961cb0"
+    sha256 cellar: :any_skip_relocation, monterey:       "ce33ea102c71dd819f4f9d9e3ba5ebffaa259de08e768c1ceeebec4a42684628"
+    sha256 cellar: :any_skip_relocation, big_sur:        "72fb7f8ebf9a4ab1cc82ff79b935d37131c00e8cbbae8d9fe159d781d93b30f7"
+    sha256 cellar: :any_skip_relocation, catalina:       "431477a165d719fa67ece1e9bedea04c0377d6a7d4513f631d8bf1ad2e9d859f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2d2e5729a550d2d2394448aaebd968875ecacef041789a0bab314e398701bfe8"
   end
 
   depends_on "cmake" => :build
@@ -44,6 +45,6 @@ class Diamond < Formula
       vspcXpgwsrspdlvirpprppkvlglqaXatapg
     EOS
     output = shell_output("#{bin}/diamond makedb --in nr.faa -d nr 2>&1")
-    assert_match "Processed 6 sequences, 572 letters.", output
+    assert_match "Database sequences  6\n  Database letters  572", output
   end
 end

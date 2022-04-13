@@ -1,30 +1,26 @@
 class Lab < Formula
   desc "Git wrapper for GitLab"
   homepage "https://zaquestion.github.io/lab"
-  url "https://github.com/zaquestion/lab/archive/v0.18.0.tar.gz"
-  sha256 "b34b08cb20d16f541eb3bf428e0224b4905ee40bda9394e7da4df756ba1aa109"
+  url "https://github.com/zaquestion/lab/archive/v0.23.0.tar.gz"
+  sha256 "8f20d5f1931e9b5daa0aa2d30fc3176d82dcca91b368905a1e1c05e2b36254b9"
   license "CC0-1.0"
-  head "https://github.com/zaquestion/lab.git"
+  head "https://github.com/zaquestion/lab.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "91fb46c4c3bae4f629e69ab3f94088abeea42696832c895957a5c8548a08417a" => :big_sur
-    sha256 "18f1c894f7d69729a4b558e5291188ded17e4025687d6b76c89f9000cd5b5402" => :arm64_big_sur
-    sha256 "411d03a214b91d9b6fa403b5a34921967bbb75bd7facf916b9d313e7845488e9" => :catalina
-    sha256 "0097c4d91eb8098827d8ed4c3a9bed00f33f30b2319a4c2a7ed82be5eb7efa25" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "4e6c5f7468bcdda2dd60824e289016e574356a3d12687200f483a3511813a96a"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "8fc0866043b2825d9c6cd55768c6dbf6a5252ee81cf08d1ec972f2f0c63e75f9"
+    sha256 cellar: :any_skip_relocation, monterey:       "bdf4b6b4eaa8cd5a867bbaa1c569896052687f777df2fdddc260ca6328e236bd"
+    sha256 cellar: :any_skip_relocation, big_sur:        "cf2122351ee8c417e167b9266f396d71c1bf076376920b00bfabea8b66d36be5"
+    sha256 cellar: :any_skip_relocation, catalina:       "831ebd5e87cfe24b4867a3a08b4c3714a050cb100ef4138d338c3d4e947ec026"
+    sha256 cellar: :any_skip_relocation, mojave:         "50e3df561e2df7c25b663adb7428cff384adde8f58129d1848b674200c132522"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "103f4ef8df39bd5fef22d6867c010fe6369da47c467bf67924aaf07f33464841"
   end
 
   depends_on "go" => :build
 
-  # fix the build and remove in next release
-  patch do
-    url "https://github.com/prarit/lab/commit/4f7ea880d638647ec907f7e5e6395498588b7bcb.patch?full_index=1"
-    sha256 "49e571927e5b85c226eacf55ad0b3918932ee526703fafb01002b541b011e80a"
-  end
-
   def install
     ldflags = "-X main.version=#{version} -s -w"
-    system "go", "build", *std_go_args, "-ldflags=#{ldflags}"
+    system "go", "build", *std_go_args(ldflags: ldflags)
     output = Utils.safe_popen_read("#{bin}/lab", "completion", "bash")
     (bash_completion/"lab").write output
     output = Utils.safe_popen_read("#{bin}/lab", "completion", "zsh")

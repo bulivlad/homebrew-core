@@ -1,23 +1,23 @@
 class Entr < Formula
   desc "Run arbitrary commands when files change"
-  homepage "http://entrproject.org/"
-  url "http://entrproject.org/code/entr-4.6.tar.gz"
-  sha256 "16de20820df4a38162354754487b1248c8711822c7342d2f6d4f28fbd4a38e6d"
+  homepage "https://eradman.com/entrproject/"
+  url "https://eradman.com/entrproject/code/entr-5.1.tar.gz"
+  sha256 "0f87f577bce87641c525addb9bcc60bbaa579fe981dab759043e3ce1556dbb92"
   license "ISC"
-  head "https://github.com/eradman/entr.git"
+  head "https://github.com/eradman/entr.git", branch: "master"
 
   livecheck do
-    url :head
-    regex(/^v?(\d+(?:\.\d+)+)$/i)
+    url "https://eradman.com/entrproject/code/"
+    regex(/href=.*?entr[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "014e80aa42f3793499133711e30b9d4b626789482f558aad60d2e864d2c5bbd0" => :big_sur
-    sha256 "f1b1b9b34ced4b9ac9b365e16673ca1030040dda599524316d0f9952cbfe07d9" => :arm64_big_sur
-    sha256 "21b69b1e641551d2022f5b261fd03d43e16e54d7eb09528890d122968de12460" => :catalina
-    sha256 "26cae580f66328a940c9f13add3c4cf91fae6b01247144a302757aac11e53427" => :mojave
-    sha256 "f37ebf2d5da20610536902c4010e4cd93136bc6282f2f3c7a119e3876c79d447" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "56f8366e478c99ffb084ac134a200c4d32be0180269efe00cae21595a32230f4"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "534fd8c1d47267ac699b82147088e7553fcc140f954bdd8e71fed39445a23fdf"
+    sha256 cellar: :any_skip_relocation, monterey:       "e98f5922ee52c2d99169c6f950d6fdd678bad77f8649a5ab1e78422aab816640"
+    sha256 cellar: :any_skip_relocation, big_sur:        "e497cfe6f336396b7a7b112764c4846ed8e40d1123f1b9e823a642253a562d81"
+    sha256 cellar: :any_skip_relocation, catalina:       "9d0c6a219c54e065abfc84b4f0c75c460288ef81dbe889005014f1ed699d4c4c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "038b376d5d99370b2532bd6cfdae9a7d01b644c196c110c3371da799a24e0c98"
   end
 
   def install
@@ -34,6 +34,6 @@ class Entr < Formula
       sleep 0.5
       touch testpath/"test.2"
     end
-    assert_equal "New File", pipe_output("#{bin}/entr -p -d echo 'New File'", testpath).strip
+    assert_equal "New File", pipe_output("#{bin}/entr -n -p -d echo 'New File'", testpath).strip
   end
 end

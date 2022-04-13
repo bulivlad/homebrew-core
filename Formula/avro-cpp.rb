@@ -1,22 +1,19 @@
 class AvroCpp < Formula
   desc "Data serialization system"
   homepage "https://avro.apache.org/"
-  url "https://www.apache.org/dyn/closer.lua?path=avro/avro-1.10.1/cpp/avro-cpp-1.10.1.tar.gz"
-  mirror "https://archive.apache.org/dist/avro/avro-1.10.1/cpp/avro-cpp-1.10.1.tar.gz"
-  sha256 "6e9e8820325cdaffcc1981958ed86b484c33dcf0277a164b2a58357fdd046cc8"
+  url "https://www.apache.org/dyn/closer.lua?path=avro/avro-1.11.0/cpp/avro-cpp-1.11.0.tar.gz"
+  mirror "https://archive.apache.org/dist/avro/avro-1.11.0/cpp/avro-cpp-1.11.0.tar.gz"
+  sha256 "ef70ca8a1cfeed7017dcb2c0ed591374deab161b86be6ca4b312bc24cada9c56"
   license "Apache-2.0"
   revision 1
 
-  livecheck do
-    url :stable
-  end
-
   bottle do
-    cellar :any
-    sha256 "6f51a239801589187903594eae05312d66b0e75c9aa1ff2eb35676656c8a5e71" => :big_sur
-    sha256 "ea71e8ee1e1274fed73fc1c748a2952104ddd2bcc9b06ae01bc7ca21caa7a637" => :arm64_big_sur
-    sha256 "1c1ae120fb6ed8cb52d4ed74bc7ec80fb75c91f8963c4f6a71963d2bbd32c8e6" => :catalina
-    sha256 "a64e584250028e59dc419d9a65a0f34b0bf74f24077b469531320bc3d95fa039" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "afc1ca56809de324699a3591a9cfc69b64910abd765ed5ed23fc147ed3f3e981"
+    sha256 cellar: :any,                 arm64_big_sur:  "a1dc26c7cc77ab1336819aa3b9cfa89d92829a58b1379fa7fc272e292dc3a7ca"
+    sha256 cellar: :any,                 monterey:       "62f6406c61b7ee09446b866e30b2718ff17323ae7341d9c30cba748cf1ef0e93"
+    sha256 cellar: :any,                 big_sur:        "c6d71d0ccb148b12c2d3418a9b9a39c224e3166e5f375f9833b5c11d070c48a0"
+    sha256 cellar: :any,                 catalina:       "4d94de0a0aaf77588d3c0f0b3255861ec89c24d5235dedd4a190f3ba4256b94b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3f29988613e601a8240626aac694acebd0410c9777521ce30b30a550a9c84035"
   end
 
   depends_on "cmake" => :build
@@ -48,7 +45,7 @@ class AvroCpp < Formula
       }
     EOS
     system "#{bin}/avrogencpp", "-i", "cpx.json", "-o", "cpx.hh", "-n", "cpx"
-    system ENV.cxx, "test.cpp", "-o", "test"
+    system ENV.cxx, "test.cpp", "-std=c++11", "-o", "test"
     system "./test"
   end
 end

@@ -1,33 +1,24 @@
 class Qca < Formula
   desc "Qt Cryptographic Architecture (QCA)"
   homepage "https://userbase.kde.org/QCA"
-  license "LGPL-2.1"
-  revision 3
-  head "https://invent.kde.org/libraries/qca.git"
-
-  stable do
-    url "https://download.kde.org/stable/qca/2.3.1/qca-2.3.1.tar.xz"
-    sha256 "c13851109abefc4623370989fae3a745bf6b1acb3c2a13a8958539823e974e4b"
-
-    # use major version for framework, instead of full version
-    # see: https://invent.kde.org/libraries/qca/-/merge_requests/34
-    patch do
-      url "https://invent.kde.org/libraries/qca/-/commit/f899a6aaad6747c703a9ee438a4a75bd7f6052f4.diff"
-      sha256 "1ae6e279d3e1e4dbe10ff80908517dab29e2b538f7c79384901d28bed69cbc9e"
-    end
-  end
+  url "https://download.kde.org/stable/qca/2.3.4/qca-2.3.4.tar.xz"
+  sha256 "6b695881a7e3fd95f73aaee6eaeab96f6ad17e515e9c2b3d4b3272d7862ff5c4"
+  license "LGPL-2.1-or-later"
+  revision 1
+  head "https://invent.kde.org/libraries/qca.git", branch: "master"
 
   livecheck do
-    url :head
-    regex(/^v?(\d+(?:\.\d+)+)$/i)
+    url "https://download.kde.org/stable/qca/"
+    regex(%r{href=["']?v?(\d+(?:\.\d+)+)/?["' >]}i)
   end
 
   bottle do
-    cellar :any
-    sha256 "0ce2bbd226e16d2e037c61f404123be202e6b3be814f3eab5be83f95f6803978" => :big_sur
-    sha256 "4d4c37739a1afeeb5623bdbc7800b82652a93e02770cdc06b63379ae35746223" => :arm64_big_sur
-    sha256 "55a109c49bc235dd6423f5924b3879c3c9677670bc45650306aa5f14cf9877aa" => :catalina
-    sha256 "41ba9d1f97eab606b1cf30566fa3b8f4a3c1bdf06b32c74deab067896fa6db7a" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "98d19292c58b6c97318f57f28fabe01f3fd47fc6468fdeae5332b216c98a2ed7"
+    sha256 cellar: :any,                 arm64_big_sur:  "c48666bc26a0fa8feb41eac998a47e16dad343e2b6492dd9c70fd42e542c7e0b"
+    sha256 cellar: :any,                 monterey:       "35ee3bfc6250c22dc31d22a480fb03f899e1905718bb2687057450a295263b37"
+    sha256 cellar: :any,                 big_sur:        "5b6a1f3bfda2eb1f81ae83b7dcfff6ff76c5531944537d588db5b74dbf4d8cb3"
+    sha256 cellar: :any,                 catalina:       "f35cba38f07f642e6645d9efb8972714ea801b44020e6ad74749022611edf298"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0a33800d859c56ebb454a1dce3c9adccb3c9602a0c10aa16deb7731707fee68a"
   end
 
   depends_on "cmake" => :build
@@ -38,7 +29,13 @@ class Qca < Formula
   depends_on "nss"
   depends_on "openssl@1.1"
   depends_on "pkcs11-helper"
-  depends_on "qt"
+  depends_on "qt@5"
+
+  on_linux do
+    depends_on "gcc"
+  end
+
+  fails_with gcc: "5"
 
   def install
     args = std_cmake_args

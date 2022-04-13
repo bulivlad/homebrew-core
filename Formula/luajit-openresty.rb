@@ -1,17 +1,30 @@
 class LuajitOpenresty < Formula
   desc "OpenResty's Branch of LuaJIT 2"
   homepage "https://github.com/openresty/luajit2"
-  url "https://github.com/openresty/luajit2/archive/v2.1-20201229.tar.gz"
-  sha256 "4275bf97356d713826e7195d1c330568b6089ff1fd4c6954f998e0f60a2baa30"
+  url "https://github.com/openresty/luajit2/archive/refs/tags/v2.1-20220411.tar.gz"
+  sha256 "d3f2c870f8f88477b01726b32accab30f6e5d57ae59c5ec87374ff73d0794316"
   license "MIT"
+  version_scheme 1
   head "https://github.com/openresty/luajit2.git", branch: "v2.1-agentzh"
 
+  # The latest LuaJIT release is unstable (2.1.0-beta3, from 2017-05-01) and
+  # OpenResty is making releases using the latest LuaJIT Git commits. With this
+  # in mind, the regex below is very permissive and will match any tags
+  # starting with a numeric version, ensuring that we match unstable versions.
+  # We should consider restricting the regex to stable versions if it ever
+  # becomes feasible in the future.
+  livecheck do
+    url :stable
+    regex(/^v?(\d+(?:[.-]\d+)+[^{}]*)/i)
+  end
+
   bottle do
-    cellar :any
-    sha256 "9fa20c915d38bc34cf61def4820d6f07e7bf16f1a2e01a8a2a80db6ba3f7567e" => :big_sur
-    sha256 "60153b2fbc7fe9735802e9c603b07f811713a3f7afc3af1f5662e9abebee3a96" => :arm64_big_sur
-    sha256 "ff62b7661154ef6b28e686dd5a5f50c732f375b67700b7aa285ef6d01b91987c" => :catalina
-    sha256 "6ba231a307a5ff68374d543b8a8a59eedb2b35228f4e822f666a187c16ef16d3" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "97b49b1612b5579992fe7e825b91f2b192bc0a28433534ac0acc222065b8aeaa"
+    sha256 cellar: :any,                 arm64_big_sur:  "6cc059ffbc72123fae17b51b47709495f0edd2e737d1fcc9d8cec1ba8cf073b7"
+    sha256 cellar: :any,                 monterey:       "cb382c21c8e0239aa7a73b031157298670369db20d247adf200ad488d6d3e61e"
+    sha256 cellar: :any,                 big_sur:        "21bb7476cda22b1fc1265f708a4b357860b238a15ccb9f8866c95a16a98dda10"
+    sha256 cellar: :any,                 catalina:       "92eadb859be61c3553a79f5b8f00ce9feeb8a0d3d9d898125aae40fce016eeec"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5d4e0b55a6e9f1397b50799fd33b4f0ee86bf749c1f36a595a309ca4b866dd6f"
   end
 
   keg_only "it conflicts with the LuaJIT formula"
@@ -49,10 +62,6 @@ class LuajitOpenresty < Formula
               "INSTALL_LMOD=#{HOMEBREW_PREFIX}/share/lua/${abiver}"
       s.gsub! "INSTALL_CMOD=${prefix}/${multilib}/lua/${abiver}",
               "INSTALL_CMOD=#{HOMEBREW_PREFIX}/${multilib}/lua/${abiver}"
-      unless build.head?
-        s.gsub! "Libs:",
-                "Libs: -pagezero_size 10000 -image_base 100000000"
-      end
     end
 
     # Having an empty Lua dir in lib/share can mess with other Homebrew Luas.

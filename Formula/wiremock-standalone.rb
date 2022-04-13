@@ -1,21 +1,20 @@
 class WiremockStandalone < Formula
   desc "Simulator for HTTP-based APIs"
-  homepage "http://wiremock.org/docs/running-standalone/"
-  url "https://search.maven.org/remotecontent?filepath=com/github/tomakehurst/wiremock-standalone/2.27.2/wiremock-standalone-2.27.2.jar"
-  sha256 "00b14f9d6399a9bba96139f84354f981d9fd1c3f4cf6938d36391f292f76382b"
+  homepage "https://wiremock.org/docs/running-standalone/"
+  url "https://search.maven.org/remotecontent?filepath=com/github/tomakehurst/wiremock-jre8-standalone/2.33.1/wiremock-jre8-standalone-2.33.1.jar"
+  sha256 "66e873c785c2cff47c3b59411d9d87c56b8863f1da00fcca6d6243dff0b620fb"
   license "Apache-2.0"
-  head "https://github.com/tomakehurst/wiremock.git"
+  head "https://github.com/tomakehurst/wiremock.git", branch: "master"
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any_skip_relocation, all: "22fba61e064ad4f8c1d5aaa63d65df5bda3ee59aec7c58dbb180cbbadb4a4cc2"
+  end
 
   depends_on "openjdk"
 
   def install
-    libexec.install "wiremock-standalone-#{version}.jar"
-    (bin/"wiremock").write <<~EOS
-      #!/bin/bash
-      exec "#{Formula["openjdk"].opt_bin}/java" -jar "#{libexec}/wiremock-standalone-#{version}.jar" "$@"
-    EOS
+    libexec.install "wiremock-jre8-standalone-#{version}.jar"
+    bin.write_jar_script libexec/"wiremock-jre8-standalone-#{version}.jar", "wiremock"
   end
 
   test do

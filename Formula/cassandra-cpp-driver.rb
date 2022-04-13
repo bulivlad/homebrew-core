@@ -1,17 +1,18 @@
 class CassandraCppDriver < Formula
   desc "DataStax C/C++ Driver for Apache Cassandra"
   homepage "https://docs.datastax.com/en/developer/cpp-driver/latest"
-  url "https://github.com/datastax/cpp-driver/archive/2.15.3.tar.gz"
-  sha256 "eccb53c5151621c3b647fc83781a542cfb93e76687b4178ebce418fc4c817293"
+  url "https://github.com/datastax/cpp-driver/archive/2.16.2.tar.gz"
+  sha256 "de60751bd575b5364c2c5a17a24a40f3058264ea2ee6fef19de126ae550febc9"
   license "Apache-2.0"
-  head "https://github.com/datastax/cpp-driver.git"
+  head "https://github.com/datastax/cpp-driver.git", branch: "master"
 
   bottle do
-    cellar :any
-    sha256 "b5abf1a67997fd3f02c070416e258916e9caa3106034bd19c65289ac61ea8e7c" => :big_sur
-    sha256 "c0eb554b6a640eed85988e787af1cfc8320b2b4920f2e88921dcf3ae67661ce1" => :catalina
-    sha256 "7600578409910afcb3f14146be2eb7f17cc1eb9c862188b10744dd092f6a80b5" => :mojave
-    sha256 "0eb84266667f4b10184e85e74784c000853b0ed4307008bdc8ee93237518a47e" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "64ed2de59c0135b2a2854c3797ba35301c8e195261c8d3fa22be15e7e0f6213a"
+    sha256 cellar: :any,                 arm64_big_sur:  "7b0a531d7126d0156ddb87365462739b3f1fedc09a8dc16d3962d60405e6dc27"
+    sha256 cellar: :any,                 monterey:       "c43517117152e217a879d11c94793c4b3dfe89d88c3482775342a331ac2400a0"
+    sha256 cellar: :any,                 big_sur:        "40e7b2c90c71303e92a7a42f0722a6802c4b420084b2e6fbef91b6d8a9135f8b"
+    sha256 cellar: :any,                 catalina:       "5789724888e6c63971817c676a6fb4508993ec220b5b837fbda1bfccb9ac09bf"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f81a2d5931a0d5132d72509b07970a1c110bb7e80910acfcbd345caa65e48dac"
   end
 
   depends_on "cmake" => :build
@@ -26,7 +27,7 @@ class CassandraCppDriver < Formula
 
   def install
     mkdir "build" do
-      system "cmake", "..", *std_cmake_args
+      system "cmake", "..", *std_cmake_args, "-DLIBUV_ROOT_DIR=#{Formula["libuv"].opt_prefix}"
       system "make"
       system "make", "install"
     end

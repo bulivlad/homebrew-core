@@ -2,18 +2,18 @@ class ConsulTemplate < Formula
   desc "Generic template rendering and notifications with Consul"
   homepage "https://github.com/hashicorp/consul-template"
   url "https://github.com/hashicorp/consul-template.git",
-      tag:      "v0.25.1",
-      revision: "171d54d1d3e732a7e960988b72ff9c2fddb3cd8f"
+      tag:      "v0.28.0",
+      revision: "ae2bbca18a8cf6c549b73a60dd26a86c814b95ed"
   license "MPL-2.0"
-  head "https://github.com/hashicorp/consul-template.git"
+  head "https://github.com/hashicorp/consul-template.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "978bab61f0209e37b5a14a1af8d9b55a767701cb5cded8107e9c7447e5e0b78d" => :big_sur
-    sha256 "5aa4fc41916cedf03968b7f7b1264acd67884f5277dfebd0c072185457b061f8" => :arm64_big_sur
-    sha256 "79c0b42239bae3e2771b9cce86d2e816654126aa6c5907be3999eadec34ecd8a" => :catalina
-    sha256 "169f7d647729d546330b8268f5e07eb378fc95e35831fb6f24d508901f607499" => :mojave
-    sha256 "37f32e5b0d9e2ffc20846be7f4e97607e76f5b27b29cf015c941c9c03cc506f4" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "2fcbca74682be77f3d3a7c148dfcf98da2369f1f26281c914d9c775e827eeacb"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "5abae2cd7ff00a6e717e1c03b13d756b688c84a2e5aebd874d558e0808f63135"
+    sha256 cellar: :any_skip_relocation, monterey:       "78f300b6baa5ac00a4bfe5f9cbfe056a44b70bc56ca625a50faf206a3ed69138"
+    sha256 cellar: :any_skip_relocation, big_sur:        "7ce95bdbde710d0e9c855cc89d6728c2237c590ba23060aae2c9f9e34a6b53a5"
+    sha256 cellar: :any_skip_relocation, catalina:       "54f51f6fa6fb4edebf3f5874156a4dd446760105eaa0a0c31b9dd4e41a3fc406"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b5a67f3a655d2df8bf65997dd4bb2ecdbe05496a4394361e6c67e33d76091020"
   end
 
   depends_on "go" => :build
@@ -25,7 +25,7 @@ class ConsulTemplate < Formula
       -X #{project}/version.Name=consul-template
       -X #{project}/version.GitCommit=#{Utils.git_short_head}
     ]
-    system "go", "build", "-ldflags", ldflags.join(" "), *std_go_args
+    system "go", "build", *std_go_args(ldflags: ldflags)
     prefix.install_metafiles
   end
 

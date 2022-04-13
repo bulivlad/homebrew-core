@@ -1,26 +1,38 @@
 class Libxslt < Formula
   desc "C XSLT library for GNOME"
   homepage "http://xmlsoft.org/XSLT/"
-  url "http://xmlsoft.org/sources/libxslt-1.1.34.tar.gz"
-  sha256 "98b1bd46d6792925ad2dfe9a87452ea2adebf69dcb9919ffd55bf926a7f93f7f"
   license "X11"
-  revision 2
+  revision 1
 
+  stable do
+    url "https://download.gnome.org/sources/libxslt/1.1/libxslt-1.1.35.tar.xz"
+    sha256 "8247f33e9a872c6ac859aa45018bc4c4d00b97e2feac9eebc10c93ce1f34dd79"
+
+    # Fix -flat_namespace being used on Big Sur and later.
+    patch do
+      url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+      sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
+    end
+  end
+
+  # We use a common regex because libxslt doesn't use GNOME's "even-numbered
+  # minor is stable" version scheme.
   livecheck do
-    url "http://xmlsoft.org/sources/"
-    regex(/href=.*?libxslt[._-]v?(\d+(?:\.\d+)+)\.t/i)
+    url :stable
+    regex(/libxslt[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    cellar :any
-    sha256 "61c11bb170d9ba4bd079a2c81887b9d82cb34a3de110117d61d75f7f050b90d3" => :big_sur
-    sha256 "7f0dcf602ce806db8ce41b1e8d4ef352823f7343f258cd0519e6ad1885f3c593" => :arm64_big_sur
-    sha256 "7f1626b1ae090f561ed8d7c2a3c7e9067ad29d68b547d91ff5a2e83d346183bc" => :catalina
-    sha256 "6c73651ec7791877fe42675f9de291709300a2c3aa0da3e859d139e4121a5a18" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "5c9f468e24ae918ae3e4966ff16cc22d5339072fc7e7508db2f36e769b563b8e"
+    sha256 cellar: :any,                 arm64_big_sur:  "2d92c6564b307cac871c57826ccd1a3f317647bd30e4c1143560b6230deac6c3"
+    sha256 cellar: :any,                 monterey:       "3282aa925b1956e8b4e5c8c58cee340551b596778822d765cacf99c20aa7c461"
+    sha256 cellar: :any,                 big_sur:        "f322603343c92777e9953ce2238236803f06a2c1195bcb87a8ddd253fc14eed7"
+    sha256 cellar: :any,                 catalina:       "f2e114e69b72994ca71c55802def701a7bf7803efeb85054e6839c5d800384b8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "cd014efb1c1c44a80fee7ae5baf6b9563deeaf3d21b3f5af3d9119b1e8f4c22c"
   end
 
   head do
-    url "https://gitlab.gnome.org/GNOME/libxslt.git"
+    url "https://gitlab.gnome.org/GNOME/libxslt.git", branch: "master"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
@@ -32,17 +44,22 @@ class Libxslt < Formula
   depends_on "libgcrypt"
   depends_on "libxml2"
 
-  def install
-    system "autoreconf", "-fiv" if build.head?
+  on_linux do
+    depends_on "pkg-config" => :build
+  end
 
+  def install
+    libxml2 = Formula["libxml2"]
+    system "autoreconf", "--force", "--install", "--verbose" if build.head?
     system "./configure", "--disable-dependency-tracking",
                           "--disable-silent-rules",
                           "--prefix=#{prefix}",
                           "--without-python",
                           "--with-crypto",
-                          "--with-libxml-prefix=#{Formula["libxml2"].opt_prefix}"
+                          "--with-libxml-prefix=#{libxml2.opt_prefix}"
     system "make"
     system "make", "install"
+    inreplace [bin/"xslt-config", lib/"xsltConf.sh"], libxml2.prefix.realpath, libxml2.opt_prefix
   end
 
   def caveats

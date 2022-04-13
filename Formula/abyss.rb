@@ -1,22 +1,22 @@
 class Abyss < Formula
   desc "Genome sequence assembler for short reads"
   homepage "https://www.bcgsc.ca/resources/software/abyss"
-  url "https://github.com/bcgsc/abyss/releases/download/2.2.5/abyss-2.2.5.tar.gz"
-  sha256 "38e886f455074c76b32dd549e94cc345f46cb1d33ab11ad3e8e1f5214fc65521"
+  url "https://github.com/bcgsc/abyss/releases/download/2.3.4/abyss-2.3.4.tar.gz"
+  sha256 "7bbe479d2574a4d0241a5f564852d637690ded165c160862977e90597c614fed"
   license all_of: ["GPL-3.0-only", "LGPL-2.1-or-later", "MIT", "BSD-3-Clause"]
 
   livecheck do
     url :stable
-    strategy :github_latest
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
   bottle do
-    cellar :any
-    sha256 "9fe0e2f711647eda6cfc6f4dc8ff0259f6fa96534fa1bfa9f895cfc2b62830b6" => :big_sur
-    sha256 "4f653f5b026d1ed8c2b0ced4f47a13bf13cbef542ca1c14d9ef4a9ac2feca90b" => :arm64_big_sur
-    sha256 "521a584ab5f11e69de3b4b2362bdcf89cf3b541b32694c30eec6e71d334c8232" => :catalina
-    sha256 "8c473ad4f6d9c3b786069c1d933d1ee8e72fb117f1ddbef65b0696163cf34292" => :mojave
-    sha256 "7fbea49ff3c1cdf2867ceac467be40d16a37cf104ef7fcd478faf0cfdd726eea" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "ddaf94b4cc55d9eeba4af66371607f9b52d88f63199be9d8dca4b35a1e174409"
+    sha256 cellar: :any,                 arm64_big_sur:  "778a4b29c03b0e5a1157690e78a53ac4ed82dc881f59a42f416772be9194967e"
+    sha256 cellar: :any,                 monterey:       "c2e61ff154139048e0ffdd23dc2389344646a81ffbf7a211ec665d39cdb607f8"
+    sha256 cellar: :any,                 big_sur:        "ed5226b1b597566cbf966d7bf4cfc560027a5279ef444c1de2abad38ffaea5c6"
+    sha256 cellar: :any,                 catalina:       "d50e051d08efd49321441dbcccd8973505d9f5e75a5b5a126946ca41e5f2a673"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "90f95159abd04629455507380bb7fd86ece2e658b1009b3c4dbd48fe0f934f2a"
   end
 
   head do
@@ -32,6 +32,7 @@ class Abyss < Formula
   depends_on "gcc"
   depends_on "open-mpi"
 
+  fails_with gcc: "5"
   fails_with :clang # no OpenMP support
 
   resource("testdata") do
@@ -54,7 +55,12 @@ class Abyss < Formula
 
   test do
     testpath.install resource("testdata")
-    system "#{bin}/abyss-pe", "k=25", "name=ts", "in=reads1.fastq reads2.fastq"
+    if which("column")
+      system "#{bin}/abyss-pe", "B=2G", "k=25", "name=ts", "in=reads1.fastq reads2.fastq"
+    else
+      # Fix error: abyss-tabtomd: column: not found
+      system "#{bin}/abyss-pe", "B=2G", "unitigs", "scaffolds", "k=25", "name=ts", "in=reads1.fastq reads2.fastq"
+    end
     system "#{bin}/abyss-fac", "ts-unitigs.fa"
   end
 end

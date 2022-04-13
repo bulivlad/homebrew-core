@@ -1,9 +1,10 @@
 class Ncmpc < Formula
   desc "Curses Music Player Daemon (MPD) client"
   homepage "https://www.musicpd.org/clients/ncmpc/"
-  url "https://www.musicpd.org/download/ncmpc/0/ncmpc-0.42.tar.xz"
-  sha256 "a5f7471d766a71c222374efa4aa17ef6ee0e42ad48d15528edd935d1f0f6cd4d"
+  url "https://www.musicpd.org/download/ncmpc/0/ncmpc-0.46.tar.xz"
+  sha256 "177f77cf09dd4ab914e8438be399cdd5d83c9aa992abc8d9abac006bb092934e"
   license "GPL-2.0-or-later"
+  revision 1
 
   livecheck do
     url "https://www.musicpd.org/download/ncmpc/0/"
@@ -11,12 +12,12 @@ class Ncmpc < Formula
   end
 
   bottle do
-    cellar :any
-    rebuild 1
-    sha256 "dcaf0d0af1cff22c8e2913fd55fef28a0205ca0ef88d38955e7dabaa06e3e241" => :big_sur
-    sha256 "812169b73cb47055ee1574ff7278afa59ea92b70cafead63992052e7b193f4c0" => :arm64_big_sur
-    sha256 "b94f6244a29cbc00d222d8b938fc44a550c2779490b1323c0d2df65eda0585c6" => :catalina
-    sha256 "ada5b8151c3e9801a270cb9c5c20cc5d24770b0d6afb71ab6ac773eccdb221d2" => :mojave
+    sha256 cellar: :any, arm64_monterey: "4eb2980aba45b5bf5fb6bf163339162bdac5ec8288ec6038c5d7f2943e86da6f"
+    sha256 cellar: :any, arm64_big_sur:  "e8c3093bbf5a5a74509de958d6360d1d2f7f0b84644478fff6dcf99c00991e4e"
+    sha256 cellar: :any, monterey:       "d7410a532844d96c9333e67ee2ffdb94d8b3cf8fb1e13fc410f9662ae8bee7e1"
+    sha256 cellar: :any, big_sur:        "60305f8697125534ad15dc71be02288fb4a2c2d156889ab04f1eb9d5a3bc72f9"
+    sha256 cellar: :any, catalina:       "b62c625ca3703f653837ffacbc98b4aa1a799ec39ce7992aae6a10d6da7bbb59"
+    sha256               x86_64_linux:   "2b3dd68e87e15a8794481b7a442fefe80c44525985eb2a447af3c5de998813c1"
   end
 
   depends_on "boost" => :build
@@ -25,15 +26,20 @@ class Ncmpc < Formula
   depends_on "pkg-config" => :build
   depends_on "gettext"
   depends_on "libmpdclient"
-  depends_on "pcre"
+  depends_on "pcre2"
 
-  # remove in next release
-  # commit reference, https://github.com/MusicPlayerDaemon/ncmpc/commit/1a45eab
-  patch :DATA
+  on_linux do
+    depends_on "gcc"
+  end
+
+  fails_with gcc: "5"
 
   def install
     mkdir "build" do
-      system "meson", *std_meson_args, "-Dcolors=false", "-Dnls=disabled", ".."
+      system "meson", *std_meson_args, "-Dcolors=false",
+                                       "-Dnls=disabled",
+                                       "-Dregex=enabled",
+                                       ".."
       system "ninja", "install"
     end
   end
@@ -42,29 +48,3 @@ class Ncmpc < Formula
     system bin/"ncmpc", "--help"
   end
 end
-
-__END__
-diff --git a/src/screen_utils.cxx b/src/screen_utils.cxx
-index 95de70e..e85061f 100644
---- a/src/screen_utils.cxx
-+++ b/src/screen_utils.cxx
-@@ -29,6 +29,7 @@
-
- #ifndef _WIN32
- #include "WaitUserInput.hxx"
-+#include <cerrno>
- #endif
-
- #include <string.h>
-diff --git a/src/signals.cxx b/src/signals.cxx
-index 4c005aa..9f3eb72 100644
---- a/src/signals.cxx
-+++ b/src/signals.cxx
-@@ -17,6 +17,7 @@
-  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-  */
-
-+#include <signal.h>
- #include "Instance.hxx"
-
- void

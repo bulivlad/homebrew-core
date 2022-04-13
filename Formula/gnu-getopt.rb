@@ -1,27 +1,33 @@
 class GnuGetopt < Formula
   desc "Command-line option parsing utility"
   homepage "https://github.com/karelzak/util-linux"
-  url "https://www.kernel.org/pub/linux/utils/util-linux/v2.36/util-linux-2.36.1.tar.xz"
-  sha256 "09fac242172cd8ec27f0739d8d192402c69417617091d8c6e974841568f37eed"
-  license "GPL-2.0"
+  url "https://www.kernel.org/pub/linux/utils/util-linux/v2.37/util-linux-2.37.4.tar.xz"
+  sha256 "634e6916ad913366c3536b6468e7844769549b99a7b2bf80314de78ab5655b83"
+  license "GPL-2.0-or-later"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "3a9e3eed0d4d9dd91a6a87f4faccad9a2a653581b119fa8cfb637efbb0f5f260" => :big_sur
-    sha256 "191033a9ec2018a50c11257c78d9f30f58b1e5a5d9a1d0366374840c5c948db7" => :arm64_big_sur
-    sha256 "5b79b3c5e0792ef471e8a45e7be1c6b53cfc82b06dc702269404bc2105c801e1" => :catalina
-    sha256 "be850eb3ab001ca8ef8f34fbe7fed93b784462a9b88c68011854a977cf492b06" => :mojave
-    sha256 "94ec5fdb67ca588ae797498c9a3a5b53aa8fea773cb6350d0d611f1248ab693a" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "921d27f26477fdaab5bb26e05c18e6632d6f70148fd3146b369e809315f47ee7"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "ab03d3ec493c05c601a045e75b2630063ce6a9c0fc4d0ef08b03740461e603d3"
+    sha256 cellar: :any_skip_relocation, monterey:       "7fa16133ac2bf8620f45b731e245309d797291ba006f0c8b27b49c1057c3c59a"
+    sha256 cellar: :any_skip_relocation, big_sur:        "a9b13a5cf0ca461780e2f5a7866b00abea8884e663404489c870570451b5b248"
+    sha256 cellar: :any_skip_relocation, catalina:       "91a066c638475bde088d05d5d9d47021f8700671bc4672430dbcbffb2e508400"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ae03962a4d30074e89c5b44aa4b60a44974cfb70f76e37e9677ae159931ca397"
   end
 
   keg_only :provided_by_macos
+
+  depends_on "asciidoctor" => :build
+
+  on_linux do
+    keg_only "conflicts with util-linux"
+  end
 
   def install
     system "./configure", "--disable-dependency-tracking",
                           "--disable-silent-rules",
                           "--prefix=#{prefix}"
 
-    system "make", "getopt"
+    system "make", "getopt", "misc-utils/getopt.1"
 
     bin.install "getopt"
     man1.install "misc-utils/getopt.1"

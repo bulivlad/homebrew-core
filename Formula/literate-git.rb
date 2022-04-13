@@ -6,18 +6,19 @@ class LiterateGit < Formula
   url "https://github.com/bennorth/literate-git/archive/v0.3.1.tar.gz"
   sha256 "f1dec77584236a5ab2bcee9169e16b5d976e83cd53d279512136bdc90b04940a"
   license "GPL-3.0-or-later"
-  revision 6
+  revision 10
 
   bottle do
-    cellar :any
-    sha256 "7cf45d23a0f329ce3a0f4f6dbf714ba2ac6cacdebda0aadecb47cbab3c837296" => :big_sur
-    sha256 "331f2b1125935469948fb649b8ac5a8063bcb63e4a7023aa8db3c6ef63a43b31" => :arm64_big_sur
-    sha256 "3a9b77d11ab5cf7c11ca7c68e87facd315892aeb3b4f39eb2e620642bd0cbce4" => :catalina
-    sha256 "ab1381ddd5dca2639be003b01a67d62a4fe76b1fbf3572859d7b5adaa1e44303" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "c2031c7652e019684c8a4fe2e4002df04a6026c12cbb39f8590283094d0f26f3"
+    sha256 cellar: :any,                 arm64_big_sur:  "b331d1904320a141a66c84a3995671a33215bc27ed0843ed841ea00083ef505b"
+    sha256 cellar: :any,                 monterey:       "cc84a4cdf421f1a5295ded1b57b7b44c51ed95b7488c539c8cb5c579b27f1153"
+    sha256 cellar: :any,                 big_sur:        "ec1b9726828e6759864d461fcc8feadc4df90d6739aa8571a3d7e4d931bc31d1"
+    sha256 cellar: :any,                 catalina:       "baa921185d969af27ffda77668f241a8a60c36f11bcaa8d3e054e3429eb732ec"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e46878c8fd6fb42c5689456331292833ab9bff08bf2a035a872760cd9250d41d"
   end
 
   depends_on "libgit2"
-  depends_on "python@3.9"
+  depends_on "python@3.10"
 
   uses_from_macos "libffi"
 
@@ -61,8 +62,8 @@ class LiterateGit < Formula
   end
 
   resource "pygit2" do
-    url "https://files.pythonhosted.org/packages/3a/42/f69de8c7a1e33f365a91fa39093f4e7a64609c2bd127203536edc813cbf7/pygit2-1.4.0.tar.gz"
-    sha256 "cbeb38ab1df9b5d8896548a11e63aae8a064763ab5f1eabe4475e6b8a78ee1c8"
+    url "https://files.pythonhosted.org/packages/7e/8c/c162e50ad20c36b457aa97a9d96536fde316d90052fb03fc4ae22a7fe9ea/pygit2-1.9.0.tar.gz"
+    sha256 "c5e8588acad5e32fa0595582571059e6b90ec7c487c58b4e53c2800dcbde44c8"
   end
 
   resource "Pygments" do

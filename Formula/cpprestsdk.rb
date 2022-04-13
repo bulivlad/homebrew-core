@@ -3,24 +3,27 @@ class Cpprestsdk < Formula
   homepage "https://github.com/Microsoft/cpprestsdk"
   # pull from git tag to get submodules
   url "https://github.com/Microsoft/cpprestsdk.git",
-      tag:      "2.10.17",
-      revision: "41e7d0074b6cb5b22c89f835b4531d848ab66987"
+      tag:      "2.10.18",
+      revision: "122d09549201da5383321d870bed45ecb9e168c5"
   license "MIT"
   head "https://github.com/Microsoft/cpprestsdk.git", branch: "development"
 
   bottle do
-    cellar :any
-    sha256 "c309b77276176ea9fea0378fe707b234d5710292a064648d7572cd6e9859fb14" => :big_sur
-    sha256 "7072462b2649c97ab3cea7ffa5506588d6f5099ad916c431bb096842a1ef7a32" => :arm64_big_sur
-    sha256 "804a90dd19fd6cadc63830629cab9dff350219022b127303801920a9a76103d8" => :catalina
-    sha256 "aee49d4c1082f6ab0d2297b6e6066f1b0c53b2bd970b2ce3e68262ad5327a7a2" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "e19ac91eefbd583d66f0b0fe37b6d416bbb650570546804948eca22c63900e5f"
+    sha256 cellar: :any,                 arm64_big_sur:  "ac66587bc353b3358ff11606ca3952fa57f7dc57a5f59414ed8bfa62e90ff858"
+    sha256 cellar: :any,                 monterey:       "32c6be3ba57c08c2832f91a6003464acef7d21427b9ac8a817580faa2df9e998"
+    sha256 cellar: :any,                 big_sur:        "c65b7f42fed4091750be219a60774854de46903c74ef99def1b73f905bb0728f"
+    sha256 cellar: :any,                 catalina:       "f89613fba00d0feaa3e55508f3fb122dc8f4126b679e55c22fd228ed44d0c1c4"
+    sha256 cellar: :any,                 mojave:         "6805fd31638651ef090d68e07cdea155d70b23365828cd1adbfd60fc132eedc3"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a50ae9413de519a390c5864972bd19432a203cdea200158e1110671e969385c1"
   end
 
   depends_on "cmake" => :build
   depends_on "pkg-config" => :build
-
   depends_on "boost"
   depends_on "openssl@1.1"
+
+  uses_from_macos "zlib"
 
   def install
     system "cmake", "-DBUILD_SAMPLES=OFF", "-DBUILD_TESTS=OFF",
@@ -34,18 +37,16 @@ class Cpprestsdk < Formula
       #include <iostream>
       #include <cpprest/http_client.h>
       int main() {
-        web::http::client::http_client client(U("https://github.com/"));
+        web::http::client::http_client client(U("https://example.com/"));
         std::cout << client.request(web::http::methods::GET).get().extract_string().get() << std::endl;
       }
     EOS
-    flags = ["-stdlib=libc++", "-std=c++11", "-I#{include}",
-             "-I#{Formula["boost"].include}",
-             "-I#{Formula["openssl@1.1"].include}", "-L#{lib}",
-             "-L#{Formula["openssl@1.1"].lib}", "-L#{Formula["boost"].lib}",
-             "-lssl", "-lcrypto", "-lboost_random", "-lboost_chrono",
-             "-lboost_thread-mt", "-lboost_system-mt", "-lboost_regex",
-             "-lboost_filesystem", "-lcpprest"] + ENV.cflags.to_s.split
-    system ENV.cxx, "-o", "test_cpprest", "test.cc", *flags
-    system "./test_cpprest"
+    system ENV.cxx, "test.cc", "-std=c++11",
+                    "-I#{Formula["boost"].include}", "-I#{Formula["openssl@1.1"].include}", "-I#{include}",
+                    "-L#{Formula["boost"].lib}", "-L#{Formula["openssl@1.1"].lib}", "-L#{lib}",
+                    "-lssl", "-lcrypto", "-lboost_random-mt", "-lboost_chrono-mt", "-lboost_thread-mt",
+                    "-lboost_system-mt", "-lboost_filesystem-mt", "-lcpprest",
+                    "-o", "test_cpprest"
+    assert_match "<title>Example Domain</title>", shell_output("./test_cpprest")
   end
 end

@@ -1,19 +1,21 @@
 class Dnsdist < Formula
   desc "Highly DNS-, DoS- and abuse-aware loadbalancer"
   homepage "https://www.dnsdist.org/"
-  url "https://downloads.powerdns.com/releases/dnsdist-1.5.1.tar.bz2"
-  sha256 "cae759729a87703f4d09b0ed4227cb224aaaa252fa92f2432fd7116f560afbf1"
-  revision 1
+  url "https://downloads.powerdns.com/releases/dnsdist-1.7.0.tar.bz2"
+  sha256 "78cc72cb0ccf7fb5f3f2fae09c79eda65a5256374da09bb541b735ea6868fc64"
+  license "GPL-2.0-only"
 
   livecheck do
     url "https://downloads.powerdns.com/releases/"
-    regex(/href=.*?dnsdist[._-]v?(\d+(?:\.\d+)*)\.t/i)
+    regex(/href=.*?dnsdist[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 "85f26051fea25986ed2510c18ab9dcc29178c7a6acc4cdd01aa2fc3bf086c88a" => :big_sur
-    sha256 "61ec7c2d3aa37965c54474ba50f739658679d2dac84e46854e0ca6fbdf9b0058" => :catalina
-    sha256 "821cb52f93b00d1f596e40a9d905f2d7a01fbd26e44bbf48299b5123ed5bc7d6" => :mojave
+    sha256 arm64_monterey: "f4abf383019b7d4b1c997c3e038f2062828fb1aa12d695eb22659e8e282b443f"
+    sha256 arm64_big_sur:  "4ff84f0cf8a10b451e651ea006546bdfec36fdf698d3a63622fe7ca4858f0e47"
+    sha256 monterey:       "5e894fc18509f36360b9bab1968d68047c4d06588c71de5eca9a3d403bfcb763"
+    sha256 big_sur:        "dc9df006ad72b5a318d9164960d95d0a839ecb883c7de99ee9f5334e917be1bd"
+    sha256 catalina:       "da62f52599b0020709e3f7ea64c9b74f1d9b3fe8750f570c030e98c5e400364d"
   end
 
   depends_on "boost" => :build
@@ -22,7 +24,7 @@ class Dnsdist < Formula
   depends_on "fstrm"
   depends_on "h2o"
   depends_on "libsodium"
-  depends_on "luajit"
+  depends_on "luajit-openresty"
   depends_on "openssl@1.1"
   depends_on "protobuf"
   depends_on "re2"
@@ -30,9 +32,6 @@ class Dnsdist < Formula
   uses_from_macos "libedit"
 
   def install
-    # error: unknown type name 'mach_port_t'
-    ENV["SDKROOT"] = MacOS.sdk_path if MacOS.version == :sierra
-
     system "./configure", "--disable-dependency-tracking",
                           "--disable-silent-rules",
                           "--prefix=#{prefix}",

@@ -1,21 +1,26 @@
 class Libaacs < Formula
   desc "Implements the Advanced Access Content System specification"
   homepage "https://www.videolan.org/developers/libaacs.html"
-  url "https://download.videolan.org/pub/videolan/libaacs/0.11.0/libaacs-0.11.0.tar.bz2"
-  sha256 "6d884381fbb659e2a565eba91e72499778635975e4b3d6fd94ab364a25965387"
-  license "LGPL-2.1"
+  url "https://download.videolan.org/pub/videolan/libaacs/0.11.1/libaacs-0.11.1.tar.bz2"
+  sha256 "a88aa0ebe4c98a77f7aeffd92ab3ef64ac548c6b822e8248a8b926725bea0a39"
+  license "LGPL-2.1-or-later"
+
+  livecheck do
+    url :homepage
+    regex(/href=.*?libaacs[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
 
   bottle do
-    cellar :any
-    sha256 "edf22602c987a889624eb8feb1ef3c13b8bbbb2397af0d4334379992c85b492b" => :big_sur
-    sha256 "dcbccde309919c3349987341fda3259e218549d5ec5c34c38c628ff6ada98bce" => :arm64_big_sur
-    sha256 "74f17ba980a3b1d763f09869541542716979e8fe8e6ee299a00a9d5fe68bbb5b" => :catalina
-    sha256 "97fbb158456e2b35633e387e239a5ccc5e90041a0bba15a139dbf32ea4de872b" => :mojave
-    sha256 "6ac467398d3fb886cee220bd7724f1341631b1ac31220e3ee504d687347a731f" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "821c6fed1af02d4446d3e376bf8eda6ef671e9623ff1332b5d299a60ef1f2dbc"
+    sha256 cellar: :any,                 arm64_big_sur:  "9205c7991ff5459dea68e115f5b09d95a937e06798c8ab536b07f554057c4261"
+    sha256 cellar: :any,                 monterey:       "32d350f3eb0294166767cf9f6f4f65c48e4619a635c8450bea42330d071e74ed"
+    sha256 cellar: :any,                 big_sur:        "cb432910cc4b313478eeb21e71035f82310189f54090723c9bc4167dc25ada9e"
+    sha256 cellar: :any,                 catalina:       "75e631b79c6ba6115572a390dd1c2ae75653449b8bd1edc27c549745b3d03ba8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "bc5a1b4925f4a25d7714f9ddebdd14478d2c75d7d292153a709a412dbb3ba63d"
   end
 
   head do
-    url "https://code.videolan.org/videolan/libaacs.git"
+    url "https://code.videolan.org/videolan/libaacs.git", branch: "master"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
@@ -24,6 +29,11 @@ class Libaacs < Formula
 
   depends_on "bison" => :build
   depends_on "libgcrypt"
+
+  uses_from_macos "flex" => :build
+
+  # Fix missing include.
+  patch :DATA
 
   def install
     system "./bootstrap" if build.head?
@@ -51,3 +61,16 @@ class Libaacs < Formula
     system "./test"
   end
 end
+__END__
+diff --git a/src/devtools/read_file.h b/src/devtools/read_file.h
+index 953b2ef..d218417 100644
+--- a/src/devtools/read_file.h
++++ b/src/devtools/read_file.h
+@@ -20,6 +20,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <errno.h>
++#include <sys/types.h>
+
+ static size_t _read_file(const char *name, off_t min_size, off_t max_size, uint8_t **pdata)
+ {

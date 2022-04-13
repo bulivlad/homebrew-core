@@ -1,19 +1,17 @@
 class Imlib2 < Formula
   desc "Image loading and rendering library"
   homepage "https://sourceforge.net/projects/enlightenment/"
-  url "https://downloads.sourceforge.net/project/enlightenment/imlib2-src/1.7.1/imlib2-1.7.1.tar.bz2"
-  sha256 "033a6a639dcbc8e03f65ff05e57068e7346d50ee2f2fff304bb9095a1b2bc407"
+  url "https://downloads.sourceforge.net/project/enlightenment/imlib2-src/1.8.1/imlib2-1.8.1.tar.xz"
+  sha256 "522e1e70e65bc0eddfe207617d15c9a395662a7c090661daaa2c294fb7d9fdaa"
   license "Imlib2"
 
-  livecheck do
-    url :stable
-  end
-
   bottle do
-    sha256 "d2af1ccb06b90d94c4a6e0502f722880a2947d126735c0e6e15bb2ec4600955d" => :big_sur
-    sha256 "9455235701eb3e7228e8189f99b79c94c3034372d475c7c0ced4468418adafbb" => :arm64_big_sur
-    sha256 "530114570c89b19a5b4383adca9168f85ae033ba75627f794c557bd5bb5179f6" => :catalina
-    sha256 "4e65ec5a0c3474e47a93b3c25048247c1062c62a5a92a2525842226c4ed238bb" => :mojave
+    sha256 arm64_monterey: "edca176b995676a8806b8c59e2db0b315f79657d9d1e66e60ad9c6d5e11110a2"
+    sha256 arm64_big_sur:  "b19e314d382bd994a865ab2eeb3490460cb226430d673e0cd434ab3c3917dcd9"
+    sha256 monterey:       "e41598d4fa65712d0347319028fec58609710c3f6412245ddf6764e6a180c27c"
+    sha256 big_sur:        "0bd95cba05083714455228fc45356ff74f26cea32530c98577f84a6e6a431c25"
+    sha256 catalina:       "88825eb4c206231481e6ae4c84e34ae074a6cf13ab4a58c5fb1c82b857da0d2d"
+    sha256 x86_64_linux:   "f667ec469d36ea317a8bd59e3af208b971a6265abbd21b8733a33ef7df079271"
   end
 
   depends_on "pkg-config" => :build
@@ -25,6 +23,12 @@ class Imlib2 < Formula
   depends_on "libx11"
   depends_on "libxcb"
   depends_on "libxext"
+
+  # Fix -flat_namespace being used on Big Sur and later.
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+    sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
+  end
 
   def install
     args = %W[

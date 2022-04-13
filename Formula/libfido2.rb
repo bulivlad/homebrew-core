@@ -1,16 +1,17 @@
 class Libfido2 < Formula
   desc "Provides library functionality for FIDO U2F & FIDO 2.0, including USB"
   homepage "https://developers.yubico.com/libfido2/"
-  url "https://github.com/Yubico/libfido2/archive/1.6.0.tar.gz"
-  sha256 "6aed47aafd22be49c38f9281fb88ccd08c98678d9b8c39cdc87d1bb3ea2c63e4"
+  url "https://github.com/Yubico/libfido2/archive/1.10.0.tar.gz"
+  sha256 "526efd3d56af706c05d09f3d21f18ee3b0b15ac0c1f5c5da1acbc27c2730b99b"
   license "BSD-2-Clause"
 
   bottle do
-    cellar :any
-    sha256 "3194f38a17f35276bb4e8863048d640a4115e5c059be92b10641f3bfe7c8e0c3" => :big_sur
-    sha256 "491588603fb5af1e9f0cedd7506a2b005d85e2ee8ddde9e8150149c8bd0462fb" => :arm64_big_sur
-    sha256 "7325754f60c62f8015cdbdd2d8c301f3b3caec734f01f23f6f62a4d4347b6fe1" => :catalina
-    sha256 "4349516e03fb119f1acf3e06604501e2906c4eb030e8260fdaa786f651ddb05e" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "e78d1d760c1c61c74ea753e38f1803aafdc516b83f446dddb43edc5245475ed3"
+    sha256 cellar: :any,                 arm64_big_sur:  "fae3b6cb7a4b24319560f28fb5610fb4fb6d2ae8e46cd346c0416ecdd16eb9bd"
+    sha256 cellar: :any,                 monterey:       "61720be49bd0fdb87b7900122e22511514f87e0d5c73eb186664bfeee274f451"
+    sha256 cellar: :any,                 big_sur:        "be93faeb2280ef841a93421db701352db1e6793840d80de120dbf9483b121325"
+    sha256 cellar: :any,                 catalina:       "d01757fc3134f2dc4ba3e0c2ea8356915a2301eaab361bc3ed6d5f4d2977cd18"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "bfc8bb06403f1c6d9402bb9f939e567da061e0e1fe351677a79624800a91ae6f"
   end
 
   depends_on "cmake" => :build
@@ -19,9 +20,17 @@ class Libfido2 < Formula
   depends_on "libcbor"
   depends_on "openssl@1.1"
 
+  on_linux do
+    depends_on "systemd" # for libudev
+  end
+
   def install
+    args = std_cmake_args
+
+    args << "-DUDEV_RULES_DIR=#{lib}/udev/rules.d" if OS.linux?
+
     mkdir "build" do
-      system "cmake", "..", *std_cmake_args
+      system "cmake", "..", *args
       system "make"
       system "make", "man_symlink_html"
       system "make", "man_symlink"
@@ -48,7 +57,7 @@ class Libfido2 < Formula
       fido_dev_info_free(&devlist, max_devices);
     }
     EOF
-    system ENV.cc, "-std=c99", "test.c", "-I#{include}", "-I#{Formula["openssl@1.1"].include}", "-o", "test",
+    system ENV.cc, "test.c", "-I#{include}", "-I#{Formula["openssl@1.1"].include}", "-o", "test",
                    "-L#{lib}", "-lfido2"
     system "./test"
   end

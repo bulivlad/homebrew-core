@@ -1,24 +1,33 @@
 class Libngspice < Formula
   desc "Spice circuit simulator as shared library"
   homepage "https://ngspice.sourceforge.io/"
-  url "https://downloads.sourceforge.net/project/ngspice/ng-spice-rework/33/ngspice-33.tar.gz"
-  sha256 "b99db66cc1c57c44e9af1ef6ccb1dcbc8ae1df3e35acf570af578f606f8541f1"
+
+  stable do
+    url "https://downloads.sourceforge.net/project/ngspice/ng-spice-rework/36/ngspice-36.tar.gz"
+    sha256 "4f818287efba245341046635b757ae81f879549b326a4316b5f6e697aa517f8c"
+
+    # Fix -flat_namespace being used on Big Sur and later.
+    patch do
+      url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+      sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
+    end
+  end
 
   livecheck do
-    url :stable
-    regex(%r{url=.*?/ngspice[._-]v?(\d+(?:\.\d+)*)\.t}i)
+    formula "ngspice"
   end
 
   bottle do
-    sha256 "34a0920853748c8f3d2a4f345224b9c7bdc03f82d27c66788898e5a80453d7bc" => :big_sur
-    sha256 "25ea0f5f85b04aed60864c0cb76df8b0ebb18926ffa63631b645c29f004464c0" => :arm64_big_sur
-    sha256 "0e5f16893b51a7c07f9f5aebd2d0e0f40404e380d1be9b81a179533baaaef218" => :catalina
-    sha256 "f366e430c2ad73979c3d1869e6619db951e88aaf0a94fd3e9ea9a819c6fa4c58" => :mojave
-    sha256 "15639064eb1fd7cdb856cfed521d266c42afe4ac752723aa87a8dcbaeeee9fa3" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "9d58e20b687ede651ca723c47a35bbc772478ab75768159021b38cb3d2f70a91"
+    sha256 cellar: :any,                 arm64_big_sur:  "06bfd009199b8955829ee232e8af51d8f5d9f18251cdfff08f957ec3cb5d4ee9"
+    sha256 cellar: :any,                 monterey:       "31d9faaad4c639bb2b16330c68bd9345df81cecc91946cf2f579ab2725ff11e0"
+    sha256 cellar: :any,                 big_sur:        "6234e617fda518242b252264e3ffdfab258711469adfdfbdf6586bb50e1776fe"
+    sha256 cellar: :any,                 catalina:       "f3d15531e93ab0c0bd4c19a17e85c1474352d04fbcd8c6592f11b687a8474138"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "179a9d7162f4dbda06ff91e35c6775cff85fcc40ff6cb65929be8bfa15823734"
   end
 
   head do
-    url "https://git.code.sf.net/p/ngspice/ngspice.git"
+    url "https://git.code.sf.net/p/ngspice/ngspice.git", branch: "master"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
@@ -41,6 +50,9 @@ class Libngspice < Formula
 
     system "./configure", *args
     system "make", "install"
+
+    # remove script files
+    rm_rf Dir[share/"ngspice/scripts"]
   end
 
   test do

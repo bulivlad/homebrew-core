@@ -1,29 +1,42 @@
 class Assimp < Formula
   desc "Portable library for importing many well-known 3D model formats"
   homepage "https://www.assimp.org/"
-  url "https://github.com/assimp/assimp/archive/v5.0.1.tar.gz"
-  sha256 "11310ec1f2ad2cd46b95ba88faca8f7aaa1efe9aa12605c55e3de2b977b3dbfc"
+  url "https://github.com/assimp/assimp/archive/v5.2.3.tar.gz"
+  sha256 "b20fc41af171f6d8f1f45d4621f18e6934ab7264e71c37cd72fd9832509af2a8"
   license :cannot_represent
-  head "https://github.com/assimp/assimp.git"
+  head "https://github.com/assimp/assimp.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 "1a4511b5f06aa0e9d579b72af3aa4dd0d43b93860d17dfacfab586ca2947d1be" => :big_sur
-    sha256 "987d2ce0acc2fbfd488f82ce67c0eb47845f8b0a832cbae8c7d1a2090e81ada3" => :arm64_big_sur
-    sha256 "28224c17d5d250055b39990a54de9e744f30b59950ed12d2a08ff0192d029c0c" => :catalina
-    sha256 "85dc308dfd468a6dd66978d890106b777829b7b4a04970c395c04aa832ad4931" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "9961dc6c4704e8755b236aaa77b8dae1f1c1533f167f1f47ed15a7fa89105c06"
+    sha256 cellar: :any,                 arm64_big_sur:  "e27cc4e35d08e02ca00ac292cd36c2d4a5513fd6a07be739b38f1ee4cc6ef758"
+    sha256 cellar: :any,                 monterey:       "d5faece7848806ffb74c5fed86ee9fd9413cd4dee86f84210cc033cb146457dd"
+    sha256 cellar: :any,                 big_sur:        "debb34ddf106651903ab16650d7a52af85f6d3d14f993979d09ec3ecba4df97b"
+    sha256 cellar: :any,                 catalina:       "d42b184019a11b425d9c3d14a9080dea21d59e5dfd11f384a901ed76dc6accc8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9c1b396cbf9435fad17fbbdfbf46f8181964c93c72bd6e030dece5cd7a10492a"
   end
 
   depends_on "cmake" => :build
+  depends_on "ninja" => :build
 
   uses_from_macos "zlib"
 
+  on_linux do
+    depends_on "gcc"
+  end
+
+  fails_with gcc: "5"
+
   def install
-    args = std_cmake_args
-    args << "-DASSIMP_BUILD_TESTS=OFF"
-    args << "-DCMAKE_INSTALL_RPATH=#{lib}"
-    system "cmake", *args
-    system "make", "install"
+    args = std_cmake_args + %W[
+      -GNinja
+      -DASSIMP_BUILD_TESTS=OFF
+      -DCMAKE_INSTALL_RPATH=#{rpath}
+    ]
+
+    mkdir "build" do
+      system "cmake", *args, ".."
+      system "ninja", "install"
+    end
   end
 
   test do

@@ -1,10 +1,10 @@
 class Wapm < Formula
   desc "WebAssembly Package Manager (CLI)"
   homepage "https://wapm.io/"
-  url "https://github.com/wasmerio/wapm-cli/archive/v0.5.0.tar.gz"
-  sha256 "7731d476585105fbb0ac5766661b4b68f1680b7071635654042bdaeef3b66987"
+  url "https://github.com/wasmerio/wapm-cli/archive/v0.5.4.tar.gz"
+  sha256 "783e1187dbcc78021180c1f7d35ea7d165415b736488c72c9ff6ea390d3c4de0"
   license "MIT"
-  head "https://github.com/wasmerio/wapm-cli.git"
+  head "https://github.com/wasmerio/wapm-cli.git", branch: "master"
 
   livecheck do
     url :stable
@@ -12,11 +12,12 @@ class Wapm < Formula
   end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "0486738558d41ea02a4798cf54538942d1fd4f292ff230cd522f51d27b91e376" => :big_sur
-    sha256 "4f1c18ce08a6f4a483a50888ad9769898a203bd826b992f877010f38a80ca710" => :catalina
-    sha256 "db34bd4d679207ae7d903a4beada8e30e3568f16c55fd610a196931c440716ef" => :mojave
-    sha256 "70e4c8f038838547a2e70116567c1042f2f4cec53542e0750d4d061f80dc7b23" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "4f9317de931934fd7f162b6a359edb28a89ca85f8d1aba713a51e9df717f4645"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "fe1397a70ed0a3ba24920014ce59573f4aa0475e66125615a3fd5efd57cf8492"
+    sha256 cellar: :any_skip_relocation, monterey:       "76421b76f33bf57add17cb62072fec9963610d4b4a95625f37b741dc6267d619"
+    sha256 cellar: :any_skip_relocation, big_sur:        "93665738e27a68c4d59244b111bed071ede27ab4e93d1dfed352ac64d2089c23"
+    sha256 cellar: :any_skip_relocation, catalina:       "b6af98436de52f5d3ce7275c2cd5c1a5781dfde99197f5faf11ceed6d553d247"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "46e7311ec4d57ef19ace21e3a4e744444228f91acf1d981242bf40763c1e289d"
   end
 
   depends_on "rust" => :build
@@ -32,7 +33,7 @@ class Wapm < Formula
     Dir.mkdir ENV["WASMER_DIR"]
     Dir.mkdir ENV["WASMER_CACHE_DIR"]
 
-    system "#{bin}/wapm", "install", "cowsay"
+    system bin/"wapm", "install", "cowsay"
 
     expected_output = <<~'EOF'
        _____________

@@ -2,24 +2,25 @@
 class Macvim < Formula
   desc "GUI for vim, made for macOS"
   homepage "https://github.com/macvim-dev/macvim"
-  url "https://github.com/macvim-dev/macvim/archive/snapshot-169.tar.gz"
-  version "8.2-169"
-  sha256 "3b5bd8631ada8566d7d575696fbe2e0df760f3cdd31c09b47980e3d62e523cc7"
+  url "https://github.com/macvim-dev/macvim/archive/snapshot-172.tar.gz"
+  version "8.2-172"
+  sha256 "b5e16d721444d8cb6231df739b1b74dec8f3cb0bde1fe8327dd86e25fc322331"
   license "Vim"
-  revision 2
-  head "https://github.com/macvim-dev/macvim.git"
+  head "https://github.com/macvim-dev/macvim.git", branch: "master"
 
   bottle do
-    sha256 "9016642d7b60229617dee39cb75b3385e4980859cc23e09c6d77275a5aa904db" => :big_sur
-    sha256 "e6f2475157275a9f8a7cedc26108c31ee388506fee5c45120527b01249865e5a" => :arm64_big_sur
-    sha256 "d04cb82219fb8f8f746a61d5b7087e29c14c9058e838206fca1308592d9cd25c" => :catalina
-    sha256 "020114123f6107a9f97921a5c148603d2b0c9e40ced1c626a1afa5269fa705de" => :mojave
+    sha256 arm64_monterey: "583d61e85112266e0a76a0f28fc000add12a780a128050537bc2431b90857d88"
+    sha256 arm64_big_sur:  "5353adb5cbd7cf25926390582328d748fe07e848eee0a999892c11e918721588"
+    sha256 monterey:       "82b452d795bab0b1771eab28210e4a342b723724d3a90ed54f411e948cf26e37"
+    sha256 big_sur:        "d901772860a5fb47aa384027e664a2ce6efcd049d66a0443545054fc17cc0c68"
+    sha256 catalina:       "d884f16d3c245adde4cb559f40a98db6fbb2ade43b8fb9c11698fb6145b086db"
   end
 
   depends_on xcode: :build
   depends_on "cscope"
   depends_on "gettext"
   depends_on "lua"
+  depends_on :macos
   depends_on "python@3.9"
   depends_on "ruby"
 
@@ -27,10 +28,6 @@ class Macvim < Formula
     because: "vim and macvim both install vi* binaries"
 
   def install
-    # Fix error: '__declspec' attributes are not enabled
-    # Remove with next release (> 8.2-169)
-    ENV.append_to_cflags "-fdeclspec" if ENV.compiler == :clang
-
     # Avoid issues finding Ruby headers
     ENV.delete("SDKROOT")
 
@@ -59,6 +56,8 @@ class Macvim < Formula
     system "make"
 
     prefix.install "src/MacVim/build/Release/MacVim.app"
+    # Remove autoupdating universal binaries
+    (prefix/"MacVim.app/Contents/Frameworks/Sparkle.framework").rmtree
     bin.install_symlink prefix/"MacVim.app/Contents/bin/mvim"
 
     # Create MacVim vimdiff, view, ex equivalents

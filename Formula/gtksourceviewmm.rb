@@ -1,10 +1,10 @@
 class Gtksourceviewmm < Formula
   desc "C++ bindings for gtksourceview"
-  homepage "https://developer.gnome.org/gtksourceviewmm/"
+  homepage "https://gitlab.gnome.org/GNOME/gtksourceviewmm"
   url "https://download.gnome.org/sources/gtksourceviewmm/2.10/gtksourceviewmm-2.10.3.tar.xz"
   sha256 "0000df1b582d7be2e412020c5d748f21c0e6e5074c6b2ca8529985e70479375b"
   license "LGPL-2.1-or-later"
-  revision 11
+  revision 12
 
   livecheck do
     url :stable
@@ -12,11 +12,13 @@ class Gtksourceviewmm < Formula
   end
 
   bottle do
-    cellar :any
-    sha256 "bf108d9937d07f20169bf75ad8a5152dd0e49a1b22f280cb0512d44e71a42656" => :big_sur
-    sha256 "2916245ab0c9b6b1fc59b1962cf2c21ed517e8adb686ca2b63395a9a66432499" => :arm64_big_sur
-    sha256 "db7588b5e582cd8cebe9360a47119c6ffbd8f67e253e47125f2341d1b7b441b4" => :catalina
-    sha256 "72ed8cbfc8f32720633bae6c041d04c7bfec0cae44f3aec08d36834cb648f46e" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "2735fdddc92f3280188428fc9fa83431a700c376bcae4424bca10005dd440c76"
+    sha256 cellar: :any,                 arm64_big_sur:  "2b73a79e4c0df491e43dcc3def52858679c0d0ff699c3bb8a003014a7940408b"
+    sha256 cellar: :any,                 monterey:       "337b822adee8ddec4bb8f9f045f10cdb5e624c35fd1bf58aaaa1ab860af3cd73"
+    sha256 cellar: :any,                 big_sur:        "cb0781be44de07c6b920d97337eeca3650d9ffc03d99cb0ac0e9da7cf2769b0c"
+    sha256 cellar: :any,                 catalina:       "d6bd00f9f409660e55085ad15802c9e9b1f5f85d8600a729da0c81e3e79cd9d2"
+    sha256 cellar: :any,                 mojave:         "5c11aa110b1c22269ddc3a2ad31752c02b6522c8310db0367dd7f112b62e0b1f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "cc5638fa500ed70f1de07180a729cee705fd3683305dabd4176f899bc7dfc17b"
   end
 
   depends_on "pkg-config" => [:build, :test]

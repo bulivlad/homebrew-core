@@ -1,22 +1,28 @@
 class WildflyAs < Formula
   desc "Managed application runtime for building applications"
-  homepage "https://wildfly.org/"
-  url "https://download.jboss.org/wildfly/21.0.2.Final/wildfly-21.0.2.Final.tar.gz"
-  sha256 "e809c1abe943f827da675aaa0338a7b836dac8c3f02423e734775a4b3ec972ac"
+  homepage "https://www.wildfly.org/"
+  url "https://github.com/wildfly/wildfly/releases/download/26.0.1.Final/wildfly-26.0.1.Final.tar.gz"
+  sha256 "bd40fcf0bc2ff1a910eb6c2e5f2cb1946053cb2d15c0323aefb40f0f3852c5e5"
   license "LGPL-2.1-or-later"
 
   livecheck do
-    url "https://wildfly.org/downloads/"
+    url "https://www.wildfly.org/downloads/"
     regex(/href=.*?wildfly[._-]v?(\d+(?:\.\d+)+)\.Final\.t/i)
   end
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any, all: "b04e4e4beb6c592f3aeb1a0478a14b829a6f7d7bbc9a00c4c9fa70b6fb8e6cba"
+  end
 
+  # Installs a pre-built x86_64-only `libwfssl`
+  depends_on arch: :x86_64
+  # Installs a pre-built `libartemis-native-64.so` file with linkage to libaio.so.1
+  depends_on :macos
   depends_on "openjdk"
 
   def install
-    rm_f Dir["bin/*.bat"]
-    rm_f Dir["bin/*.ps1"]
+    buildpath.glob("bin/*.{bat,ps1}").map(&:unlink)
+    buildpath.glob("**/win-x86_64").map(&:rmtree)
 
     inreplace "bin/standalone.sh", /JAVA="[^"]*"/, "JAVA='#{Formula["openjdk"].opt_bin}/java'"
 

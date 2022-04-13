@@ -6,16 +6,19 @@ class Jmxterm < Formula
   license "Apache-2.0"
   revision 1
 
-  bottle :unneeded
+  bottle do
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, all: "be1cdf19cb1f7ca3fe0b5a19b41622e57eda0e4e2343c0468ea7cfb88ce628d3"
+  end
 
-  depends_on "openjdk@8"
+  depends_on "openjdk"
 
   def install
     libexec.install "jmxterm-#{version}-uber.jar"
-    bin.write_jar_script libexec/"jmxterm-#{version}-uber.jar", "jmxterm", "", java_version: "1.8"
+    bin.write_jar_script libexec/"jmxterm-#{version}-uber.jar", "jmxterm", ""
   end
 
   test do
-    assert_match(/"software\.name".=."jmxterm";/, shell_output("echo about | #{bin}/jmxterm -n"))
+    assert_match(/"software\.name".=."jmxterm";/, pipe_output("#{bin}/jmxterm -n", "about"))
   end
 end

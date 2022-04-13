@@ -1,25 +1,21 @@
 class Help2man < Formula
   desc "Automatically generate simple man pages"
   homepage "https://www.gnu.org/software/help2man/"
-  url "https://ftp.gnu.org/gnu/help2man/help2man-1.47.16.tar.xz"
-  mirror "https://ftpmirror.gnu.org/help2man/help2man-1.47.16.tar.xz"
-  sha256 "3ef8580c5b86e32ca092ce8de43df204f5e6f714b0cd32bc6237e6cd0f34a8f4"
+  url "https://ftp.gnu.org/gnu/help2man/help2man-1.49.1.tar.xz"
+  mirror "https://ftpmirror.gnu.org/help2man/help2man-1.49.1.tar.xz"
+  sha256 "fd99a664ec4be9a86a0dd89719989f14f367a9c079d75d0e1d71e18a7bb51b03"
   license "GPL-3.0-or-later"
-  revision 1
-
-  livecheck do
-    url :stable
-  end
 
   bottle do
-    cellar :any
-    sha256 "64157a192452284e835e7826c9a4deb9afaa9a7fadae2407989aad35e3e20fba" => :big_sur
-    sha256 "0df51bfb13aae7a1cc8fefd2d5853d5659ef29bd676ae1b84de1c5775fd46475" => :catalina
-    sha256 "0c6508b21593f464813e5d0f813801fb26af4792bb8cc4aaee0a4ad9b44350f9" => :mojave
-    sha256 "46f3e7058af47162c5649eed42b2e573b27ac2187f0c397e83357e0ba0724e93" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "2a5d861e17cce90ad93cd77ac048a8fb4710cb7690bae264653fda06780282aa"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "2a5d861e17cce90ad93cd77ac048a8fb4710cb7690bae264653fda06780282aa"
+    sha256 cellar: :any,                 monterey:       "d8865b2976749558b98909feeb26b63435a430dbbe5ccd190d490f0ccad0ff3d"
+    sha256 cellar: :any,                 big_sur:        "005f3e09437c5372a0b7e4e094618d1056998fde46320d676e14d3ef8187b155"
+    sha256 cellar: :any,                 catalina:       "55b35783121c456e3681fa9eab2f2129c40cfffb3e354ee36f2d0e6a120182f4"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "524924459d3f94ea7d9feb39972df90c53988362b5982bf2cd855caa68057469"
   end
 
-  depends_on "gettext"
+  depends_on "gettext" if Hardware::CPU.intel?
 
   uses_from_macos "perl"
 
@@ -31,11 +27,9 @@ class Help2man < Formula
   def install
     ENV.prepend_create_path "PERL5LIB", libexec/"lib/perl5"
 
-    resources.each do |r|
-      r.stage do
-        args = ["INSTALL_BASE=#{libexec}"]
-        args.unshift "--defaultdeps" if r.name == "MIME::Charset"
-        system "perl", "Makefile.PL", *args
+    if Hardware::CPU.intel?
+      resource("Locale::gettext").stage do
+        system "perl", "Makefile.PL", "INSTALL_BASE=#{libexec}"
         system "make", "install"
       end
     end
@@ -44,13 +38,22 @@ class Help2man < Formula
     # see https://github.com/Homebrew/homebrew/issues/12609
     ENV.deparallelize
 
-    system "./configure", "--prefix=#{prefix}", "--enable-nls"
+    args = []
+    args << "--enable-nls" if Hardware::CPU.intel?
+
+    system "./configure", "--prefix=#{prefix}", *args
     system "make", "install"
     (libexec/"bin").install "#{bin}/help2man"
     (bin/"help2man").write_env_script("#{libexec}/bin/help2man", PERL5LIB: ENV["PERL5LIB"])
   end
 
   test do
-    assert_match "help2man #{version}", shell_output("#{bin}/help2man --locale=en_US.UTF-8 #{bin}/help2man")
+    out = if Hardware::CPU.intel?
+      shell_output("#{bin}/help2man --locale=en_US.UTF-8 #{bin}/help2man")
+    else
+      shell_output("#{bin}/help2man #{bin}/help2man")
+    end
+
+    assert_match "help2man #{version}", out
   end
 end

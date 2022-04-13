@@ -1,28 +1,37 @@
 class Libxml2 < Formula
   desc "GNOME XML library"
   homepage "http://xmlsoft.org/"
-  url "http://xmlsoft.org/sources/libxml2-2.9.10.tar.gz"
-  mirror "https://ftp.osuosl.org/pub/blfs/conglomeration/libxml2/libxml2-2.9.10.tar.gz"
-  sha256 "aafee193ffb8fe0c82d4afef6ef91972cbaf5feea100edc2f262750611b4be1f"
   license "MIT"
-  revision 2
 
+  stable do
+    url "https://download.gnome.org/sources/libxml2/2.9/libxml2-2.9.13.tar.xz"
+    sha256 "276130602d12fe484ecc03447ee5e759d0465558fbc9d6bd144e3745306ebf0e"
+
+    # Fix -flat_namespace being used on Big Sur and later.
+    patch do
+      url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+      sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
+    end
+  end
+
+  # We use a common regex because libxml2 doesn't use GNOME's "even-numbered
+  # minor is stable" version scheme.
   livecheck do
-    url "http://xmlsoft.org/sources"
-    regex(/href=.*?libxml2[._-]v?([\d.]+\.[\d.]+\.[\d.]+)\.t/i)
+    url :stable
+    regex(/libxml2[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    cellar :any
-    sha256 "0170a16da823ce77d1aad7db927b23a1adb12285a174f36a918275d7952eaaae" => :big_sur
-    sha256 "c2e1bb939465a54e70ac4a6a8c333d00bc01a3738037f77cfd2227e47053ff47" => :arm64_big_sur
-    sha256 "2983d5a448504389888720bf951713114ed7f010d96cde9289fdc5c4b539d303" => :catalina
-    sha256 "7bcd780db5693475c7711eefbbcf703507865e06483e7338ab61027ec375c4bc" => :mojave
-    sha256 "34d84eaef7f80632a6547903d640be06c6d92b9ca2b815b64b74943b4cf73e63" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "1ebcd2fa8e48d384beddb7e016bbe994eab1982d9582f227101dcdb2961b3b1f"
+    sha256 cellar: :any,                 arm64_big_sur:  "c7e58f96d887c48155d6313d7a861ff7257dc0aa773af24241ee3e0519055fe5"
+    sha256 cellar: :any,                 monterey:       "51fb1fa73c67da7e66555925ec512aa05eb80af02ceb3d2923eba97da6c8df6b"
+    sha256 cellar: :any,                 big_sur:        "4398ed732014a4f6ce01740c6a9814eb456d154d969b3b35d1f545876225887b"
+    sha256 cellar: :any,                 catalina:       "96c7793298f4bf2d8e178d6fbec9cb008714e02ffd3de6c89cd80a43769e7a17"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "01393bbdc60b7263d0c66d19bb56361d703c69c7ab56940561746715958b2d5e"
   end
 
   head do
-    url "https://gitlab.gnome.org/GNOME/libxml2.git"
+    url "https://gitlab.gnome.org/GNOME/libxml2.git", branch: "master"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
@@ -32,7 +41,7 @@ class Libxml2 < Formula
 
   keg_only :provided_by_macos
 
-  depends_on "python@3.9"
+  depends_on "python@3.9" => [:build, :test]
   depends_on "readline"
 
   uses_from_macos "zlib"
@@ -44,23 +53,6 @@ class Libxml2 < Formula
   patch do
     url "https://bugzilla.opensuse.org/attachment.cgi?id=746044"
     sha256 "37eb81a8ec6929eed1514e891bff2dd05b450bcf0c712153880c485b7366c17c"
-  end
-
-  # Resolves CVE-2018-8048, CVE-2018-3740, CVE-2018-3741
-  # Upstream hasn't patched this bug, but Nokogiri distributes
-  # libxml2 with this patch to fix this issue
-  # https://bugzilla.gnome.org/show_bug.cgi?id=769760
-  # https://github.com/sparklemotion/nokogiri/pull/1746
-  patch do
-    url "https://raw.githubusercontent.com/sparklemotion/nokogiri/38721829c1df30e93bdfbc88095cc36838e497f3/patches/libxml2/0001-Revert-Do-not-URI-escape-in-server-side-includes.patch"
-    sha256 "c755e6e17c02584bfbfc8889ffc652384b010c0bd71879d7ff121ca60a218fcd"
-  end
-
-  # Fix compatibility with Python 3.9
-  # https://gitlab.gnome.org/GNOME/libxml2/-/issues/149
-  patch do
-    url "https://gitlab.gnome.org/nwellnhof/libxml2/-/commit/e4fb36841800038c289997432ca547c9bfef9db1.patch"
-    sha256 "c3fa874b78d76b8de8afbbca9f83dc94e9a0da285eaf6ee1f6976ed4cd41e367"
   end
 
   def sdk_include
@@ -86,7 +78,7 @@ class Libxml2 < Formula
       # We need to insert our include dir first
       inreplace "setup.py", "includes_dir = [",
                             "includes_dir = ['#{include}', '#{sdk_include}',"
-      system Formula["python@3.9"].opt_bin/"python3", "setup.py", "install", "--prefix=#{prefix}"
+      system Formula["python@3.9"].opt_bin/"python3", *Language::Python.setup_install_args(prefix)
     end
   end
 

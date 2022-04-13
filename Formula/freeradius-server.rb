@@ -1,22 +1,31 @@
 class FreeradiusServer < Formula
   desc "High-performance and highly configurable RADIUS server"
   homepage "https://freeradius.org/"
-  url "https://github.com/FreeRADIUS/freeradius-server/archive/release_3_0_21.tar.gz"
-  sha256 "b2014372948a92f86cfe2cf43c58ef47921c03af05666eb9d6416bdc6eeaedc2"
-  license "GPL-2.0"
-  head "https://github.com/FreeRADIUS/freeradius-server.git"
+  license all_of: ["GPL-2.0-or-later", "LGPL-2.1-or-later"]
+  head "https://github.com/FreeRADIUS/freeradius-server.git", branch: "master"
+
+  stable do
+    url "https://github.com/FreeRADIUS/freeradius-server/archive/release_3_0_25.tar.gz"
+    sha256 "493b0b9bef3d9f0e6949fcfd6aa282164f6b8e6404231f2b0d1353739199ffcd"
+
+    # Fix -flat_namespace being used
+    patch do
+      url "https://github.com/FreeRADIUS/freeradius-server/commit/6c1cdb0e75ce36f6fadb8ade1a69ba5e16283689.patch?full_index=1"
+      sha256 "7e7d055d72736880ca8e1be70b81271dd02f2467156404280a117cb5dc8dccdc"
+    end
+  end
 
   livecheck do
-    url :head
+    url :stable
     regex(/^release[._-](\d+(?:[._]\d+)+)$/i)
   end
 
   bottle do
-    sha256 "d5870925f8214783c694f3c359d75a816c40f2e76ce0c0e7443357603cd0193e" => :big_sur
-    sha256 "4721314881382789163f956e5ab1edba62d3984a2d5b2ee714f57ed695ad03a4" => :arm64_big_sur
-    sha256 "c3174a08eaeabce252f16224d93fcb1503584ac6b2d7733a6e80eb558cfefee5" => :catalina
-    sha256 "4c4dc47fe8af598594c4dd24184f7b5400e383e7649c6f6aa98f1663997b04ec" => :mojave
-    sha256 "2c8d33eddc1311f098175f2854173bbd4181d9f20fa0d1807950a84198fca6e1" => :high_sierra
+    sha256 arm64_big_sur: "f4ed69d19363b792ffba75c41b703bd6f068a2d65d76a3046ba6947832b6a6b3"
+    sha256 big_sur:       "a28e06a16084beb496edcb341dcf5aaf7f6da6ef995bd7383545d59aac76f393"
+    sha256 catalina:      "6fe8001066708fc01ba0c71a7a0246aee4af4910a68f155d82fd411a7a826c1b"
+    sha256 mojave:        "660eb25588c2d0c68aae1684bfc9f9174c6c6d4d721d196a6232c981718e9ebf"
+    sha256 x86_64_linux:  "d71cb20afdd11e9793b6299e241474f8f4d07174625809f07f228ec06cfeb950"
   end
 
   depends_on "openssl@1.1"

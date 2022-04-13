@@ -1,9 +1,10 @@
 class Tectonic < Formula
   desc "Modernized, complete, self-contained TeX/LaTeX engine"
   homepage "https://tectonic-typesetting.github.io/"
-  url "https://github.com/tectonic-typesetting/tectonic/archive/tectonic@0.4.1.tar.gz"
-  sha256 "5a2c910f822d59ddaf9d32a0e5f7f34ce30f44e4129513b3a0c50425cf48ac8f"
+  url "https://github.com/tectonic-typesetting/tectonic/archive/tectonic@0.8.2.tar.gz"
+  sha256 "1f92a5ff25725a9a4c0eefd4ea306da1e63f57c40d4ceb0972c7e5bb73297b4f"
   license "MIT"
+  revision 1
 
   # As of writing, only the tags starting with `tectonic@` are release versions.
   # NOTE: The `GithubLatest` strategy cannot be used here because the "latest"
@@ -14,11 +15,12 @@ class Tectonic < Formula
   end
 
   bottle do
-    cellar :any
-    sha256 "98a8197e79a15cbb27f29f871d78ef1ee3a5bff4292afd0aa030b12bc8d6e7bb" => :big_sur
-    sha256 "8af05e3deffb86e2f2893b40692d5299bb66e323dc24a52277f605bb48274261" => :arm64_big_sur
-    sha256 "ee982811abc9559c29b502bac4938342c7c8c6d707ca4d374b0d5cf39ee1d6a0" => :catalina
-    sha256 "573741924359aa5859b481faa45c18956f00b9c5e865877da40f2d71ccafb868" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "be507de3cd9b77fa2ab5c7677189d9687b5b3392a9bf916be6eeed8bb35bb7e1"
+    sha256 cellar: :any,                 arm64_big_sur:  "dc5cfda9a86fea4223ac45436d11cf2b2adee281070d7cf99c04defeec92ffc5"
+    sha256 cellar: :any,                 monterey:       "68665b117fdd0961964057692c9eeb47acb272f9cc7a7198ff890208752bb41f"
+    sha256 cellar: :any,                 big_sur:        "d932309d51b4e1322746a81d5d4d0dab1efc4c856dc494a1791cb7711461a030"
+    sha256 cellar: :any,                 catalina:       "afb3e78a43a2d9d044845bba81ec50f2b66d04b3847de9c028db48af805f0ed5"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5ddf29581458963094ee3f25b53a13bccd6a82e3f48f3a7e94fd95cab664fc96"
   end
 
   depends_on "pkg-config" => :build
@@ -39,7 +41,7 @@ class Tectonic < Formula
     # https://crates.io/crates/openssl#manual-configuration
     ENV["OPENSSL_DIR"] = Formula["openssl@1.1"].opt_prefix
 
-    system "cargo", "install", *std_cargo_args
+    system "cargo", "install", "--features", "external-harfbuzz", *std_cargo_args
   end
 
   test do

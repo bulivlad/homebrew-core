@@ -1,20 +1,23 @@
 class Sundials < Formula
   desc "Nonlinear and differential/algebraic equations solver"
   homepage "https://computing.llnl.gov/projects/sundials"
-  url "https://computing.llnl.gov/projects/sundials/download/sundials-5.6.1.tar.gz"
-  sha256 "16b77999ec7e7f2157aa1d04ca1de4a2371ca8150e056d24951d0c58966f2a83"
+  url "https://github.com/LLNL/sundials/releases/download/v5.8.0/sundials-5.8.0.tar.gz"
+  sha256 "d4ed403351f72434d347df592da6c91a69452071860525385b3339c824e8a213"
   license "BSD-3-Clause"
 
   livecheck do
-    url "https://computation.llnl.gov/projects/sundials/sundials-software"
+    url "https://computing.llnl.gov/projects/sundials/sundials-software"
     regex(/href=.*?sundials[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 "3efeaeab0d7097370464a61085e8feddabf80436e092674f8ec36894406d791c" => :big_sur
-    sha256 "ce5c25344fa3d88cc89d4840706bc7b03ce0b8abcbe199f253da7fac03bfdd0f" => :arm64_big_sur
-    sha256 "db84818157b4d314de7ebc338f8c972cb026f84ff9234365b2e91bbc8a4caaf1" => :catalina
-    sha256 "1876f70f5c54be1cc4aadc7935385e65451f7612766f1a33a0850e12c152232f" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "c77ad026c0753be7749b297b1d1921af49134dae6c8ccb3eeb705e3efaefd0cc"
+    sha256 cellar: :any,                 arm64_big_sur:  "cde3904eedbacf16fa230074549d7728dcb03345bdea7da67c637744b45b590d"
+    sha256 cellar: :any,                 monterey:       "891690db69fc58e026bc1f4eca0109f1fc5f5c9889b7da5d12b9eb54a480dcae"
+    sha256 cellar: :any,                 big_sur:        "a14e546867d769d774bcd5a6a723644cf1004a1627eb483bbeca143245c2834f"
+    sha256 cellar: :any,                 catalina:       "32eb458bf6dc7fcb58336ed4af87de8686fce5d94a1df384a3a29496f1e1d47e"
+    sha256 cellar: :any,                 mojave:         "5739a52fbed858b21ea5078f9371ce443476917552041efc16343c5fc4d48b60"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "909bc3b7d778f3e89f14738f7b2fa74940a4cd26dabb2bb63f652cf1c5fdc843"
   end
 
   depends_on "cmake" => :build
@@ -53,7 +56,7 @@ class Sundials < Formula
   test do
     cp Dir[pkgshare/"examples/*"], testpath
     system ENV.cc, "-I#{include}", "test_nvector.c", "sundials_nvector.c",
-                   "test_nvector_serial.c", "-L#{lib}", "-lsundials_nvecserial"
+                   "test_nvector_serial.c", "-L#{lib}", "-lsundials_nvecserial", "-lm"
     assert_match "SUCCESS: NVector module passed all tests",
                  shell_output("./a.out 42 0")
   end

@@ -1,33 +1,25 @@
 class Libgcrypt < Formula
   desc "Cryptographic library based on the code from GnuPG"
   homepage "https://gnupg.org/related_software/libgcrypt/"
-  url "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.8.7.tar.bz2"
-  sha256 "03b70f028299561b7034b8966d7dd77ef16ed139c43440925fe8782561974748"
+  url "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.10.1.tar.bz2"
+  sha256 "ef14ae546b0084cd84259f61a55e07a38c3b53afc0f546bffcef2f01baffe9de"
   license "GPL-2.0-only"
-  revision 1
 
   livecheck do
     url "https://gnupg.org/ftp/gcrypt/libgcrypt/"
-    regex(/libgcrypt[._-]v?(\d+\.\d+\.\d+)/i)
+    regex(/href=.*?libgcrypt[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    cellar :any
-    sha256 "5817c944582b6e68f0bf3a689d9aec37a755541b7961ea0c54833d30f471b2ba" => :big_sur
-    sha256 "7b930440e5155aa2b7373cfa253165a52739de2022f97f1becd3a23ddb26aab5" => :arm64_big_sur
-    sha256 "899287732003176706501ba11ab37d616523a974acf0c75b6229e3f6157d2fd0" => :catalina
-    sha256 "c25a11f0b29055cdcd994e661699eac0f7da7e9b91135a91de7a76d6f07525c1" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "3fe47336e43abb2d06395af3ddb83aceb9a08b826f338d2f740eb57271f1eddc"
+    sha256 cellar: :any,                 arm64_big_sur:  "3350e668f3ff1a912cb16c74104eb835134fe0343bea9db4d6bf027f24616593"
+    sha256 cellar: :any,                 monterey:       "ac2f757bc87dac1c676d14d4382aa3baa1b3dadc3850aedd99b6acd8c06e4719"
+    sha256 cellar: :any,                 big_sur:        "e3c2dfd3c1a92117d52ca06de3e05f427c7c045031957cd61ebbf0e8146c7052"
+    sha256 cellar: :any,                 catalina:       "39658feb6872c97f486ea8c88cd515411a612baf459721f4b88196067fb91ff4"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "dff2a2b4cf7e623f895acb2cec5a85c5878d1db618637eb8495e2f6850ab21ed"
   end
 
   depends_on "libgpg-error"
-
-  # Upstream patch which corrects the pkg-config flags to include the header and library paths
-  # Important on non /usr/local prefixes
-  # https://git.gnupg.org/cgi-bin/gitweb.cgi?p=libgcrypt.git;a=commit;h=761d12f140b77b907087590646651d9578b68a54
-  patch do
-    url "https://git.gnupg.org/cgi-bin/gitweb.cgi?p=libgcrypt.git;a=patch;h=761d12f140b77b907087590646651d9578b68a54"
-    sha256 "f4da2d8c93bc52a26efa429a81d32141246d163d752464cd17ac9cce27d1fc64"
-  end
 
   def install
     system "./configure", "--disable-dependency-tracking",
@@ -35,21 +27,14 @@ class Libgcrypt < Formula
                           "--enable-static",
                           "--prefix=#{prefix}",
                           "--disable-asm",
-                          "--with-libgpg-error-prefix=#{Formula["libgpg-error"].opt_prefix}",
-                          "--disable-jent-support" # Requires ENV.O0, which is unpleasant.
+                          "--with-libgpg-error-prefix=#{Formula["libgpg-error"].opt_prefix}"
+
+    # The jitter entropy collector must be built without optimisations
+    ENV.O0 { system "make", "-C", "random", "rndjent.o", "rndjent.lo" }
 
     # Parallel builds work, but only when run as separate steps
     system "make"
-    on_macos do
-      # Slightly hideous hack to help `make check` work in
-      # normal place on >10.10 where SIP is enabled.
-      # https://github.com/Homebrew/homebrew-core/pull/3004
-      # https://bugs.gnupg.org/gnupg/issue2056
-      MachO::Tools.change_install_name("#{buildpath}/tests/.libs/random",
-                                       "#{lib}/libgcrypt.20.dylib",
-                                       "#{buildpath}/src/.libs/libgcrypt.20.dylib")
-      MachO.codesign!("#{buildpath}/tests/.libs/random") if Hardware::CPU.arm?
-    end
+    MachO.codesign!("#{buildpath}/tests/.libs/random") if OS.mac? && Hardware::CPU.arm?
 
     system "make", "check"
     system "make", "install"

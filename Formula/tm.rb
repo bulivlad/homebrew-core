@@ -1,17 +1,18 @@
 class Tm < Formula
   desc "TriggerMesh CLI to work with knative objects"
   homepage "https://triggermesh.com"
-  url "https://github.com/triggermesh/tm/archive/v1.1.0.tar.gz"
-  sha256 "d403d3f32540e77cb6726c0ee2d10ae1fd3ac6d2cd4e0b94c12222148b56b549"
+  url "https://github.com/triggermesh/tm/archive/v1.16.0.tar.gz"
+  sha256 "0d268a334720ab02866a974d402e1aa394d98d3454de98e4074f9062cc96d32a"
   license "Apache-2.0"
-  head "https://github.com/triggermesh/tm.git"
+  head "https://github.com/triggermesh/tm.git", branch: "main"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "23afb2232f4254c6ce2b3c5104ef8ee2e4e83d96256dce8bb619528e9777b3fe" => :big_sur
-    sha256 "3aa822177fc4d588cd89d406d62e8f002cee994a47cfea7f32535bff0f93eb4c" => :arm64_big_sur
-    sha256 "b7923845ee0e1681493c53784c6f1e181818f365285b477f2283c772ed5cc3a5" => :catalina
-    sha256 "9114671c8810164964727e5405e9cddc85963e0f716a9165ba0ab0080b6bd423" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "bbd91d59cb089c0df468a4e4846cd16a381b4d17bffae48dd99965bd903f7568"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "23f09702f15e046c68f951c606ed88c312a9dcbed701dab94d3ac4132e91fef7"
+    sha256 cellar: :any_skip_relocation, monterey:       "7df892bebb3c0b2db143bf4a5bd42e9e87d4a57b16c2076816732692231d5d9c"
+    sha256 cellar: :any_skip_relocation, big_sur:        "e4ebf7082f64fadb2f9e32edf71d95189dfa622b92015053b8d4baa12ba22300"
+    sha256 cellar: :any_skip_relocation, catalina:       "ab52e13a06ffc1478ee78663a2266df23379b69a1efefc9551a6555c181b2143"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7e1f0748b37b620253178b4f1b3ad40d7595f3dff0e14302ed79bb525b475a57"
   end
 
   depends_on "go" => :build
@@ -20,9 +21,9 @@ class Tm < Formula
     ldflags = %W[
       -s -w
       -X github.com/triggermesh/tm/cmd.version=v#{version}
-    ]
+    ].join(" ")
 
-    system "go", "build", *std_go_args, "-ldflags", ldflags.join(" ")
+    system "go", "build", *std_go_args(ldflags: ldflags)
   end
 
   test do

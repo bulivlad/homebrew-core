@@ -1,23 +1,23 @@
 class Imgproxy < Formula
   desc "Fast and secure server for resizing and converting remote images"
   homepage "https://imgproxy.net"
-  url "https://github.com/imgproxy/imgproxy/archive/v2.15.0.tar.gz"
-  sha256 "3bee2aecbb66c98c9e1254a163fb53e32e8af5bf8e3a92f119427113bee01c91"
+  url "https://github.com/imgproxy/imgproxy/archive/v3.4.0.tar.gz"
+  sha256 "6c6ad103e6d2c7a5fe0ff3f5d3b48726b66403d854ba8e79f221c57c5a5a2705"
   license "MIT"
-  revision 1
-  head "https://github.com/imgproxy/imgproxy.git"
+  head "https://github.com/imgproxy/imgproxy.git", branch: "master"
 
   bottle do
-    cellar :any
-    sha256 "ccd0a102ec452a68a26280f0173534784d0a7797de833bafbc2015027634fc0a" => :big_sur
-    sha256 "215159ed8fcf0216e0f81cb38c460316349828680d5376358c21ba6ee77138b2" => :arm64_big_sur
-    sha256 "8cefa46ab480ea6b763077f8d12b0783e9482355aa2b1bf99ee2c8126279f8c6" => :catalina
-    sha256 "ca7688ab9b51b8f6e71d664bd210ccacefd66c08f16fce12fd26b89b8017358e" => :mojave
-    sha256 "7572ce24b608a282fc82231c0d2455f03dcc15953df73de4f302bf11375fb39c" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "30ff699f2c774aab001f88a03409f7810e443f343a6155f35e214918e77b58c9"
+    sha256 cellar: :any,                 arm64_big_sur:  "bc31aca24e026512d5eee40debd8e2829f27ecaa7c94982c93ae5dffbca66683"
+    sha256 cellar: :any,                 monterey:       "d93c0df2b77a6948263faeb5238d55ade568f6a35085ec24320b0d760f57ec7c"
+    sha256 cellar: :any,                 big_sur:        "cbc0321ccbef63733b4452a58606aab7991ad8b5b2f7534de64d196c75495785"
+    sha256 cellar: :any,                 catalina:       "d330d74711f446d04d685ba1219b9e7a5a483220510a15eee2adc3594be2182e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "87a6977d04dd275a02156cd5fc776a91e75852d3eddb960f8168d9445536af3c"
   end
 
   depends_on "go" => :build
   depends_on "pkg-config" => :build
+  depends_on "glib"
   depends_on "vips"
 
   def install
@@ -43,13 +43,12 @@ class Imgproxy < Formula
     output = testpath/"test-converted.png"
 
     system "curl", "-s", "-o", output,
-           "http://127.0.0.1:#{port}/insecure/fit/100/100/no/0/plain/local:///test.jpg@png"
-    assert_equal 0, $CHILD_STATUS
+           "http://127.0.0.1:#{port}/insecure/resize:fit:100:100:true/plain/local:///test.jpg@png"
     assert_predicate output, :exist?
 
     file_output = shell_output("file #{output}")
     assert_match "PNG image data", file_output
-    assert_match "1 x 1", file_output
+    assert_match "100 x 100", file_output
   ensure
     Process.kill("TERM", pid)
     Process.wait(pid)

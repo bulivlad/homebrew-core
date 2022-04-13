@@ -1,18 +1,18 @@
 class Opencolorio < Formula
   desc "Color management solution geared towards motion picture production"
   homepage "https://opencolorio.org/"
-  url "https://github.com/imageworks/OpenColorIO/archive/v1.1.1.tar.gz"
-  sha256 "c9b5b9def907e1dafb29e37336b702fff22cc6306d445a13b1621b8a754c14c8"
+  url "https://github.com/imageworks/OpenColorIO/archive/v2.1.1.tar.gz"
+  sha256 "16ebc3e0f21f72dbe90fe60437eb864f4d4de9c255ef8e212f837824fc9b8d9c"
   license "BSD-3-Clause"
-  revision 3
-  head "https://github.com/imageworks/OpenColorIO.git"
+  head "https://github.com/imageworks/OpenColorIO.git", branch: "master"
 
   bottle do
-    cellar :any
-    sha256 "41d69027763621bd23db83f3656587afbb90a456d6aab1d4429839a04a2bfdb8" => :big_sur
-    sha256 "41140d26dbe70add3bece6d1dfc2b6a01b7ed1879c79c18e29eeefd66694b9db" => :catalina
-    sha256 "f3b183e64cf41cc28273b9e0fe99013fd1bd4a7f3774f3be370423d04ac847da" => :mojave
-    sha256 "4beea67e0c1400c1d82b1257bae9476e4f58fbab6a727f31161199b5dae4d3bc" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "f50d5ba3977c39c7675f9a47c6e6e8a94dde8ffaa0eff80e0a4f3f85ac60fc83"
+    sha256 cellar: :any,                 arm64_big_sur:  "a12191e6238cf29395345d5d1be49d52912a1e6a6066baa11558184122df6d31"
+    sha256 cellar: :any,                 monterey:       "e909973e5bb4f73da7feb23846bc2f1ac5dbe9de58c7f1cdbcb5cea375faac15"
+    sha256 cellar: :any,                 big_sur:        "d5569167550905603f4512ed476af45f9803d292f5de1b122e509854d24c43a7"
+    sha256 cellar: :any,                 catalina:       "b12394d8d4e9180dfcb7bb943d1d0fa25546f86f82b50863be7566320b6de9b8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "919b027f1ebe994bf1e43f264a361b70183e28200e10340fc6fb56d7978e6ece"
   end
 
   depends_on "cmake" => :build
@@ -23,6 +23,7 @@ class Opencolorio < Formula
   def install
     args = std_cmake_args + %W[
       -DCMAKE_VERBOSE_MAKEFILE=OFF
+      -DCMAKE_INSTALL_RPATH=#{rpath}
       -DPYTHON=python3
       -DPYTHON_EXECUTABLE=#{Formula["python@3.9"].opt_bin}/"python3"
     ]

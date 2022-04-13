@@ -1,6 +1,6 @@
 class Cdrtools < Formula
   desc "CD/DVD/Blu-ray premastering and recording software"
-  homepage "http://cdrecord.org/"
+  homepage "https://cdrtools.sourceforge.io/private/cdrecord.html"
   url "https://downloads.sourceforge.net/project/cdrtools/alpha/cdrtools-3.02a09.tar.gz"
   mirror "https://fossies.org/linux/misc/cdrtools-3.02a09.tar.gz"
   sha256 "c7e4f732fb299e9b5d836629dadf5512aa5e6a5624ff438ceb1d056f4dcb07c2"
@@ -13,10 +13,13 @@ class Cdrtools < Formula
   end
 
   bottle do
-    sha256 "dd2f2609309ef54a2b9289ef79032222714f01c86ecb280d8d79ebc520488ae6" => :big_sur
-    sha256 "06bd97603df2dba522d6cb18b50815b3cb4f6b619b3244e6d870009831129a37" => :arm64_big_sur
-    sha256 "411c2dc1a6931d3c7c299d7c9d73129efbf45a39a421518158a3852de554fcaf" => :catalina
-    sha256 "4669f544745a05b8ef4ffd9bc1ea446ef7cda4c98f32b26279c81af803f1ab7e" => :mojave
+    sha256 arm64_monterey: "954f46597d28f0a8ca1eca8de6ca79182a3904472944e484c7406663f7b6a95c"
+    sha256 arm64_big_sur:  "06bd97603df2dba522d6cb18b50815b3cb4f6b619b3244e6d870009831129a37"
+    sha256 monterey:       "464dd4f91af02239f99ee4f67109ffd830efdd8eb51e409649e352fe4946e74a"
+    sha256 big_sur:        "dd2f2609309ef54a2b9289ef79032222714f01c86ecb280d8d79ebc520488ae6"
+    sha256 catalina:       "411c2dc1a6931d3c7c299d7c9d73129efbf45a39a421518158a3852de554fcaf"
+    sha256 mojave:         "4669f544745a05b8ef4ffd9bc1ea446ef7cda4c98f32b26279c81af803f1ab7e"
+    sha256 x86_64_linux:   "4933b72c86f84c6378d621ecc1e5ac26621ef8b5b8e890b0841d389edc64db12"
   end
 
   depends_on "smake" => :build

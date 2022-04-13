@@ -4,7 +4,7 @@ class Launch < Formula
   url "https://sabi.net/nriley/software/launch-1.2.5.tar.gz"
   sha256 "486632b11bee04d9f6bcb595fd2a68b5fde2f748ebdc182274778cc5cf97ff70"
   license "BSD-3-Clause"
-  head "https://github.com/nriley/launch.git"
+  head "https://github.com/nriley/launch.git", branch: "master"
 
   livecheck do
     url "https://sabi.net/nriley/software/"
@@ -12,22 +12,22 @@ class Launch < Formula
   end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "d1e62bfa93fad6f10574c7556e2e21f2b551e12a23ac729fefd0e8e03763baeb" => :big_sur
-    sha256 "b6a459442e09592a2ff98434c9d2b53b30ec71920e66d8bb3b66a7704715d7c7" => :arm64_big_sur
-    sha256 "e6e543dda95bf0eea6d817e5df484f91493f84bc49bedf5d73420be8452f3f05" => :catalina
-    sha256 "39473462b7b66e86f4d3abfef40f6b9314793ae6d621dba3ca61ccf9f06f1d0f" => :mojave
-    sha256 "7ea743ebff2392770ebb7bd7ff0a420ad9a3f6bc50d1181df7518a5fe46a8000" => :high_sierra
-    sha256 "4fa06c0d934752695a0c823c51569063b50f8826c7fb9cbd302f731b059e4225" => :sierra
-    sha256 "9905b0dd99460cd88d48a1cf4c230ec03db380262001fa7a2ba54cbcbb84fad0" => :el_capitan
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "37a22a51899be9434558af2a787f253c90af7b1dc5dc17017096b221c0b85dc3"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "a8bc9136d5da0270c108662086bebfd5cf74cd5eb82a773318e9be1b7a61b986"
+    sha256 cellar: :any_skip_relocation, monterey:       "4813f636dd057ce7e61e02019d3886e2519ca4189c2ee1a98a2f9fa111412225"
+    sha256 cellar: :any_skip_relocation, big_sur:        "0190475edf924787849170f68ab44589bbb41e8eb8e72dc86fefb4f15954ce00"
+    sha256 cellar: :any_skip_relocation, catalina:       "1d48da3f7c9c226fe622e83b1ff37bca0b960ab6979b01f2bf2e4b8010febacc"
+    sha256 cellar: :any_skip_relocation, mojave:         "d9eddaed19bcf6f70a4d6039028cc95693a616006541bd07e3ccea619f462ad8"
   end
 
   depends_on xcode: :build
+  depends_on :macos
 
   def install
     rm_rf "launch" # We'll build it ourself, thanks.
     xcodebuild "-configuration", "Deployment", "SYMROOT=build", "clean"
-    xcodebuild "-configuration", "Deployment", "SYMROOT=build"
+    xcodebuild "-arch", Hardware::CPU.arch, "-configuration", "Deployment", "SYMROOT=build"
 
     man1.install gzip("launch.1")
     bin.install "build/Deployment/launch"

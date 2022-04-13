@@ -1,10 +1,10 @@
 class AnycableGo < Formula
   desc "WebSocket server with action cable protocol"
   homepage "https://github.com/anycable/anycable-go"
-  url "https://github.com/anycable/anycable-go/archive/v1.0.3.tar.gz"
-  sha256 "8aa780b0ee5bf527fe211585aba2441a9cd5b72e58f353e3d4f76286262bf33a"
+  url "https://github.com/anycable/anycable-go/archive/v1.2.0.tar.gz"
+  sha256 "d8d411e078f0e3de754623fe4d68025d60c8a9fcd31a29972d8c2f72d2a8d541"
   license "MIT"
-  head "https://github.com/anycable/anycable-go.git"
+  head "https://github.com/anycable/anycable-go.git", branch: "master"
 
   livecheck do
     url :stable
@@ -12,11 +12,12 @@ class AnycableGo < Formula
   end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "4fad3cde32a0582f7c67e5b1c1cf042b26440550adbea601b8e47a8391628763" => :big_sur
-    sha256 "ee40011c6d573f3f567adeec8098428d602580fec188af1191027380b0017989" => :arm64_big_sur
-    sha256 "c9524a91cef04b327a268ed84a95bde54adaf82b82527bb3e086382c81fc6798" => :catalina
-    sha256 "3ca5d2a4a546fda4da5e840ef21f80494bcc0fd1df3890040cb63fcfc59911eb" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "dbb6bea87e378580ae10593bdfbf55b4a488348e75d29ae354461bacd7245ded"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "ed7c9befcb24175ed31dced0fb7cbfc24c6afc8b878f236a9a84819ef259eb98"
+    sha256 cellar: :any_skip_relocation, monterey:       "fd109c24e5407068d5352fbd8ac7643a62dcba47a4c1f44b215f880a42c680ea"
+    sha256 cellar: :any_skip_relocation, big_sur:        "73fbdd129544f14df687c4f77d60d8e7ee66c008526f2e184065eeca18215624"
+    sha256 cellar: :any_skip_relocation, catalina:       "67acf8def8551f823001dc792ccf81fa145179cd526699d3783c85a7cbbe9320"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "335920268709ce85f3101047512f67c320415783913d9de8eb3c735bbba83bd9"
   end
 
   depends_on "go" => :build
@@ -31,7 +32,7 @@ class AnycableGo < Formula
       "-X github.com/anycable/anycable-go/utils.version=#{version}"
     end
 
-    system "go", "build", "-mod=vendor", "-ldflags", ldflags.join(" "), *std_go_args,
+    system "go", "build", "-mod=vendor", *std_go_args(ldflags: ldflags),
                           "-v", "github.com/anycable/anycable-go/cmd/anycable-go"
   end
 

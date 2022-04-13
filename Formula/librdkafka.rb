@@ -1,25 +1,28 @@
 class Librdkafka < Formula
   desc "Apache Kafka C/C++ library"
   homepage "https://github.com/edenhill/librdkafka"
-  url "https://github.com/edenhill/librdkafka/archive/v1.5.3.tar.gz"
-  sha256 "2105ca01fef5beca10c9f010bc50342b15d5ce6b73b2489b012e6d09a008b7bf"
+  url "https://github.com/edenhill/librdkafka/archive/refs/tags/v1.8.2.tar.gz"
+  sha256 "6a747d293a7a4613bd2897e28e8791476fbe1ae7361f2530a876e0fd483482a6"
   license "BSD-2-Clause"
-  head "https://github.com/edenhill/librdkafka.git"
+  head "https://github.com/edenhill/librdkafka.git", branch: "master"
 
   livecheck do
-    url :head
+    url :stable
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
   bottle do
-    sha256 "b2e4bc434128ae0051500313fb75f584590edcc52801727c3a7a56667377100e" => :big_sur
-    sha256 "a18360feef0dce0cbb1b4aa519c91c78040f0b1ff30d1f1aea7fa1c362f98d4a" => :arm64_big_sur
-    sha256 "694b593d8b0c3a3e36b3583c59d5df46096839b7efe94144498bf2e784b438c5" => :catalina
-    sha256 "7c9b9a039460637f5271309113080485e5b32a75c7b28f0669441e52e6b1bab7" => :mojave
+    rebuild 1
+    sha256 cellar: :any,                 arm64_monterey: "62d464f0c91804cbc7e243d2947a3684fbe7f984fed62a61911c4e758274b213"
+    sha256 cellar: :any,                 arm64_big_sur:  "f173038bf4ca75233c4d323dd07743d04accce68aa8513284b4ec1465a689589"
+    sha256                               monterey:       "a3852aef4d08f02186ac10d3ac20dbbf5270b1ded8c8a2ceac004bfde3936488"
+    sha256                               big_sur:        "40c00838eb97e3781930de8c4c743319fb126cbfd63195cd3ccc561380835c02"
+    sha256                               catalina:       "00b5f82f5bdc5e71d80355125634e30ec04059fce88dac2b4560259bdabbe990"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e11b1becd5dc7eabf9f453e92cd4a9f71fa0e16ff92a07baa265021f4efebd99"
   end
 
   depends_on "pkg-config" => :build
-  depends_on "python@3.9" => :build
+  depends_on "python@3.10" => :build
   depends_on "lz4"
   depends_on "lzlib"
   depends_on "openssl@1.1"

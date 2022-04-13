@@ -1,10 +1,10 @@
 class WireguardTools < Formula
   desc "Tools for the WireGuard secure network tunnel"
   homepage "https://www.wireguard.com/"
-  url "https://git.zx2c4.com/wireguard-tools/snapshot/wireguard-tools-1.0.20200827.tar.xz"
-  sha256 "51bc85e33a5b3cf353786ae64b0f1216d7a871447f058b6137f793eb0f53b7fd"
-  license "GPL-2.0"
-  head "https://git.zx2c4.com/wireguard-tools.git"
+  url "https://git.zx2c4.com/wireguard-tools/snapshot/wireguard-tools-1.0.20210914.tar.xz"
+  sha256 "97ff31489217bb265b7ae850d3d0f335ab07d2652ba1feec88b734bc96bd05ac"
+  license "GPL-2.0-only"
+  head "https://git.zx2c4.com/wireguard-tools.git", branch: "master"
 
   livecheck do
     url :head
@@ -12,12 +12,13 @@ class WireguardTools < Formula
   end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "007564c0016fce46841d7d28f907fc0c9ffa7480f95c846608a689c7f288600e" => :big_sur
-    sha256 "f6ee3e4d2d716d4bd5d3fd704653f33b016ffe6f73dc8734523a0cfbef80487d" => :arm64_big_sur
-    sha256 "45e84d6fd3efe601ecb6c959a356169908bd12aa2aaa42122663619c47c02e4e" => :catalina
-    sha256 "7c53423bac89aef0a7a521f04707961bf4416925edb3022d0bfc839f345f991b" => :mojave
-    sha256 "7041f9c62ee72513ec0eb67ec1b240ce4be95c771aeecb9302fed746c0029dfc" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "dab3c446484b6fce766584a472894f32e476d0599df1c65b8115ca0c8abce262"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "92e86c34ca2a747177fdc78ed6dfe44970f4943a6d929ca1c3c04698c05b5631"
+    sha256 cellar: :any_skip_relocation, monterey:       "ef2ec79723d6ad586e54148c0fc23775528fcea79ba3ef052e7000c1029e3d86"
+    sha256 cellar: :any_skip_relocation, big_sur:        "fddbe8d3d5d10d9f4f5cb34fb1235367a93f127decda021842d58f92d53fc686"
+    sha256 cellar: :any_skip_relocation, catalina:       "f24424c4b4c8aeaccc23f61c8b01f7296e8622d4be0436ac26b9de664a99d6bd"
+    sha256 cellar: :any_skip_relocation, mojave:         "79939305daed2313e0be3aa2e9420eb0c576e25c557d22a36b9dae6591ba8710"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b6870c3e5fad02dbdfd95280a09b089b667351547ee0e47f80c9285e9078b8bc"
   end
 
   depends_on "bash"

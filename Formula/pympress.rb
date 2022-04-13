@@ -3,53 +3,34 @@ class Pympress < Formula
 
   desc "Simple and powerful dual-screen PDF reader designed for presentations"
   homepage "https://github.com/Cimbali/pympress/"
-  url "https://files.pythonhosted.org/packages/92/80/c63ad7748e877dfeb5d7d756c1bdd4c2657e5a857814b4d6edf96d44678c/pympress-1.5.3.tar.gz"
-  sha256 "d8c10c286d1de2210c19a3e752542b61c8bcc592c48553f7c7043e943a87d05d"
-  license "GPL-2.0"
-  revision 2
-  head "https://github.com/Cimbali/pympress.git"
-
-  livecheck do
-    url :stable
-  end
+  url "https://files.pythonhosted.org/packages/3f/33/56f8e84cc3079f866d8b3fdd2d9ef538fab7a9a0cfc7b0e02c5cf65b95fb/pympress-1.7.1.tar.gz"
+  sha256 "bfdc228cb14862dba943abf9ece92d9e966c433e566ba514985739966f838ee3"
+  license "GPL-2.0-or-later"
+  head "https://github.com/Cimbali/pympress.git", branch: "master"
 
   bottle do
-    cellar :any
-    sha256 "0dace778ed9f1ac2939f6b4c1305a629c4fc256d8768b9658196e90f0819e84e" => :big_sur
-    sha256 "d730fa081be30bd9dd49fa5f08cf8aa39ac31842fbb8b86423c1bc28db8b616c" => :catalina
-    sha256 "88b035ea21bd93571a1920bd94c1bc293ee68ffbc63237dbe8f9da0958323bae" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "e182e85a285464afff947ad42d25fccbeebfd802722c4c6668e610bb03c54165"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "d73a5236bf39d3b088ed79701623775ba520e0c666999c21305c9781a182a800"
+    sha256 cellar: :any_skip_relocation, monterey:       "269509fc2d58e1d0319bb0799556287b57d4d25e5a7e2481d70a3ebc70dd27bf"
+    sha256 cellar: :any_skip_relocation, big_sur:        "ead363489a8fbe39769636a5e5acf5ccc062daa5fc83d4ec27e6218c595faae6"
+    sha256 cellar: :any_skip_relocation, catalina:       "99da6a30b038eccc64d69c514f0c6e60212389bac7e6c2ba94f86d8089484154"
   end
 
   depends_on "gobject-introspection"
+  depends_on "gst-plugins-bad"
+  depends_on "gst-plugins-base"
+  depends_on "gst-plugins-good"
+  depends_on "gst-plugins-ugly"
+  depends_on "gstreamer"
   depends_on "gtk+3"
   depends_on "libyaml"
   depends_on "poppler"
   depends_on "pygobject3"
   depends_on "python@3.9"
 
-  resource "argh" do
-    url "https://files.pythonhosted.org/packages/e3/75/1183b5d1663a66aebb2c184e0398724b624cecd4f4b679cb6e25de97ed15/argh-0.26.2.tar.gz"
-    sha256 "e9535b8c84dc9571a48999094fda7f33e63c3f1b74f3e5f3ac0105a58405bb65"
-  end
-
-  resource "pathtools" do
-    url "https://files.pythonhosted.org/packages/e7/7f/470d6fcdf23f9f3518f6b0b76be9df16dcc8630ad409947f8be2eb0ed13a/pathtools-0.1.2.tar.gz"
-    sha256 "7c35c5421a39bb82e58018febd90e3b6e5db34c5443aaaf742b3f33d4655f1c0"
-  end
-
-  resource "python-vlc" do
-    url "https://files.pythonhosted.org/packages/a8/51/299f4804c43f99d718ed43a63b1ea0712932e25b6bbe1ee1817cb8e954f7/python-vlc-3.0.7110.tar.gz"
-    sha256 "821bca0dbe08fbff97a65e56ff2318ad7d499330876579c39f01f3fb38c7b679"
-  end
-
-  resource "PyYAML" do
-    url "https://files.pythonhosted.org/packages/e3/e8/b3212641ee2718d556df0f23f78de8303f068fe29cdaa7a91018849582fe/PyYAML-5.1.2.tar.gz"
-    sha256 "01adf0b6c6f61bd11af6e10ca52b7d4057dd0be0343eb9283c878cf3af56aee4"
-  end
-
   resource "watchdog" do
-    url "https://files.pythonhosted.org/packages/bb/e3/5a55d48a29300160779f0a0d2776d17c1b762a2039b36de528b093b87d5b/watchdog-0.9.0.tar.gz"
-    sha256 "965f658d0732de3188211932aeb0bb457587f04f63ab4c1e33eab878e9de961d"
+    url "https://files.pythonhosted.org/packages/e8/a8/fc4edd7d768361b00ea850e5310211d157df6b5a1db6148dd434e787d898/watchdog-2.1.6.tar.gz"
+    sha256 "a36e75df6c767cbf46f61a91c70b3ba71811dfa0aca4a324d9407a06a8b7a2e7"
   end
 
   def install
@@ -58,11 +39,9 @@ class Pympress < Formula
   end
 
   test do
-    system bin/"pympress", "--help"
+    # (pympress:48790): Gtk-WARNING **: 13:03:37.080: cannot open display
+    return if OS.linux? && ENV["HOMEBREW_GITHUB_ACTIONS"]
 
-    # Version info contained in log file only if all dependencies loaded successfully
-    assert_predicate testpath/"Library/Logs/pympress.log", :exist?
-    output = (testpath/"Library/Logs/pympress.log").read
-    assert_match /^INFO:pympress.__main__:Pympress: #{version}\s*;/, output
+    system bin/"pympress", "--quit"
   end
 end

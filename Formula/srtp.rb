@@ -1,10 +1,11 @@
 class Srtp < Formula
   desc "Implementation of the Secure Real-time Transport Protocol"
   homepage "https://github.com/cisco/libsrtp"
-  url "https://github.com/cisco/libsrtp/archive/v2.3.0.tar.gz"
-  sha256 "94093a5d04c5f4743e8d81182b76938374df6d393b45322f24960d250b0110e8"
+  url "https://github.com/cisco/libsrtp/archive/v2.4.2.tar.gz"
+  sha256 "3b1bcb14ebda572b04b9bdf07574a449c84cb924905414e4d94e62837d22b628"
   license "BSD-3-Clause"
-  head "https://github.com/cisco/libsrtp.git"
+  revision 1
+  head "https://github.com/cisco/libsrtp.git", branch: "master"
 
   livecheck do
     url :stable
@@ -12,18 +13,19 @@ class Srtp < Formula
   end
 
   bottle do
-    cellar :any
-    sha256 "c7d718635bf47976fd6458c37a3373be978e0254811d5249477a83bf4b885388" => :big_sur
-    sha256 "60ba6d403720966a354577c14dbacaa27980f292eb71dec3d32472e0aa2aa659" => :arm64_big_sur
-    sha256 "b96d4c3bb159a6f43d5bdd9cc0be0d8deecb06c95df19f2d9cc1f517ffc64ad6" => :catalina
-    sha256 "4bbad999b46dd545aa32882e968d441f5d5e709dc8549ef79e3885dd49fcb964" => :mojave
-    sha256 "5c70c41484064bbe25c31a19fc2cffc5cbea3de27e837a039b17767aeb1b57b8" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "4e8db729f069ebd07a19f506d28a3f491328e6d6521d81f3176617fcdfcba2b9"
+    sha256 cellar: :any,                 arm64_big_sur:  "da78f2f142b179a51309a70d2a823960198086609fc6f38dfc45559b2e581e13"
+    sha256 cellar: :any,                 monterey:       "b27445521d7cf59ccecbb3842fab8f6b89c54b98fb22eb8707ec68bc9f2926f8"
+    sha256 cellar: :any,                 big_sur:        "1b530260c922cc08de98cad6dc62e124ed05efd190a79364809268cfe566e7a6"
+    sha256 cellar: :any,                 catalina:       "ec45e12636b266303efe3ca1d4cb3cc595955c62ff197a900e6f0f0519bb51e0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6916cca964b049c777c87efd01272c76a246349cd93306e57fc68a8edaae426b"
   end
 
   depends_on "pkg-config" => :build
+  depends_on "openssl@1.1"
 
   def install
-    system "./configure", "--disable-debug", "--prefix=#{prefix}"
+    system "./configure", "--disable-debug", "--prefix=#{prefix}", "--enable-openssl"
     system "make", "test"
     system "make", "shared_library"
     system "make", "install" # Can't go in parallel of building the dylib

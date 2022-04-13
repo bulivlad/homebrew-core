@@ -1,8 +1,8 @@
 class Libusb < Formula
   desc "Library for USB device access"
   homepage "https://libusb.info/"
-  url "https://github.com/libusb/libusb/releases/download/v1.0.24/libusb-1.0.24.tar.bz2"
-  sha256 "7efd2685f7b327326dcfb85cee426d9b871fd70e22caa15bb68d595ce2a2b12a"
+  url "https://github.com/libusb/libusb/releases/download/v1.0.26/libusb-1.0.26.tar.bz2"
+  sha256 "12ce7a61fc9854d1d2a1ffe095f7b5fac19ddba095c259e6067a46500381b5a5"
   license "LGPL-2.1-or-later"
 
   livecheck do
@@ -11,11 +11,12 @@ class Libusb < Formula
   end
 
   bottle do
-    cellar :any
-    sha256 "74e0067e968ddbea31e070885ae86bc1db5c66fd157588e84576e653e62894c8" => :big_sur
-    sha256 "1c40f64450705461a5373c3d54257e646d39914d44bffaf9d957bbe063db2129" => :arm64_big_sur
-    sha256 "034ae259f17afb5894860cdb1786fd6d391359e8d221c0f765eceed6210b60df" => :catalina
-    sha256 "1318e1155192bdaf7d159562849ee8f73cb0f59b0cb77c142f8be99056ba9d9e" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "ab90516396d8dc99f96d31615bcbddfcfd2082fcc7494dabb9d22b275628e800"
+    sha256 cellar: :any,                 arm64_big_sur:  "d9121e56c7dbfad640c9f8e3c3cc621d88404dc1047a4a7b7c82fe06193bca1f"
+    sha256 cellar: :any,                 monterey:       "e79be7d4c611f0017567172771761b1df62d140e79ffa6d2538577eb24a48e44"
+    sha256 cellar: :any,                 big_sur:        "963720057ac56afd38f8d4f801f036231f08f5cf7db36cb470814cbc1b38e49c"
+    sha256 cellar: :any,                 catalina:       "72ed40aec0356157f3d5071ecb28c481b3f3502985a320ec1848cdc8cf8483c1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4cae18b6a0315f7e3d8fa8039fd18d6d20fd7f8a0dbb9399e63c95ae0c52fb9d"
   end
 
   head do
@@ -24,6 +25,10 @@ class Libusb < Formula
     depends_on "autoconf" => :build
     depends_on "automake" => :build
     depends_on "libtool" => :build
+  end
+
+  on_linux do
+    depends_on "systemd"
   end
 
   def install
@@ -38,8 +43,8 @@ class Libusb < Formula
   test do
     cp_r (pkgshare/"examples"), testpath
     cd "examples" do
-      system ENV.cc, "-lusb-1.0", "-L#{lib}", "-I#{include}/libusb-1.0",
-             "listdevs.c", "-o", "test"
+      system ENV.cc, "listdevs.c", "-L#{lib}", "-I#{include}/libusb-1.0",
+             "-lusb-1.0", "-o", "test"
       system "./test"
     end
   end

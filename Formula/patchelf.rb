@@ -1,39 +1,38 @@
 class Patchelf < Formula
   desc "Modify dynamic ELF executables"
   homepage "https://github.com/NixOS/patchelf"
-  url "https://github.com/NixOS/patchelf/releases/download/0.12/patchelf-0.12.tar.bz2"
-  sha256 "699a31cf52211cf5ad6e35a8801eb637bc7f3c43117140426400d67b7babd792"
+  url "https://github.com/NixOS/patchelf/releases/download/0.14.5/patchelf-0.14.5.tar.bz2"
+  sha256 "b9a46f2989322eb89fa4f6237e20836c57b455aa43a32545ea093b431d982f5c"
   license "GPL-3.0-or-later"
-  revision 3
-  head "https://github.com/NixOS/patchelf.git"
+  head "https://github.com/NixOS/patchelf.git", branch: "master"
 
   livecheck do
-    url :head
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "d83931e807f58c62f0b321b9523d16de6602415f0e19b3702d072b4dec382cb6" => :big_sur
-    sha256 "d600655f0357e24341513f4688532d920baca6c302ba8be53b4a8b84a9db1bb0" => :arm64_big_sur
-    sha256 "344c4459a5b03099308520eb7ef906242bca77f08ac1660ac61b74ccd7871b1c" => :catalina
-    sha256 "906cd9171c62947d8133b990bbc15ad7803bb5623f5b72332fa792a01c9634ac" => :mojave
-    sha256 "a73b17a4a11801b06958235f32423bd735be9a9bf126b43499c552f2c9ac489f" => :x86_64_linux
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "93f86615872480fa711de7c7abb8874b102a0ec71a6c7b526f24de390e768c64"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "c44eb9355929d5d5a29eef98ba237bb0be07e887dd1a78d597f9193eb4c6a86f"
+    sha256 cellar: :any_skip_relocation, monterey:       "56aa96ca13ab94c578f37dbd6f27a66df3f8a7ff065c69e24fe96945570dc5ea"
+    sha256 cellar: :any_skip_relocation, big_sur:        "4066a672a259b9f5e63c8733848436c7b327a7855cdf9befd0634f437314971b"
+    sha256 cellar: :any_skip_relocation, catalina:       "c1c28ffdfd4dc20b6fbea1db1f1d26c1456968a041bf99e84bf9973719164884"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b78bf9f5d693ab680158e2bdf341c4915712078fee53421c05f5a87af7f2d9cc"
   end
 
-  resource "helloworld" do
+  on_linux do
+    depends_on "gcc"
+  end
+
+  fails_with gcc: "5" # Needs std::optional
+
+  resource "homebrew-helloworld" do
     url "http://timelessname.com/elfbin/helloworld.tar.gz"
     sha256 "d8c1e93f13e0b7d8fc13ce75d5b089f4d4cec15dad91d08d94a166822d749459"
   end
 
-  # Fix unsupported overlap of SHT_NOTE and PT_NOTE
-  # See https://github.com/NixOS/patchelf/pull/230
-  patch do
-    url "https://github.com/rmNULL/patchelf/commit/6edec83653ce1b5fc201ff6db93b966394766814.patch?full_index=1"
-    sha256 "072eff6c5b33298b423f47ec794c7765a42d58a2050689bb20bf66076afb98ac"
-  end
-
   def install
-    on_linux do
+    if OS.linux?
       # Fix ld.so path and rpath
       # see https://github.com/Homebrew/linuxbrew-core/pull/20548#issuecomment-672061606
       ENV["HOMEBREW_DYNAMIC_LINKER"] = File.readlink("#{HOMEBREW_PREFIX}/lib/ld.so")
@@ -47,7 +46,7 @@ class Patchelf < Formula
   end
 
   test do
-    resource("helloworld").stage do
+    resource("homebrew-helloworld").stage do
       assert_equal "/lib/ld-linux.so.2\n", shell_output("#{bin}/patchelf --print-interpreter chello")
       assert_equal "libc.so.6\n", shell_output("#{bin}/patchelf --print-needed chello")
       assert_equal "\n", shell_output("#{bin}/patchelf --print-rpath chello")

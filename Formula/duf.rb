@@ -1,17 +1,18 @@
 class Duf < Formula
   desc "Disk Usage/Free Utility - a better 'df' alternative"
   homepage "https://github.com/muesli/duf"
-  url "https://github.com/muesli/duf/archive/v0.5.0.tar.gz"
-  sha256 "d8879fbf091cd6f6a3b95102fdeb7d21b7fc8200df1a9864b89d8e87057fc9c6"
+  url "https://github.com/muesli/duf/archive/v0.8.1.tar.gz"
+  sha256 "ebc3880540b25186ace220c09af859f867251f4ecaef435525a141d98d71a27a"
   license "MIT"
-  head "https://github.com/muesli/duf.git"
+  head "https://github.com/muesli/duf.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "d6f7af02fd6422feeb24fdd9babb145c3f98323e064c5f46dd494d1edf706e38" => :big_sur
-    sha256 "ac445821820ebafe2ab4bfaab44773760b8a592c00a167700c32716869bba18c" => :arm64_big_sur
-    sha256 "6b0501d446ed33d86614bf447b4a653aec11bc002dfb1fc5f50e9efb6b83b831" => :catalina
-    sha256 "3e7b9439d31b8f2486b7812dd741b62c6ff3eed2c691b4c0e87d9a2276fa1b49" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "ecd8c737c799f637d764a08d6e6ca989987b8076ac128af8d3d69a98dba68002"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "ecd8c737c799f637d764a08d6e6ca989987b8076ac128af8d3d69a98dba68002"
+    sha256 cellar: :any_skip_relocation, monterey:       "3c21e47dd0b481fd42a8da9acd9abdd838d4ef03ccd9936904cb63ed357cab47"
+    sha256 cellar: :any_skip_relocation, big_sur:        "3c21e47dd0b481fd42a8da9acd9abdd838d4ef03ccd9936904cb63ed357cab47"
+    sha256 cellar: :any_skip_relocation, catalina:       "3c21e47dd0b481fd42a8da9acd9abdd838d4ef03ccd9936904cb63ed357cab47"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d4f4e300c50dd460d534e71edcdf436251a0e9f44457d35cdf02a46d61b446ec"
   end
 
   depends_on "go" => :build

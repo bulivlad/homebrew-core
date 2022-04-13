@@ -1,25 +1,35 @@
 class Sheldon < Formula
   desc "Fast, configurable, shell plugin manager"
-  homepage "https://rossmacarthur.github.io/sheldon"
-  url "https://github.com/rossmacarthur/sheldon/archive/0.6.0.tar.gz"
-  sha256 "5c04abd956634725e23a3a782fe0fb40a9fe1323ed07fcf8ff2a30ce59b83b59"
+  homepage "https://sheldon.cli.rs"
+  url "https://github.com/rossmacarthur/sheldon/archive/0.6.6.tar.gz"
+  sha256 "9d6cdc8fe011c4defe65fbe1507e48a51f8efdeebb5d5b0b39fbde2c73566973"
   license any_of: ["Apache-2.0", "MIT"]
-  head "https://github.com/rossmacarthur/sheldon.git"
+  head "https://github.com/rossmacarthur/sheldon.git", branch: "trunk"
 
   bottle do
-    cellar :any
-    sha256 "1acd1c15437fbe6c58223e5dbd14c14fdb79e5b5cb5ee6f5505ab1fc3fa65432" => :big_sur
-    sha256 "a0968805397cf22b45b76d7fbe74764ad03b4dd4a45b8417b69fbfc01fa95d8a" => :arm64_big_sur
-    sha256 "7bbb0e9ca7d115d7ed4c310248c3937e7117feab47ba13683a80f675d76b4c44" => :catalina
-    sha256 "72906d43188f39876956cea5803662f6eba42c59b285ae48e46853e671f9312f" => :mojave
-    sha256 "ab46bcf3bdea25e2f39aa079044d9bf3ccd691697296e6747f9f63fe09c316b4" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "bea66f2f424e7d4d5ca7bc8a43f4f972e2d7fa0f7e96d6a529ddd9c7ec056941"
+    sha256 cellar: :any,                 arm64_big_sur:  "ea1ace82500b5f2cd0d8a9c7ce613246a054e7523991c90227caf76dfc5c2ad1"
+    sha256 cellar: :any,                 monterey:       "f4c691f11e4898193a2c9a203a3e3ed8bb543f719131f4de89aa43e762666662"
+    sha256 cellar: :any,                 big_sur:        "a8e57a37ac0645beb8672becca7a14e6d7559ba7270e171870454fb7ada91a6c"
+    sha256 cellar: :any,                 catalina:       "726a11a98a2756256c383072fa52f469dbd767e8fbe25eb0283dd1d8e1812c05"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "16e37b1849f9c60215c701bcd6c256955c96b4edb62a866b9d6c678ac105b0ec"
   end
 
   depends_on "rust" => :build
+  depends_on "curl"
   depends_on "openssl@1.1"
+
+  uses_from_macos "zlib"
+
+  on_linux do
+    depends_on "pkg-config" => :build
+  end
 
   def install
     system "cargo", "install", *std_cargo_args
+
+    bash_completion.install "completions/sheldon.bash" => "sheldon"
+    zsh_completion.install "completions/sheldon.zsh" => "_sheldon"
   end
 
   test do

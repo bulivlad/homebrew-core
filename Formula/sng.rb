@@ -6,16 +6,13 @@ class Sng < Formula
   license "Zlib"
   revision 1
 
-  livecheck do
-    url :stable
-  end
-
   bottle do
     rebuild 1
-    sha256 "f0e4ce732890622d796d3ab7d5c2d078f9ad327e5d64bdf9d7625b15d7a38281" => :big_sur
-    sha256 "441c39690c079231af81a27fce72a0f0ea7cf982c9e48e320160ccc7304486a0" => :arm64_big_sur
-    sha256 "070137e810c2ea02cdb3727ef7fc0da31065762ed6fee972a33d8690fc43e051" => :catalina
-    sha256 "de4c08894b82e37ff3fc07fd0ade38ede24bcf241757f0b6392ab2f4a5f87d67" => :mojave
+    sha256 arm64_big_sur: "441c39690c079231af81a27fce72a0f0ea7cf982c9e48e320160ccc7304486a0"
+    sha256 big_sur:       "f0e4ce732890622d796d3ab7d5c2d078f9ad327e5d64bdf9d7625b15d7a38281"
+    sha256 catalina:      "070137e810c2ea02cdb3727ef7fc0da31065762ed6fee972a33d8690fc43e051"
+    sha256 mojave:        "de4c08894b82e37ff3fc07fd0ade38ede24bcf241757f0b6392ab2f4a5f87d67"
+    sha256 x86_64_linux:  "be14ddf01908c6812e41c87ca5210adde91fe356e46704a380259b587b9741a3"
   end
 
   depends_on "libpng"
@@ -29,6 +26,6 @@ class Sng < Formula
   test do
     cp test_fixtures("test.png"), "test.png"
     system bin/"sng", "test.png"
-    assert_include File.read("test.sng"), "width: 8; height: 8; bitdepth: 8;"
+    assert_includes File.read("test.sng"), "width: 8; height: 8; bitdepth: 8;"
   end
 end

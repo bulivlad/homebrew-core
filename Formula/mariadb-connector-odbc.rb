@@ -1,20 +1,25 @@
 class MariadbConnectorOdbc < Formula
   desc "Database driver using the industry standard ODBC API"
-  homepage "https://downloads.mariadb.org/connector-odbc/"
-  url "https://downloads.mariadb.org/f/connector-odbc-3.1.11/mariadb-connector-odbc-3.1.11-ga-src.tar.gz"
-  sha256 "d81a35cd9c9d2e1e732b7bd9ee704eb83775ed74bcc38d6cd5d367a3fc525a34"
+  homepage "https://mariadb.org/download/?tab=connector&prod=connector-odbc"
+  url "https://downloads.mariadb.com/Connectors/odbc/connector-odbc-3.1.15/mariadb-connector-odbc-3.1.15-src.tar.gz"
+  mirror "https://fossies.org/linux/misc/mariadb-connector-odbc-3.1.15-src.tar.gz/"
+  sha256 "cf35944e1bd0d3d6bd883bdda8a65abaea2375e8a8d5803840b6e2ce819a2577"
   license "LGPL-2.1-or-later"
 
+  # https://mariadb.org/download/ sometimes lists an older version as newest,
+  # so we check the JSON data used to populate the mariadb.com downloads page
+  # (which lists GA releases).
   livecheck do
-    url :homepage
-    regex(/Download (\d+(?:\.\d+)+) Stable Now!/i)
+    url "https://mariadb.com/downloads_data.json"
+    regex(/href=.*?mariadb-connector-odbc[._-]v?(\d+(?:\.\d+)+)-src\.t/i)
   end
 
   bottle do
-    sha256 "8ecf2575cfb6897176626d13821da084b97a86fff29103f21a6122fb508234c6" => :big_sur
-    sha256 "14eab02c927c39019801250936766b9f913ccee3ce1ebc0a10d87753ec46e5c3" => :arm64_big_sur
-    sha256 "9e026906501acc48c754a22cd3415f968121d378d9b23ae02d09a92e771634b9" => :catalina
-    sha256 "7291bc304b018ed6f5b9edbc5dcc35de99135be517eb559217148ae3f9d333c2" => :mojave
+    sha256 cellar: :any, arm64_monterey: "b42f1ff1129c849ac5cbba73424266fc19f3a3f6e17e08553e5e42a5acdb4325"
+    sha256 cellar: :any, arm64_big_sur:  "bfaba599e5ffe9b9012514a7da54d632d757f2bcec7f2deaefce2a8dee7231e8"
+    sha256 cellar: :any, monterey:       "417e39a2ed3e66fdee7263addcdc610d8c3cf440ffae2b03f2301a62fa8dff97"
+    sha256 cellar: :any, big_sur:        "0adf308c6438698c03832df3b4972e1007b39a76b29edf835e7f8fdd59065cb6"
+    sha256 cellar: :any, catalina:       "ba65e8cb114ebcd3ffa3680a24198e8c0e03a87d8f209cfae67505eb1aa6d6ac"
   end
 
   depends_on "cmake" => :build

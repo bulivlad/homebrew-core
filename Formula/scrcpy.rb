@@ -1,27 +1,35 @@
 class Scrcpy < Formula
   desc "Display and control your Android device"
   homepage "https://github.com/Genymobile/scrcpy"
-  url "https://github.com/Genymobile/scrcpy/archive/v1.17.tar.gz"
-  sha256 "c16f1fe1789290d0c7dd3a2778f33d6dc6347ffe3e78e64127b85eda52420d7f"
+  url "https://github.com/Genymobile/scrcpy/archive/v1.23.tar.gz"
+  sha256 "47686af76e2314404deda0eea58761ca1378a6a1567408b4560683461c7ea18b"
   license "Apache-2.0"
-  revision 1
 
   bottle do
-    sha256 "bc5af06f2c3de38ac6a5f6bd46ff0f8a048fcf610f1909065ed670112021f53e" => :big_sur
-    sha256 "c66169f203ac1714e6f632989c1b15c95907a67f943efd38303945a4d24f136f" => :arm64_big_sur
-    sha256 "55b97c706cc08908698b79d9d46bc091bcd746111ed834fbaa32a43f85833bfc" => :catalina
-    sha256 "f954665b6b5d479a4f6329e66cd3f8256fbb5ba165ac418f5a9bb2820e57c547" => :mojave
+    sha256 arm64_monterey: "a57fe498d64e7ad4a5130cfc31b7553f3be1ff97b9129847feaec4ac2fd7fa7f"
+    sha256 arm64_big_sur:  "7cdbdf9f8925d40982367d4b61ce4bf2284bbcfc8531f1c5c1a7b36e8310a1b2"
+    sha256 monterey:       "0edc7bae4a82088c6cea0b03ce77d4689e19bd76f2d75d70df0880ffc173e752"
+    sha256 big_sur:        "2161c94f66ee47ea365b714ec02c676338062f1cecd905d22c43c39ae5f15149"
+    sha256 catalina:       "10f5b925f7d485474d2dc9155f000ccd7ddb13aee4e8f4e0cb495bda7341ef23"
+    sha256 x86_64_linux:   "0139a07a7c645bc4984fb4c1c2e211f97ce198a71077138bc74c1dbffea322f6"
   end
 
   depends_on "meson" => :build
   depends_on "ninja" => :build
   depends_on "pkg-config" => :build
   depends_on "ffmpeg"
+  depends_on "libusb"
   depends_on "sdl2"
 
+  on_linux do
+    depends_on "gcc" => :build
+  end
+
+  fails_with gcc: "5"
+
   resource "prebuilt-server" do
-    url "https://github.com/Genymobile/scrcpy/releases/download/v1.17/scrcpy-server-v1.17"
-    sha256 "11b5ad2d1bc9b9730fb7254a78efd71a8ff46b1938ff468e47a21b653a1b6725"
+    url "https://github.com/Genymobile/scrcpy/releases/download/v1.23/scrcpy-server-v1.23"
+    sha256 "2a913fd47478c0b306fca507cb0beb625e49a19ff9fc7ab904e36ef5b9fe7e68"
   end
 
   def install
@@ -50,18 +58,25 @@ class Scrcpy < Formula
   test do
     fakeadb = (testpath/"fakeadb.sh")
 
-    # When running, scrcpy calls adb three times:
-    #  - adb push ... (to push scrcpy-server.jar)
-    #  - adb reverse ... tcp:PORT ...
-    #  - adb shell ...
-    # However, exiting on $1 = shell didn't work properly, so instead
-    # fakeadb exits on $1 = reverse
+    # When running, scrcpy calls adb five times:
+    #  - adb start-server
+    #  - adb devices -l
+    #  - adb -s SERIAL push ... (to push scrcpy-server.jar)
+    #  - adb -s SERIAL reverse ... tcp:PORT ...
+    #  - adb -s SERIAL shell ...
+    # However, exiting on $3 = shell didn't work properly, so instead
+    # fakeadb exits on $3 = reverse
 
     fakeadb.write <<~EOS
       #!/bin/sh
-      echo $@ >> #{testpath/"fakeadb.log"}
+      echo "$@" >> #{testpath/"fakeadb.log"}
 
-      if [ "$1" = "reverse" ]; then
+      if [ "$1" = "devices" ]; then
+        echo "List of devices attached"
+        echo "emulator-1337          device product:sdk_gphone64_x86_64 model:sdk_gphone64_x86_64 device:emulator64_x86_64_arm64 transport_id:1"
+      fi
+
+      if [ "$3" = "reverse" ]; then
         exit 42
       fi
     EOS
@@ -71,7 +86,7 @@ class Scrcpy < Formula
 
     # It's expected to fail after adb reverse step because fakeadb exits
     # with code 42
-    out = shell_output("#{bin}/scrcpy -p 1337 2>&1", 1)
+    out = shell_output("#{bin}/scrcpy --no-display --record=file.mp4 -p 1337 2>&1", 1)
     assert_match(/ 42/, out)
 
     log_content = File.read(testpath/"fakeadb.log")

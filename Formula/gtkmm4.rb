@@ -1,8 +1,8 @@
 class Gtkmm4 < Formula
   desc "C++ interfaces for GTK+ and GNOME"
   homepage "https://www.gtkmm.org/"
-  url "https://download.gnome.org/sources/gtkmm/4.0/gtkmm-4.0.0.tar.xz"
-  sha256 "3105adb76b738e4af5c0be7b1915f8e39de15474fcfdced9f5a59a2d9b52f83e"
+  url "https://download.gnome.org/sources/gtkmm/4.6/gtkmm-4.6.1.tar.xz"
+  sha256 "0d5efeca9ec64fdd530bb8226c6310ac99549b3dd9604d6e367639791af3d1e0"
   license "LGPL-2.1-or-later"
 
   livecheck do
@@ -11,12 +11,12 @@ class Gtkmm4 < Formula
   end
 
   bottle do
-    cellar :any
-    rebuild 1
-    sha256 "a6cb635d097c0a9efc7715a2d6d73af7513b3ae03f88afb69377042902a31b09" => :big_sur
-    sha256 "5393bb27125814b587b43c3bf448c4df9bf4423445135927fe050969297665fb" => :arm64_big_sur
-    sha256 "eb185bc75e8189fbb6e5c3a6008931436d03bcb1cfe77f0b95088b4468dd3ba6" => :catalina
-    sha256 "1df902710183ad22fe01dc9f665f8730704e4aeffd2d5e694c84a56d56d0faa9" => :mojave
+    sha256 cellar: :any, arm64_monterey: "d0a29a1b6856c7e1b43254ab5648d8cee10fc118e893b774e91bbf1e64c7fc62"
+    sha256 cellar: :any, arm64_big_sur:  "63206963d3f5e963e1ea9478a52615bae880ce196f8ca47c30bde6e821adb0ee"
+    sha256 cellar: :any, monterey:       "ce1bdb42ba696680e8950eb8bbc7b2fe3f4adc16cbf69f54ce543729234b2ca3"
+    sha256 cellar: :any, big_sur:        "8fe3a6122f0e7669953da0bf617095cf062ede423ce9eec112b5bfe5e59ca6c4"
+    sha256 cellar: :any, catalina:       "fbb4f9ecf8b3b16d7c56cf7a9e056b80884e3db21389f27710fc4ffb5898845c"
+    sha256               x86_64_linux:   "7ad7516dfea72e57da04c003e66294bea0b262dbe7ee695fb506aa9ffb4d83c7"
   end
 
   depends_on "meson" => :build
@@ -25,6 +25,12 @@ class Gtkmm4 < Formula
   depends_on "cairomm"
   depends_on "gtk4"
   depends_on "pangomm"
+
+  on_linux do
+    depends_on "gcc"
+  end
+
+  fails_with gcc: "5"
 
   def install
     ENV.cxx11

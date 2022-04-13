@@ -1,8 +1,8 @@
 class Flank < Formula
   desc "Massively parallel Android and iOS test runner for Firebase Test Lab"
   homepage "https://github.com/Flank/flank"
-  url "https://github.com/Flank/flank/releases/download/v21.01.1/flank.jar"
-  sha256 "69fd42d9140271330a356db8e82ec77577565c60edc444f9febebacb839e0209"
+  url "https://github.com/Flank/flank/releases/download/v22.04.0/flank.jar"
+  sha256 "d800eec42b13887c1c97bb1d01700f9a15cddc1a143aa425cff100db947c82f7"
   license "Apache-2.0"
 
   livecheck do
@@ -10,7 +10,9 @@ class Flank < Formula
     strategy :github_latest
   end
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any_skip_relocation, all: "3cae087dd0a64467c9c190d4a738e8896e5a2bea2755e2e5bcef8f4eda580e7f"
+  end
 
   depends_on "openjdk"
 
@@ -30,7 +32,6 @@ class Flank < Formula
     EOS
 
     output = shell_output("#{bin}/flank android doctor")
-    assert_match "version: v#{version}", output
     assert_match "Valid yml file", output
   end
 end

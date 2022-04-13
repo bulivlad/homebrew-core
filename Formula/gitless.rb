@@ -6,18 +6,19 @@ class Gitless < Formula
   url "https://files.pythonhosted.org/packages/9c/2e/457ae38c636c5947d603c84fea1cf51b7fcd0c8a5e4a9f2899b5b71534a0/gitless-0.8.8.tar.gz"
   sha256 "590d9636d2ca743fdd972d9bf1f55027c1d7bc2ab1d5e877868807c3359b78ef"
   license "MIT"
-  revision 7
+  revision 12
 
   bottle do
-    cellar :any
-    sha256 "4c845e5cc5e9fafccda5ab5b2dfeb1e9cbbbe8f67ab9c2f72060c09a8d7743e4" => :big_sur
-    sha256 "8fe3da387f2212fe2618a07b2e1682e3bae08be20f105734e21079f0f3df7d79" => :arm64_big_sur
-    sha256 "1f52f84f5a9f9c9633e7fc9ef7ef8227431abd37ca6629f33986766b61470cc0" => :catalina
-    sha256 "50884b829598dab4558bc9f338b96b6ac18302c426ad6cfd440d2d721b1cb30a" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "930d981b076e6f37f54021fba191dccaf3ead841fa08ca93b993420952cb55bd"
+    sha256 cellar: :any,                 arm64_big_sur:  "b797e5d6fc3f8e345558a294fd13fd31caa06f171937ecf226587bca565a94fb"
+    sha256 cellar: :any,                 monterey:       "338fc691dcb1771aca97b818e594579a5b96804d27217c6537411854c7255bd9"
+    sha256 cellar: :any,                 big_sur:        "542d73db7431dfb2314ba8e39e4bf06696e3d237a5a52672e62d6fc998c1e3f6"
+    sha256 cellar: :any,                 catalina:       "030a960a118be8c8fe0f269746b0b262f8ccb02c4bbef85022f4b553f72019d3"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ee102de0d62502b39dc37be4dcbab8856b47d340bdf282823d72d9badf9d6220"
   end
 
   depends_on "libgit2"
-  depends_on "python@3.9"
+  depends_on "python@3.10"
 
   uses_from_macos "libffi"
 
@@ -51,8 +52,8 @@ class Gitless < Formula
   end
 
   resource "pygit2" do
-    url "https://files.pythonhosted.org/packages/3a/42/f69de8c7a1e33f365a91fa39093f4e7a64609c2bd127203536edc813cbf7/pygit2-1.4.0.tar.gz"
-    sha256 "cbeb38ab1df9b5d8896548a11e63aae8a064763ab5f1eabe4475e6b8a78ee1c8"
+    url "https://files.pythonhosted.org/packages/7e/8c/c162e50ad20c36b457aa97a9d96536fde316d90052fb03fc4ae22a7fe9ea/pygit2-1.9.0.tar.gz"
+    sha256 "c5e8588acad5e32fa0595582571059e6b90ec7c487c58b4e53c2800dcbde44c8"
   end
 
   resource "sh" do
@@ -65,7 +66,7 @@ class Gitless < Formula
     sha256 "70e8a77beed4562e7f14fe23a786b54f6296e34344c23bc42f07b15018ff98e9"
   end
 
-  # Allow to be dependent on pygit2 1.4.0
+  # Allow to be dependent on pygit2 1.9.0
   # Remove for next version
   patch :DATA
 
@@ -93,7 +94,7 @@ index 05f190a..5eb025f 100644
  # make sure to update setup.py
 
 -pygit2==0.28.2  # requires libgit2 0.28
-+pygit2==1.4.0  # requires libgit2 0.28
++pygit2==1.9.0  # requires libgit2 1.4
  clint==0.5.1
  sh==1.12.14;sys_platform!='win32'
  pbs==0.110;sys_platform=='win32'
@@ -106,7 +107,7 @@ index 68a3a87..d1704a8 100755
      install_requires=[
        # make sure it matches requirements.txt
 -      'pygit2==0.28.2', # requires libgit2 0.28
-+      'pygit2==1.4.0', # requires libgit2 0.28
++      'pygit2==1.9.0', # requires libgit2 1.4
        'clint>=0.3.6',
        'sh>=1.11' if sys.platform != 'win32' else 'pbs>=0.11'
      ],

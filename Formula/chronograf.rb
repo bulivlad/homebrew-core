@@ -3,22 +3,23 @@ require "language/node"
 class Chronograf < Formula
   desc "Open source monitoring and visualization UI for the TICK stack"
   homepage "https://docs.influxdata.com/chronograf/latest/"
-  url "https://github.com/influxdata/chronograf/archive/1.8.9.1.tar.gz"
-  sha256 "edf5038b301bc0cf49b2f74f1fcdc0a2d66fe5e4b69f753fd879972b7e04a7ee"
+  url "https://github.com/influxdata/chronograf/archive/1.9.4.tar.gz"
+  sha256 "ff294f25a9de57140024b9953992c1a4d79ec88167ad28435645d888a0096c27"
   license "AGPL-3.0-or-later"
-  head "https://github.com/influxdata/chronograf.git"
+  head "https://github.com/influxdata/chronograf.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "9c3ca12cf1f5694468d1b38f5306467e5720feab4e6d99f3c9fd4f26a623bea3" => :big_sur
-    sha256 "8688a32e5306ca3f821e58d5c751a2ba3d79ea17d0b5c69a5548989097b9024b" => :arm64_big_sur
-    sha256 "0dc8c14ac9fe9d682d7459a69f4208e36471e2f7f791b3719c872294b068ad4e" => :catalina
-    sha256 "23e175b2e6c9d10af4e8a67e2bb53eee074facf82299336a9d5869731d161e44" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "3ac8da143b92111d61c6911950351cea601a47a31966f68b374c208e3bf64314"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "49f3702369d67cb88f10c0f8929eeec8395e08aecf72c5b34fd3b6a3a7895e5e"
+    sha256 cellar: :any_skip_relocation, monterey:       "f7458350c65b537d1fbac3216f0b10c02b8fc79ca584907c375a8346ad78b955"
+    sha256 cellar: :any_skip_relocation, big_sur:        "ce89af5bfe0791d75fbdd44d9bf89f69a812848426c3163fa64e7dee331b6257"
+    sha256 cellar: :any_skip_relocation, catalina:       "b2f8e625b097c6e78f52d70ab34f1c9c3c30cbaa5ad2e714d58378a13aa1d438"
   end
 
   depends_on "go" => :build
   depends_on "go-bindata" => :build
-  depends_on "node" => :build
+  # Switch to `node` when chronograf updates dependency node-sass>=6.0.0
+  depends_on "node@14" => :build
   depends_on "yarn" => :build
   depends_on "influxdb"
   depends_on "kapacitor"
@@ -26,45 +27,18 @@ class Chronograf < Formula
   def install
     Language::Node.setup_npm_environment
 
-    cd "ui" do # fix compatibility with the latest node
-      system "yarn", "upgrade", "parcel@1.11.0"
-    end
     system "make", "dep"
     system "make", ".jssrc"
     system "make", "chronograf"
     bin.install "chronograf"
   end
 
-  plist_options manual: "chronograf"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>KeepAlive</key>
-          <dict>
-            <key>SuccessfulExit</key>
-            <false/>
-          </dict>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>ProgramArguments</key>
-          <array>
-            <string>#{opt_bin}/chronograf</string>
-          </array>
-          <key>RunAtLoad</key>
-          <true/>
-          <key>WorkingDirectory</key>
-          <string>#{var}</string>
-          <key>StandardErrorPath</key>
-          <string>#{var}/log/chronograf.log</string>
-          <key>StandardOutPath</key>
-          <string>#{var}/log/chronograf.log</string>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run opt_bin/"chronograf"
+    keep_alive true
+    error_log_path var/"log/chronograf.log"
+    log_path var/"log/chronograf.log"
+    working_dir var
   end
 
   test do

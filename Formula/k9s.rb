@@ -2,27 +2,38 @@ class K9s < Formula
   desc "Kubernetes CLI To Manage Your Clusters In Style!"
   homepage "https://k9scli.io/"
   url "https://github.com/derailed/k9s.git",
-      tag:      "v0.24.2",
-      revision: "f929114ae4679c89ca06b2833d8a0fca5f1ec69d"
+      tag:      "v0.25.18",
+      revision: "6085039f83cd5e8528c898cc1538f5b3287ce117"
   license "Apache-2.0"
-  head "https://github.com/derailed/k9s.git"
+  head "https://github.com/derailed/k9s.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    rebuild 1
-    sha256 "f1abfe7adcb179fae34191080e448524b45f94ee23d602bcc3c045e119731451" => :big_sur
-    sha256 "4b97e560c2791134ed747798643bc013b6714b4d8470cee0b353c9460c305918" => :arm64_big_sur
-    sha256 "de85ed24992be74b62bb7ba5c1585d8cf486b1c89f517f2934e207bfcd2a6f56" => :catalina
-    sha256 "bd05c90c7a7cd58cf29419c0562b2e08213fe528b9e6af99e8ab40201f1a2cc4" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "fabed8c642a6242e1e169b774f450c3a1206efdbd4b8dba6927ff73db8c65135"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "4073ea13ff799d8ee9beaf78f32050895b4f67eee630ca2c1e91188e8e373f9f"
+    sha256 cellar: :any_skip_relocation, monterey:       "c869f9a76bb60f92bb3cdd11dabfa239381def0bd117b5395c7a9c70bcca9e5e"
+    sha256 cellar: :any_skip_relocation, big_sur:        "f341e0a3c66071e280207a46716a2b354f784a253539960d4335118ba4328537"
+    sha256 cellar: :any_skip_relocation, catalina:       "424a41b797240daee6ba710c63c52d062b47a9b987a566bb5e63e17b6a6a7cbd"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "300598cf8c533553ecef66565215384980b9cf8187e66cca4ca8cecdca4f8fb4"
   end
 
   depends_on "go" => :build
 
   def install
-    system "go", "build", "-ldflags",
-             "-s -w -X github.com/derailed/k9s/cmd.version=#{version}
-             -X github.com/derailed/k9s/cmd.commit=#{Utils.git_head}",
-             *std_go_args
+    ldflags = %W[
+      -s -w
+      -X github.com/derailed/k9s/cmd.version=#{version}
+      -X github.com/derailed/k9s/cmd.commit=#{Utils.git_head}
+    ]
+    system "go", "build", *std_go_args(ldflags: ldflags)
+
+    bash_output = Utils.safe_popen_read(bin/"k9s", "completion", "bash")
+    (bash_completion/"k9s").write bash_output
+
+    zsh_output = Utils.safe_popen_read(bin/"k9s", "completion", "zsh")
+    (zsh_completion/"_k9s").write zsh_output
+
+    fish_output = Utils.safe_popen_read(bin/"k9s", "completion", "fish")
+    (fish_completion/"k9s.fish").write fish_output
   end
 
   test do

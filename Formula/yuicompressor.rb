@@ -11,7 +11,10 @@ class Yuicompressor < Formula
     strategy :github_latest
   end
 
-  bottle :unneeded
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "94b45d04e09ea0fda70a1913d9af1c1770ff333c1602e67f1d2c2b9fa4f1fecd"
+  end
 
   depends_on "openjdk"
 

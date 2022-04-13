@@ -2,21 +2,29 @@ class ThorsSerializer < Formula
   desc "Declarative serialization library (JSON/YAML) for C++"
   homepage "https://github.com/Loki-Astari/ThorsSerializer"
   url "https://github.com/Loki-Astari/ThorsSerializer.git",
-      tag:      "2.0.15",
-      revision: "a3105857c3c12365a61c79d96e3a938b1942c385"
+      tag:      "2.2.10",
+      revision: "9a508808d5b2a43a0f52a50aadb7645915202309"
   license "MIT"
 
   bottle do
-    cellar :any
-    sha256 "c9e5ad98aa1ec0ce8b0003e865ab33f8d53583548bb4eeb8500e2c1a98e08f99" => :big_sur
-    sha256 "832d5ce674557e3c007d8224c3c16f89ee4d8d6cd4e39848ecc28bd94b9297b7" => :arm64_big_sur
-    sha256 "b03bf969cade0d22b86d88ad9c7414ee49c585bed65b3aed18dc28c24bd5ddf4" => :catalina
-    sha256 "eddf2665dbf5da0f54b4ad942a4b78214afa0242f22106b91a55e6868bb5a2a5" => :mojave
-    sha256 "8649be65f46b9cbde2fadc93962d4ad4a4e06478ead0469505ba6c5fa4ea36c4" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "21992172551a86998c68a66c1cba7804b36bb7c9fa4172e26a27475d67f43bfe"
+    sha256 cellar: :any,                 arm64_big_sur:  "4651acf8a32970d42ea85a0e7db8649dba6221486f59d52bcf57ea089c0b5fb1"
+    sha256 cellar: :any,                 monterey:       "08e5784cde54f98fd26f16e831a20261373fb73aaa5ccfbcf74d3d33445a4e0a"
+    sha256 cellar: :any,                 big_sur:        "2b97e4a4d91ab8b977b18c176b1e440f238825e1e43a5a7cdebc6a56178b1f08"
+    sha256 cellar: :any,                 catalina:       "9c8f540a49fc00748a477344344adbe2dbf2fd867b599ffc8e9e1f0aa0dbd391"
+    sha256 cellar: :any,                 mojave:         "72728f0f7647bb87b6cfc5cb5123d18b090660c03c58dbeff12418629bf396b4"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "501f35e0df7b8d5131a06b59a2e03f366b7f6621f7c5309a0c0503a0c53bdb54"
   end
 
   depends_on "boost" => :build
+  depends_on "bzip2"
   depends_on "libyaml"
+
+  on_linux do
+    depends_on "gcc"
+  end
+
+  fails_with gcc: "5"
 
   def install
     ENV["COV"] = "gcov"
@@ -62,7 +70,7 @@ class ThorsSerializer < Formula
     EOS
     system ENV.cxx, "-std=c++17", "test.cpp", "-o", "test",
            "-I#{Formula["boost"].opt_include}",
-           "-I#{include}", "-L#{lib}", "-lThorSerialize17"
+           "-I#{include}", "-L#{lib}", "-lThorSerialize17", "-lThorsLogging17", "-ldl"
     system "./test"
   end
 end

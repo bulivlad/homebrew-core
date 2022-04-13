@@ -1,8 +1,8 @@
 class CvsFastExport < Formula
   desc "Export an RCS or CVS history as a fast-import stream"
   homepage "http://www.catb.org/~esr/cvs-fast-export/"
-  url "http://www.catb.org/~esr/cvs-fast-export/cvs-fast-export-1.55.tar.gz"
-  sha256 "af58e16667c6e02e8431ff666effe306d3b30086fab483170257890da1afc21b"
+  url "http://www.catb.org/~esr/cvs-fast-export/cvs-fast-export-1.59.tar.gz"
+  sha256 "2439cd83f54c98f248e85d3ba3becbe028580e89652c50756022fbe564a9e8da"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -11,11 +11,13 @@ class CvsFastExport < Formula
   end
 
   bottle do
-    cellar :any_skip_relocation
-    rebuild 1
-    sha256 "7ee763f03cb997d6717bad92d53983324e4bb89be855aedb37af0ef38cec8180" => :big_sur
-    sha256 "e6faed55a91a59f97af42d5bb102d3438aab4509e5c7fd4e5d28f238012de2f5" => :catalina
-    sha256 "b2b8f37662e652697231b8efb9fe6cb4927513f849d4853b54fbe90220d55d77" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "e5e761e7cd008d32d3635bbd954ce0319a125a278e89df39ba0283b163c2310e"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "8f67f51244e6191a06fad37c03c8f0c19586c2f31a2b3142e547aa1520808ceb"
+    sha256 cellar: :any_skip_relocation, monterey:       "12792207ac5289b70caab3f356d05ac3885286d152a26746ff99474130203228"
+    sha256 cellar: :any_skip_relocation, big_sur:        "677fd2515d4ba02e87130f58ac3414ce4f2cb55c91ca024365cbfc2d552a421c"
+    sha256 cellar: :any_skip_relocation, catalina:       "247aed80d2a7ae72a264aebaa9e52901bb23be829645826a026f236ace7fc2e0"
+    sha256 cellar: :any_skip_relocation, mojave:         "baf10f703b56df5adb4e41f60ac5a5c90734b446c0003f49494e983e49229739"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "90ea42813a02d6faaf251b749efa907c5ac0a6c3ebfd5fafafa0d49e584ae3ca"
   end
 
   head do
@@ -26,6 +28,9 @@ class CvsFastExport < Formula
   depends_on "asciidoc" => :build
   depends_on "docbook-xsl" => :build
   depends_on "cvs" => :test
+
+  uses_from_macos "libxml2"
+  uses_from_macos "libxslt"
 
   def install
     ENV["XML_CATALOG_FILES"] = "#{etc}/xml/catalog"

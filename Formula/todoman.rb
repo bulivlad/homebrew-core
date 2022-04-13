@@ -3,24 +3,23 @@ class Todoman < Formula
 
   desc "Simple CalDAV-based todo manager"
   homepage "https://todoman.readthedocs.io/"
-  url "https://files.pythonhosted.org/packages/05/7f/6387b4c886c88e983931dfdef884177495cbafaebe7d239c01406d8b5f6a/todoman-3.9.0.tar.gz"
-  sha256 "e7e5cab13ecce0562b1f13f46ab8cbc079caed4b462f2371929f8a4abff2bcbe"
+  url "https://files.pythonhosted.org/packages/2d/b0/ffe9e812fa710579d07369763262e418cadb2a99fc5d0ec0d685c7f33a69/todoman-4.1.0.tar.gz"
+  sha256 "ce3caa481d923e91da9b492b46509810a754e2d3ef857f5d20bc5a8e362b50c8"
   license "ISC"
-  head "https://github.com/pimutils/todoman.git"
-
-  livecheck do
-    url :stable
-  end
+  head "https://github.com/pimutils/todoman.git", branch: "main"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "67b32a6c50b1ebd68727c4cf02086fab7206300c82abd76e364b0f66d664267f" => :big_sur
-    sha256 "8c560182a558c8374186d2e8b9944209308362b17d5a0c358adc21fc3e6885e4" => :arm64_big_sur
-    sha256 "607fe3be782f120d990422e478cb380530d60de3890f54cb3a700d40c4ee6a54" => :catalina
-    sha256 "33524bd7330f99979230051bf8a8f6d4e173ab4dac6dc9dece6667582e1b28da" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "fbc49789ca82123ddb165380dc10fa598335b9c892b05012174f091185886e06"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "2ad8941910dd324c0c9a1eff79fec0313fef5a53bf547c632c24de57e396c5fb"
+    sha256 cellar: :any_skip_relocation, monterey:       "4da34ad0ce35739040ebac5ba8da6eba936a9fb67487ab6db6cf1b6db332b56e"
+    sha256 cellar: :any_skip_relocation, big_sur:        "72cac8ed69f61678a2e8b665b550e27694325811ab5ace67b60772a9c4d5831f"
+    sha256 cellar: :any_skip_relocation, catalina:       "6f5089d7b1405734c1a88c1caf07f1c995606cb8c41f61a80b04ea06d2d1756a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8487a64b4a5ba1f7fa89426140d104e9c41e53de6a4008920bd2887867050194"
   end
 
+  depends_on "python-tabulate"
   depends_on "python@3.9"
+  depends_on "six"
 
   conflicts_with "devtodo", because: "both install a `todo` binary"
 
@@ -30,8 +29,8 @@ class Todoman < Formula
   end
 
   resource "click" do
-    url "https://files.pythonhosted.org/packages/27/6f/be940c8b1f1d69daceeb0032fee6c34d7bd70e3e649ccac0951500b4720e/click-7.1.2.tar.gz"
-    sha256 "d2b5255c7c6349bc1bd1e59e08cd12acbbd63ce649f2588755783aa94dfb6b1a"
+    url "https://files.pythonhosted.org/packages/f4/09/ad003f1e3428017d1c3da4ccc9547591703ffea548626f47ec74509c5824/click-8.0.3.tar.gz"
+    sha256 "410e932b050f5eed773c4cda94de75971c89cdb3155a72a0831139a79e5ecb5b"
   end
 
   resource "click-log" do
@@ -39,19 +38,14 @@ class Todoman < Formula
     sha256 "16fd1ca3fc6b16c98cea63acf1ab474ea8e676849dc669d86afafb0ed7003124"
   end
 
-  resource "configobj" do
-    url "https://files.pythonhosted.org/packages/64/61/079eb60459c44929e684fa7d9e2fdca403f67d64dd9dbac27296be2e0fab/configobj-5.0.6.tar.gz"
-    sha256 "a2f5650770e1c87fb335af19a9b7eb73fc05ccf22144eb68db7d00cd2bcb0902"
-  end
-
   resource "humanize" do
-    url "https://files.pythonhosted.org/packages/61/b2/1d04b65aa3b47aacff465b5c8937c8620fce710ad73ac3b15facb1ede188/humanize-3.1.0.tar.gz"
-    sha256 "fd3eb915310335c63a54d4507289ecc7b3a7454cd2c22ac5086d061a3cbfd592"
+    url "https://files.pythonhosted.org/packages/8a/b6/e7d99d1cc225a069f3f7a906a213cb1a0148dac27119290c41dc257ffe53/humanize-3.13.1.tar.gz"
+    sha256 "12f113f2e369dac7f35d3823f49262934f4a22a53a6d3d4c86b736f50db88c7b"
   end
 
   resource "icalendar" do
-    url "https://files.pythonhosted.org/packages/58/b8/9aa7963f442b2a8bfdfc40eab8bc399c5eaac5711b8919c52122e4903544/icalendar-4.0.7.tar.gz"
-    sha256 "0fc18d87f66e0b5da84fa731389496cfe18e4c21304e8f6713556b2e8724a7a4"
+    url "https://files.pythonhosted.org/packages/1e/4b/b9e53b2fc4f7942c5698842005ad9e55dd4d932434f5bd1cf8acf3d06b01/icalendar-4.0.9.tar.gz"
+    sha256 "cc73fa9c848744843046228cb66ea86cd8c18d73a51b140f7c003f760b84a997"
   end
 
   resource "parsedatetime" do
@@ -60,28 +54,18 @@ class Todoman < Formula
   end
 
   resource "python-dateutil" do
-    url "https://files.pythonhosted.org/packages/be/ed/5bbc91f03fa4c839c4c7360375da77f9659af5f7086b7a7bdda65771c8e0/python-dateutil-2.8.1.tar.gz"
-    sha256 "73ebfe9dbf22e832286dafa60473e4cd239f8592f699aa5adaf10050e6e1823c"
+    url "https://files.pythonhosted.org/packages/4c/c4/13b4776ea2d76c115c1d1b84579f3764ee6d57204f6be27119f13a61d0a9/python-dateutil-2.8.2.tar.gz"
+    sha256 "0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86"
   end
 
   resource "pytz" do
-    url "https://files.pythonhosted.org/packages/09/07/448a8887c7195450604dfc0305d80d74324c36ee18ed997664051d4bffe3/pytz-2020.4.tar.gz"
-    sha256 "3e6b7dd2d1e0a59084bcee14a17af60c5c562cdc16d828e8eba2e683d3a7e268"
+    url "https://files.pythonhosted.org/packages/e3/8e/1cde9d002f48a940b9d9d38820aaf444b229450c0854bdf15305ce4a3d1a/pytz-2021.3.tar.gz"
+    sha256 "acad2d8b20a1af07d4e4c9d2e9285c5ed9104354062f275f3fcd88dcef4f1326"
   end
 
   resource "pyxdg" do
     url "https://files.pythonhosted.org/packages/6f/2e/2251b5ae2f003d865beef79c8fcd517e907ed6a69f58c32403cec3eba9b2/pyxdg-0.27.tar.gz"
     sha256 "80bd93aae5ed82435f20462ea0208fb198d8eec262e831ee06ce9ddb6b91c5a5"
-  end
-
-  resource "six" do
-    url "https://files.pythonhosted.org/packages/6b/34/415834bfdafca3c5f451532e8a8d9ba89a21c9743a0c59fbd0205c7f9426/six-1.15.0.tar.gz"
-    sha256 "30639c035cdb23534cd4aa2dd52c3bf48f06e5f4a941509c8bafd8ce11080259"
-  end
-
-  resource "tabulate" do
-    url "https://files.pythonhosted.org/packages/57/6f/213d075ad03c84991d44e63b6516dd7d185091df5e1d02a660874f8f7e1e/tabulate-0.8.7.tar.gz"
-    sha256 "db2723a20d04bcda8522165c73eea7c300eda74e0ce852d9022e0159d7895007"
   end
 
   resource "urwid" do
@@ -95,11 +79,10 @@ class Todoman < Formula
 
   test do
     ENV["LC_ALL"] = "en_US.UTF-8"
-    (testpath/".config/todoman/todoman.conf").write <<~EOS
-      [main]
-      path = #{testpath}/.calendar/*
-      date_format = %Y-%m-%d
-      default_list = Personal
+    (testpath/".config/todoman/config.py").write <<~EOS
+      path = "#{testpath}/.calendar/*"
+      date_format = "%Y-%m-%d"
+      default_list = "Personal"
     EOS
     (testpath/".calendar/Personal").mkpath
     system "#{bin}/todo", "new", "newtodo"

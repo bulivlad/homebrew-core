@@ -1,19 +1,21 @@
 class Lldpd < Formula
   desc "Implementation of IEEE 802.1ab (LLDP)"
-  homepage "https://vincentbernat.github.io/lldpd/"
-  url "https://media.luffy.cx/files/lldpd/lldpd-1.0.8.tar.gz"
-  sha256 "98d200e76e30f6262c4a4493148c1840827898329146a57a34f8f0f928ca3def"
+  homepage "https://lldpd.github.io/"
+  url "https://media.luffy.cx/files/lldpd/lldpd-1.0.13.tar.gz"
+  sha256 "d639827fd8a27720d1bfd94bc52eca24af63ddcc3c9d2da60788778889d84701"
   license "ISC"
 
   livecheck do
-    url "https://github.com/vincentbernat/lldpd.git"
+    url "https://github.com/lldpd/lldpd.git"
   end
 
   bottle do
-    sha256 "9c55269d6b7bac30bd47b0733056f87c4aa7e38a44b55b806aae7ef3cc270ffc" => :big_sur
-    sha256 "015c4c0324661d90e06436a348dfc37af918e7bbea32ee63e2db58469a5a230e" => :arm64_big_sur
-    sha256 "9c82d5c9c454ce3cd453b379e31bd79922ebe5e0b7377c6e845cb039ca3fddf1" => :catalina
-    sha256 "2f35d49b7ca199a2980f08816bc055cfec43f29b0c2c55a05cb55dcc72b9ccea" => :mojave
+    sha256 arm64_monterey: "95fd094817acf4cf94f42e5e80c30d3dd397a6e7529ea4ac286c6434ec7e16be"
+    sha256 arm64_big_sur:  "d9d390a4404acff3d2d13a9dbdbd412833534f33447f6e0ec0283917abc6b261"
+    sha256 monterey:       "3817d0b551c350cec5db423aaa6cf05901ea5dd9a417d71692c9bc25c183c337"
+    sha256 big_sur:        "4c2dba23fc7245e3b5988feedfe59032f7eed33dc248cbfdc70d0bb300afd035"
+    sha256 catalina:       "20caa1840ab87f99001b351c9d7aea2bb876880970c437eca9850c7a6e9bcf5d"
+    sha256 x86_64_linux:   "380bb78d5ab7308637e07d68ea60018f75af59c172f5fdf8b21e6f0f82c958fa"
   end
 
   depends_on "pkg-config" => :build
@@ -49,23 +51,8 @@ class Lldpd < Formula
   end
 
   plist_options startup: true
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-      <dict>
-        <key>Label</key>
-        <string>#{plist_name}</string>
-        <key>ProgramArguments</key>
-        <array>
-          <string>#{opt_sbin}/lldpd</string>
-        </array>
-        <key>RunAtLoad</key><true/>
-        <key>KeepAlive</key><true/>
-      </dict>
-      </plist>
-    EOS
+  service do
+    run opt_sbin/"lldpd"
+    keep_alive true
   end
 end

@@ -1,24 +1,31 @@
 class Cli53 < Formula
   desc "Command-line tool for Amazon Route 53"
   homepage "https://github.com/barnybug/cli53"
-  url "https://github.com/barnybug/cli53/archive/0.8.17.tar.gz"
-  sha256 "32b8e6ffe3234f87497328285c377b9280d1b302658e9acb45eb0dedbda0b14d"
+  url "https://github.com/barnybug/cli53/archive/0.8.18.tar.gz"
+  sha256 "aa9ee59a52fc45f426680da48f45a79f2ac8365c15d8d7beed83a8ed71a891e4"
   license "MIT"
+  revision 1
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "0cb72c1182f1f323ce607fe9e016c3cf9352db57e18384da6b356164aab751cf" => :big_sur
-    sha256 "1d7ce2cfe475ced9a092cf4c8c18d34feab5398249bc8672235c13004dfe9206" => :arm64_big_sur
-    sha256 "65f9f13eb5c2f53afcb697f9699f8dd6b9df5f400908a2d3423879f8ca895942" => :catalina
-    sha256 "73ec9efeaf423dd32530bd4a547b11522b54dd5666942735268bb7690479ff09" => :mojave
-    sha256 "190e2e02b890cf099ca52d1468b224d16c82840a3a534db83a2aed5553b07bfc" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "0f5849c18c169f394c6927c73ce11e24138adf502e74ca4b74120c2098f92498"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "2ad73cd56c4d7364e1139d2510e29cecf63a642cf38066243b329c11cbf7ad29"
+    sha256 cellar: :any_skip_relocation, monterey:       "a9bc2052505280534e55bcd7322b4ba189f74af6217a2c7b634eeac859ff9ee3"
+    sha256 cellar: :any_skip_relocation, big_sur:        "41bb4f7c005387ef1d24468438b9b044e940832fb96f9c1a1e1b0dc0ef02b8ea"
+    sha256 cellar: :any_skip_relocation, catalina:       "a0e1334b7c9d281766c11087bb93b53583ece127bb07541e7e14e92514a26cfc"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "277053f98b9c41c06694bc74d8455d8a2641d928e6e24d0621b574ab725a34c7"
   end
 
   depends_on "go" => :build
 
+  # Update AWS SDK. Fixes build on Go 1.18.
+  # https://github.com/barnybug/cli53/pull/318
+  patch do
+    url "https://github.com/barnybug/cli53/commit/c60679c9171a4f8f04d09224ac4aacc316eed849.patch?full_index=1"
+    sha256 "19842038d57cc78d738754772d4535cc59a77f9da3d00982dec533a565fa193d"
+  end
+
   def install
-    system "go", "build", "-ldflags", "-s -w", "-trimpath", "-o", bin/"cli53", "./cmd/cli53"
-    prefix.install_metafiles
+    system "go", "build", *std_go_args(ldflags: "-s -w"), "./cmd/cli53"
   end
 
   test do

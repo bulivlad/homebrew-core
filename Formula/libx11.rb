@@ -1,15 +1,17 @@
 class Libx11 < Formula
   desc "X.Org: Core X11 protocol client library"
   homepage "https://www.x.org/"
-  url "https://www.x.org/archive/individual/lib/libX11-1.7.0.tar.bz2"
-  sha256 "36c8f93b6595437c8cfbc9f08618bcb3041cbd303e140a0013f88e4c2977cb54"
+  url "https://www.x.org/archive/individual/lib/libX11-1.7.5.tar.gz"
+  sha256 "78992abcd2bfdebe657699203ad8914e7ae77025175460e04a1045387192a978"
   license "MIT"
 
   bottle do
-    sha256 "8663963c8520d669be3a5cf7e49bc253dc39ea3aba8d35b01cdd9103a058041f" => :big_sur
-    sha256 "dcef5a7d1e2ba4b3ce4169f6b7504ca4875ba7e70742609342bcb5f4b8d6001c" => :arm64_big_sur
-    sha256 "59b7a9aa7a99a4f7257617558c71b1ca0ccf34f065dda785a3616b3c5ec75754" => :catalina
-    sha256 "b3f38839b3b3a024247ffb43324f6a53ecc45ec8bd32de3d7bfbc1142385488a" => :mojave
+    sha256 arm64_monterey: "bfbdc0d5131a5de5af488a3bca4d21bf0b234fdeb5e815d27118185797dfb504"
+    sha256 arm64_big_sur:  "d5844f2f5eb76760b8018d99f7260ad1288e464cba8fdadce290d51087923ccf"
+    sha256 monterey:       "bdbae40d452075838a74df3b078aee8a64bfa399fe1df65a3897995bf193dbf0"
+    sha256 big_sur:        "9c6cae8533144284adc333fd7f7d7718fcdcaff9f37a0979b0b6e358b661134c"
+    sha256 catalina:       "9ac01c5ba3fe93243188303cdd652cbe0c7f4607b412c2596f54eb4f92ad5453"
+    sha256 x86_64_linux:   "0ecf5a4ebc6f6e2153dd4883b3c24565f6db2d48667a2d3a71ee19ccd8d55dcb"
   end
 
   depends_on "pkg-config" => :build
@@ -19,6 +21,8 @@ class Libx11 < Formula
   depends_on "xorgproto"
 
   def install
+    ENV.delete "LC_ALL"
+    ENV["LC_CTYPE"] = "C"
     args = %W[
       --prefix=#{prefix}
       --sysconfdir=#{etc}

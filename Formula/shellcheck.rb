@@ -1,22 +1,22 @@
 class Shellcheck < Formula
   desc "Static analysis and lint tool, for (ba)sh scripts"
   homepage "https://www.shellcheck.net/"
-  url "https://github.com/koalaman/shellcheck/archive/v0.7.1.tar.gz"
-  sha256 "50a219bde5c16fc0a40e2e3725b6c192ff589bc8a2569c32b62dcaece0495896"
-  license "GPL-3.0"
-  head "https://github.com/koalaman/shellcheck.git"
+  url "https://github.com/koalaman/shellcheck/archive/v0.8.0.tar.gz"
+  sha256 "dad3a2140389f5032996e6d381a47074ddbad6e5d9155f72ef732952c8861a3b"
+  license "GPL-3.0-or-later"
+  head "https://github.com/koalaman/shellcheck.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    rebuild 1
-    sha256 "c7bd19ca5bc623c8a958c4cb56b77ab89e652c20a1a66dfbbc0c5d8832b60ada" => :big_sur
-    sha256 "0cd635d2172d5e6617be8cdfb2723b6aa6feb2aa22e36cb3172d8b6fa012f4a0" => :catalina
-    sha256 "37201a49c0d7a5be49c5d97d4f6f8f5fcfef7d700b4694f74648a1addcd6783d" => :mojave
-    sha256 "1b20aeaba4d5e2e3df5cbe27636d655b6f877ee05a41d25fe1e0b3f9d00afa81" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "625466bcd245a36da12ee088877d582c7e9fec1622418d1165a7d7d8f204ecc3"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "883ba5ee45554568cd1ce106dc6c090ec0745f576a4a6708332de951b03c7423"
+    sha256 cellar: :any_skip_relocation, monterey:       "cfd8c8e8d8927dfd4b83593f539690a6083b075b0a1ff8a66578e8bb810d3db9"
+    sha256 cellar: :any_skip_relocation, big_sur:        "d88edc1ae7db555ec5da01d4a1272da8260eb62073d2cdfa5fa3dce37d51fbe6"
+    sha256 cellar: :any_skip_relocation, catalina:       "24a67cd4f2b66a02cb77a1c705d7dcf25b4410209435a0b1136398da1fa6f766"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "961b2f3d75cf86dd5bc767cf689eee8f8e88bb30d716cf208b4bb89d61e5a553"
   end
 
   depends_on "cabal-install" => :build
-  depends_on "ghc@8.8" => :build
+  depends_on "ghc" => :build
   depends_on "pandoc" => :build
 
   def install

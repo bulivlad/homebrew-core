@@ -1,21 +1,17 @@
 class JsonrpcGlib < Formula
   desc "GNOME library to communicate with JSON-RPC based peers"
   homepage "https://gitlab.gnome.org/GNOME/jsonrpc-glib"
-  url "https://download.gnome.org/sources/jsonrpc-glib/3.38/jsonrpc-glib-3.38.0.tar.xz"
-  sha256 "dc5f1914a91152b70fa8fc9a11ede13148ab4af644db27a36632388c927a8a82"
+  url "https://download.gnome.org/sources/jsonrpc-glib/3.42/jsonrpc-glib-3.42.0.tar.xz"
+  sha256 "221989a57ca82a12467dc427822cd7651b0cad038140c931027bf1074208276b"
   license "LGPL-2.1-or-later"
 
-  livecheck do
-    url :stable
-  end
-
   bottle do
-    cellar :any
-    sha256 "922f8e0d4df5ea8c43e188ca633694d0665046c2a364c62348c32e22309f2b5b" => :big_sur
-    sha256 "06160c00773beabdcff9556c7b3cc1149b281e693807adb50afa5004999482d1" => :arm64_big_sur
-    sha256 "5dcab8d9974c1bd60c225d8ce2976fd20c0cedcaf2d537a57f42fe80aec20ece" => :catalina
-    sha256 "3a7318d1a9d0bee9a6b234494236778205d9dcbfb20622dbbda6c3007b3f8858" => :mojave
-    sha256 "fc193951d9001132ec4fe5ee59fccae34ee8249bf51b386a52924056a0d2f333" => :high_sierra
+    sha256 cellar: :any, arm64_monterey: "92133b3379600969851a22f77764ea937b7a2c6ed7abfaace7f5d82a46f2e365"
+    sha256 cellar: :any, arm64_big_sur:  "3dba2a5b06bdbc459d6fec65f00dad9f9b2882fa5a67da9a50daa8a9a5332171"
+    sha256 cellar: :any, monterey:       "cd47544117766135f25e5330c9bf0d56714546c22a233d2fc958d3fad2fa1ab6"
+    sha256 cellar: :any, big_sur:        "10bac873ad2f887cb49000ba547b74f3a0f415171cfc4b277ad597838ad77ba9"
+    sha256 cellar: :any, catalina:       "56077dcb4a1b7160f150d9ce3fe15b7967b4575ba125be59dda49601d55740d8"
+    sha256               x86_64_linux:   "f045fc3c514160508c4d033da944dfffaefa784c8646d7993e57682395a55218"
   end
 
   depends_on "gobject-introspection" => :build
@@ -66,7 +62,7 @@ class JsonrpcGlib < Formula
       -ljson-glib-1.0
       -ljsonrpc-glib-1.0
     ]
-    on_macos do
+    if OS.mac?
       flags << "-lintl"
       flags << "-Wl,-framework"
       flags << "-Wl,CoreFoundation"

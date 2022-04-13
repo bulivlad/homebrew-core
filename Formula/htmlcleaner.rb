@@ -1,23 +1,17 @@
 class Htmlcleaner < Formula
   desc "HTML parser written in Java"
   homepage "https://htmlcleaner.sourceforge.io"
-  url "https://downloads.sourceforge.net/project/htmlcleaner/htmlcleaner/htmlcleaner%20v2.24/htmlcleaner-2.24-src.zip"
-  sha256 "ee476c1f31eabcbd56c174ec482910e1b19907ad3e57dff9a4d0a2f456c9cd42"
+  url "https://downloads.sourceforge.net/project/htmlcleaner/htmlcleaner/htmlcleaner%20v2.26/htmlcleaner-2.26-src.zip"
+  sha256 "617ddb866530f512c2c6f6f89b40a9ac6e46bf515960c49f47d8d037adaf0e2c"
   license "BSD-3-Clause"
-  revision 1
-
-  livecheck do
-    url :stable
-  end
 
   bottle do
-    cellar :any_skip_relocation
-    rebuild 1
-    sha256 "e2d3b97f42d5d1442dc129bc32f56db6319caf5a58c54946f498862cf03b474f" => :big_sur
-    sha256 "f589e5b99a7d2443607e863555978b07e7c6fe30d9e7c8b536583dfcf87713e4" => :arm64_big_sur
-    sha256 "1676af315722a63de9c45daf78e747fd2653e72682bf6c8cb3a22c5262f762d4" => :catalina
-    sha256 "112f63a58175f8ab10dc077490a4704a18cefe190fb617f511a441f391cdbeac" => :mojave
-    sha256 "af704dd8dba231d424e0145132f4dab9c93c94d8699267eb3eace5fe90e57623" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "b6a287a43392e2a9ea253172a5000ff7da6f898dffda7c3052eda4ecdb91a961"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "9db87bc977615b9bb0250f0dc9f735dcd3d20a0799700640afe80c9bb011dd29"
+    sha256 cellar: :any_skip_relocation, monterey:       "6dd5433406edc84f3e175426793cc788d1edc8cae11bfacfbaf4431f39c631a9"
+    sha256 cellar: :any_skip_relocation, big_sur:        "573b152655d4c622581d6dc5f73229271cfd4307b3dd4d63967d41b2c3da5ae9"
+    sha256 cellar: :any_skip_relocation, catalina:       "03d164b2210190deecac6180af860948b1d4e09a318dce0bbe631b7e98f0d0a0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "bc3f63cf7c8a4d264c34fe39dfc265422a15564e04ce5495ab9bc08c91838dbf"
   end
 
   depends_on "maven" => :build

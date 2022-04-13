@@ -1,36 +1,47 @@
 class Ccache < Formula
   desc "Object-file caching compiler wrapper"
   homepage "https://ccache.dev/"
-  url "https://github.com/ccache/ccache/releases/download/v4.1/ccache-4.1.tar.xz"
-  sha256 "5fdc804056632d722a1182e15386696f0ea6c59cb4ab4d65a54f0b269ae86f99"
+  url "https://github.com/ccache/ccache/releases/download/v4.6/ccache-4.6.tar.xz"
+  sha256 "3d2bb860f4359169e640f60cf7cc11da5fab5fb9aed55230d78141e49c3945e9"
   license "GPL-3.0-or-later"
-  head "https://github.com/ccache/ccache.git"
+  head "https://github.com/ccache/ccache.git", branch: "master"
 
   bottle do
-    cellar :any
-    sha256 "ba8c28a2cc2a76753263e785ea4055bb0859cf1b966015755fb025335d7c21fa" => :big_sur
-    sha256 "1fcd4dbb4b915a0938911157556dd8bfa43303987d752236618002ec7d809818" => :arm64_big_sur
-    sha256 "234a4d2ba07206b539a347adff99f283da2bf219775e30da5567140cbd7c4fdf" => :catalina
-    sha256 "bd87ccc67069931f9a4b1833c6ac97f9168425fc4b5680d152f18b64cd87e825" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "a6c2f84141f941f468a3a5ad894494303dd2e5bb7e10dd6c2f299af096560185"
+    sha256 cellar: :any,                 arm64_big_sur:  "0d4ea837de83f77233704f1b73d7a993318f73491ef84daba69dfdd56f7719b8"
+    sha256 cellar: :any,                 monterey:       "fc91ed794d820ed244ab6401cd6b5d4153c2dcc928032fdd9effbd7bbe5fc483"
+    sha256 cellar: :any,                 big_sur:        "55e3ed0d7a2628730bcc60eefb43a36f3226c3cf2b0256fa56cc36f57647ce95"
+    sha256 cellar: :any,                 catalina:       "de15068d015ee2698bbddb9588741b0f15f9cbf44fc5d235a4821bfd064fb90e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1a35232f5d08f3d0d508ce1671d232e22d0d6f7bff532da9cbeff24d675dab7c"
   end
 
+  depends_on "asciidoctor" => :build
   depends_on "cmake" => :build
+  depends_on "pkg-config" => :build
+
+  depends_on "hiredis"
   depends_on "zstd"
 
+  on_linux do
+    depends_on "gcc"
+  end
+
+  fails_with gcc: "5"
+
   def install
-    # ccache SIMD checks are broken in 4.1, disable manually for now:
-    # https://github.com/ccache/ccache/pull/735
-    extra_args = []
-    if Hardware::CPU.arm?
-      extra_args << "-DHAVE_C_SSE2=0"
-      extra_args << "-DHAVE_C_SSE41=0"
-      extra_args << "-DHAVE_AVX2=0"
-      extra_args << "-DHAVE_C_AVX2=0"
-      extra_args << "-DHAVE_C_AVX512=0"
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args, "-DENABLE_IPO=TRUE"
+    system "cmake", "--build", "build"
+
+    # Homebrew compiler shim actively prevents ccache usage (see caveats), which will break the test suite.
+    # We run the test suite for ccache because it provides a more in-depth functional test of the software
+    # (especially with IPO enabled), adds negligible time to the build process, and we don't actually test
+    # this formula properly in the test block since doing so would be too complicated.
+    # See https://github.com/Homebrew/homebrew-core/pull/83900#issuecomment-90624064
+    with_env(CC: DevelopmentTools.locate(DevelopmentTools.default_compiler)) do
+      system "ctest", "-j#{ENV.make_jobs}", "--test-dir", "build"
     end
 
-    system "cmake", ".", *extra_args, *std_cmake_args
-    system "make", "install"
+    system "cmake", "--install", "build"
 
     libexec.mkpath
 
@@ -40,13 +51,13 @@ class Ccache < Formula
       cc
       gcc gcc2 gcc3 gcc-3.3 gcc-4.0
       gcc-4.2 gcc-4.3 gcc-4.4 gcc-4.5 gcc-4.6 gcc-4.7 gcc-4.8 gcc-4.9
-      gcc-5 gcc-6 gcc-7 gcc-8 gcc-9 gcc-10
+      gcc-5 gcc-6 gcc-7 gcc-8 gcc-9 gcc-10 gcc-11
       c++ c++3 c++-3.3 c++-4.0
       c++-4.2 c++-4.3 c++-4.4 c++-4.5 c++-4.6 c++-4.7 c++-4.8 c++-4.9
-      c++-5 c++-6 c++-7 c++-8 c++-9 c++-10
+      c++-5 c++-6 c++-7 c++-8 c++-9 c++-10 c++-11
       g++ g++2 g++3 g++-3.3 g++-4.0
       g++-4.2 g++-4.3 g++-4.4 g++-4.5 g++-4.6 g++-4.7 g++-4.8 g++-4.9
-      g++-5 g++-6 g++-7 g++-8 g++-9 g++-10
+      g++-5 g++-6 g++-7 g++-8 g++-9 g++-10 g++-11
     ].each do |prog|
       libexec.install_symlink bin/"ccache" => prog
     end

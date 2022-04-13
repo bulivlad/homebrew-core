@@ -1,27 +1,23 @@
 class Travis < Formula
   desc "Command-line client for Travis CI"
   homepage "https://github.com/travis-ci/travis.rb/"
-  url "https://github.com/travis-ci/travis.rb/archive/v1.10.0.tar.gz"
-  sha256 "b63991faebbd5da0e92bf1547775b69a0dbed01dd57e8b469d23a2a7bd79da43"
+  url "https://github.com/travis-ci/travis.rb/archive/v1.11.0.tar.gz"
+  sha256 "76cb0821aeb60e3e302932365dd437a393674de80e02972873bf3e511af564ca"
   license "MIT"
-  revision 2
+  revision 1
 
   bottle do
-    cellar :any
-    sha256 "99dc7883369970404609ba84dae65605c9c53be3deda72591fe19ffc67c06ef7" => :big_sur
-    sha256 "8f1ccd0d3968312e30c5451e80704472d9b717275ad09d64c2d475fc92666d3e" => :arm64_big_sur
-    sha256 "cd76462008b4094ecc79d7b715bc8bbe25c16648c2ae4be0a939415fa61b6d02" => :catalina
-    sha256 "23356035200869589c3cf664a6d137477529a27c60bc1ce2a68e6fc6f084693d" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "668e747cf04776b79f25d587e0927e0c3a64d37e09db4e84db6ecded29d5a672"
+    sha256 cellar: :any,                 arm64_big_sur:  "bf2c4092341390a13aafcf999b963402a3a40543913123e5064972a3448d8980"
+    sha256 cellar: :any,                 monterey:       "53b7abaa30cc82ad4aebba780820f275eab14fe967c2d1b5f2297013dfdb36a1"
+    sha256 cellar: :any,                 big_sur:        "fd1df0523c4c5ff90c18749eea5414c422a1256f31086207401b079c4dd922d4"
+    sha256 cellar: :any,                 catalina:       "96ee2f88a4b5c58aeb3a8518190e798ba4c33d4080bcd758789328b4c3c10bc1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "aff57e5c66026ee18ba8e67894148caa8443cbf52f2712ee0773583fd497e79b"
   end
 
   depends_on "pkg-config" => :build
-  depends_on "ruby"
-
-  if MacOS.version < :catalina
-    depends_on "libffi"
-  else
-    uses_from_macos "libffi"
-  end
+  depends_on "ruby@3.0"
+  uses_from_macos "libffi", since: :catalina
 
   resource "activesupport" do
     url "https://rubygems.org/gems/activesupport-5.2.4.4.gem"
@@ -163,6 +159,7 @@ class Travis < Formula
     system "gem", "build", "travis.gemspec"
     system "gem", "install", "--ignore-dependencies", "travis-#{version}.gem"
     bin.install libexec/"bin/travis"
+    (libexec/"gems/travis-#{version}/assets/notifications/Travis CI.app").rmtree
     bin.env_script_all_files(libexec/"bin", GEM_HOME: ENV["GEM_HOME"])
   end
 

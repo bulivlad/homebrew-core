@@ -1,10 +1,10 @@
 class Gstreamer < Formula
   desc "Development framework for multimedia applications"
   homepage "https://gstreamer.freedesktop.org/"
-  url "https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-1.18.3.tar.xz"
-  sha256 "0c2e09e18f2df69a99b5cb3bd53c597b3cc2e35cf6c98043bb86a66f3d312100"
+  url "https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-1.20.1.tar.xz"
+  sha256 "de094a404a3ad8f4977829ea87edf695a4da0b5c8f613ebe54ab414bac89f031"
   license "LGPL-2.0-or-later"
-  head "https://gitlab.freedesktop.org/gstreamer/gstreamer.git"
+  head "https://gitlab.freedesktop.org/gstreamer/gstreamer.git", branch: "main"
 
   livecheck do
     url "https://gstreamer.freedesktop.org/src/gstreamer/"
@@ -12,10 +12,12 @@ class Gstreamer < Formula
   end
 
   bottle do
-    sha256 "f5ddbdbbee54212f4a7ea77df78f7444591416290de476b1241955d258b1da19" => :big_sur
-    sha256 "760ba2b158b164beb570455fdca6540957ccbde2b2eab5a37ed430ae63ec1150" => :arm64_big_sur
-    sha256 "bc7d7022010b0208963c624b9310814b3be2c87fea16f567091a4517c771bfda" => :catalina
-    sha256 "b073cef5157e71dc3c7ff1ada4296dd64ac1e81ec2b94a5095e7135f9c1333f5" => :mojave
+    sha256 arm64_monterey: "dd425d8ae882c6d2119e51ebc6ef10742472fa7b6e3e250e728ae893f555ae38"
+    sha256 arm64_big_sur:  "1715bbe4b0b2c4880a8e557eb8670a9f82203b7acbe84dcf1e2e9362000bb28b"
+    sha256 monterey:       "899a70db3e2c7192a5908a8b7ab1de0d22d4973ab35951901a867d89be4f0e11"
+    sha256 big_sur:        "36d32c9bc0c06b18b5e393594c3e017ef8a92bfe7373bfc8eb344be3364f7cd2"
+    sha256 catalina:       "52b662142cc56997c1a809ddc5aaeb39fec140b0cbe3cd36fa22faeca86fad67"
+    sha256 x86_64_linux:   "1b564a43905edbe270da0ea2b0c9ed565a144b5d78e7e6b6221a7e287a4ca5c1"
   end
 
   depends_on "bison" => :build
@@ -49,6 +51,8 @@ class Gstreamer < Formula
       system "ninja", "-v"
       system "ninja", "install", "-v"
     end
+
+    bin.env_script_all_files libexec/"bin", GST_PLUGIN_SYSTEM_PATH: HOMEBREW_PREFIX/"lib/gstreamer-1.0"
   end
 
   def caveats

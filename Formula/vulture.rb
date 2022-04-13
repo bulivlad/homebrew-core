@@ -3,21 +3,23 @@ class Vulture < Formula
 
   desc "Find dead Python code"
   homepage "https://github.com/jendrikseipp/vulture"
-  url "https://files.pythonhosted.org/packages/44/a5/bfc438b2e5d06440c7340d7eeefe98e3af69b3053698cf30ac662f4ebc96/vulture-2.1.tar.gz"
-  sha256 "933bf7f3848e9e39ecab6a12faa59d5185471c887534abac13baea6fe8138cc2"
+  url "https://files.pythonhosted.org/packages/30/8b/bf4765866521da744ca081f09184657c0dc4fd8ee910a2fd1043d2c7cd6e/vulture-2.3.tar.gz"
+  sha256 "03d5a62bcbe9ceb9a9b0575f42d71a2d414070229f2e6f95fa6e7c71aaaed967"
   license "MIT"
-  head "https://github.com/jendrikseipp/vulture.git"
+  revision 1
+  head "https://github.com/jendrikseipp/vulture.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "a3d2a03fa3542b8e7fd9acf7f4f5e4135ad27b5238ffa34505ff59e091a36e88" => :big_sur
-    sha256 "ca85d3256fecad7108d300f4e22e0a2868ae27de1aea09290d686cccfd029c94" => :arm64_big_sur
-    sha256 "cbe063689773ed4f0f631c359603a53f803f312b98944e3718d21b9f7974bda7" => :catalina
-    sha256 "87d1b12cb798f56a56f0c16bcd5af882ecf111a5a181655209da4cc60afd0d81" => :mojave
-    sha256 "305fefa88f47886779dc6c377abba61134c4c045be7400227bc7b0b24d75c337" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "8df33d60a71db6f9cf50d1eb6ba88cb809b8f58971a3993a3e0695fe2d26c94b"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "15943088313f0f1636786938dba0625f4826370e556585b48d2d154a00a9a805"
+    sha256 cellar: :any_skip_relocation, monterey:       "4947fe3d214639b74461fd582c0262044b208462cc889d4ebfc863927dcbe30f"
+    sha256 cellar: :any_skip_relocation, big_sur:        "ede0a34d82eda81423282e75f1fa99d3b86b16b78cb2961928f6a6b3bfb77341"
+    sha256 cellar: :any_skip_relocation, catalina:       "480319c78f46a25a94c7e993bc88102d0569895403a06c370551bfc2455c0e95"
+    sha256 cellar: :any_skip_relocation, mojave:         "c3e6dffc1ca081ce496cf44351a836a9a1fc6d0984897efc7efeae4d8ae52696"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3c69939c42b00da8c3f7688cd7a4cdec39631299492f7c30b051c9d19f1f97b2"
   end
 
-  depends_on "python@3.9"
+  depends_on "python@3.10"
 
   resource "toml" do
     url "https://files.pythonhosted.org/packages/be/ba/1f744cdc819428fc6b5084ec34d9b30660f6f9daaf70eead706e3203ec3c/toml-0.10.2.tar.gz"

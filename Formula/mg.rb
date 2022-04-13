@@ -1,18 +1,22 @@
 class Mg < Formula
   desc "Small Emacs-like editor"
   homepage "https://github.com/ibara/mg"
-  url "https://github.com/ibara/mg/releases/download/mg-6.8.1/mg-6.8.1.tar.gz"
-  sha256 "a4af7afa77fed691096be8e2ff0507cc6bdd8efe7255916f714168d02790044c"
+  url "https://github.com/ibara/mg/releases/download/mg-7.0/mg-7.0.tar.gz"
+  sha256 "650dbdf9c9a72ec1922486ce07112d6181fc88a30770913d71d5c99c57fb2ac5"
   license all_of: [:public_domain, "ISC", :cannot_represent]
   version_scheme 1
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "d953ff7efb6a4fffedc3021dc85397ada7062a5af02a27ccd6480235c808d9f5" => :big_sur
-    sha256 "5f981515a969a53ba0a0dfa6eb180d73a0e094d8dca0490edf0a7785ab49a2a8" => :arm64_big_sur
-    sha256 "3dba473bffce8dbbd93c3b73e989348873317705b768cd9e920c8d4365caa5e6" => :catalina
-    sha256 "c81adc2432c2e5f07faac951fe0f07407d0abc24234e6302acd55ac7e99bb501" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "3052fc6f184a489918dcb2f59feae7c25e11d911e4b507e2d1a1f74dfa981a20"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "22ed7427d1bbe11394d61c776f7bd2d8aefa2669a4159e81196c8d4bb706f723"
+    sha256 cellar: :any_skip_relocation, monterey:       "39a073c05e204261444939e0e1fbd5aed12c2bbab7a787f713a463a9f4ce6855"
+    sha256 cellar: :any_skip_relocation, big_sur:        "e467c5834007598019dbe5e2fb8ebddf2c06dc153ad3af0f659ef758983125cc"
+    sha256 cellar: :any_skip_relocation, catalina:       "40b95e37d6c760e37102fffb1d037b14ae12bb72b5e9313a6eaa76da4ed933cd"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "67149965b00f9cd7a4e8c632354c958ebe2d044ee216ac74e68f57f9cdc4d391"
   end
+
+  uses_from_macos "expect" => :test
+  uses_from_macos "ncurses"
 
   def install
     system "./configure", "--prefix=#{prefix}",
@@ -22,16 +26,14 @@ class Mg < Formula
   end
 
   test do
-    (testpath/"command.sh").write <<~EOS
-      #!/usr/bin/expect -f
+    (testpath/"command.exp").write <<~EOS
       set timeout -1
       spawn #{bin}/mg
       match_max 100000
       send -- "\u0018\u0003"
       expect eof
     EOS
-    chmod 0755, testpath/"command.sh"
 
-    system testpath/"command.sh"
+    system "expect", "-f", "command.exp"
   end
 end

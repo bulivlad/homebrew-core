@@ -1,38 +1,42 @@
 class Libosinfo < Formula
   desc "Operating System information database"
   homepage "https://libosinfo.org/"
-  url "https://releases.pagure.org/libosinfo/libosinfo-1.8.0.tar.xz"
-  sha256 "49ff32be0d209f6c99480e28b94340ac3dd0158322ae4303adfbdfe973a108a5"
+  url "https://releases.pagure.org/libosinfo/libosinfo-1.10.0.tar.xz"
+  sha256 "a252e00fc580deb21da0da8c0aa03b8c31e8440b8448c8b98143fab477d32305"
   license "LGPL-2.0-or-later"
-  revision 3
 
   livecheck do
     url "https://releases.pagure.org/libosinfo/?C=M&O=D"
-    regex(/href=.*?libosinfo[._-]v?([\d.]+)\.t/i)
+    regex(/href=.*?libosinfo[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 "485f4ed04f60420b754b32014321e797d05a52f56c066ef8e0d5bd084e03b101" => :big_sur
-    sha256 "152cf602867b1aa39692a57f0fe05b56206c3754379baf175c781c9244213407" => :arm64_big_sur
-    sha256 "6a779d888f548649d3482452583ced807c9aceca45bb0989122b22822ec82316" => :catalina
-    sha256 "60e18106b7dca908a79e1edf59cd090ecb3a11d611d84330806aa0941fedb035" => :mojave
-    sha256 "eabb00c969fe4686063a44b6d58170bc566972278d8b27468ac56341e7d083d3" => :high_sierra
+    sha256 arm64_monterey: "2659892b2d277e688c8edc0f03875c1e518f5ab515a200d58698f717e9ed7dac"
+    sha256 arm64_big_sur:  "e8f42ab6e678acb61213692e472cc233112067f87b9d10744c4db4a10e14729c"
+    sha256 monterey:       "6fa3411b44dcdd8d33e73fa6d7b4e4d21828d0e00c52430c68684e9a0a2a45c6"
+    sha256 big_sur:        "494af85f0b66b208db81e2114e492c683028ebe8c1748c61bfaaaa5b8fc7892f"
+    sha256 catalina:       "ae3b5681f80d8a2fb8413b4d0e86ea64a4c6e48d809b9f96d2064ed1d7ecb570"
+    sha256 x86_64_linux:   "eb8f140219fb3208a0ee34a0e412a6a4d24581e622e2d81cd269c2b10a8312e3"
   end
 
   depends_on "gobject-introspection" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
   depends_on "pkg-config" => :build
-  depends_on "check"
+  depends_on "vala" => :build
   depends_on "gettext"
   depends_on "glib"
   depends_on "libsoup"
-  depends_on "libxml2"
+  depends_on "osinfo-db"
   depends_on "usb.ids"
 
+  uses_from_macos "pod2man" => :build
+  uses_from_macos "libxml2"
+  uses_from_macos "libxslt"
+
   resource "pci.ids" do
-    url "https://raw.githubusercontent.com/pciutils/pciids/791050fc4eca1e19db3a985a284081f9038c21aa/pci.ids"
-    sha256 "587aa462719ffa840254e88b7b79fb499da2c3af227496a45d7e8b7c87f790f6"
+    url "https://raw.githubusercontent.com/pciutils/pciids/7d42acec647d327f0824260c2d4656410d48986a/pci.ids"
+    sha256 "7e6314c5ecab564af740b1a7da0b2839690716344504420f19ae21bb8cf7ae9e"
   end
 
   def install
@@ -48,7 +52,7 @@ class Libosinfo < Formula
       system "meson", *std_meson_args, *flags, ".."
       system "ninja", "install", "-v"
     end
-    (share/"osinfo/.keep").write ""
+    share.install_symlink HOMEBREW_PREFIX/"share/osinfo"
   end
 
   test do

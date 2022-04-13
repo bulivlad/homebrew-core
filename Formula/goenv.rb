@@ -5,17 +5,28 @@ class Goenv < Formula
   sha256 "1559f2907ee0339328466fe93f3c9637b7674917db81754412c7f842749e3201"
   license "MIT"
   version_scheme 1
-  head "https://github.com/syndbg/goenv.git"
+  head "https://github.com/syndbg/goenv.git", branch: "master"
 
   livecheck do
-    url :head
+    url :stable
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
-  bottle :unneeded
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "18e8cdaeba562696634782aff8f2affff1201d91fab4334346942b11ece548a5"
+  end
 
   def install
-    inreplace "libexec/goenv", "/usr/local", HOMEBREW_PREFIX
+    inreplace_files = [
+      "libexec/goenv",
+      "plugins/go-build/install.sh",
+      "test/goenv.bats",
+      "test/test_helper.bash",
+    ]
+    inreplace_files << "test/init.bats" unless build.head?
+    inreplace inreplace_files, "/usr/local", HOMEBREW_PREFIX
+
     prefix.install Dir["*"]
     %w[goenv-install goenv-uninstall go-build].each do |cmd|
       bin.install_symlink "#{prefix}/plugins/go-build/bin/#{cmd}"

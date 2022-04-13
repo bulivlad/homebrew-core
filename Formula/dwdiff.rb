@@ -4,6 +4,7 @@ class Dwdiff < Formula
   url "https://os.ghalkes.nl/dist/dwdiff-2.1.4.tar.bz2"
   sha256 "df16fec44dcb467d65a4246a43628f93741996c1773e930b90c6dde22dd58e0a"
   license "GPL-3.0-only"
+  revision 3
 
   livecheck do
     url "https://os.ghalkes.nl/dist/"
@@ -11,10 +12,12 @@ class Dwdiff < Formula
   end
 
   bottle do
-    sha256 "da01b804a7337d212eaa81bd24f03d84acad1c7a0dec29ba1963cc9e2210263a" => :big_sur
-    sha256 "76860b0aea804eda3d1f9aa8f35b5b5cffe9c5dfae3abdfde268f03c8522b6a7" => :arm64_big_sur
-    sha256 "53b5c3a5a6f4bf8eca91bbfc6428b821697800abae53f27c4cae781bd7388db3" => :catalina
-    sha256 "e81958863d5893f914895fe4fe4e8662af9246986bfad79a37656e2874c5f30a" => :mojave
+    sha256 arm64_monterey: "c6ac8bd5755d425b521cd053dffb6b8ed743576e23f3f32691af25eff05dcaa5"
+    sha256 arm64_big_sur:  "5e1721a6b5e82ffd1e96912c68b130b56c757cc1dc838101f6ca35c033e71a8c"
+    sha256 monterey:       "532f53fb5ce20b15ae8ab16fb7a73cae4c2e606529dfa16e57c72f35242c3154"
+    sha256 big_sur:        "068d3426506689419160ae59cdb21cd8546622b05965fefff4e310b32862bf5b"
+    sha256 catalina:       "1bfc80e8d237eaafb2144c225a1c34e86934c35021df7ae98a5743de35ad21fb"
+    sha256 x86_64_linux:   "3efef1cf3d0b820d21bfc5e2c6d9258224527f98233b0f45be5ea90d3304f72b"
   end
 
   depends_on "pkg-config" => :build
@@ -25,7 +28,8 @@ class Dwdiff < Formula
     gettext = Formula["gettext"]
     icu4c = Formula["icu4c"]
     ENV.append "CFLAGS", "-I#{gettext.include} -I#{icu4c.include}"
-    ENV.append "LDFLAGS", "-L#{gettext.lib} -L#{icu4c.lib} -lintl"
+    ENV.append "LDFLAGS", "-L#{gettext.lib} -L#{icu4c.lib}"
+    ENV.append "LDFLAGS", "-lintl" if OS.mac?
 
     system "./configure", "--prefix=#{prefix}"
     system "make", "install"

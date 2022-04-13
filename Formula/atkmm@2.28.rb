@@ -1,8 +1,8 @@
 class AtkmmAT228 < Formula
   desc "Official C++ interface for the ATK accessibility toolkit library"
   homepage "https://www.gtkmm.org/"
-  url "https://download.gnome.org/sources/atkmm/2.28/atkmm-2.28.1.tar.xz"
-  sha256 "116876604770641a450e39c1f50302884848ce9cc48d43c5dc8e8efc31f31bad"
+  url "https://download.gnome.org/sources/atkmm/2.28/atkmm-2.28.2.tar.xz"
+  sha256 "a0bb49765ceccc293ab2c6735ba100431807d384ffa14c2ebd30e07993fd2fa4"
   license "LGPL-2.1-or-later"
 
   livecheck do
@@ -11,18 +11,20 @@ class AtkmmAT228 < Formula
   end
 
   bottle do
-    cellar :any
-    sha256 "ef1b7d9dc9fd11bc07199b54078619fb68d78b8bbcf7a6335ccebc28a4ae215a" => :big_sur
-    sha256 "eae5a9abd9c93ef9c81d292c788df9e0099ce8f3a991728eff969c74a3753ab4" => :arm64_big_sur
-    sha256 "750b50b9da2bf48ce5e69b0fbaf09e87183e5c0bd79fb2d3574e23e9fa8c7e6e" => :catalina
-    sha256 "5d3a7b3bed2ee8da8a8152138db15aa461aee925c3a2eba5b83b3da8bfea6c84" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "c998a07090f1a5979f5fffc63ae20a16e05683904391c1e6af55201c91111803"
+    sha256 cellar: :any,                 arm64_big_sur:  "e983693a33a42234e168ab6691a030a7e90f6ed0730dc3011034ec14478472b6"
+    sha256 cellar: :any,                 monterey:       "2a89fdca2f46e5a75c864fe197d2f7e2584d07f68c0fa693480d6da4adf75581"
+    sha256 cellar: :any,                 big_sur:        "ee8b64bf67e30fb46e3e8b1ec34c902055cad8ec635a8de8331073406e6a81f2"
+    sha256 cellar: :any,                 catalina:       "e6f94253d0a96d89131fe72fcf212028e87f41875761e57dd5f0cc40b46bfaf2"
+    sha256 cellar: :any,                 mojave:         "2b7ac6cd13ae986cef9784908877b3e4b58d42846b23f733e6f8c17600a44cc3"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f39ac64ae650ee9f8d40447d346fc2166bc24a016d2e29cb2d23836c290be5e3"
   end
 
   depends_on "meson" => :build
   depends_on "ninja" => :build
   depends_on "pkg-config" => :build
   depends_on "atk"
-  depends_on "glibmm@2.64"
+  depends_on "glibmm@2.66"
 
   def install
     ENV.cxx11
@@ -46,7 +48,7 @@ class AtkmmAT228 < Formula
     atk = Formula["atk"]
     gettext = Formula["gettext"]
     glib = Formula["glib"]
-    glibmm = Formula["glibmm@2.64"]
+    glibmm = Formula["glibmm@2.66"]
     libsigcxx = Formula["libsigc++@2"]
     flags = %W[
       -I#{atk.opt_include}/atk-1.0
@@ -72,9 +74,7 @@ class AtkmmAT228 < Formula
       -lgobject-2.0
       -lsigc-2.0
     ]
-    on_macos do
-      flags << "-lintl"
-    end
+    flags << "-lintl" if OS.mac?
     system ENV.cxx, "-std=c++11", "test.cpp", "-o", "test", *flags
     system "./test"
   end

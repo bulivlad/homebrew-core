@@ -1,9 +1,9 @@
 class Icu4c < Formula
   desc "C/C++ and Java libraries for Unicode and globalization"
   homepage "http://site.icu-project.org/home"
-  url "https://github.com/unicode-org/icu/releases/download/release-67-1/icu4c-67_1-src.tgz"
-  version "67.1"
-  sha256 "94a80cd6f251a53bd2a997f6f1b5ac6653fe791dfab66e1eb0227740fb86d5dc"
+  url "https://github.com/unicode-org/icu/releases/download/release-70-1/icu4c-70_1-src.tgz"
+  version "70.1"
+  sha256 "8d205428c17bf13bb535300669ed28b338a157b1c01ae66d31d0d3e2d47c3fd5"
   license "ICU"
 
   livecheck do
@@ -15,22 +15,15 @@ class Icu4c < Formula
   end
 
   bottle do
-    cellar :any
-    sha256 "114cce72e22c5eb713f56b9f91a076b2f2d5930152d3638a95c6decee511aa3e" => :big_sur
-    sha256 "28603c8d1cc113f70ad4042548f8f6585606025b48d315958236531e8f8d8550" => :arm64_big_sur
-    sha256 "2d1e91b5127f66e7941790c004817c94c892725c88f84f1e4c37297fcbc0c72f" => :catalina
-    sha256 "b6069459c78f18045ee922ce5cb5b235d4b479597d79c3c298d09e0de3d70794" => :mojave
-    sha256 "0720bd47f020d5ca895ae79eb61623ed3c7de0d4c4f221613105f47147aec01f" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "43cf787a35559b90597db8e1aaba95dbeedb84b1ee3d2e942be8938ae618724c"
+    sha256 cellar: :any,                 arm64_big_sur:  "c3c22a25dd864a6494d2371bea6b8b9d5e49f8c401b2f6cda00f4c349f57e975"
+    sha256 cellar: :any,                 monterey:       "321592eb1aebb7c6edc7a5e91393598725ebcc63362f059072b993c27f3bf979"
+    sha256 cellar: :any,                 big_sur:        "f124a30b9ecb4bfe61cd8ab5e46d58877fd5acb319360dae446648730a4b3ad8"
+    sha256 cellar: :any,                 catalina:       "8773ed472307dff9a522558503e0f12aa77433510e856136946a558ae3087c0f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "04f36c9e1047fb1a9e1f1889eae2ade68d6518fb847a90e7947cc87ca94512ef"
   end
 
   keg_only :provided_by_macos, "macOS provides libicucore.dylib (but nothing else)"
-
-  # fix C++14 compatibility of U_ASSERT macro.
-  # Remove with next release (ICU 68).
-  patch :p2 do
-    url "https://github.com/unicode-org/icu/commit/715d254a02b0b22681cb6f861b0921ae668fa7d6.patch?full_index=1"
-    sha256 "a87e1b9626ec5803b1220489c0d6cc544a5f293f1c5280e3b27871780c4ecde8"
-  end
 
   def install
     args = %W[
@@ -49,6 +42,11 @@ class Icu4c < Formula
   end
 
   test do
-    system "#{bin}/gendict", "--uchars", "/usr/share/dict/words", "dict"
+    if File.exist? "/usr/share/dict/words"
+      system "#{bin}/gendict", "--uchars", "/usr/share/dict/words", "dict"
+    else
+      (testpath/"hello").write "hello\nworld\n"
+      system "#{bin}/gendict", "--uchars", "hello", "dict"
+    end
   end
 end

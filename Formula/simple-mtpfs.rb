@@ -6,10 +6,9 @@ class SimpleMtpfs < Formula
   license "GPL-2.0"
 
   bottle do
-    cellar :any
-    sha256 "d902aae104d1f2ae07bdb28ecabbef8d9d97d9326a3e29050c83a4dd69597ed4" => :catalina
-    sha256 "4f9c18fb88084e24773591124bdcfdc0ceb3741f2cdaffa2d67e7b22cfe5672e" => :mojave
-    sha256 "0a22b0fd5ea759ce48068efabf40ac09b4a76d5dcf942db8b672edfd3e1b90a8" => :high_sierra
+    sha256 cellar: :any, catalina:    "d902aae104d1f2ae07bdb28ecabbef8d9d97d9326a3e29050c83a4dd69597ed4"
+    sha256 cellar: :any, mojave:      "4f9c18fb88084e24773591124bdcfdc0ceb3741f2cdaffa2d67e7b22cfe5672e"
+    sha256 cellar: :any, high_sierra: "0a22b0fd5ea759ce48068efabf40ac09b4a76d5dcf942db8b672edfd3e1b90a8"
   end
 
   depends_on "autoconf" => :build
@@ -19,8 +18,7 @@ class SimpleMtpfs < Formula
   depends_on "libmtp"
 
   on_macos do
-    deprecate! date: "2020-11-10", because: "requires FUSE"
-    depends_on :osxfuse
+    disable! date: "2021-04-08", because: "requires closed-source macFUSE"
   end
 
   on_linux do
@@ -34,6 +32,18 @@ class SimpleMtpfs < Formula
       "LDFLAGS=-L/usr/local/include/osxfuse"
     system "make"
     system "make", "install"
+  end
+
+  def caveats
+    on_macos do
+      <<~EOS
+        The reasons for disabling this formula can be found here:
+          https://github.com/Homebrew/homebrew-core/pull/64491
+
+        An external tap may provide a replacement formula. See:
+          https://docs.brew.sh/Interesting-Taps-and-Forks
+      EOS
+    end
   end
 
   test do

@@ -7,16 +7,13 @@ class Ddd < Formula
   license all_of: ["GPL-3.0-only", "GFDL-1.1-or-later"]
   revision 1
 
-  livecheck do
-    url :stable
-  end
-
   bottle do
     rebuild 2
-    sha256 "498ceb2dc933d2c85e7407f077d187c6cd799ba2f539694087134d038bb211d9" => :big_sur
-    sha256 "df163eb838675a73c69913af1e1526a5c20e5cbeafa58836112ce4ae642a705a" => :catalina
-    sha256 "ef4ae2c46be3ad1aee12c52ca34d7606c3aa056250792a61c03af4581fe8e568" => :mojave
-    sha256 "9fc9c568178424aeb25d6721c4faffb99a8bd7ef967ea0ae4e3464b65651d0b8" => :high_sierra
+    sha256 big_sur:      "498ceb2dc933d2c85e7407f077d187c6cd799ba2f539694087134d038bb211d9"
+    sha256 catalina:     "df163eb838675a73c69913af1e1526a5c20e5cbeafa58836112ce4ae642a705a"
+    sha256 mojave:       "ef4ae2c46be3ad1aee12c52ca34d7606c3aa056250792a61c03af4581fe8e568"
+    sha256 high_sierra:  "9fc9c568178424aeb25d6721c4faffb99a8bd7ef967ea0ae4e3464b65651d0b8"
+    sha256 x86_64_linux: "b77e99734dc952ce417d949ba92e03e138f8f4b1a8224a4e3a98bc2822cea7b8"
   end
 
   depends_on "gdb" => :test
@@ -52,6 +49,13 @@ class Ddd < Formula
   end
 
   def install
+    if OS.linux?
+      # Patch to fix compilation error
+      # https://savannah.gnu.org/bugs/?33960
+      # Remove with next release
+      inreplace "ddd/strclass.C", "#include <stdlib.h>", "#include <stdlib.h>\n#include <cstdio>"
+    end
+
     system "./configure", "--disable-debug",
                           "--disable-dependency-tracking",
                           "--enable-builtin-app-defaults",
@@ -72,6 +76,6 @@ class Ddd < Formula
     output = shell_output("#{bin}/ddd --version")
     output.force_encoding("ASCII-8BIT") if output.respond_to?(:force_encoding)
     assert_match version.to_s, output
-    assert_match testpath.to_s, shell_output("printf pwd\\\\nquit | #{bin}/ddd --gdb --nw true 2>&1")
+    assert_match testpath.to_s, pipe_output("#{bin}/ddd --gdb --nw true 2>&1", "pwd\nquit")
   end
 end

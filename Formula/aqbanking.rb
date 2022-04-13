@@ -1,8 +1,8 @@
 class Aqbanking < Formula
   desc "Generic online banking interface"
   homepage "https://www.aquamaniac.de/sites/aqbanking/"
-  url "https://www.aquamaniac.de/rdm/attachments/download/342/aqbanking-6.2.5.tar.gz"
-  sha256 "cf5b060e3ec7e3fc925687caf044d4df3dbf9595f23c4fe8ffad78f44af0d6df"
+  url "https://www.aquamaniac.de/rdm/attachments/download/400/aqbanking-6.4.1.tar.gz"
+  sha256 "79adeaf05e99b5aa0d31c3eac3db37a56bb375f537b3f106a9acfcf844dadd77"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -11,14 +11,16 @@ class Aqbanking < Formula
   end
 
   bottle do
-    sha256 "e1236223ad900e4aea9b78e38bdcb0054a254a01207b68847e3ad17106db371e" => :big_sur
-    sha256 "630a89380604bf0f7e0f0a9e02a94bb3e9f6d440288e48977d15b62270073d6e" => :catalina
-    sha256 "6bedce92b40d4f2ce98fceca64afb4188e286bfd5387fda1233950e8cc2efd17" => :mojave
-    sha256 "086f77cd676c597f9963a1ccac53d960d4a9ef832431245928b5e81c3f59ad13" => :high_sierra
+    sha256 arm64_monterey: "5a86ff8e93a1e454ae3588bb749378fb863230e353be6b862a36a6cf5bfed7df"
+    sha256 arm64_big_sur:  "d83a2a3067d0151089605f34c2b96b72cc55b4f5258bc84575094f04c22ddb8f"
+    sha256 monterey:       "f4820594692e060267a740df585c979feda7ac75adb6eae42269ecd77cfcf98b"
+    sha256 big_sur:        "e15bcadc4d81ae9214ccd2b71cd9596f1431cc0d80032f4ba443cc46c7481283"
+    sha256 catalina:       "329934083304ca7ca6a3a30832ca652973fa0eaacf3a493520cc850675a22b68"
+    sha256 x86_64_linux:   "84a998567c4b0898daeabaf3c6bf6bf6027f625c3fbe060911dc8e9bebc35c74"
   end
 
   head do
-    url "https://git.aquamaniac.de/git/aqbanking.git"
+    url "https://git.aquamaniac.de/git/aqbanking.git", branch: "master"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
@@ -31,7 +33,7 @@ class Aqbanking < Formula
   depends_on "ktoblzcheck"
   depends_on "libxml2"
   depends_on "libxmlsec1"
-  depends_on "libxslt"
+  depends_on "libxslt" # Our libxslt links with libgcrypt
   depends_on "pkg-config" # aqbanking-config needs pkg-config for execution
 
   def install
@@ -42,6 +44,8 @@ class Aqbanking < Formula
                           "--disable-dependency-tracking",
                           "--prefix=#{prefix}",
                           "--enable-cli"
+    # This is banking software, so let's run the test suite.
+    system "make", "check"
     system "make", "install"
   end
 

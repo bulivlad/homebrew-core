@@ -1,8 +1,8 @@
 class Cortex < Formula
   desc "Long term storage for Prometheus"
   homepage "https://cortexmetrics.io/"
-  url "https://github.com/cortexproject/cortex/archive/v1.6.0.tar.gz"
-  sha256 "17dd427a676eb2af52a5d758397a4c384fe73e2e1379122b0a3dc6e36b378de4"
+  url "https://github.com/cortexproject/cortex/archive/v1.11.1.tar.gz"
+  sha256 "7219bac21a49af6b3c3dd691aa867573f8b8d89f91a4433bfa185bc775ec3d3b"
   license "Apache-2.0"
 
   livecheck do
@@ -11,54 +11,30 @@ class Cortex < Formula
   end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "b2b1578fbda810919635eb9c5e6cd26c9826d9b66811a2408f9459f4428e6c52" => :big_sur
-    sha256 "a15b4792c7334365dbda6493e87214b2a7b091c5f6342bdb175ca6e44688bb4c" => :arm64_big_sur
-    sha256 "b89466af24dab8ef0e913462515d6bd0a1673c11d8eb8b0e1712212c1cb25dc1" => :catalina
-    sha256 "f0cf729caf7dc1b9cd19e2f4ac12bc38961f36f76d2ddbfac4365912dd33d8c4" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "16a5cfa0b7e9ee7ecb3ff74712ddf1ef064622eda638fe7cd39c4f1f345e6607"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "b50a50da4d491cdd184b432a31f17194f5c529fa04a236f2035a4844fc6024d5"
+    sha256 cellar: :any_skip_relocation, monterey:       "f17c643b312242f03a84b4dd39d270213407bf3d0cda771ec15763ad88ff9842"
+    sha256 cellar: :any_skip_relocation, big_sur:        "fc017ba00df3b41e00cfb2e4aac7efc312fb5f83aefc6b7486ae791894dc5060"
+    sha256 cellar: :any_skip_relocation, catalina:       "1f4a8d739fbfecbffe21fe4cfd6225436d85013658a282d557ead7f09ac83750"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e0c836828b0067478d9d663b94bba17966f421237fc2113cf06cdef6b0feeca1"
   end
 
   depends_on "go" => :build
 
   def install
     system "go", "build", *std_go_args, "./cmd/cortex"
-    cd "docs/configuration" do
+    cd "docs/chunks-storage" do
       inreplace "single-process-config.yaml", "/tmp", var
       etc.install "single-process-config.yaml" => "cortex.yaml"
     end
   end
 
-  plist_options manual: "cortex -config.file=#{HOMEBREW_PREFIX}/etc/cortex.yaml"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>KeepAlive</key>
-          <dict>
-            <key>SuccessfulExit</key>
-            <false/>
-          </dict>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>ProgramArguments</key>
-          <array>
-            <string>#{opt_bin}/cortex</string>
-            <string>-config.file=#{etc}/cortex.yaml</string>
-          </array>
-          <key>RunAtLoad</key>
-          <true/>
-          <key>WorkingDirectory</key>
-          <string>#{var}</string>
-          <key>StandardErrorPath</key>
-          <string>#{var}/log/cortex.log</string>
-          <key>StandardOutPath</key>
-          <string>#{var}/log/cortex.log</string>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run [opt_bin/"cortex", "-config.file=#{etc}/cortex.yaml"]
+    keep_alive true
+    error_log_path var/"log/cortex.log"
+    log_path var/"log/cortex.log"
+    working_dir var
   end
 
   test do

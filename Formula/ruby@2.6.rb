@@ -1,20 +1,27 @@
 class RubyAT26 < Formula
   desc "Powerful, clean, object-oriented scripting language"
   homepage "https://www.ruby-lang.org/"
-  url "https://cache.ruby-lang.org/pub/ruby/2.6/ruby-2.6.6.tar.xz"
-  sha256 "5db187882b7ac34016cd48d7032e197f07e4968f406b0690e20193b9b424841f"
+  url "https://cache.ruby-lang.org/pub/ruby/2.6/ruby-2.6.10.tar.xz"
+  sha256 "5fd8ded51321b88fdc9c1b4b0eb1b951d2eddbc293865da0151612c2e814c1f2"
   license "Ruby"
-  revision 1
+
+  livecheck do
+    url "https://www.ruby-lang.org/en/downloads/"
+    regex(/href=.*?ruby[._-]v?(2\.6(?:\.\d+)+)\.t/i)
+  end
 
   bottle do
-    rebuild 1
-    sha256 "90a02e7c3985c005348fb1b750c22dce1ebbbd1a8854f3250da9956308c0c65f" => :big_sur
-    sha256 "a96708875a8876b485f3363013325280b7bc430b2476f1a96eec868a576c3767" => :arm64_big_sur
-    sha256 "9a4c70bb351c889e3b529be56eeb5699331f6de5bd0564e1baf14c94af37f523" => :catalina
-    sha256 "30328442ad700d940208b1423bab0a0cdc84aaa02501de820ca6d7903fee09a3" => :mojave
+    sha256 arm64_monterey: "74f876ed5b99df4aac83e9493f1e35b9acd5caa40d455d74409dbb50da0e484e"
+    sha256 arm64_big_sur:  "5ddd0ae653c7fb59b23b2fe4c9d009e18f3c2c747c9bc0d912ac71bb90f0f9ca"
+    sha256 monterey:       "aba04d15f44c56b143076f4287067b7ee5a36b9ffe060291d21117412e637512"
+    sha256 big_sur:        "e0fac9dca78403a5963836b7f31261c831fb36fb568a75da05ab8e7fb93aa374"
+    sha256 catalina:       "b0b42c392235f47b3a697b51e02cb6cc2b1a628a689cac02d4c166bd22a109fa"
+    sha256 x86_64_linux:   "8aa297f5ccd7dd3956911e6b09b475a791e90c8a928b101744dd8988e366eeb8"
   end
 
   keg_only :versioned_formula
+
+  deprecate! date: "2022-04-12", because: :unsupported
 
   depends_on "pkg-config" => :build
   depends_on "libyaml"
@@ -45,9 +52,7 @@ class RubyAT26 < Formula
       --with-opt-dir=#{paths.join(":")}
       --without-gmp
     ]
-    on_macos do
-      args << "--disable-dtrace" unless MacOS::CLT.installed?
-    end
+    args << "--disable-dtrace" if OS.mac? && !MacOS::CLT.installed?
 
     # Correct MJIT_CC to not use superenv shim
     args << "MJIT_CC=/usr/bin/#{DevelopmentTools.default_compiler}"

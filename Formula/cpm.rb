@@ -1,17 +1,18 @@
 class Cpm < Formula
   desc "Fast CPAN module installer"
   homepage "https://metacpan.org/pod/cpm"
-  url "https://cpan.metacpan.org/authors/id/S/SK/SKAJI/App-cpm-0.997000.tar.gz"
-  sha256 "6bf25a25dfb2331dee623d5cc3d030d9be647e7c766e82196a383f16b92e419f"
+  url "https://cpan.metacpan.org/authors/id/S/SK/SKAJI/App-cpm-0.997009.tar.gz"
+  sha256 "7b22795a4ec866eaf81dbb66b68b04df4881cfca4f4f0f824589f3083b9e55a6"
   license any_of: ["Artistic-1.0-Perl", "GPL-1.0-or-later"]
-  head "https://github.com/skaji/cpm.git"
+  head "https://github.com/skaji/cpm.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "00c937cca67b30b62f57f395a3b2b65023ce0fc22ecc6898e5632a21a8c3cffd" => :big_sur
-    sha256 "6ae4ce127f80c7c1f72a651c5ae37531726e431b69c41f90e4f2c90b56765ac0" => :arm64_big_sur
-    sha256 "c1c3eb60b9a990d9534f28d44990449b674e6c03544fcf2f3daeb3dde4ab700f" => :catalina
-    sha256 "c04b9529d213461432fb0028c66587f3890d1044376f260b0466f48357b7c2d7" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "51dc94450d3f70fa63714430925e3be139f0297c6dcfbaf6545d3b57e29c1da7"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "51dc94450d3f70fa63714430925e3be139f0297c6dcfbaf6545d3b57e29c1da7"
+    sha256 cellar: :any_skip_relocation, monterey:       "41a4c585cc7121f5a5015c44f6839c8919c4cde9b432273a4c5d55b33ddd8bc5"
+    sha256 cellar: :any_skip_relocation, big_sur:        "41a4c585cc7121f5a5015c44f6839c8919c4cde9b432273a4c5d55b33ddd8bc5"
+    sha256 cellar: :any_skip_relocation, catalina:       "41a4c585cc7121f5a5015c44f6839c8919c4cde9b432273a4c5d55b33ddd8bc5"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2a1e1554df7e82ac58415c930b7f48774e1a86dd0aee63e58e1c1863a8918b80"
   end
 
   depends_on "perl"
@@ -77,8 +78,8 @@ class Cpm < Formula
   end
 
   resource "File::Which" do
-    url "https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/File-Which-1.23.tar.gz"
-    sha256 "b79dc2244b2d97b6f27167fc3b7799ef61a179040f3abd76ce1e0a3b0bc4e078"
+    url "https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/File-Which-1.27.tar.gz"
+    sha256 "3201f1a60e3f16484082e6045c896842261fc345de9fb2e620fd2a2c7af3a93a"
   end
 
   resource "File::pushd" do
@@ -111,9 +112,14 @@ class Cpm < Formula
     sha256 "88efbe2e9a642dceaa186430fedfcf999aaf0e06f6cced28a714b8e56b514921"
   end
 
+  resource "Module::cpmfile" do
+    url "https://cpan.metacpan.org/authors/id/S/SK/SKAJI/Module-cpmfile-0.006.tar.gz"
+    sha256 "1bc976e2937724896c9f6eae9e5dca981e27f98430b92de270ee3514fd00ac0f"
+  end
+
   resource "Parallel::Pipes" do
-    url "https://cpan.metacpan.org/authors/id/S/SK/SKAJI/Parallel-Pipes-0.005.tar.gz"
-    sha256 "44bd9e2be33d7b314f81c9b886a95d53514689090635f9fad53181f2d3051fd5"
+    url "https://cpan.metacpan.org/authors/id/S/SK/SKAJI/Parallel-Pipes-0.101.tar.gz"
+    sha256 "a5a08a6b3a4b0a3e17ea64fb7c174570522558125ed0e2f507eb189f2855c9f4"
   end
 
   resource "Parse::PMFile" do
@@ -132,8 +138,8 @@ class Cpm < Formula
   end
 
   resource "URI" do
-    url "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/URI-5.05.tar.gz"
-    sha256 "a5c113d2d02706d9fbdca6a86f290c5b05b2f86836d4e7fe1447f063261b79ec"
+    url "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/URI-5.10.tar.gz"
+    sha256 "16325d5e308c7b7ab623d1bf944e1354c5f2245afcfadb8eed1e2cae9a0bd0b5"
   end
 
   resource "Win32::ShellQuote" do
@@ -141,9 +147,14 @@ class Cpm < Formula
     sha256 "aa74b0e3dc2d41cd63f62f853e521ffd76b8d823479a2619e22edb4049b4c0dc"
   end
 
+  resource "YAML::PP" do
+    url "https://cpan.metacpan.org/authors/id/T/TI/TINITA/YAML-PP-0.031.tar.gz"
+    sha256 "d7c837f732b023b67aa3666d14887f1cd756ce5c5bb6b07eee0b3701cf9e4cf8"
+  end
+
   resource "local::lib" do
-    url "https://cpan.metacpan.org/authors/id/H/HA/HAARG/local-lib-2.000024.tar.gz"
-    sha256 "2e9b917bd48a0615e42633b2a327494e04610d8f710765b9493d306cead98a05"
+    url "https://cpan.metacpan.org/authors/id/H/HA/HAARG/local-lib-2.000028.tar.gz"
+    sha256 "408317d67a59f9f91e23e3000b82de4f529cf9cf0896e228f3a27d6f607bfe3d"
   end
 
   def install
@@ -151,6 +162,7 @@ class Cpm < Formula
 
     build_pl = [
       "Module::Build::Tiny",
+      "Module::cpmfile",
       "Command::Runner",
       "Parallel::Pipes",
     ]

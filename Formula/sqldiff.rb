@@ -1,22 +1,22 @@
 class Sqldiff < Formula
   desc "Displays the differences between SQLite databases"
   homepage "https://www.sqlite.org/sqldiff.html"
-  url "https://www.sqlite.org/2020/sqlite-src-3340000.zip"
-  version "3.34.0"
-  sha256 "a5c2000ece56d2de13c474658b9cdba6b7f2608a4d711e245518ea02a2a2333e"
+  url "https://sqlite.org/2022/sqlite-src-3380200.zip"
+  version "3.38.2"
+  sha256 "c7c0f070a338c92eb08805905c05f254fa46d1c4dda3548a02474f6fb567329a"
   license "blessing"
 
   livecheck do
-    url "https://sqlite.org/news.html"
-    regex(%r{v?(\d+(?:\.\d+)+)</h3>}i)
+    formula "sqlite"
   end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "bc9c5f75179eebb911074c3ee03c3b569bcf78fd2b86638426cf80fcc0545ccb" => :big_sur
-    sha256 "9604fef23b34f1867541a51fbfbaa562f0c124933243958524c77412cce309b4" => :arm64_big_sur
-    sha256 "90f82a12f8b463d6ae92da105788e8a855968250f6ae2ea971e3945d3b3a5cc7" => :catalina
-    sha256 "8461ed8c4664c0c026fac15277fa6d2e18586f6be60e0ea71fd6eaaffa27e8d1" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "e3213520bb1e4ace1e6617e8ca065e0b09e403df07b1d85dcbba41c25ea8f31b"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "6c180e6cfd007d52d836619ba8e4386f63489c66c155f4cd386b24cb8660bfa5"
+    sha256 cellar: :any_skip_relocation, monterey:       "12f65bd390e0c9bdc561c3a7722301554f0c231289dd70a2399d080eff3a59c0"
+    sha256 cellar: :any_skip_relocation, big_sur:        "a4c1ec033e66e1ff28915c7e3d75d29bd1acbdf239f0ee12442d197e9fcab11b"
+    sha256 cellar: :any_skip_relocation, catalina:       "101caafba42333ceef5daaee91c97caf3bf9133247c2724517d35c9d5786febf"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1d7c6769db7b3725f1c5cced6e074c8e511b61632727b2122effa64029fa57db"
   end
 
   uses_from_macos "tcl-tk" => :build
@@ -32,7 +32,7 @@ class Sqldiff < Formula
     dbpath = testpath/"test.sqlite"
     sqlpath = testpath/"test.sql"
     sqlpath.write "create table test (name text);"
-    system "/usr/bin/sqlite3 #{dbpath} < #{sqlpath}"
+    system "sqlite3 #{dbpath} < #{sqlpath}"
     assert_equal "test: 0 changes, 0 inserts, 0 deletes, 0 unchanged",
                  shell_output("#{bin}/sqldiff --summary #{dbpath} #{dbpath}").strip
   end

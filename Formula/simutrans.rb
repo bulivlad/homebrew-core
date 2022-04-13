@@ -1,24 +1,24 @@
 class Simutrans < Formula
   desc "Transport simulator"
   homepage "https://www.simutrans.com/"
-  url "svn://servers.simutrans.org/simutrans/trunk/", revision: "9274"
-  version "122.0"
+  url "svn://servers.simutrans.org/simutrans/trunk/", revision: "10421"
+  version "123.0.1"
   license "Artistic-1.0"
-  head "https://github.com/aburch/simutrans.git"
+  head "https://github.com/aburch/simutrans.git", branch: "master"
 
   livecheck do
     url "https://sourceforge.net/projects/simutrans/files/simutrans/"
+    regex(%r{href=.*?/files/simutrans/(\d+(?:[.-]\d+)+)/}i)
     strategy :page_match
-    regex(%r{href=.*?/files/simutrans/(\d+(?:[-_.]\d+)+)/}i)
   end
 
   bottle do
-    cellar :any
-    sha256 "6684c3e916b6566a770f7239b5df397a2216ed0522a0df7e96a204a6e49164a0" => :big_sur
-    sha256 "ea6599b33bd87ece631672772db23a583fb7ca3bbd2a99c0364add9302196e9d" => :arm64_big_sur
-    sha256 "50aa64655688d3768238ac9878307d252fbaafd5c8dd6af3bfaa5f9874b53a97" => :catalina
-    sha256 "3dbf340c91f3e97998b2b0b9e2c064c21a2e9fc656d73ccb25e558175350ada6" => :mojave
-    sha256 "fea3c9fde01b95445d1eb02749f8ed3621e9e5a59f70c5a2f962e9360696a797" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "89c68007e13410b6d7fc4d675f0eabc4487393ad4d4768d2e0830a206ae5dae7"
+    sha256 cellar: :any,                 arm64_big_sur:  "aa8073c151259b074563854c6ea63ffaab8a41b268b150e24d3dab93ab75231e"
+    sha256 cellar: :any,                 monterey:       "339ac25e7eb60cbe2158c59feece111a66bdb587e23f4104c5045b820c861031"
+    sha256 cellar: :any,                 big_sur:        "076b15195eb642b6e97eef391580c62d9333a52c68f8551aeb1812736e9967d1"
+    sha256 cellar: :any,                 catalina:       "e618f3935018b641b10d70286fe3d60e366cfcd914125a634d6c51c8e33fad79"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2c2eb82d4b879f59e2201b78d11cea24a8f8f3fc7ba2859d5c6c3aa41a830355"
   end
 
   depends_on "autoconf" => :build
@@ -28,27 +28,39 @@ class Simutrans < Formula
   depends_on "libpng"
   depends_on "sdl2"
 
-  resource "pak64" do
-    url "https://downloads.sourceforge.net/project/simutrans/pak64/122-0/simupak64-122-0.zip"
-    sha256 "ce2ebf0e4e0c8df5defa10be114683f65559d5a994d1ff6c96bdece7ed984b74"
+  uses_from_macos "curl"
+  uses_from_macos "unzip"
+
+  on_linux do
+    depends_on "gcc"
   end
 
-  resource "text" do
-    url "https://simutrans-germany.com/translator/data/tab/language_pack-Base+texts.zip"
-    sha256 "a2078e40a96afbdaff4e192fd8cdfcb5b9c367f1b135e926335023abd9280152"
+  fails_with gcc: "5"
+
+  resource "pak64" do
+    url "https://downloads.sourceforge.net/project/simutrans/pak64/123-0/simupak64-123-0.zip"
+    sha256 "b8a0a37c682d8f62a3b715c24c49bc738f91d6e1e4600a180bb4d2e9f85b86c1"
   end
 
   def install
+    # These translations are dynamically generated.
+    system "./get_lang_files.sh"
+
     args = %w[
       BACKEND=sdl2
       MULTI_THREAD=1
       OPTIMISE=1
-      OSTYPE=mac
       USE_FREETYPE=1
       USE_UPNP=0
       USE_ZSTD=0
     ]
-    args << "AV_FOUNDATION=1" if MacOS.version >= :sierra
+    if OS.mac?
+      args << "AV_FOUNDATION=1" if MacOS.version >= :sierra
+      args << "OSTYPE=mac"
+    elsif OS.linux?
+      args << "OSTYPE=linux"
+    end
+
     system "autoreconf", "-ivf"
     system "./configure", "--prefix=#{prefix}", "CC=#{ENV.cc}"
     system "make", "all", *args
@@ -64,7 +76,6 @@ class Simutrans < Formula
     bin.install "nettools/nettool"
 
     libexec.install resource("pak64")
-    (libexec/"text").install resource("text")
   end
 
   test do

@@ -6,6 +6,7 @@ class Cryptominisat < Formula
   # Everything that's needed to run/build/install/link the system is MIT licensed. This allows
   # easy distribution and running of the system everywhere.
   license "MIT"
+  revision 2
 
   livecheck do
     url "https://github.com/msoos/cryptominisat.git"
@@ -13,9 +14,12 @@ class Cryptominisat < Formula
   end
 
   bottle do
-    sha256 "a44fd7c5ef4e744e5f2b09fb9ed007b08c5a3a77ce77f82a84c7c50a1fc3741a" => :big_sur
-    sha256 "2c6b3e384755e1696497a521e474a3260e4bfbd270a5008b0d4e967e3fa263dc" => :catalina
-    sha256 "8643301b4c05958d3c220f1c4f0a155ba2ae9877871598c9862b7479a1805e08" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "97285ce6d4de3cd1ddbae653a5361b2aca7692ac116e2bb0ad7c3026c3147132"
+    sha256 cellar: :any,                 arm64_big_sur:  "8416efd9860f11189aadfb69cac1c211f8773fa058177955082faa9981334941"
+    sha256 cellar: :any,                 monterey:       "c4de01735f86feefd2234bdd1c178f3c2d68a568ad8aa1f9bc8620e5dff9c023"
+    sha256 cellar: :any,                 big_sur:        "291f5080fe3f1af3b219fd3fc2bdaa7ce66ea05f099fa60444ffb24625d32b9c"
+    sha256 cellar: :any,                 catalina:       "af9e9370e163b91db83faf606de77f52faf60498e38504a4753224e080899ebd"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5a70ea83ec78219e0586fa86ff607141005af77fcc3c00c16e62c07f1ae96e50"
   end
 
   depends_on "cmake" => :build
@@ -24,12 +28,17 @@ class Cryptominisat < Formula
 
   def install
     # fix audit failure with `lib/libcryptominisat5.5.7.dylib`
-    inreplace "src/GitSHA1.cpp.in", "@CMAKE_CXX_COMPILER@", "/usr/bin/clang++"
+    inreplace "src/GitSHA1.cpp.in", "@CMAKE_CXX_COMPILER@", ENV.cxx
 
-    mkdir "build" do
-      system "cmake", "..", *std_cmake_args, "-DNOM4RI=ON"
-      system "make", "install"
-    end
+    # fix building C++ with the value of PY_C_CONFIG
+    inreplace "python/setup.py.in", "cconf +", "cconf + ['-std=gnu++11'] +"
+
+    system "cmake", "-S", ".", "-B", "build",
+                    "-DNOM4RI=ON",
+                    "-DCMAKE_INSTALL_RPATH=#{rpath}",
+                    *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
@@ -41,7 +50,7 @@ class Cryptominisat < Formula
       -1 2 3 0
     EOS
     result = shell_output("#{bin}/cryptominisat5 simple.cnf", 20)
-    assert_match /s UNSATISFIABLE/, result
+    assert_match "s UNSATISFIABLE", result
 
     (testpath/"test.py").write <<~EOS
       import pycryptosat

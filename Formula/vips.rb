@@ -1,10 +1,10 @@
 class Vips < Formula
   desc "Image processing library"
   homepage "https://github.com/libvips/libvips"
-  url "https://github.com/libvips/libvips/releases/download/v8.10.5/vips-8.10.5.tar.gz"
-  sha256 "a4eef2f5334ab6dbf133cd3c6d6394d5bdb3e76d5ea4d578b02e1bc3d9e1cfd8"
+  url "https://github.com/libvips/libvips/releases/download/v8.12.2/vips-8.12.2.tar.gz"
+  sha256 "565252992aff2c7cd10c866c7a58cd57bc536e03924bde29ae0f0cb9e074010b"
   license "LGPL-2.1-or-later"
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -12,20 +12,29 @@ class Vips < Formula
   end
 
   bottle do
-    sha256 "a36a7a2e76a5ae32912fb15b16a97af9f3e6fe301bfc2aa1c688b01f5d588e88" => :big_sur
-    sha256 "3f592d22b8bc5035eacf6905609274e55e9f22f34850b2179b32156e5499e974" => :arm64_big_sur
-    sha256 "c8bac206f43b178d5ac9f052ff856f1f7eddb5f606a32daa9388b73f56fbb3f8" => :catalina
-    sha256 "ababb7eedd532a9c51114b8e500ef0f3db3cb9199a6a68168114e04a026c12dd" => :mojave
+    sha256 arm64_monterey: "0e9d0479d01b08754283b695427a7c1aa36beffb567c07e25fdac8a2685f7649"
+    sha256 arm64_big_sur:  "4c2b975f8a4f7a9e6e1ca1b50fcc66c52a2b5f257a48d1fef828c487f26334b2"
+    sha256 monterey:       "eb519980dbd7e7c42e7f7731be36838b5d279f95e2b7cbc4c8c7fa17df13c7d9"
+    sha256 big_sur:        "e824f02d4b151c8b5004f64132965dfccd1bd13040f021346df0aedd52c70ca4"
+    sha256 catalina:       "77dfb217bd6b4b0dd1292fe29f8021bf4bb8333523a8715ac4f4467a8e29f94a"
+    sha256 x86_64_linux:   "a02853a50059059c308a93900839afb5fb4fbc3b0b5cb96a0f6535db085ad5eb"
   end
 
   depends_on "pkg-config" => :build
+  depends_on "cairo"
   depends_on "cfitsio"
+  depends_on "cgif"
   depends_on "fftw"
   depends_on "fontconfig"
+  depends_on "freetype"
+  depends_on "gdk-pixbuf"
   depends_on "gettext"
-  depends_on "giflib"
   depends_on "glib"
+  depends_on "harfbuzz"
+  depends_on "hdf5"
   depends_on "imagemagick"
+  depends_on "imath"
+  depends_on "jpeg-xl"
   depends_on "libexif"
   depends_on "libgsf"
   depends_on "libheif"
@@ -35,20 +44,26 @@ class Vips < Formula
   depends_on "librsvg"
   depends_on "libspng"
   depends_on "libtiff"
+  depends_on "libxml2"
   depends_on "little-cms2"
   depends_on "mozjpeg"
   depends_on "openexr"
+  depends_on "openjpeg"
   depends_on "openslide"
   depends_on "orc"
   depends_on "pango"
   depends_on "poppler"
   depends_on "webp"
 
+  uses_from_macos "expat"
   uses_from_macos "zlib"
 
   on_linux do
+    depends_on "gcc"
     depends_on "gobject-introspection"
   end
+
+  fails_with gcc: "5"
 
   def install
     # mozjpeg needs to appear before libjpeg, otherwise it's not used
@@ -57,7 +72,6 @@ class Vips < Formula
     args = %W[
       --disable-dependency-tracking
       --prefix=#{prefix}
-      --with-magick
     ]
 
     system "./configure", *args

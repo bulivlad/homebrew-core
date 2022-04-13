@@ -4,17 +4,15 @@ class Gspell < Formula
   url "https://download.gnome.org/sources/gspell/1.8/gspell-1.8.4.tar.xz"
   sha256 "cf4d16a716e813449bd631405dc1001ea89537b8cdae2b8abfb3999212bd43b4"
   license "LGPL-2.1-or-later"
-
-  livecheck do
-    url :stable
-  end
+  revision 5
 
   bottle do
-    sha256 "2faf4dc1eba31babb0699a27e513825e161c758a8f413c9f60bee4cb05e61b9d" => :big_sur
-    sha256 "e8165b2fe1d4033e4d69905a9ffd928ef60f4aec6dd410c43a1ac564a314e87a" => :arm64_big_sur
-    sha256 "b7165cc3def086000bc01e62724c5ae303200ca3eff64f681ead49f80313db20" => :catalina
-    sha256 "eb478bbf00c69404e64f21db962abdcd237d146a326d2779aaeae08f6414b8a2" => :mojave
-    sha256 "24dd633197c7ea490125a506db6379f7b134efdd1f7426bb6d9c0830c1b09f98" => :high_sierra
+    sha256 arm64_monterey: "7ec89b831d4f6aa1300b2fbe4aab3f219cf2dff52d2d3e06a697d5820de6e368"
+    sha256 arm64_big_sur:  "2ee4a35046b74bc0683baeea277ace95fbf929f64a80d33a3f18b430f86cd895"
+    sha256 monterey:       "d6a84e05eabbb7c37823dc3c7622920c5476d4b18d7349133fdf39c64f3ea551"
+    sha256 big_sur:        "3b5a01439377cb87b9eb6e515bc5019fe3be40907f6dcc7ba072649fb169f259"
+    sha256 catalina:       "297f8d03c748f1f0d8d9ae59826d65c6d408b6c29eb7ca2188ceccaced83eed7"
+    sha256 x86_64_linux:   "a9796edf66803b8301545cd811df36d0d5b7f621d979b527c94dc3eecb7984a1"
   end
 
   depends_on "autoconf" => :build
@@ -78,7 +76,7 @@ class Gspell < Formula
       -I#{glib.opt_include}/glib-2.0
       -I#{glib.opt_lib}/glib-2.0/include
     ]
-    on_macos do
+    if OS.mac?
       gtk_mac_integration = Formula["gtk-mac-integration"]
       flags << "-I#{gtk_mac_integration.opt_include}/gtkmacintegration"
     end
@@ -113,9 +111,7 @@ class Gspell < Formula
       -lpango-1.0
       -lpangocairo-1.0
     ]
-    on_macos do
-      flags << "-lintl"
-    end
+    flags << "-lintl" if OS.mac?
     system ENV.cc, "test.c", "-o", "test", *flags
     ENV["G_DEBUG"] = "fatal-warnings"
 

@@ -1,29 +1,31 @@
 class Ipbt < Formula
   desc "Program for recording a UNIX terminal session"
   homepage "https://www.chiark.greenend.org.uk/~sgtatham/ipbt/"
-  url "https://www.chiark.greenend.org.uk/~sgtatham/ipbt/ipbt-20190601.d1519e0.tar.gz"
-  version "20190601"
-  sha256 "a519507fccda5e3054d3639e9abedb482a108fa8ee6fc3b1c03ba0d6a4ba48aa"
+  url "https://www.chiark.greenend.org.uk/~sgtatham/ipbt/ipbt-20220403.d4e7fcd.tar.gz"
+  version "20220403"
+  sha256 "8c7f325166b86055232cca9d745c6a18dcdcb6d30a0685e07ac0eab677912b05"
+  license "MIT"
 
   livecheck do
     url :homepage
-    regex(/href=.*?ipbt[._-]v?(\d+)(?:\.[\da-z]+)?\.t/i)
+    regex(/href=.*?ipbt[._-]v?(\d+(?:\.\d+)*)(?:[._-][\da-z]+)?\.t/i)
   end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "136112dbee67f57c38adf83a55913fff16c4444d7c849b80be5c463f5e2efc76" => :big_sur
-    sha256 "e9b51c4509c77561acb5e1d2d90dd0b0e0e64b13c15bc3238e508995eb6c782a" => :arm64_big_sur
-    sha256 "367536bc0020cd8b4313936070ec9539bcfe56de061a40b6bfc4aa0533d82a5a" => :catalina
-    sha256 "e68f7a1286319ca19382bef65cbf2d80fd1f15bc46dc623cbe9b8f73b5d9d848" => :mojave
-    sha256 "9ae5d95807ead91cb2bd746fb2f3d4fee82cb39dba42f67bdea9eede792b7261" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "347ce1b20027c44a89574d58a960b3e1126a0e7b39c24e3ee855e67da6c94726"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "2ef9e7bf3fa26b211ffb1fa2592b6595eea314a8aa7dbe0858cc75d877004b28"
+    sha256 cellar: :any_skip_relocation, monterey:       "677064f3ddf5de10e21b57cb755659c8a5269f533d7979650377567d265d32ca"
+    sha256 cellar: :any_skip_relocation, big_sur:        "b0db9c92b9bc916ecd88f7b67e4d5fee7378c0a85d576ba12f1e12362aec2456"
+    sha256 cellar: :any_skip_relocation, catalina:       "c58b151b7c65f18cfc11daaae87fc532d9021a9b09de9287696dcab6d4b90b43"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "13a8dfbb93b8ddf44dc033e892ed3846e1ac2760d56e0bb8b0ffb24aef465a75"
   end
+
+  depends_on "cmake" => :build
 
   uses_from_macos "ncurses"
 
   def install
-    system "./configure", "--prefix=#{prefix}",
-                          "--disable-dependency-tracking"
+    system "cmake", ".", *std_cmake_args
     system "make", "install"
   end
 

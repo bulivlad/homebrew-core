@@ -2,8 +2,8 @@ class Fortio < Formula
   desc "HTTP and gRPC load testing and visualization tool and server"
   homepage "https://fortio.org/"
   url "https://github.com/fortio/fortio.git",
-      tag:      "v1.11.5",
-      revision: "696d6ace5d1ac8535ee5e49b20bcfa9a779035e2"
+      tag:      "v1.25.0",
+      revision: "3eed83884d1264b2faa10dc3fc2b0517ae2eae8d"
   license "Apache-2.0"
 
   livecheck do
@@ -12,17 +12,19 @@ class Fortio < Formula
   end
 
   bottle do
-    sha256 "7abc5fc9821fb5247e4904b565303e4df7576fdf51a768179324b803eb48c2af" => :big_sur
-    sha256 "9513e525fc8c109ad78fa2e6469a989d61df1ee25765058c3689eadd5f0f960d" => :arm64_big_sur
-    sha256 "d8d2481d518527632bbd376fc86742a84f5e4214f68fed1497d94e4f2ba0ea01" => :catalina
-    sha256 "99d1d9593eee47c5317a26e1ef796f16d8c6bb13e0bad8cfa7588b337afccabf" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "1edfec0ab9fb2fea5434454c93af797e478231f9809f637d8a8fb9e40488a02b"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "5dc3e508eb5eaa01a20be303a002795c43b474ed688505b924bef9ac7db512c6"
+    sha256 cellar: :any_skip_relocation, monterey:       "590d2ea94d81078e1ba8be686920ffaa5e2f52f2dae0ae6fd8c65be10fda2d63"
+    sha256 cellar: :any_skip_relocation, big_sur:        "6eb52f59789165e9d78e79305cfba66c247f99b1168ebeb94a678d648bfb43b6"
+    sha256 cellar: :any_skip_relocation, catalina:       "c66eb4ef443b95067d166310095be368f4ceb6d06a6ecd72e9ff049e9c39ddd6"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "03380cf33e28d0bf094443ee99c85546ad73d418a0ac9a2cbfd136ddd93eccdc"
   end
 
   depends_on "go" => :build
 
   def install
-    system "make", "official-build", "OFFICIAL_BIN=#{bin}/fortio", "LIB_DIR=#{lib}"
-    lib.install "ui/static", "ui/templates"
+    system "make", "-j1", "official-build-clean", "official-build-version", "OFFICIAL_BIN=#{bin}/fortio",
+      "BUILD_DIR=./tmp/fortio_build"
   end
 
   test do
@@ -35,7 +37,7 @@ class Fortio < Formula
       end
       sleep 2
       output = shell_output("#{bin}/fortio load http://localhost:#{port}/ 2>&1")
-      assert_match /^All\sdone/, output.lines.last
+      assert_match(/^All\sdone/, output.lines.last)
     ensure
       Process.kill("SIGTERM", pid)
     end

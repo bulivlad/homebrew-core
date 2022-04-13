@@ -1,23 +1,27 @@
 class MariadbConnectorC < Formula
   desc "MariaDB database connector for C applications"
-  homepage "https://downloads.mariadb.org/connector-c/"
-  url "https://downloads.mariadb.org/f/connector-c-3.1.11/mariadb-connector-c-3.1.11-src.tar.gz"
-  mirror "https://fossies.org/linux/misc/mariadb-connector-c-3.1.11-src.tar.gz"
-  sha256 "3e6f6c399493fe90efdc21a3fe70c30434b7480e8195642a959f1dd7a0fa5b0f"
+  homepage "https://mariadb.org/download/?tab=connector&prod=connector-c"
+  url "https://downloads.mariadb.com/Connectors/c/connector-c-3.2.6/mariadb-connector-c-3.2.6-src.tar.gz"
+  mirror "https://fossies.org/linux/misc/mariadb-connector-c-3.2.6-src.tar.gz/"
+  sha256 "9c22fff9d18db7ebdcb63979882fb6b68d2036cf2eb62f043eac922cd36bdb91"
   license "LGPL-2.1-or-later"
-  revision 1
-  head "https://github.com/mariadb-corporation/mariadb-connector-c.git"
+  head "https://github.com/mariadb-corporation/mariadb-connector-c.git", branch: "3.2"
 
+  # https://mariadb.org/download/ sometimes lists an older version as newest,
+  # so we check the JSON data used to populate the mariadb.com downloads page
+  # (which lists GA releases).
   livecheck do
-    url "https://downloads.mariadb.org/connector-c/+releases/"
-    regex(%r{href=.*?connector-c/v?(\d+(?:\.\d+)+)/?["' >]}i)
+    url "https://mariadb.com/downloads_data.json"
+    regex(/href=.*?mariadb-connector-c[._-]v?(\d+(?:\.\d+)+)-src\.t/i)
   end
 
   bottle do
-    sha256 "336449db2c8c97536c63023289de0afe75324a7b85c1cd601e5248100cb8f34b" => :big_sur
-    sha256 "32910577f524f9100dccee7efdf1fff27e2e2804c757ace2d84ac304f12c64d3" => :arm64_big_sur
-    sha256 "2efbfa48262a5d9f5232d68ac6ae2d0e82fe55fed4cf2278cd2ec858a34d7e1a" => :catalina
-    sha256 "31b05ada881147da4af8f2ac0b5402fcaa8e995876451e3af5d448f2df2cd609" => :mojave
+    sha256 arm64_monterey: "a26f011092cfc5962d0fe3331ace48a40e4d7fc9001bd7fca89efbfe68308a08"
+    sha256 arm64_big_sur:  "0631d039b19fa059891ebf8a1c4c60af89748db33932b10c4538d4a54ddefc0e"
+    sha256 monterey:       "e7de3468abc7b07e6c94034ba3ada6a968623dde712b6a21188ad222561e63ce"
+    sha256 big_sur:        "31f236b45772756f8999afb3f6199316f2932b95185dcec65ccce4a53e093822"
+    sha256 catalina:       "88bb6df52bfa57ead262cc0a5e9ec05efb6cd4c8ba31525d0fd52b7876b4fa37"
+    sha256 x86_64_linux:   "b76dab98adafa4669aee3c1e99615823d0288d2f8f140ac4fb5cf8180d1fa86f"
   end
 
   depends_on "cmake" => :build
@@ -33,6 +37,7 @@ class MariadbConnectorC < Formula
     args << "-DWITH_OPENSSL=On"
     args << "-DWITH_EXTERNAL_ZLIB=On"
     args << "-DOPENSSL_INCLUDE_DIR=#{Formula["openssl@1.1"].opt_include}"
+    args << "-DINSTALL_MANDIR=#{share}"
     args << "-DCOMPILATION_COMMENT=Homebrew"
 
     system "cmake", ".", *args

@@ -1,11 +1,10 @@
 class Notmuch < Formula
   desc "Thread-based email index, search, and tagging"
   homepage "https://notmuchmail.org/"
-  url "https://notmuchmail.org/releases/notmuch-0.31.3.tar.xz"
-  sha256 "484041aed08f88f3a528a5b82489b6cda4090764228813bca73678da3a753aca"
+  url "https://notmuchmail.org/releases/notmuch-0.35.tar.xz"
+  sha256 "a831c414c4f20a6cae3a580793c855102d3295080f000eb3832b77226a40ac39"
   license "GPL-3.0-or-later"
-  revision 1
-  head "https://git.notmuchmail.org/git/notmuch", using: :git
+  head "https://git.notmuchmail.org/git/notmuch", using: :git, branch: "master"
 
   livecheck do
     url "https://notmuchmail.org/releases/"
@@ -13,14 +12,16 @@ class Notmuch < Formula
   end
 
   bottle do
-    cellar :any
-    sha256 "50463927fdfdbd0c2ce451b058d62411c1103224b782594a7c0e31e5cfb6b62d" => :big_sur
-    sha256 "adf2064697804a4c19a1840b14e2ad346062ad27511eccee87cf12d9d772f83d" => :arm64_big_sur
-    sha256 "ce1daba205ab1785008998e93dcb203c06afba8967dece326fec8a868b08de97" => :catalina
-    sha256 "b3dff4eefeaa3438b0b3c87c36b6fb2b3c41da2cdc59e1870a9f8eb1348d4392" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "4794d09aeec3a31ab42f446faccddafe437b4ba5bd3733cda47306416164ba3a"
+    sha256 cellar: :any,                 arm64_big_sur:  "a6ad91582b6044c0bb56128e63b12cf574a4be7ecbc1ea92b092d6c1f94cf83e"
+    sha256 cellar: :any,                 monterey:       "db79f0dc2fb3be4d30af78f2afce38bc4a2f726e9078f72a7b6f2a06bd1f35de"
+    sha256 cellar: :any,                 big_sur:        "9d37afdac92c51c5513b02be5e64d574e7efb6a9116c4994ac0235e4955ca247"
+    sha256 cellar: :any,                 catalina:       "959f1a2b48b723fe1d5996d29eb74a3a1179287e350977caea952c812250b65c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "179de9fb07f4c41ffc3714b85f3f3dcff995b50d50302de884fa92de6d92c8ea"
   end
 
   depends_on "doxygen" => :build
+  depends_on "emacs" => :build
   depends_on "libgpg-error" => :build
   depends_on "pkg-config" => :build
   depends_on "sphinx-doc" => :build
@@ -29,7 +30,8 @@ class Notmuch < Formula
   depends_on "python@3.9"
   depends_on "talloc"
   depends_on "xapian"
-  depends_on "zlib"
+
+  uses_from_macos "zlib", since: :sierra
 
   def install
     args = %W[
@@ -43,10 +45,12 @@ class Notmuch < Formula
     ]
 
     ENV.append_path "PYTHONPATH", Formula["sphinx-doc"].opt_libexec/"lib/python3.9/site-packages"
+    ENV.cxx11 if OS.linux?
 
     system "./configure", *args
     system "make", "V=1", "install"
 
+    elisp.install Dir["emacs/*.el"]
     bash_completion.install "completion/notmuch-completion.bash"
 
     (prefix/"vim/plugin").install "vim/notmuch.vim"
@@ -56,6 +60,20 @@ class Notmuch < Formula
     cd "bindings/python" do
       system Formula["python@3.9"].opt_bin/"python3", *Language::Python.setup_install_args(prefix)
     end
+
+    # If installed in non-standard prefixes, such as is the default with
+    # Homebrew on Apple Silicon machines, other formulae can fail to locate
+    # libnotmuch.dylib due to not checking locations like /opt/homebrew for
+    # libraries. This is a bug in notmuch rather than Homebrew; globals.py
+    # uses a vanilla CDLL instead of CDLL wrapped with `find_library`
+    # which effectively causes the issue.
+    #
+    # CDLL("libnotmuch.dylib") = OSError: dlopen(libnotmuch.dylib, 6): image not found
+    # find_library("libnotmuch") = '/opt/homebrew/lib/libnotmuch.dylib'
+    # http://notmuch.198994.n3.nabble.com/macOS-globals-py-issue-td4044216.html
+    inreplace lib/"python3.9/site-packages/notmuch/globals.py",
+               "libnotmuch.{0:s}.dylib",
+               opt_lib/"libnotmuch.{0:s}.dylib"
   end
 
   test do

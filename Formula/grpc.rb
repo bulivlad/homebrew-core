@@ -2,12 +2,10 @@ class Grpc < Formula
   desc "Next generation open source RPC library and framework"
   homepage "https://grpc.io/"
   url "https://github.com/grpc/grpc.git",
-      tag:      "v1.33.2",
-      revision: "ee5b762f33a42170144834f5ab7efda9d76c480b",
-      shallow:  false
+      tag:      "v1.44.0",
+      revision: "591d56e1300b6d11948e1b821efac785a295989c"
   license "Apache-2.0"
-  revision 3
-  head "https://github.com/grpc/grpc.git"
+  head "https://github.com/grpc/grpc.git", branch: "master"
 
   livecheck do
     url :stable
@@ -15,31 +13,53 @@ class Grpc < Formula
   end
 
   bottle do
-    cellar :any
-    sha256 "58661a605453a4c4e9b354b83f4a4bafd60c959264f47c517d0a34d3e8ccb69a" => :big_sur
-    sha256 "6e6f844c74329e4716772ca2980a3d71852acf06a34b04c166c3784474268b8a" => :catalina
-    sha256 "3bd3f893f80ea7e9682012655b7a07e7c4510897ed69bd2ae468a61fcf076b9b" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "afda954c3973058cc131d53895bf0a1ed8f0bc62b69fa07012e338558e0c4e10"
+    sha256 cellar: :any,                 arm64_big_sur:  "1891cc11afbc1fc1506aaaa03da207ed85337e00e38f82dfa871d3a12dce3841"
+    sha256 cellar: :any,                 monterey:       "3dc3439d4f381046d8898a4cd82f46cdccd80f944e513ac5cc9e56dc8c4e709d"
+    sha256 cellar: :any,                 big_sur:        "6ea01ab7fb3bb76926b284cc3840f34ba4904496a67c4da3754f9a15f6d38ef9"
+    sha256 cellar: :any,                 catalina:       "adfc33c975d45304c703c6db83d32f2dc0a5bcc15f3fd53d756a62154ef3e0a0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4fc6c53266041f0a3f9a886293225b2765e94fd66047b6efef3f8d8c92ec53a6"
   end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "cmake" => :build
   depends_on "libtool" => :build
+  depends_on "pkg-config" => :test
   depends_on "abseil"
   depends_on "c-ares"
-  depends_on "gflags"
   depends_on "openssl@1.1"
   depends_on "protobuf"
   depends_on "re2"
 
   uses_from_macos "zlib"
 
+  on_macos do
+    # This shouldn't be needed for `:test`, but there's a bug in `brew`:
+    # CompilerSelectionError: pdnsrec cannot be built with any available compilers.
+    depends_on "llvm" => [:build, :test] if DevelopmentTools.clang_build_version <= 1100
+  end
+
+  on_linux do
+    depends_on "gcc"
+  end
+
+  fails_with :clang do
+    build 1100
+    cause "Requires C++17 features not yet implemented"
+  end
+
+  fails_with gcc: "5" # C++17
+
   def install
+    ENV.remove "HOMEBREW_LIBRARY_PATHS", Formula["llvm"].opt_lib
+    ENV.llvm_clang if OS.mac? && (DevelopmentTools.clang_build_version <= 1100)
     mkdir "cmake/build" do
-      args = %w[
+      args = %W[
         ../..
         -DCMAKE_CXX_STANDARD=17
         -DCMAKE_CXX_STANDARD_REQUIRED=TRUE
+        -DCMAKE_INSTALL_RPATH=#{rpath}
         -DBUILD_SHARED_LIBS=ON
         -DgRPC_BUILD_TESTS=OFF
         -DgRPC_INSTALL=ON
@@ -54,22 +74,29 @@ class Grpc < Formula
       system "cmake", *args
       system "make", "install"
 
-      args = %w[
+      args = %W[
         ../..
-        -DCMAKE_EXE_LINKER_FLAGS=-lgflags
-        -DCMAKE_SHARED_LINKER_FLAGS=-lgflags
+        -DCMAKE_INSTALL_RPATH=#{rpath}
         -DBUILD_SHARED_LIBS=ON
         -DgRPC_BUILD_TESTS=ON
-        -DgRPC_GFLAGS_PROVIDER=package
       ] + std_cmake_args
       system "cmake", *args
       system "make", "grpc_cli"
       bin.install "grpc_cli"
-      lib.install Dir["libgrpc++_test_config*.{dylib,so}*"]
+      lib.install Dir[shared_library("libgrpc++_test_config", "*")]
+
+      if OS.mac?
+        # These are installed manually, so need to be relocated manually as well
+        MachO::Tools.add_rpath(bin/"grpc_cli", rpath)
+        MachO::Tools.add_rpath(lib/shared_library("libgrpc++_test_config"), rpath)
+      end
     end
   end
 
   test do
+    # Force use of system clang on Mojave
+    ENV.clang if OS.mac? && (DevelopmentTools.clang_build_version <= 1100)
+
     (testpath/"test.cpp").write <<~EOS
       #include <grpc/grpc.h>
       int main() {
@@ -78,8 +105,11 @@ class Grpc < Formula
         return GRPC_STATUS_OK;
       }
     EOS
-    system ENV.cc, "test.cpp", "-I#{include}", "-L#{lib}", "-lgrpc", "-o", "test"
+    ENV.prepend_path "PKG_CONFIG_PATH", Formula["openssl@1.1"].opt_lib/"pkgconfig"
+    pkg_config_flags = shell_output("pkg-config --cflags --libs libcares protobuf re2 grpc++").chomp.split
+    system ENV.cc, "test.cpp", "-L#{Formula["abseil"].opt_lib}", *pkg_config_flags, "-o", "test"
     system "./test"
+
     output = shell_output("grpc_cli ls localhost:#{free_port} 2>&1", 1)
     assert_match "Received an error when querying services endpoint.", output
   end

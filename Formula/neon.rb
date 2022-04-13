@@ -1,9 +1,10 @@
 class Neon < Formula
   desc "HTTP and WebDAV client library with a C interface"
   homepage "https://notroj.github.io/neon/"
-  url "https://notroj.github.io/neon/neon-0.31.2.tar.gz"
-  mirror "https://fossies.org/linux/www/neon-0.31.2.tar.gz"
-  sha256 "cf1ee3ac27a215814a9c80803fcee4f0ede8466ebead40267a9bd115e16a8678"
+  url "https://notroj.github.io/neon/neon-0.32.2.tar.gz"
+  mirror "https://fossies.org/linux/www/neon-0.32.2.tar.gz"
+  sha256 "986566468c6295fc5d0fb141a5981e31c9f82ee38e938374abed8471ef2fb286"
+  license "LGPL-2.0-or-later"
 
   livecheck do
     url :homepage
@@ -11,17 +12,19 @@ class Neon < Formula
   end
 
   bottle do
-    cellar :any
-    rebuild 1
-    sha256 "2257aace79050e66bd7c2de052d7506a0fdfbc62ba9b84ff2f87da6396aa22da" => :big_sur
-    sha256 "59508df4cea7739d669187e923c1e3ceac1b3e65cbfbe6c1e5d38ef37bb65382" => :arm64_big_sur
-    sha256 "08c046a121125fb4a2ec4e84035586aa46086aa07a0bbeb2f189ed7e597a6d67" => :catalina
-    sha256 "20d474191273a8210f05ecb6ed300d6aa92ffccd6cc45d3ef1f12d8d58d5fee9" => :mojave
-    sha256 "0bc378496a9a3c82f30909210acdd3ead44594dba78741797edabbec2b9481e8" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "5b10f6c1be6a6897763339f92831344a2ca97a27e26bc8c27399358f6214961f"
+    sha256 cellar: :any,                 arm64_big_sur:  "c3e6c0140a0761348ec6ebb26ff464bc3baf250b3674df7a9692a0af7a6d4068"
+    sha256 cellar: :any,                 monterey:       "2a3ce9b7329c7abcbbe9167e8d5fef45a242d1ae2d876a989b41cabbec19171a"
+    sha256 cellar: :any,                 big_sur:        "ddf63fc6da79aa76871cf66c88237c2a0cb83a35fd01263c608c9c8dbf122ff7"
+    sha256 cellar: :any,                 catalina:       "25216dfe96706b6e1cab7cc6b15300571fe38a00973e0c31209886a1005cf290"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9929c188b7c2bac00ea1bbb3b169481e02feb41d04157b80ba19b47e78b9add7"
   end
 
   depends_on "pkg-config" => :build
+  depends_on "xmlto" => :build
   depends_on "openssl@1.1"
+
+  uses_from_macos "libxml2"
 
   # Configure switch unconditionally adds the -no-cpp-precomp switch
   # to CPPFLAGS, which is an obsolete Apple-only switch that breaks
@@ -32,6 +35,7 @@ class Neon < Formula
   def install
     # Work around configure issues with Xcode 12
     ENV.append "CFLAGS", "-Wno-implicit-function-declaration"
+    ENV["XML_CATALOG_FILES"] = etc/"xml/catalog"
 
     system "./configure", "--disable-debug",
                           "--prefix=#{prefix}",

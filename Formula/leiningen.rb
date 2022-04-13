@@ -1,31 +1,25 @@
 class Leiningen < Formula
   desc "Build tool for Clojure"
   homepage "https://github.com/technomancy/leiningen"
-  url "https://github.com/technomancy/leiningen/archive/2.9.5.tar.gz"
-  sha256 "a29b45966e5cc1a37d5dc07fe436ed7cb172c88c53d44a049956ff53a096d43e"
+  url "https://github.com/technomancy/leiningen/archive/2.9.8.tar.gz"
+  sha256 "be299cbd70693213c6887f931327fb9df3bd54930a521d0fc88bea04d55c5cd4"
   license "EPL-1.0"
-  head "https://github.com/technomancy/leiningen.git"
+  head "https://github.com/technomancy/leiningen.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "f9aface1f4c962c0e00bf8300b33eb453734972dc11cc299c1ca0851de7b1940" => :big_sur
-    sha256 "5bd84d71583cc06ab837b857db70e16a8061abdb44c6855bd66fd06b021b88aa" => :arm64_big_sur
-    sha256 "7c29f1583ec0deb5b873547b3d9366d9d90f00728dd24e52d2538d5131f0dedb" => :catalina
-    sha256 "c1df069aa1d80a6005c7536a88ecb28440c1a8d1e8b82314784f63f033002831" => :mojave
+    sha256 cellar: :any_skip_relocation, all: "b223d9b801258547b2c6990b84f64f64f11a3ac89d774b2a4ef52c8df47ef4da"
   end
 
   depends_on "openjdk"
 
   resource "jar" do
-    url "https://github.com/technomancy/leiningen/releases/download/2.9.5/leiningen-2.9.5-standalone.zip", using: :nounzip
-    sha256 "df490c98bfe8d667bc5d83b80238528877234c285d0d48f61a4c8743c2db1eea"
+    url "https://github.com/technomancy/leiningen/releases/download/2.9.8/leiningen-2.9.8-standalone.jar"
+    sha256 "2a0e9114e0d623c748a9ade5d72b54128b31b5ddb13f51b04c533f104bb0c48d"
   end
 
   def install
+    libexec.install resource("jar")
     jar = "leiningen-#{version}-standalone.jar"
-    resource("jar").stage do
-      libexec.install "leiningen-#{version}-standalone.zip" => jar
-    end
 
     # bin/lein autoinstalls and autoupdates, which doesn't work too well for us
     inreplace "bin/lein-pkg" do |s|
@@ -50,7 +44,7 @@ class Leiningen < Formula
   test do
     (testpath/"project.clj").write <<~EOS
       (defproject brew-test "1.0"
-        :dependencies [[org.clojure/clojure "1.5.1"]])
+        :dependencies [[org.clojure/clojure "1.10.3"]])
     EOS
     (testpath/"src/brew_test/core.clj").write <<~EOS
       (ns brew-test.core)

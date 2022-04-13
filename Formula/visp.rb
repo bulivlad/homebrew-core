@@ -1,9 +1,10 @@
 class Visp < Formula
   desc "Visual Servoing Platform library"
   homepage "https://visp.inria.fr/"
-  url "https://gforge.inria.fr/frs/download.php/latestfile/475/visp-3.3.0.tar.gz"
-  sha256 "f2ed11f8fee52c89487e6e24ba6a31fa604b326e08fb0f561a22c877ebdb640d"
-  revision 11
+  url "https://visp-doc.inria.fr/download/releases/visp-3.5.0.tar.gz"
+  sha256 "494a648b2570da2a200ba326ed61a14e785eb9ee08ef12d3ad178b2f384d3d30"
+  license "GPL-2.0-or-later"
+  revision 1
 
   livecheck do
     url "https://visp.inria.fr/download/"
@@ -11,8 +12,11 @@ class Visp < Formula
   end
 
   bottle do
-    sha256 "bbc1c7b0022d1c99d9d144f73a82024d6af8eee0763a794fbc5ce0da98ac6308" => :catalina
-    sha256 "a6c1d3468de47a6725bea5933e1fddbb616fb5736af372a158a1d10aba992101" => :mojave
+    sha256 cellar: :any, arm64_monterey: "8cfe4fdc76612710b245a9f20ff23f4b8a0e31dd21a632c918dcbae3f311259b"
+    sha256 cellar: :any, arm64_big_sur:  "faddbd4e18caba15dbc033a686c6ecfde11006a45f2849ef7fd0cdff9da3ce66"
+    sha256 cellar: :any, monterey:       "ab699c9e421d6a09f49cc880f1585aea6336aba3e7bd5945652df96292dbc53c"
+    sha256 cellar: :any, big_sur:        "2cd260cb6587cfe9a4739c78cbb972e2190b428c8c7e29305f33476b4e9fd654"
+    sha256 cellar: :any, catalina:       "23f11b05c01c2aa107b077a5f9bf5287da606ed91ada7c27995665f457cb8586"
   end
 
   depends_on "cmake" => :build
@@ -26,29 +30,20 @@ class Visp < Formula
   depends_on "pcl"
   depends_on "zbar"
 
-  # from first commit at https://github.com/lagadic/visp/pull/768 - remove in next release
-  patch do
-    url "https://github.com/lagadic/visp/commit/61c8beb8442f9e0fe7df8966e2e874929af02344.patch?full_index=1"
-    sha256 "429bf02498fc03fff7bc2a2ad065dea6d8a8bfbde6bb1adb516fa821b1e5c96f"
-  end
-
-  # Fixes build on OpenCV >= 4.4.0
-  # Extracted from https://github.com/lagadic/visp/pull/795
-  patch :DATA
+  uses_from_macos "libxml2"
+  uses_from_macos "zlib"
 
   def install
     ENV.cxx11
 
-    sdk = MacOS::CLT.installed? ? "" : MacOS.sdk_path
-
     # Avoid superenv shim references
     inreplace "CMakeLists.txt" do |s|
-      s.sub! /CMake build tool:"\s+\${CMAKE_BUILD_TOOL}/,
-             "CMake build tool:            gmake\""
-      s.sub! /C\+\+ Compiler:"\s+\${VISP_COMPILER_STR}/,
-             "C++ Compiler:                clang++\""
-      s.sub! /C Compiler:"\s+\${CMAKE_C_COMPILER}/,
-             "C Compiler:                  clang\""
+      s.sub!(/CMake build tool:"\s+\${CMAKE_BUILD_TOOL}/,
+             "CMake build tool:            gmake\"")
+      s.sub!(/C\+\+ Compiler:"\s+\${VISP_COMPILER_STR}/,
+             "C++ Compiler:                clang++\"")
+      s.sub!(/C Compiler:"\s+\${CMAKE_C_COMPILER}/,
+             "C Compiler:                  clang\"")
     end
 
     system "cmake", ".", "-DBUILD_DEMOS=OFF",
@@ -76,23 +71,33 @@ class Visp < Formula
                          "-DPNG_PNG_INCLUDE_DIR=#{Formula["libpng"].opt_include}",
                          "-DPNG_LIBRARY_RELEASE=#{Formula["libpng"].opt_lib}/libpng.dylib",
                          "-DUSE_PTHREAD=ON",
-                         "-DPTHREAD_INCLUDE_DIR=#{sdk}/usr/include",
-                         "-DPTHREAD_LIBRARY=/usr/lib/libpthread.dylib",
                          "-DUSE_PYLON=OFF",
                          "-DUSE_REALSENSE=OFF",
                          "-DUSE_REALSENSE2=OFF",
                          "-DUSE_X11=OFF",
                          "-DUSE_XML2=ON",
-                         "-DXML2_INCLUDE_DIR=#{sdk}/usr/include/libxml2",
-                         "-DXML2_LIBRARY=/usr/lib/libxml2.dylib",
                          "-DUSE_ZBAR=ON",
                          "-DZBAR_INCLUDE_DIRS=#{Formula["zbar"].opt_include}",
                          "-DZBAR_LIBRARIES=#{Formula["zbar"].opt_lib}/libzbar.dylib",
                          "-DUSE_ZLIB=ON",
-                         "-DZLIB_INCLUDE_DIR=#{sdk}/usr/include",
-                         "-DZLIB_LIBRARY_RELEASE=/usr/lib/libz.dylib",
                          *std_cmake_args
+
+    # Replace generated references to OpenCV's Cellar path
+    opencv = Formula["opencv"]
+    opencv_references = Dir[
+      "CMakeCache.txt",
+      "CMakeFiles/Export/lib/cmake/visp/VISPModules.cmake",
+      "VISPConfig.cmake",
+      "VISPGenerateConfigScript.info.cmake",
+      "VISPModules.cmake",
+      "modules/**/flags.make",
+      "unix-install/VISPConfig.cmake",
+    ]
+    inreplace opencv_references, opencv.prefix.realpath, opencv.opt_prefix
     system "make", "install"
+
+    # Make sure software built against visp don't reference opencv's cellar path either
+    inreplace lib/"pkgconfig/visp.pc", opencv.prefix.realpath, opencv.opt_prefix
   end
 
   test do
@@ -110,26 +115,3 @@ class Visp < Formula
     assert_equal version.to_s, shell_output("./test").chomp
   end
 end
-__END__
-diff --git a/modules/vision/src/key-point/vpKeyPoint.cpp b/modules/vision/src/key-point/vpKeyPoint.cpp
-index dd5cabf..23ed382 100644
---- a/modules/vision/src/key-point/vpKeyPoint.cpp
-+++ b/modules/vision/src/key-point/vpKeyPoint.cpp
-@@ -2269,7 +2269,7 @@ void vpKeyPoint::initDetector(const std::string &detectorName)
-
-   if (detectorNameTmp == "SIFT") {
- #ifdef VISP_HAVE_OPENCV_XFEATURES2D
--    cv::Ptr<cv::FeatureDetector> siftDetector = cv::xfeatures2d::SIFT::create();
-+    cv::Ptr<cv::FeatureDetector> siftDetector = cv::SIFT::create();
-     if (!usePyramid) {
-       m_detectors[detectorNameTmp] = siftDetector;
-     } else {
-@@ -2447,7 +2447,7 @@ void vpKeyPoint::initExtractor(const std::string &extractorName)
- #else
-   if (extractorName == "SIFT") {
- #ifdef VISP_HAVE_OPENCV_XFEATURES2D
--    m_extractors[extractorName] = cv::xfeatures2d::SIFT::create();
-+    m_extractors[extractorName] = cv::SIFT::create();
- #else
-     std::stringstream ss_msg;
-     ss_msg << "Fail to initialize the extractor: SIFT. OpenCV version  " << std::hex << VISP_HAVE_OPENCV_VERSION

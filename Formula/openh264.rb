@@ -1,25 +1,24 @@
 class Openh264 < Formula
   desc "H.264 codec from Cisco"
   homepage "https://www.openh264.org/"
-  url "https://github.com/cisco/openh264/archive/v2.1.1.tar.gz"
-  sha256 "af173e90fce65f80722fa894e1af0d6b07572292e76de7b65273df4c0a8be678"
+  url "https://github.com/cisco/openh264/archive/v2.2.0.tar.gz"
+  sha256 "e4e5c8ba48e64ba6ce61e8b6e2b76b2d870c74c270147649082feabb40f25905"
   license "BSD-2-Clause"
-  head "https://github.com/cisco/openh264.git"
+  head "https://github.com/cisco/openh264.git", branch: "master"
 
   bottle do
-    cellar :any
-    sha256 "8025149092f1d95f870524cb04786fa08f3f67e1e60e259b675ba2a03b38949a" => :big_sur
-    sha256 "548fde2cb583ccc88f96e931787b758c309100a6386cfd2bf9e4173cc1d99601" => :arm64_big_sur
-    sha256 "40bbd156c791be70467bebecb927745edc9b54dd46aa2c4a317562a4cf1dce8e" => :catalina
-    sha256 "952ae4b5cafae14722588046032ee363b7b027178aa30ec450e4ee916b85eb4b" => :mojave
-    sha256 "de7a5593d7a401e606b44d88347e83651508538d2461e4510b024f41b8b0f42e" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "ac418886ca549ee2314ceac303e2a75f14128bbf50a364bf3fa897e6990e74ba"
+    sha256 cellar: :any,                 arm64_big_sur:  "516ad67a9e9ec7514f640734411a5d02e5b01f59ba39ab29aad0323d6e9d0fff"
+    sha256 cellar: :any,                 monterey:       "add5458dedf101bad97882556a748ae65026698733eca39770aa10efa16d7818"
+    sha256 cellar: :any,                 big_sur:        "c53a7e8bca47d027408277325edefef2355443bc302f61f1c7583189d6275231"
+    sha256 cellar: :any,                 catalina:       "79e8f9ae3259899d18839e8796d36ffb1baf453952d5516a304eba69b81c3bd3"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d873035084f800e380a82b7d66055704d0fbd9511e912227f2b0d8e18089070a"
   end
 
   depends_on "nasm" => :build
 
   def install
     system "make", "install-shared", "PREFIX=#{prefix}"
-    chmod 0444, "#{lib}/libopenh264.dylib"
   end
 
   test do

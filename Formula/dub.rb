@@ -1,32 +1,34 @@
 class Dub < Formula
   desc "Build tool for D projects"
   homepage "https://code.dlang.org/getting_started"
-  url "https://github.com/dlang/dub/archive/v1.24.0.tar.gz"
-  sha256 "4d14ba97748d89a2af9a3d62c1721c2f92bd393b010a9a4a39037449941e1312"
+  url "https://github.com/dlang/dub/archive/v1.28.0.tar.gz"
+  sha256 "bf072edeedc6761fe407aebc55cb9ab624bd61aac2611404990717c2be00ca66"
   license "MIT"
   version_scheme 1
-  head "https://github.com/dlang/dub.git"
+  head "https://github.com/dlang/dub.git", branch: "master"
 
   livecheck do
-    url :head
+    url :stable
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "3b754d2403322152227cc45a1525321f64c940143bde42220595dcee4d32361f" => :big_sur
-    sha256 "b71a9aa0abd4e9f25391ab6e25be4357c5a70801c4c2e86332bfc909c5253568" => :catalina
-    sha256 "acdd545896e27976e2178ea9bf12dba7d39e2118ba04dc762a444f639b51ce81" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "cccc9ceee9ec8c4b9862e0442c92f426a2382d7a8312e46b56f71a94cdeb640c"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f2d4071b7584a465ffe9f200352d461803d3d7cf27bfab801018cbe1c9ea1542"
+    sha256 cellar: :any_skip_relocation, monterey:       "9408c7786db9c860425b00340da19ea6863edaef9acffb63feeaf5a5804d1fa5"
+    sha256 cellar: :any_skip_relocation, big_sur:        "440f2e41dd346d764059e952079cc2f940209697815ff2804f917dac395617bd"
+    sha256 cellar: :any_skip_relocation, catalina:       "d65451e626f8fb08f13aa92e483dedadcaa616868426ed3e9e38c7de59e19a44"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "493ad504e56b4ba4d1d3adf4887a40d8c062271a6f4127ef1eee85b9f900ccd8"
   end
 
-  depends_on "dmd" => :build
+  depends_on "ldc" => :build
   depends_on "pkg-config"
 
   uses_from_macos "curl"
 
   def install
     ENV["GITVER"] = version.to_s
-    system "./build.d"
+    system "ldc2", "-run", "./build.d"
     system "bin/dub", "scripts/man/gen_man.d"
     bin.install "bin/dub"
     man1.install Dir["scripts/man/*.1"]

@@ -1,60 +1,45 @@
 class Traefik < Formula
   desc "Modern reverse proxy"
   homepage "https://traefik.io/"
-  url "https://github.com/traefik/traefik/releases/download/v2.3.7/traefik-v2.3.7.src.tar.gz"
-  sha256 "23920765851c058f3a2429bd88f5168dbe8ba41f67056ff5e4f507118a5d272a"
+  url "https://github.com/traefik/traefik/releases/download/v2.6.3/traefik-v2.6.3.src.tar.gz"
+  sha256 "5cffbcd97dc8138c87fbf8e6c3c692edf09ffea4555b21c8fdd0dd47a3baaf3d"
   license "MIT"
-  head "https://github.com/traefik/traefik.git"
+  head "https://github.com/traefik/traefik.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "bf212f487104da56096e7f8fe250f5af7a7ab23d3f0d13efdf0b38b5950ae47e" => :big_sur
-    sha256 "3964c1805ce308a71ebce937bce3a68a5369e3805002838768f13d3fac68cea1" => :arm64_big_sur
-    sha256 "8b0ea832df996689f59152bc36c67969e56b5affb75c9c8756128b079358fd72" => :catalina
-    sha256 "47ca71eaa1f3ab629725208d28e76bffbac7ae417a6cc818ca01f383007fc6f4" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "dde6ef76853fb26e794c6ea22efb4ad46b2c46292e4df0a1057c9874b62a7fa2"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "718fbbf4006dfb863ae978dd7a80c1d906c090efc5a8115cf50cd3c3fa81ea84"
+    sha256 cellar: :any_skip_relocation, monterey:       "ad0f85f1aac3eaf44a33f5392be5479dbc8437fc3401229fae7561d0a4585293"
+    sha256 cellar: :any_skip_relocation, big_sur:        "df767bcf4719a07eabf8bea23172448cb0d369c4e32cbee2992837960faca511"
+    sha256 cellar: :any_skip_relocation, catalina:       "5e3e0b7af24791e3f5a8831d9577fe836472b11a23ece498081c08738caee62b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b355ddb70fb40c720165e46928362d5d2e14e3a4c99e8d7595b84e4f5ede10d2"
   end
 
   depends_on "go" => :build
   depends_on "go-bindata" => :build
 
-  def install
-    system "go", "generate"
-    system "go", "build",
-      "-ldflags", "-s -w -X github.com/traefik/traefik/v#{version.major}/pkg/version.Version=#{version}",
-      "-trimpath", "-o", bin/"traefik", "./cmd/traefik"
+  # Fix build with Go 1.18.
+  # Remove with v2.7.
+  patch do
+    url "https://github.com/traefik/traefik/commit/9297055ad8f651c751473b5fd4103eb224a8337e.patch?full_index=1"
+    sha256 "b633710c7bde8737fbe0170066a765ee749f014d38afd06ef40085773e152fd0"
   end
 
-  plist_options manual: "traefik"
+  def install
+    ldflags = %W[
+      -s -w
+      -X github.com/traefik/traefik/v#{version.major}/pkg/version.Version=#{version}
+    ].join(" ")
+    system "go", "generate"
+    system "go", "build", *std_go_args(ldflags: ldflags), "./cmd/traefik"
+  end
 
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>KeepAlive</key>
-          <false/>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>ProgramArguments</key>
-          <array>
-            <string>#{opt_bin}/traefik</string>
-            <string>--configfile=#{etc/"traefik/traefik.toml"}</string>
-          </array>
-          <key>EnvironmentVariables</key>
-          <dict>
-          </dict>
-          <key>RunAtLoad</key>
-          <true/>
-          <key>WorkingDirectory</key>
-          <string>#{var}</string>
-          <key>StandardErrorPath</key>
-          <string>#{var}/log/traefik.log</string>
-          <key>StandardOutPath</key>
-          <string>#{var}/log/traefik.log</string>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run [opt_bin/"traefik", "--configfile=#{etc}/traefik/traefik.toml"]
+    keep_alive false
+    working_dir var
+    log_path var/"log/traefik.log"
+    error_log_path var/"log/traefik.log"
   end
 
   test do
@@ -78,10 +63,10 @@ class Traefik < Formula
       end
       sleep 5
       cmd_ui = "curl -sIm3 -XGET http://127.0.0.1:#{http_port}/"
-      assert_match /404 Not Found/m, shell_output(cmd_ui)
+      assert_match "404 Not Found", shell_output(cmd_ui)
       sleep 1
       cmd_ui = "curl -sIm3 -XGET http://127.0.0.1:#{ui_port}/dashboard/"
-      assert_match /200 OK/m, shell_output(cmd_ui)
+      assert_match "200 OK", shell_output(cmd_ui)
     ensure
       Process.kill(9, pid)
       Process.wait(pid)

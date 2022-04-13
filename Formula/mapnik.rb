@@ -4,7 +4,8 @@ class Mapnik < Formula
   url "https://github.com/mapnik/mapnik/releases/download/v3.1.0/mapnik-v3.1.0.tar.bz2"
   sha256 "43d76182d2a975212b4ad11524c74e577576c11039fdab5286b828397d8e6261"
   license "LGPL-2.1-or-later"
-  head "https://github.com/mapnik/mapnik.git"
+  revision 8
+  head "https://github.com/mapnik/mapnik.git", branch: "master"
 
   livecheck do
     url :stable
@@ -12,14 +13,16 @@ class Mapnik < Formula
   end
 
   bottle do
-    cellar :any
-    sha256 "393431760e716e1486d6db7444a4eda2b5af3d778b11f5cfcec3d2866cc9c338" => :big_sur
-    sha256 "f8e6c2aebb84d38a4e93b17bba0b9210f61b5d3f4034963440c20af45b8e02ec" => :arm64_big_sur
-    sha256 "fc68ba4d5314b418a23bc78578cc4e3579d31832d3a49031a2e40c07ed83a3ec" => :catalina
-    sha256 "ff48d9d688e35d2d683089500267e193e0b11ff55053176c2d81d09b629ef52a" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "d674480b7e4e3947596fb6aa39ee0646876149a7fb09a6606b0189a3cd4cab5b"
+    sha256 cellar: :any,                 arm64_big_sur:  "95b63730f23c0c25d05026fd1bb899591a36c5bf66b1c399570126e5a7483417"
+    sha256 cellar: :any,                 monterey:       "208dbe0310b4ab92bf229f6ec91bec75968adce03941f52f0d237737f8ef3101"
+    sha256 cellar: :any,                 big_sur:        "35472048579ffd32d6891db4cf3204d83e60f2f991a493c64e804edf67b7a7b1"
+    sha256 cellar: :any,                 catalina:       "85c16f13492ccaccd895027e2c8ff2185fac734f8049d15d1cf557c4fd52fed4"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "dcb3b0dc4edac0a7ac653171585ed2d987fb5c7cfad75fd5ac42485ebef26bd3"
   end
 
   depends_on "pkg-config" => :build
+  depends_on "python@3.9" => :build
   depends_on "boost"
   depends_on "cairo"
   depends_on "freetype"
@@ -36,13 +39,11 @@ class Mapnik < Formula
   def install
     ENV.cxx11
 
+    ENV["PYTHON"] = Formula["python@3.9"].opt_bin/"python3"
+
     # Work around "error: no member named 'signbit' in the global namespace"
     # encountered when trying to detect boost regex in configure
     ENV.delete("SDKROOT") if DevelopmentTools.clang_build_version >= 900
-
-    # Use Proj 6.0.0 compatibility headers
-    # https://github.com/mapnik/mapnik/issues/4036
-    ENV.append_to_cflags "-DACCEPT_USE_OF_DEPRECATED_PROJ_API_H"
 
     boost = Formula["boost"].opt_prefix
     freetype = Formula["freetype"].opt_prefix
@@ -82,6 +83,8 @@ class Mapnik < Formula
       WEBP_INCLUDES=#{webp}/include
       WEBP_LIBS=#{webp}/lib
     ]
+
+    inreplace "Makefile", "PYTHON = python", "PYTHON = python3"
 
     system "./configure", *args
     system "make"

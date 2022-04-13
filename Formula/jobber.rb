@@ -4,14 +4,17 @@ class Jobber < Formula
   url "https://github.com/dshearer/jobber/archive/v1.4.4.tar.gz"
   sha256 "fd88a217a413c5218316664fab5510ace941f4fdb68dcb5428385ff09c68dcc2"
   license "MIT"
-  head "https://github.com/dshearer/jobber.git"
+  head "https://github.com/dshearer/jobber.git", branch: "master"
 
   bottle do
-    sha256 "d6b20d135d1f3c3a83bbef5a8bd75aee37bbf737731c6e0dc24dfdfbc0985bdd" => :big_sur
-    sha256 "b7ae670b701b1ed169771f2bc34822a785614ad33827e049d5c7456c02cf3591" => :arm64_big_sur
-    sha256 "f34fec60aef5e18cfc6f5bb8f1e0dbb00a866a01e3e0041d6c8e055ee7c4e27e" => :catalina
-    sha256 "6bb3016d2f4200636cd51c237d04039b8bbf285d473acb37589e45fc602caf30" => :mojave
-    sha256 "1fafbf17e64ac28355dd28758441f97fbe8b7e633bde0cf48a744918c281f8da" => :high_sierra
+    rebuild 1
+    sha256 arm64_monterey: "14087e07df78fd1e53fa44cc873df0db56eee9b0c89154161ee1a4c617c8ae9d"
+    sha256 arm64_big_sur:  "c751dfdc4e8a2336eb4441dde62d3fc83d8ca869fe95e4804cecb99112551361"
+    sha256 monterey:       "d54b324e8914c637f54418851308b825241d2c3142c8c13e9a6316ff31ab6e99"
+    sha256 big_sur:        "669af998fd35ba85849f725ba8360cffbadfba87a8bd5f7adc43aa3a830caba5"
+    sha256 catalina:       "993170495768a40b7f86927bfc14a66397b9109c3d9520815727f0123409b1e0"
+    sha256 mojave:         "3767f3c9fa38a4ad1d8df745f8e5451bef3fea39e0f758a081e414f7d87feafa"
+    sha256 x86_64_linux:   "e8d9630a84c0fce0514498c0379961df72d461ad3eb2d82847b66ea34732188c"
   end
 
   depends_on "go" => :build
@@ -23,28 +26,11 @@ class Jobber < Formula
   end
 
   plist_options startup: true
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>Program</key>
-          <string>#{libexec}/jobbermaster</string>
-          <key>RunAtLoad</key>
-          <true/>
-          <key>KeepAlive</key>
-          <true/>
-          <key>StandardOutPath</key>
-          <string>#{var}/log/jobber.log</string>
-          <key>StandardErrorPath</key>
-          <string>#{var}/log/jobber.log</string>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run libexec/"jobbermaster"
+    keep_alive true
+    log_path var/"log/jobber.log"
+    error_log_path var/"log/jobber.log"
   end
 
   test do

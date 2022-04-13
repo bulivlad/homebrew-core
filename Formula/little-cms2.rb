@@ -3,8 +3,8 @@ class LittleCms2 < Formula
   homepage "https://www.littlecms.com/"
   # Ensure release is announced at https://www.littlecms.com/categories/releases/
   # (or https://www.littlecms.com/blog/)
-  url "https://downloads.sourceforge.net/project/lcms/lcms/2.11/lcms2-2.11.tar.gz"
-  sha256 "dc49b9c8e4d7cdff376040571a722902b682a795bf92985a85b48854c270772e"
+  url "https://downloads.sourceforge.net/project/lcms/lcms/2.13/lcms2-2.13.1.tar.gz"
+  sha256 "d473e796e7b27c5af01bd6d1552d42b45b43457e7182ce9903f38bb748203b88"
   license "MIT"
   version_scheme 1
 
@@ -14,16 +14,16 @@ class LittleCms2 < Formula
   # that the post URLs, headings, etc. maintain a consistent format.
   livecheck do
     url "https://www.littlecms.com/categories/releases/"
-    regex(%r{href=.*lcms2[._-]v?(\d+(?:\.\d+)+)/?["' >]}i)
+    regex(/Little\s*CMS\s+v?(\d+(?:\.\d+)+)\s+released/im)
   end
 
   bottle do
-    cellar :any
-    sha256 "e6f70f21087ef1f0e1379446b5b5f460915d3a132763919feb245534ed9bc4af" => :big_sur
-    sha256 "249a7b998b64074fa0978aa52cdbb9d11414734b2b5c2061ebc61159a9f98771" => :arm64_big_sur
-    sha256 "b0fe7486871b0fb0e34012f48bce09e96229e5e2985d64e7a0164c2847e41975" => :catalina
-    sha256 "e05f0a487d2243411eeb9fd9909f875517d7b27feb3cb914117acd9c60b76fcc" => :mojave
-    sha256 "928d1b8b8292a2d7950d0ef1381c70996bcde325f0124d7dcb68059090544dac" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "0fc9bdf0e245b210e0260f2a641dc88b1b1b5c1004eeadaafb9536eb21a347ab"
+    sha256 cellar: :any,                 arm64_big_sur:  "e78f36abce8a417db16755c5dbbdf8817e14861ea92bd029bb36e424a8563f52"
+    sha256 cellar: :any,                 monterey:       "0c50589e60d1fdc8e8ae52550c1ed0e9bbc68f77d105fa0180192d517cc5a85a"
+    sha256 cellar: :any,                 big_sur:        "7fbbf54484b962a2b72104db3f425587acf88666c0dd0753b00eb104bce1a2cc"
+    sha256 cellar: :any,                 catalina:       "152469fd79f4dde476f916be31fe0657656f298512201e6eb8be9f8dd9016c7a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "021649a443c169b8b18dd404f99d367ef79e5a6f650d8912b552a1b887e85ffe"
   end
 
   depends_on "jpeg"

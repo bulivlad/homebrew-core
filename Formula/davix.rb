@@ -1,19 +1,18 @@
 class Davix < Formula
   desc "Library and tools for advanced file I/O with HTTP-based protocols"
   homepage "https://github.com/cern-fts/davix"
-  url "https://github.com/cern-fts/davix/releases/download/R_0_7_6/davix-0.7.6.tar.gz"
-  sha256 "a2e7fdff29f7ba247a3bcdb08ab1db6d6ed745de2d3971b46526986caf360673"
-  license "LGPL-2.1"
-  head "https://github.com/cern-fts/davix.git"
+  url "https://github.com/cern-fts/davix/releases/download/R_0_8_1/davix-0.8.1.tar.gz"
+  sha256 "3f42f4eadaf560ab80984535ffa096d3e88287d631960b2193e84cf29a5fe3a6"
+  license "LGPL-2.1-or-later"
+  head "https://github.com/cern-fts/davix.git", branch: "devel"
 
   bottle do
-    cellar :any
-    rebuild 1
-    sha256 "9e554eb91c81f79781ea0890dd7309fe94010b32787a465f2368a8c0cd9129f9" => :big_sur
-    sha256 "29e62d295cee33757abdf95ee7cb4c3aa5b180419e6687bf9347a6a121cab134" => :arm64_big_sur
-    sha256 "e96a673e5adb6b0856928002be86673db1ba3efd3b8b06d5f87b8793d99698bb" => :catalina
-    sha256 "1c863a82c559b2cb4def7b425339edbb5cb31847d21ae886f92e8616bd8af497" => :mojave
-    sha256 "41917fcf64168c8f229fe025d77807e2adf7298e2bdfcb2c4b582e9d116faf4b" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "94b126cc7cd16f3e057e3e53cae4f29ac0c67b33493e7e233088cbf3a031eb08"
+    sha256 cellar: :any,                 arm64_big_sur:  "1352499f99f63e3db5b8bee1c5c33a3c91f01fe0469aba37e730cf345630b8ea"
+    sha256 cellar: :any,                 monterey:       "078b736ba2804b062d528d51c1573ce63650efc171fff6be48bda1930a26880a"
+    sha256 cellar: :any,                 big_sur:        "d7a35a8730e5b829bb96af49ada8ce8e506306d1bc339811054ac16fb6f25faa"
+    sha256 cellar: :any,                 catalina:       "e5e1f1c20c98c6ec7938021b254262689b9a7ede8f948cd9278123b1d8825831"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "55792b06f189367e5f8e0c0820234502d059507794e52ea84992764041704236"
   end
 
   depends_on "cmake" => :build
@@ -27,7 +26,7 @@ class Davix < Formula
   end
 
   def install
-    system "cmake", ".", *std_cmake_args
+    system "cmake", ".", *std_cmake_args, "-DCMAKE_INSTALL_RPATH=#{rpath}"
     system "make", "install"
   end
 

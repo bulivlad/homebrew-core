@@ -1,16 +1,17 @@
 class Libolm < Formula
   desc "Implementation of the Double Ratchet cryptographic ratchet"
   homepage "https://gitlab.matrix.org/matrix-org/olm"
-  url "https://gitlab.matrix.org/matrix-org/olm/-/archive/3.2.1/olm-3.2.1.tar.gz"
-  sha256 "d947d9570345e68696668cb855f1a6a7141b7b89cbcc15a08b1fae18535c4c45"
+  url "https://gitlab.matrix.org/matrix-org/olm/-/archive/3.2.11/olm-3.2.11.tar.gz"
+  sha256 "dd32cbaf7745bb3c8e792c91572bd91d5fcfd172a965aa37267e8eb89c21a9d1"
   license "Apache-2.0"
 
   bottle do
-    cellar :any
-    sha256 "0634af436ccc158ea8ba3e15a53df9b3677b88db950691aaf1174189a925c8a5" => :big_sur
-    sha256 "850ca4e75b42221ea5ec4ed0ffb845b9f9d032f711b6ceb600d85813e81d50a3" => :catalina
-    sha256 "09cad39ec7953a8f3d0c9848673490624153107f1fce18db4a489147fa1170bf" => :mojave
-    sha256 "efe5613af63cc93f582b0e6f6dbe81ec9863d49dc347bf354e202ed8c9ed3ed6" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "bacee7bf54245a34cb91d2d956b24f97af4d3dc36ec1662bd73312b7932f8ac6"
+    sha256 cellar: :any,                 arm64_big_sur:  "5fe0c428aaddc4d7ce273c58dc3c87411a9ae4018e049d8d9d5ea3f31596cb6a"
+    sha256 cellar: :any,                 monterey:       "0c7df35ab79f283e750b0227589a46a1605390185385307ffa0d31863d9328d1"
+    sha256 cellar: :any,                 big_sur:        "fdd17b291c4441e41fdd7d3d1d5f06f400886e7ba957b8bc897e5b470f81c1e3"
+    sha256 cellar: :any,                 catalina:       "296839bc2cbe0941e8778a943d084fc1a04bc35630921c51d9914311ed453e1c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "627cb1752220cfa2cc02452221847d7df20bd08268983a9919d5a4529f644448"
   end
 
   depends_on "cmake" => :build
@@ -24,6 +25,7 @@ class Libolm < Formula
     (testpath/"test.cpp").write <<~EOS
       #include <iostream>
       #include <vector>
+      #include <stdlib.h>
 
       #include "olm/olm.h"
 
@@ -33,8 +35,9 @@ class Libolm < Formula
         void * utility_buffer = malloc(::olm_utility_size());
         ::OlmUtility * utility = ::olm_utility(utility_buffer);
 
-        uint8_t output[43];
+        uint8_t output[44];
         ::olm_sha256(utility, "Hello, World", 12, output, 43);
+        output[43] = '\0';
         cout << output;
         return 0;
       }

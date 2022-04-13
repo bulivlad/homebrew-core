@@ -1,30 +1,33 @@
 class Lmdb < Formula
   desc "Lightning memory-mapped database: key-value data store"
-  homepage "https://symas.com/lmdb/"
-  url "https://git.openldap.org/openldap/openldap/-/archive/LMDB_0.9.27/openldap-LMDB_0.9.27.tar.bz2"
-  sha256 "2746e429364bfa6f048f2980b8aab6ef461937e33e5c955d7b6242719b2527c4"
+  homepage "https://www.symas.com/symas-embedded-database-lmdb"
+  url "https://git.openldap.org/openldap/openldap/-/archive/LMDB_0.9.29/openldap-LMDB_0.9.29.tar.bz2"
+  sha256 "182e69af99788b445585b8075bbca89ae8101069fbeee25b2756fb9590e833f8"
   license "OLDAP-2.8"
   version_scheme 1
   head "https://git.openldap.org/openldap/openldap.git", branch: "mdb.master"
 
   livecheck do
-    url :head
+    url :stable
     regex(/^LMDB[._-]v?(\d+(?:\.\d+)+)$/i)
   end
 
   bottle do
-    cellar :any
-    sha256 "6244986c2cd93bd2770fc0cfac79f80e9d98ea197d84acce00322335fe9e2e18" => :big_sur
-    sha256 "706f2a266c430ad3cffcbf5bc9e87a6d1e63a9eb7f2d74b3b95c28e8910cd71d" => :arm64_big_sur
-    sha256 "1495b5b154e77771ff450d1687c2afeec377db57498900b2bb692d23b4bd25b8" => :catalina
-    sha256 "496f41bc0f050e5657a4ecc1409fccf8f2247521c3d3ebe16bdeb2007e0dbc71" => :mojave
-    sha256 "36d2564ec79b8547154e706980fbc25d38575d424299216ec10adae598e6b1c9" => :high_sierra
+    rebuild 2
+    sha256 cellar: :any,                 arm64_monterey: "5a02c8325714c21cf296f22807ab3eeca897e88f7163f9202b29cfbc97b1cce1"
+    sha256 cellar: :any,                 arm64_big_sur:  "c41fb2e2798d68609b974ab0897a2aee8a09628f34e93b4d2dca9b39c96a8fd0"
+    sha256 cellar: :any,                 monterey:       "7425bcf375008775546c80f8e783fc01cea763d597e049abf5e0b64dfcbaf8ee"
+    sha256 cellar: :any,                 big_sur:        "4b09b12695d58a6f3e311df5d0b80719ca409a4e47424a77425b008582ec5ddf"
+    sha256 cellar: :any,                 catalina:       "2b0ba99f6858d120ff7ab84fe0af0268523d3643246d56e0156161f32c3beff3"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d5cb6f9534ff4823b76d71214fed3f29bef56b73fd6feb691d047abf92795c95"
   end
 
   def install
     cd "libraries/liblmdb" do
-      system "make", "SOEXT=.dylib"
-      system "make", "install", "SOEXT=.dylib", "prefix=#{prefix}"
+      args = []
+      args << "SOEXT=.dylib" if OS.mac?
+      system "make", *args
+      system "make", "install", *args, "prefix=#{prefix}"
     end
   end
 

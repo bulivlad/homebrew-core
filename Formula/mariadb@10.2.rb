@@ -1,20 +1,34 @@
 class MariadbAT102 < Formula
   desc "Drop-in replacement for MySQL"
   homepage "https://mariadb.org/"
-  url "https://downloads.mariadb.org/f/mariadb-10.2.36/source/mariadb-10.2.36.tar.gz"
-  sha256 "652997e5f11db8c3953aa01cd583513306a2571294020f3022ac2d7bd6f2d2c0"
+  url "https://downloads.mariadb.com/MariaDB/mariadb-10.2.41/source/mariadb-10.2.41.tar.gz"
+  sha256 "851de7accdbddd2fcf8c31e4ddd4957d3c5d61bcefed1f3efaa6625e8cf200cf"
   license "GPL-2.0-only"
 
+  # This uses a placeholder regex to satisfy the `PageMatch` strategy
+  # requirement. In the future, this will be updated to use a `Json` strategy
+  # and we can remove the unused regex at that time.
   livecheck do
-    url "https://downloads.mariadb.org/"
-    regex(/Download v?(10\.2(?:\.\d+)+) Stable Now/i)
+    url "https://downloads.mariadb.org/rest-api/mariadb/all-releases/?olderReleases=false"
+    regex(/unused/i)
+    strategy :page_match do |page|
+      json = JSON.parse(page)
+      json["releases"]&.map do |release|
+        next unless release["release_number"]&.start_with?(version.major_minor)
+        next unless release["status"]&.include?("stable")
+
+        release["release_number"]
+      end
+    end
   end
 
   bottle do
-    rebuild 1
-    sha256 "c2501e6d92de0975f5ad19fbfc62245338c2f29a6fa08eb8069f95ba4dc9e9d6" => :big_sur
-    sha256 "2db8118d48d5a60baf02578bfee76a629a5e018a222494702cf011ddd5a065fb" => :catalina
-    sha256 "bdcc71b7912793ca6ca3833c2c2b06a8053500a735f2bce2dbf4d680863dc17a" => :mojave
+    sha256 arm64_monterey: "9f4d278e33ad437ff10bdb11dffdc756a3bc74d673ef625c4ed01340f352cf4f"
+    sha256 arm64_big_sur:  "5614b538b3a13a3efb09db5b149ce0f553b4ec3801543f7ebbf25c1d7df6a481"
+    sha256 monterey:       "3dfd5f27858abc65f951b4d1fef36fe3c6364fa238e28dd8e8b83f00095483b9"
+    sha256 big_sur:        "28a6f727baba55fd0cac1a06a4aa752ca51243bfc706bbb4a6b98652cea661b2"
+    sha256 catalina:       "8cd264c77d0f1f2fd15f2ce49e8f545faaacf639c53534c3070837b72766322d"
+    sha256 x86_64_linux:   "a68287d12116d15e0a59f4335d9be9e105c2c41e7270394ee808e72fc09f4de8"
   end
 
   keg_only :versioned_formula
@@ -22,10 +36,25 @@ class MariadbAT102 < Formula
   # See: https://mariadb.com/kb/en/changes-improvements-in-mariadb-102/
   deprecate! date: "2022-05-01", because: :unsupported
 
+  depends_on "bison" => :build
   depends_on "cmake" => :build
   depends_on "pkg-config" => :build
   depends_on "groonga"
   depends_on "openssl@1.1"
+  depends_on "pcre2"
+
+  uses_from_macos "bzip2"
+  uses_from_macos "ncurses"
+  uses_from_macos "zlib"
+
+  # This upstream commit was added for MariaDB 10.3+, but not 10.2. If it is not
+  # added in the next release, we should open an upstream PR to do so.
+  on_linux do
+    depends_on "gcc"
+    depends_on "linux-pam"
+  end
+
+  fails_with gcc: "5"
 
   def install
     # Set basedir and ldata so that mysql_install_db can find the server
@@ -47,7 +76,6 @@ class MariadbAT102 < Formula
       -DINSTALL_DOCDIR=share/doc/#{name}
       -DINSTALL_INFODIR=share/info
       -DINSTALL_MYSQLSHAREDIR=share/mysql
-      -DWITH_PCRE=bundled
       -DWITH_READLINE=yes
       -DWITH_SSL=yes
       -DWITH_UNIT_TESTS=OFF
@@ -57,10 +85,17 @@ class MariadbAT102 < Formula
       -DCOMPILATION_COMMENT=Homebrew
     ]
 
+    if OS.linux?
+      args << "-DWITH_NUMA=OFF"
+      args << "-DENABLE_DTRACE=NO"
+      args << "-DCONNECT_WITH_JDBC=OFF"
+    end
+
     # disable TokuDB, which is currently not supported on macOS
     args << "-DPLUGIN_TOKUDB=NO"
 
     system "cmake", ".", *std_cmake_args, *args
+
     system "make"
     system "make", "install"
 
@@ -95,7 +130,7 @@ class MariadbAT102 < Formula
       wsrep_sst_xtrabackup
       wsrep_sst_xtrabackup-v2
     ].each do |f|
-      inreplace "#{bin}/#{f}", "$(dirname $0)/wsrep_sst_common",
+      inreplace "#{bin}/#{f}", "$(dirname \"$0\")/wsrep_sst_common",
                                "#{libexec}/wsrep_sst_common"
     end
 
@@ -110,10 +145,12 @@ class MariadbAT102 < Formula
   end
 
   def post_install
-    return if ENV["CI"]
-
     # Make sure the var/mysql directory exists
     (var/"mysql").mkpath
+
+    # Don't initialize database, it clashes when testing other MySQL-like implementations.
+    return if ENV["HOMEBREW_GITHUB_ACTIONS"]
+
     unless File.exist? "#{var}/mysql/mysql/user.frm"
       ENV["TMPDIR"] = nil
       system "#{bin}/mysql_install_db", "--verbose", "--user=#{ENV["USER"]}",
@@ -133,30 +170,10 @@ class MariadbAT102 < Formula
     EOS
   end
 
-  plist_options manual: "#{HOMEBREW_PREFIX}/opt/mariadb@10.2/bin/mysql.server start"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-      <dict>
-        <key>KeepAlive</key>
-        <true/>
-        <key>Label</key>
-        <string>#{plist_name}</string>
-        <key>ProgramArguments</key>
-        <array>
-          <string>#{opt_bin}/mysqld_safe</string>
-          <string>--datadir=#{var}/mysql</string>
-        </array>
-        <key>RunAtLoad</key>
-        <true/>
-        <key>WorkingDirectory</key>
-        <string>#{var}</string>
-      </dict>
-      </plist>
-    EOS
+  service do
+    run [opt_bin/"mysqld_safe", "--datadir=#{var}/mysql"]
+    keep_alive true
+    working_dir var
   end
 
   test do

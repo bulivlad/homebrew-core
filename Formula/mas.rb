@@ -2,37 +2,28 @@ class Mas < Formula
   desc "Mac App Store command-line interface"
   homepage "https://github.com/mas-cli/mas"
   url "https://github.com/mas-cli/mas.git",
-      tag:      "v1.7.1",
-      revision: "b8dcb4ce4b1d78ada7556565dd5c73e9913758d8"
+      tag:      "v1.8.6",
+      revision: "560c89af2c1fdf0da9982a085e19bb6f5f9ad2d0"
   license "MIT"
-  head "https://github.com/mas-cli/mas.git"
+  head "https://github.com/mas-cli/mas.git", branch: "main"
 
   bottle do
-    cellar :any
-    sha256 "432091a534d0a1f753fcf953fb1c20c10ef5762b7f8922cb378c3dcd36898d30" => :big_sur
-    sha256 "e6de2f98ebd21885a9827664fe1b7eea5516a7fd75d5b7383e3a9b088591a27f" => :catalina
-    sha256 "8b6dc4e261ebdc8e2f93afe87da3db4d482eb3d8a0358ab19a0485d434550e77" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "379d46e2657be295321f1603dc1df28130ea0b5b264ceb192a9ba488d77c7a98"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "918a1484de106940f7bebc936e1ded87d7b65652054b09204887ad0651937ec4"
+    sha256 cellar: :any_skip_relocation, monterey:       "6b313f2f66d028cb7782c108d6e502ce73ccb9c08fac3bece0b057fcce5c4689"
+    sha256 cellar: :any_skip_relocation, big_sur:        "50b50f51219143fcb69c730b52b74011a76104f66348ea727d0200f7b375ae25"
+    sha256 cellar: :any_skip_relocation, catalina:       "d241d3b9156b033f3d2c31684a44de726297e07fd9bd5e3ccc4c36e4f1c3baf3"
   end
 
-  depends_on "carthage" => :build
-  depends_on xcode: ["10.2", :build]
+  depends_on :macos
+  if Hardware::CPU.arm?
+    depends_on xcode: ["12.2", :build]
+  else
+    depends_on xcode: ["12.0", :build]
+  end
 
   def install
-    # Working around build issues in dependencies
-    # - Prevent warnings from causing build failures
-    # - Prevent linker errors by telling all lib builds to use max size install names
-    # - Ensure dependencies build for the current CPU; otherwise Commandant will
-    #   build for x86_64 when running arm64
-    xcconfig = buildpath/"Overrides.xcconfig"
-    xcconfig.write <<~EOS
-      GCC_TREAT_WARNINGS_AS_ERRORS = NO
-      OTHER_LDFLAGS = -headerpad_max_install_names
-      VALID_ARCHS = #{Hardware::CPU.arch}
-    EOS
-    ENV["XCODE_XCCONFIG_FILE"] = xcconfig
-
-    # Only build necessary dependencies
-    system "carthage", "bootstrap", "--platform", "macOS", "Commandant"
+    system "script/build"
     system "script/install", prefix
 
     bash_completion.install "contrib/completion/mas-completion.bash" => "mas"
@@ -41,6 +32,6 @@ class Mas < Formula
 
   test do
     assert_equal version.to_s, shell_output("#{bin}/mas version").chomp
-    assert_include shell_output("#{bin}/mas info 497799835"), "Xcode"
+    assert_includes shell_output("#{bin}/mas info 497799835"), "Xcode"
   end
 end

@@ -1,28 +1,28 @@
 class Dprint < Formula
   desc "Pluggable and configurable code formatting platform written in Rust"
   homepage "https://dprint.dev/"
-  url "https://github.com/dprint/dprint/archive/0.11.0.tar.gz"
-  sha256 "beb0e57cf3db632a2f2704b7e0cfca49be5c2d4428d19fa10b62b9dfd6d4d210"
+  url "https://github.com/dprint/dprint/archive/0.24.4.tar.gz"
+  sha256 "877e32d2b07df2389f976a02f390dbc8e562375b24802c31d49109287bc111b1"
   license "MIT"
-  head "https://github.com/dprint/dprint.git"
+  head "https://github.com/dprint/dprint.git", branch: "main"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "77a9ea8f3e9bfbe4933a58d111f11f7a9d5354c9c431ea18e0183960e9273845" => :big_sur
-    sha256 "811b611a09d890db5548facc7db914f13741e7d2de94b4f0081a0746f4f6a179" => :catalina
-    sha256 "79814bd0f878870701930232ab8b3f7490cf16ae0190dd65b61ba30c810f0ba3" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "bab139960dc6e04ff4796adc57c32cc9f3089f299503794bb5c8d3b5286b2a8f"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "99792833530c0699b39f9137e28ac25e3df437da7302a025105fd4dac8a09b81"
+    sha256 cellar: :any_skip_relocation, monterey:       "1dbaae38665e3673e2da976526b250f07f5e60d3528d038b8b6218f8fa420fc5"
+    sha256 cellar: :any_skip_relocation, big_sur:        "0efa2c8d08e8a588f4cb81470f6bf1f00c9d49127af33d925f1a3c84d50d99f0"
+    sha256 cellar: :any_skip_relocation, catalina:       "5f83f1c219e53d623d104d7c20493f16f219d1219edb2d57db5ce6842514a5a0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "36b8d6f3bfa1d8abb03ebe65b3f35d64c220324ade319dfcf0812351252e962b"
   end
 
   depends_on "rust" => :build
 
   def install
-    # replace `--path` arg with `./crates/dprint`
-    args = std_cargo_args.map { |s| s == "." ? "./crates/dprint" : s }
-    system "cargo", "install", *args
+    system "cargo", "install", *std_cargo_args(path: "crates/dprint")
   end
 
   test do
-    (testpath/".dprintrc.json").write <<~EOS
+    (testpath/"dprint.json").write <<~EOS
       {
         "$schema": "https://dprint.dev/schemas/v0.json",
         "projectType": "openSource",
@@ -42,7 +42,7 @@ class Dprint < Formula
           "**/target"
         ],
         "plugins": [
-          "https://plugins.dprint.dev/typescript-0.34.0.wasm",
+          "https://plugins.dprint.dev/typescript-0.44.1.wasm",
           "https://plugins.dprint.dev/json-0.7.2.wasm",
           "https://plugins.dprint.dev/markdown-0.4.3.wasm",
           "https://plugins.dprint.dev/rustfmt-0.3.0.wasm"

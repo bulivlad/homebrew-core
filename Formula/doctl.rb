@@ -1,17 +1,18 @@
 class Doctl < Formula
   desc "Command-line tool for DigitalOcean"
   homepage "https://github.com/digitalocean/doctl"
-  url "https://github.com/digitalocean/doctl/archive/v1.54.1.tar.gz"
-  sha256 "f61746217994a7270ac32d9707a7c2906e94821238bdb938b0e3be70f2f2dcb5"
+  url "https://github.com/digitalocean/doctl/archive/v1.73.0.tar.gz"
+  sha256 "cc7a6f91febf4d40f8afca0fe4ddfa7aa9be3572e3a0124fca2865e35b52ef00"
   license "Apache-2.0"
-  head "https://github.com/digitalocean/doctl.git"
+  head "https://github.com/digitalocean/doctl.git", branch: "main"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "c7364270f4ed854ac83472230a0f99b406c9e97bea23965778864829f3f7862e" => :big_sur
-    sha256 "634bd6e36f69b5de8d6cdee81291ef5b205b7617b2896fb18292d60cf1c36325" => :arm64_big_sur
-    sha256 "8ba22777e8cb899332d661e97616ae35c5a4a1bcb1b3175198773fbe6e9ff0cb" => :catalina
-    sha256 "617faa7920513cc0d8851667f9840dabcdde844691619a14415018ef25e80208" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "5d5e641d2447ab70303144a5bca8247d356ae255cd5682b7f93a5da665a42539"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "ef53e332c57dd127a3c4f9877ec8a1c69b63107c5b03df8a336cc026f447f19c"
+    sha256 cellar: :any_skip_relocation, monterey:       "193ccac317506a2c94271365db89e46f708de084373c6ca9a1222a8b7b571b6f"
+    sha256 cellar: :any_skip_relocation, big_sur:        "2c34774cff1d169e3e7ed455b96adb782c0f66bc63f6866bafe7b9acc8d34df5"
+    sha256 cellar: :any_skip_relocation, catalina:       "aeaa4a79cd0e9aec237bf9b91de40844a73c0820983613d4fc06c17e34996558"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4863dbefb13f3d6ca0f349f576c8c79ceec2924d4d38d7279fbd7a470c079f79"
   end
 
   depends_on "go" => :build
@@ -23,9 +24,9 @@ class Doctl < Formula
       #{base_flag}.Minor=#{version.minor}
       #{base_flag}.Patch=#{version.patch}
       #{base_flag}.Label=release
-    ].join(" ")
+    ]
 
-    system "go", "build", "-ldflags", ldflags, *std_go_args, "github.com/digitalocean/doctl/cmd/doctl"
+    system "go", "build", *std_go_args(ldflags: ldflags), "./cmd/doctl"
 
     (bash_completion/"doctl").write `#{bin}/doctl completion bash`
     (zsh_completion/"_doctl").write `#{bin}/doctl completion zsh`

@@ -1,32 +1,22 @@
 class ArxLibertatis < Formula
   desc "Cross-platform, open source port of Arx Fatalis"
   homepage "https://arx-libertatis.org/"
-  license "GPL-3.0"
-  revision 2
-
-  stable do
-    url "https://arx-libertatis.org/files/arx-libertatis-1.1.2.tar.xz"
-    sha256 "82adb440a9c86673e74b84abd480cae968e1296d625b6d40c69ca35b35ed4e42"
-
-    # Add a missing include to CMakeLists.txt
-    patch do
-      url "https://github.com/arx/ArxLibertatis/commit/442ba4af978160abd3856a9daec38f5b6e213cb4.patch?full_index=1"
-      sha256 "de361866cc51c14f317a67dcfd3b736160a577238f931c78a525ea2864b1add9"
-    end
-  end
+  url "https://arx-libertatis.org/files/arx-libertatis-1.2.1/arx-libertatis-1.2.1.tar.xz"
+  sha256 "aafd8831ee2d187d7647ad671a03aabd2df3b7248b0bac0b3ac36ffeb441aedf"
+  license "GPL-3.0-or-later"
 
   livecheck do
-    url :head
-    regex(/^v?(\d+(?:\.\d+)+)$/i)
+    url "https://arx-libertatis.org/files/"
+    regex(%r{href=["']?arx-libertatis[._-]v?(\d+(?:\.\d+)+)/?["' >]}i)
   end
 
   bottle do
-    cellar :any
-    sha256 "2a9e06b2b91e1133389728b2ad0c81f23d95a266a451144fb8639953b5a96cd3" => :big_sur
-    sha256 "204111aff418fd39e00ab1fcb961f2c7d5a7580223ecdbac4011b7c1f3122f03" => :arm64_big_sur
-    sha256 "b93ffc0870dffd0bab99117814e3c094fc019c2315bdd8fc35f687c1009dd661" => :catalina
-    sha256 "39fc49249e5a82bd067c05bcd056b454a90ace91f364b3c33534901827247b2c" => :mojave
-    sha256 "2fe2043845655c6f3e75be1dc7213826fd142f806fd7b59006fdef940584e92a" => :high_sierra
+    sha256 arm64_monterey: "9fd235faef3f4cac1fa1bc33acace5545839c5bf9a4344793225f734dc0f4b7e"
+    sha256 arm64_big_sur:  "5b7dd893fd8ab89d9265dc031d48781b14437ba175265f89a316a0d60686927e"
+    sha256 monterey:       "d9c218e036852e73dea349e17eaa6e03358f7118bd41acd98a5f4bae7b25bc9d"
+    sha256 big_sur:        "e855dfe524dd05d0ebf94acee4cb2e74f2037d0c4c44eb76fd5f49fbbb8477f8"
+    sha256 catalina:       "a8a9036477373bd0065f739c0bbc8bd6e20b09da4d643f20483ab6aec6a6d289"
+    sha256 x86_64_linux:   "fcdc6dcedd23cc35e9bf57f97b4aa5946fe36adc3ffc9e15140224f79cc7d14f"
   end
 
   head do
@@ -43,30 +33,18 @@ class ArxLibertatis < Formula
   depends_on "freetype"
   depends_on "glew"
   depends_on "innoextract"
-  depends_on "sdl"
+  depends_on "sdl2"
+
+  uses_from_macos "zlib"
+
+  on_linux do
+    depends_on "openal-soft"
+  end
 
   conflicts_with "rnv", because: "both install `arx` binaries"
 
   def install
     args = std_cmake_args
-
-    # The patches for these aren't straightforward to backport because of
-    # other changes; these minimal inreplaces get it building.
-    # HEAD is fine, and the next stable release will contain these changes.
-    if build.stable?
-      # https://github.com/arx/ArxLibertatis/commit/39fb9a0e3a6888a6a5f040e39896e88750c89065
-      inreplace "src/platform/Time.cpp", "clock_t ", "clockid_t "
-
-      # Version parsing is broken in the current stable; fixed upstream.
-      # This hardcodes the current version based on data from VERSION.
-      inreplace "src/core/Version.cpp.in" do |s|
-        s.gsub! "${VERSION_COUNT}", "5"
-        s.gsub! "${VERSION_2}", "10"
-        s.gsub! "${VERSION_0}", "1.1.2"
-        s.gsub! "${GIT_SUFFIX_5}", "+Homebrew-1"
-        s.gsub! "${VERSION_4}", "Rhaa Movis"
-      end
-    end
 
     # Install prebuilt icons to avoid inkscape and imagemagick deps
     if build.head?
@@ -75,7 +53,11 @@ class ArxLibertatis < Formula
     end
 
     mkdir "build" do
-      system "cmake", "..", *args
+      system "cmake", "..", *args,
+                            "-DBUILD_CRASHREPORTER=OFF",
+                            "-DSTRICT_USE=ON",
+                            "-DWITH_OPENGL=glew",
+                            "-DWITH_SDL=2"
       system "make", "install"
     end
   end

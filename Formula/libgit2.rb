@@ -1,10 +1,11 @@
 class Libgit2 < Formula
   desc "C library of Git core methods that is re-entrant and linkable"
   homepage "https://libgit2.github.com/"
-  url "https://github.com/libgit2/libgit2/archive/v1.1.0.tar.gz"
-  sha256 "41a6d5d740fd608674c7db8685685f45535323e73e784062cf000a633d420d1e"
+  url "https://github.com/libgit2/libgit2/archive/v1.4.2.tar.gz"
+  sha256 "901c2b4492976b86477569502a41c31b274b69adc177149c02099ea88404ef19"
   license "GPL-2.0-only"
-  head "https://github.com/libgit2/libgit2.git"
+  revision 1
+  head "https://github.com/libgit2/libgit2.git", branch: "main"
 
   livecheck do
     url :stable
@@ -12,11 +13,12 @@ class Libgit2 < Formula
   end
 
   bottle do
-    cellar :any
-    sha256 "8f441c63c8c7737c0278b0537f095c84f0eacf80ff8231df57b5be92474884c2" => :big_sur
-    sha256 "cc3c73fe59d8250e417e5bb0e401095fbb3686576302f0e54c9a97dd0c412ed7" => :arm64_big_sur
-    sha256 "55559e477a533a5682da7853f03149000cce14371ed7b0ffc5ceaff285b6348b" => :catalina
-    sha256 "0bb2d00f1e5b6133df5792c06fd726ad15a9364e184d05653bde6b6c1d5095ae" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "ba844640bf55e048c7c1000619e88656f2bc5f39411003b95ab923301917a14e"
+    sha256 cellar: :any,                 arm64_big_sur:  "64995a946f855eef27fd0ceb184693b3c5774f4ba875673d999ab54bc778a4fe"
+    sha256 cellar: :any,                 monterey:       "d9197798c559cdb6e7c360e4b85f6e8f22c2a07462928dd3b7f56be2aa8cd61c"
+    sha256 cellar: :any,                 big_sur:        "17d55226d035b43a2f5248d026b35c7850090475b60300abe539ba4bcff67a1f"
+    sha256 cellar: :any,                 catalina:       "4f9e56622c47612bff8c681bb5714fdb478f1b5abc2123486daaf72a29bff807"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "96136c8fc93c4f9d86c813c86b11d12e84249588ca85aca61d3390c51432f9a6"
   end
 
   depends_on "cmake" => :build
@@ -27,6 +29,7 @@ class Libgit2 < Formula
     args = std_cmake_args
     args << "-DBUILD_EXAMPLES=YES"
     args << "-DBUILD_CLAR=NO" # Don't build tests.
+    args << "-DUSE_SSH=YES"
 
     mkdir "build" do
       system "cmake", "..", *args
@@ -44,9 +47,11 @@ class Libgit2 < Formula
   test do
     (testpath/"test.c").write <<~EOS
       #include <git2.h>
+      #include <assert.h>
 
       int main(int argc, char *argv[]) {
         int options = git_libgit2_features();
+        assert(options & GIT_FEATURE_SSH);
         return 0;
       }
     EOS

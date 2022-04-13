@@ -2,45 +2,38 @@ class Eksctl < Formula
   desc "Simple command-line tool for creating clusters on Amazon EKS"
   homepage "https://eksctl.io"
   url "https://github.com/weaveworks/eksctl.git",
-      tag:      "0.35.0",
-      revision: "1eafbc7b3fa3d9c31575b51b8fbac718ec108051"
+      tag:      "0.90.0",
+      revision: "08de3f8af239b0882bc8e5575637bc03b7528d4a"
   license "Apache-2.0"
-  revision 1
-  head "https://github.com/weaveworks/eksctl.git"
+  head "https://github.com/weaveworks/eksctl.git", branch: "main"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "665b157fc2746b7164dc5f124067342fa691ef66fad7981d94ca5c4bf7c2d1af" => :big_sur
-    sha256 "fa29ae5e5a92f707a8d42c12f0c3a43c7072f997bbc4c31597417f019e749bc9" => :arm64_big_sur
-    sha256 "ca88675d26cfc649026f1b087b4675bb40168affbc4b74d99634a43091158132" => :catalina
-    sha256 "07fb2c3e42cd6297fd6dbaa45d75c5c92f5d0b4839f10a58675f3701bf732761" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "10cf38d951454c605e07eadad6a815d2877def39d9633a3c0fbffe3fa78ab849"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "122c47bd9ebdc4876659983d6942d416df0b465858ef423a8395f954a29ac24a"
+    sha256 cellar: :any_skip_relocation, monterey:       "2c36a17090e4352c893a098854eb1bba08c63dff9a4b31d089af1a3771d120b9"
+    sha256 cellar: :any_skip_relocation, big_sur:        "75b7ede327c7d4256b5fc9d1c957afac3a7cbc6574a391e7f3e2457a6497b3c9"
+    sha256 cellar: :any_skip_relocation, catalina:       "3cbc32390f269d33772316d24abe17b24de563b3cd054ff39182784233ea9415"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a285ef1082be70cdaea99636c26870b49b7586cc60884812399de72ae461ed53"
   end
 
   depends_on "counterfeiter" => :build
   depends_on "go" => :build
   depends_on "go-bindata" => :build
+  depends_on "ifacemaker" => :build
   depends_on "mockery" => :build
   depends_on "aws-iam-authenticator"
-
-  # PR ref, https://github.com/weaveworks/eksctl/pull/2987
-  # remove in next release
-  patch do
-    url "https://github.com/chenrui333/eksctl/commit/2207612.patch?full_index=1"
-    sha256 "50870dd22647f6b6252678fb5302c81aa89ca04177f3f327a044d301eb483c14"
-  end
 
   def install
     ENV["GOBIN"] = HOMEBREW_PREFIX/"bin"
     system "make", "build"
     bin.install "eksctl"
 
-    # Install bash completion
-    output = Utils.safe_popen_read("#{bin}/eksctl", "completion", "bash")
-    (bash_completion/"eksctl").write output
-
-    # Install zsh completion
-    output = Utils.safe_popen_read("#{bin}/eksctl", "completion", "zsh")
-    (zsh_completion/"_eksctl").write output
+    bash_output = Utils.safe_popen_read(bin/"eksctl", "completion", "bash")
+    (bash_completion/"eksctl").write bash_output
+    zsh_output = Utils.safe_popen_read(bin/"eksctl", "completion", "zsh")
+    (zsh_completion/"_eksctl").write zsh_output
+    fish_output = Utils.safe_popen_read(bin/"eksctl", "completion", "fish")
+    (fish_completion/"eksctl.fish").write fish_output
   end
 
   test do

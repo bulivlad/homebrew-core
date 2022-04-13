@@ -1,9 +1,9 @@
 class Cproto < Formula
   desc "Generate function prototypes for functions in input files"
   homepage "https://invisible-island.net/cproto/"
-  url "https://invisible-mirror.net/archives/cproto/cproto-4.7r.tgz"
-  mirror "https://deb.debian.org/debian/pool/main/c/cproto/cproto_4.7r.orig.tar.gz"
-  sha256 "36641744094baee2883044595659b529787dd295a75584a2bc2cbf250b0c3e1b"
+  url "https://invisible-mirror.net/archives/cproto/cproto-4.7t.tgz"
+  mirror "https://deb.debian.org/debian/pool/main/c/cproto/cproto_4.7t.orig.tar.gz"
+  sha256 "3cce82a71687b69e0a3e23489fe825ba72e693e559ccf193395208ac0eb96fe5"
   license all_of: [
     :public_domain,
     "MIT",
@@ -16,11 +16,11 @@ class Cproto < Formula
   end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "08f390dd44633ad2e1ca5018496adb855e8786d3584f69ff2283e05cc00214b2" => :big_sur
-    sha256 "0175783f96e502a01fc60f8931e5c803875d1f04ac39be006cbc695535375722" => :arm64_big_sur
-    sha256 "0359e4506a282356c97f5973ebadb1bef2fa9fe87aca8e3f073922a8ce40b3f8" => :catalina
-    sha256 "92d8a89a3921677c7aadf9c74555de8365357e1844705d08c24905c989c2f9b3" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "13b780ef3e9078c16847e134c3bf54ca9b8af8504b3cf5f4ed3bf493bad1493f"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "71bca925406cc678f69551bb66d465d44376bc1f1854aba91003218dae5cdadf"
+    sha256 cellar: :any_skip_relocation, monterey:       "6079a4a6df45f570734658bfda2197d6b9542a706cf0176f39be008f9e327a45"
+    sha256 cellar: :any_skip_relocation, big_sur:        "90f6050bc98803612e77e1464bdacd518fbbf0f62607508ab1018553f0d59713"
+    sha256 cellar: :any_skip_relocation, catalina:       "9f2cdd0ade5c49f112c2e87c5a18c9990805bc8447ad4e0350fafa26b08ac244"
   end
 
   def install

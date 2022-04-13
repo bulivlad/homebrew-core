@@ -2,26 +2,25 @@ class AnimeDownloader < Formula
   include Language::Python::Virtualenv
 
   desc "Download your favourite anime"
-  homepage "https://github.com/vn-ki/anime-downloader"
-  url "https://files.pythonhosted.org/packages/4f/be/34909ae8d7f322f777475db916b4b5eecec2a20b09a1b07e410f2c6b2c45/anime-downloader-5.0.5.tar.gz"
-  sha256 "2e204fbeb4631e71b94f8c7a952640309f4f154ab41063aeef8754ef339f74bd"
+  homepage "https://github.com/anime-dl/anime-downloader"
+  url "https://files.pythonhosted.org/packages/00/8b/2f354c0c2e56f1fe45e805698bd6a81c472473a48b814c44aaed2d41016d/anime-downloader-5.0.9.tar.gz"
+  sha256 "40eaded9508a30f35993b2fc0f436c357d9939d58625a10bd595bfc11816ead4"
   license "Unlicense"
-  head "https://github.com/vn-ki/anime-downloader.git"
-
-  livecheck do
-    url :stable
-  end
+  head "https://github.com/anime-dl/anime-downloader.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "37a58c59d9ecf285050795d6581d2dcb0e0861d8b998e34260701a8200a824b7" => :big_sur
-    sha256 "7315ffb54c95ce9010915a5775226b932d6ce8a044551e94d37fd5851249dbbb" => :arm64_big_sur
-    sha256 "57273993dbef082d5898202a4e8cda6ead8dd2666da5105cdf296a784c3623a1" => :catalina
-    sha256 "48b168bbd5eb0fce4a0978eb2b39032b7aa32b7967574c43e82bc3f8e24f6991" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "c56a2f2880ad0f27d82283fa496ed29920a55e06c24e9e294edafea385e7c872"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "51528ac11b71b803cec6866244164cc4b5e837fbc189c38cdb054bf189ef59f7"
+    sha256 cellar: :any_skip_relocation, monterey:       "fde42013e865de24caed2210d8b72a48e78b77f39d9058ae93872dd453479af2"
+    sha256 cellar: :any_skip_relocation, big_sur:        "4b7f8ef5058b22b72b3f5bda4ad9110c9d4ab4e7bc9aa5cf9691ca5f0c5ea558"
+    sha256 cellar: :any_skip_relocation, catalina:       "ca0111a1386a2269340b3ce8b7d7a24766975cc680ab60e4c045cadae989e106"
+    sha256 cellar: :any_skip_relocation, mojave:         "b561d3e6d9c25da1d6088154ce894985d5e6d0b08d317566e31ee9a970dc1754"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a0f571445d312cada1fb7ce349655e378ef21cfd7e227780a8dad74a58671f7d"
   end
 
   depends_on "aria2"
   depends_on "node"
+  depends_on "python-tabulate"
   depends_on "python@3.9"
 
   resource "beautifulsoup4" do
@@ -70,8 +69,8 @@ class AnimeDownloader < Formula
   end
 
   resource "pycryptodome" do
-    url "https://files.pythonhosted.org/packages/c4/3a/5bca2cb1648b171afd6b7d29a11c6bca8b305bb75b7e2d78a0f5c61ff95e/pycryptodome-3.9.9.tar.gz"
-    sha256 "910e202a557e1131b1c1b3f17a63914d57aac55cf9fb9b51644962841c3995c4"
+    url "https://files.pythonhosted.org/packages/88/7f/740b99ffb8173ba9d20eb890cc05187677df90219649645aca7e44eb8ff4/pycryptodome-3.10.1.tar.gz"
+    sha256 "3e2e3a06580c5f190df843cdb90ea28d61099cf4924334d5297a995de68e4673"
   end
 
   resource "pySmartDL" do
@@ -90,18 +89,13 @@ class AnimeDownloader < Formula
   end
 
   resource "soupsieve" do
-    url "https://files.pythonhosted.org/packages/58/5d/445e21e92345848305eecf473338e9ec7ed8905b99ea78415042060127fc/soupsieve-2.1.tar.gz"
-    sha256 "6dc52924dc0bc710a5d16794e6b3480b2c7c08b07729505feab2b2c16661ff6e"
-  end
-
-  resource "tabulate" do
-    url "https://files.pythonhosted.org/packages/57/6f/213d075ad03c84991d44e63b6516dd7d185091df5e1d02a660874f8f7e1e/tabulate-0.8.7.tar.gz"
-    sha256 "db2723a20d04bcda8522165c73eea7c300eda74e0ce852d9022e0159d7895007"
+    url "https://files.pythonhosted.org/packages/c8/3f/e71d92e90771ac2d69986aa0e81cf0dfda6271e8483698f4847b861dd449/soupsieve-2.2.1.tar.gz"
+    sha256 "052774848f448cf19c7e959adf5566904d525f33a3f8b6ba6f6f8f26ec7de0cc"
   end
 
   resource "urllib3" do
-    url "https://files.pythonhosted.org/packages/29/e6/d1a1d78c439cad688757b70f26c50a53332167c364edb0134cadd280e234/urllib3-1.26.2.tar.gz"
-    sha256 "19188f96923873c92ccb987120ec4acaa12f0461fa9ce5d3d0772bc965a39e08"
+    url "https://files.pythonhosted.org/packages/cb/cf/871177f1fc795c6c10787bc0e1f27bb6cf7b81dbde399fd35860472cecbc/urllib3-1.26.4.tar.gz"
+    sha256 "e7b021f7241115872f92f43c6508082facffbd1c048e3c6e2bb9c2a157e28937"
   end
 
   def install

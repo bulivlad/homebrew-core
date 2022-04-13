@@ -1,16 +1,18 @@
 class Rocksdb < Formula
   desc "Embeddable, persistent key-value store for fast storage"
   homepage "https://rocksdb.org/"
-  url "https://github.com/facebook/rocksdb/archive/v6.14.6.tar.gz"
-  sha256 "fa61c55735a4911f36001a98aa2f5df1ffe4b019c492133d0019f912191209ce"
+  url "https://github.com/facebook/rocksdb/archive/v7.0.3.tar.gz"
+  sha256 "85bcdcd4adcd77eed6748804d5672d5725b5d2a469694e2a3dbd21b175cf4fd2"
   license any_of: ["GPL-2.0-only", "Apache-2.0"]
-  revision 1
+  head "https://github.com/facebook/rocksdb.git", branch: "main"
 
   bottle do
-    cellar :any
-    sha256 "f8065a2594655a33d36335f516b0448f2195ba5b4088aa36186b56bf3c1fb989" => :big_sur
-    sha256 "a9e2c1d9c7f27200b8ff1483233fdf671665f8bbc5671eeb27875ae20d212e07" => :catalina
-    sha256 "629da5a15d3e75afc921716e2c13b5f580444d6c9bf380e3ccb92e215c9978a0" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "72d280af1e3cc131ef2de59781a7eb89d4ce61df0defc23a2e3ddb0c8d21bb4e"
+    sha256 cellar: :any,                 arm64_big_sur:  "7749fba348ffefb6fe0830146c031d038e2e5cf3d5e863abf6a8b61ae200dcee"
+    sha256 cellar: :any,                 monterey:       "7ec3031bd34da67798b9b5aa6090b5ba438e1aea18ff7a098b3834c0051e15c2"
+    sha256 cellar: :any,                 big_sur:        "bc59c25326447c43172e92f784533d722dca9ae1edf5cd4b0200056fc046dda3"
+    sha256 cellar: :any,                 catalina:       "94b0de194cd78db1eaeb43220754fdec2349734b7098a6fc44bb681e8e712e88"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "262d1ae78f4a4c82220f64d915aec54bdc4e6e923268b7848524bae2e314b754"
   end
 
   depends_on "cmake" => :build
@@ -22,48 +24,60 @@ class Rocksdb < Formula
   uses_from_macos "bzip2"
   uses_from_macos "zlib"
 
-  # Add artifact suffix to shared library
-  # https://github.com/facebook/rocksdb/pull/7755
-  patch do
-    url "https://github.com/facebook/rocksdb/commit/98f3f3143007bcb5455105a05da7eeecc9cf53a0.patch?full_index=1"
-    sha256 "6fb59cd640ed8c39692855115b72e8aa8db50a7aa3842d53237e096e19f88fc1"
+  on_linux do
+    depends_on "gcc"
+  end
+
+  fails_with :gcc do
+    version "6"
+    cause "Requires C++17 compatible compiler. See https://github.com/facebook/rocksdb/issues/9388"
   end
 
   def install
-    ENV.cxx11
-    args = std_cmake_args
-    args << "-DPORTABLE=ON"
-    args << "-DUSE_RTTI=ON"
-    args << "-DWITH_BENCHMARK_TOOLS=OFF"
-    args << "-DWITH_BZ2=ON"
-    args << "-DWITH_LZ4=ON"
-    args << "-DWITH_SNAPPY=ON"
-    args << "-DWITH_ZLIB=ON"
-    args << "-DWITH_ZSTD=ON"
-
-    # build regular rocksdb
-    system "cmake", ".", *args
-    system "make", "install"
-
-    cd "tools" do
-      bin.install "sst_dump" => "rocksdb_sst_dump"
-      bin.install "db_sanity_test" => "rocksdb_sanity_test"
-      bin.install "write_stress" => "rocksdb_write_stress"
-      bin.install "ldb" => "rocksdb_ldb"
-      bin.install "db_repl_stress" => "rocksdb_repl_stress"
-      bin.install "rocksdb_dump"
-      bin.install "rocksdb_undump"
-    end
-    bin.install "db_stress_tool/db_stress" => "rocksdb_stress"
+    base_args = std_cmake_args + %W[
+      -DPORTABLE=ON
+      -DUSE_RTTI=ON
+      -DWITH_BENCHMARK_TOOLS=OFF
+      -DWITH_BZ2=ON
+      -DWITH_LZ4=ON
+      -DWITH_SNAPPY=ON
+      -DWITH_ZLIB=ON
+      -DWITH_ZSTD=ON
+      -DCMAKE_EXE_LINKER_FLAGS=-Wl,-rpath,#{rpath}
+    ]
 
     # build rocksdb_lite
-    args << "-DROCKSDB_LITE=ON"
-    args << "-DARTIFACT_SUFFIX=_lite"
-    args << "-DWITH_CORE_TOOLS=OFF"
-    args << "-DWITH_TOOLS=OFF"
-    system "make", "clean"
-    system "cmake", ".", *args
-    system "make", "install"
+    lite_args = base_args + %w[
+      -DROCKSDB_LITE=ON
+      -DARTIFACT_SUFFIX=_lite
+      -DWITH_CORE_TOOLS=OFF
+      -DWITH_TOOLS=OFF
+    ]
+    mkdir "build_lite" do
+      system "cmake", "..", *lite_args
+      system "make", "install"
+    end
+    p = lib/"cmake/rocksdb/RocksDB"
+    ["Targets.cmake", "Targets-release.cmake"].each do |s|
+      File.rename "#{p}#{s}", "#{p}_Lite#{s}"
+    end
+
+    # build regular rocksdb
+    mkdir "build" do
+      system "cmake", "..", *base_args
+      system "make", "install"
+
+      cd "tools" do
+        bin.install "sst_dump" => "rocksdb_sst_dump"
+        bin.install "db_sanity_test" => "rocksdb_sanity_test"
+        bin.install "write_stress" => "rocksdb_write_stress"
+        bin.install "ldb" => "rocksdb_ldb"
+        bin.install "db_repl_stress" => "rocksdb_repl_stress"
+        bin.install "rocksdb_dump"
+        bin.install "rocksdb_undump"
+      end
+      bin.install "db_stress_tool/db_stress" => "rocksdb_stress"
+    end
   end
 
   test do
@@ -79,12 +93,21 @@ class Rocksdb < Formula
     EOS
 
     extra_args = []
-    on_macos do
+    if OS.mac?
       extra_args << "-stdlib=libc++"
       extra_args << "-lstdc++"
     end
     system ENV.cxx, "test.cpp", "-o", "db_test", "-v",
-                                "-std=c++11",
+                                "-std=c++17",
+                                *extra_args,
+                                "-lz", "-lbz2",
+                                "-L#{lib}", "-lrocksdb",
+                                "-L#{Formula["snappy"].opt_lib}", "-lsnappy",
+                                "-L#{Formula["lz4"].opt_lib}", "-llz4",
+                                "-L#{Formula["zstd"].opt_lib}", "-lzstd"
+    system "./db_test"
+    system ENV.cxx, "test.cpp", "-o", "db_test_lite", "-v",
+                                "-std=c++17",
                                 *extra_args,
                                 "-lz", "-lbz2",
                                 "-L#{lib}", "-lrocksdb_lite",
@@ -92,7 +115,7 @@ class Rocksdb < Formula
                                 "-L#{Formula["snappy"].opt_lib}", "-lsnappy",
                                 "-L#{Formula["lz4"].opt_lib}", "-llz4",
                                 "-L#{Formula["zstd"].opt_lib}", "-lzstd"
-    system "./db_test"
+    system "./db_test_lite"
 
     assert_match "sst_dump --file=", shell_output("#{bin}/rocksdb_sst_dump --help 2>&1")
     assert_match "rocksdb_sanity_test <path>", shell_output("#{bin}/rocksdb_sanity_test --help 2>&1", 1)

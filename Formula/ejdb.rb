@@ -1,24 +1,41 @@
 class Ejdb < Formula
   desc "Embeddable JSON Database engine C11 library"
   homepage "https://ejdb.org"
-  url "https://github.com/Softmotions/ejdb/archive/v2.0.58.tar.gz"
-  sha256 "5ce47419fa9c6e9629313b24a2a72a6b1f582aeccaa05714cb48878b36336edf"
+  url "https://github.com/Softmotions/ejdb.git",
+      tag:      "v2.72",
+      revision: "5f44c3f222b34dc9180259e37cdd1677b84d1a85"
   license "MIT"
-  head "https://github.com/Softmotions/ejdb.git"
+  head "https://github.com/Softmotions/ejdb.git", branch: "master"
 
   bottle do
-    cellar :any
-    sha256 "f63ee650d9e19612d1b40fec61eefba9b01d572d0225caea37adf84700bc30f9" => :big_sur
-    sha256 "c0dfbfc5731c6b16e39c79e27e5157687ce1e73268d8c57a2d832b53519c2aea" => :arm64_big_sur
-    sha256 "14e460d2d3c44b2c8cf1995d50431f5f8c0cf85c244082ab52f98a72d40df18d" => :catalina
-    sha256 "62739192755aaae8b7f23948be0d01e41c1e10277abe5b580f6c36bd01b21255" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "c1a23396c872b4a5e05a98ae982103cfc67da805706a091dc1c57d7770026998"
+    sha256 cellar: :any,                 arm64_big_sur:  "85c60ffc351cf601c932406f75606edbf041abade468ea7ca47b2cb9a7f4cee7"
+    sha256 cellar: :any,                 monterey:       "c0a2639abef7cd76b167ae19af901b9d4cca045a2b88044e9dddcf65bc1494db"
+    sha256 cellar: :any,                 big_sur:        "e77d0cd2d377db7230ab9d6663f859ce9b4d59333204858851aae34bf689c54e"
+    sha256 cellar: :any,                 catalina:       "13387810b1f21f9d068dfe4dd82844e19a3f4e12fa95c7fd78d8fb001a1ff6c5"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "eedee3fd1e621438e436a004062a96fc79e195f4b3b1e1358220c6cd46ace47f"
   end
 
   depends_on "cmake" => :build
 
+  uses_from_macos "curl" => :build
+
+  on_linux do
+    depends_on "gcc" => [:build, :test]
+  end
+
+  fails_with :gcc do
+    version "7"
+    cause <<-EOS
+      build/src/extern_iwnet/src/iwnet.c: error: initializer element is not constant
+      Fixed in GCC 8.1, see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=69960
+    EOS
+  end
+
   def install
     mkdir "build" do
       system "cmake", "..", *std_cmake_args
+      ENV.deparallelize # CMake Error: WSLAY Not Found
       system "make", "install"
     end
   end

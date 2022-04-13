@@ -1,9 +1,11 @@
 class Bcftools < Formula
   desc "Tools for BCF/VCF files and variant calling from samtools"
   homepage "https://www.htslib.org/"
-  url "https://github.com/samtools/bcftools/releases/download/1.11/bcftools-1.11.tar.bz2"
-  sha256 "3ceee47456ec481f34fa6c34beb6fe892b5b365933191132721fdf126e45a064"
-  license "MIT"
+  url "https://github.com/samtools/bcftools/releases/download/1.15.1/bcftools-1.15.1.tar.bz2"
+  sha256 "f21f9564873eb27ccf22d13b91a64acb8fbbfe4f9e4c37933a54b9a95857f2d7"
+  # The bcftools source code is MIT/Expat-licensed, but when it is configured
+  # with --enable-libgsl the resulting executable is GPL-licensed.
+  license "GPL-3.0-or-later"
 
   livecheck do
     url :stable
@@ -11,16 +13,16 @@ class Bcftools < Formula
   end
 
   bottle do
-    sha256 "67d1219c5df4b512f08199740257e15b38422ba461c2de3ef2ed0697c8e28305" => :big_sur
-    sha256 "59762e9109882da66c1ebf0d0381f5d38cada1e58732025f0c91ab9cb85f0031" => :arm64_big_sur
-    sha256 "fb3b25ef0fa059b400d4094e9719208c74b7665c45d378aec46f26efe5c179c6" => :catalina
-    sha256 "cbc6f8a457ddb9d4e6c14a1b5f78023f66305aa9df7f8495252b9a774821fec9" => :mojave
-    sha256 "d6ea207bfe680f637147e39e7cf2f3311709dc3c1964bdf5d3506d13200da7a8" => :high_sierra
+    sha256                               arm64_monterey: "547be287eadb9b767ab27232071c0fbd6895cea8de8470a657912d82ea90183c"
+    sha256                               arm64_big_sur:  "856cc821f42aa3a34efc45c71fe5be9139605e52373d123bd04be511d1476380"
+    sha256                               monterey:       "51b716a9f1b3b6889ee91f67135f0b3ef19bd4fbc298f1c3607497842684a5a2"
+    sha256                               big_sur:        "da96ced1e7dea42220ef0bea1deecc4f38bb1f30d68cd980dbdb37cdd61a719c"
+    sha256                               catalina:       "622b3e4e56e7b716824e3552e7cb9468753ba4dddacb7ef9b14e7e128cf68fc8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e7d57e0c0fbe7639362ba27ef336000e43e6be81c68d920cf7f86d6b4f50eeb5"
   end
 
   depends_on "gsl"
   depends_on "htslib"
-  depends_on "xz"
 
   def install
     system "./configure", "--prefix=#{prefix}",

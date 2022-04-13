@@ -1,10 +1,9 @@
 class Halide < Formula
   desc "Language for fast, portable data-parallel computation"
   homepage "https://halide-lang.org"
-  url "https://github.com/halide/Halide/archive/v10.0.0.tar.gz"
-  sha256 "23808f8e9746aea25349a16da92e89ae320990df3c315c309789fb209ee40f20"
+  url "https://github.com/halide/Halide/archive/v14.0.0.tar.gz"
+  sha256 "f9fc9765217cbd10e3a3e3883a60fc8f2dbbeaac634b45c789577a8a87999a01"
   license "MIT"
-  revision 1
 
   livecheck do
     url :stable
@@ -12,32 +11,33 @@ class Halide < Formula
   end
 
   bottle do
-    cellar :any
-    sha256 "061a4d20c6c8772a49b858e9cae542482e4383328ec8baaef0eb4613dc06f398" => :big_sur
-    sha256 "8f6e1c100dd2fbabef29fd1ffe9dbb30500c6fc095b38c2c7382ca82eb70e6ac" => :arm64_big_sur
-    sha256 "997ed23a3fcb238899272fab8a0f9c2948477fb53bdc1bf2382a31418bc51571" => :catalina
-    sha256 "281f9219faf56e6e4b01e44bde6d9e8a4cd8bb0283e14aa6f2f78f6db4301dec" => :mojave
-    sha256 "5aaa4023bfff9d9f1f18ee1efae442ff7e0c21c84acc220555504c42705d9c7c" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "5d6deeee63f5251f982a8bd33b5eadde2ed76043243d2b0b3549a5d73d40773b"
+    sha256 cellar: :any,                 arm64_big_sur:  "2a3a60f4bf9e2b96e060ccd3f97bdb5f01300db7d41064a1f8ea5522eaae6fe5"
+    sha256 cellar: :any,                 monterey:       "6c76d4bda2ecde2563febab79f1b56a9d2f3f42f30359974875ebd5ee46a9978"
+    sha256 cellar: :any,                 big_sur:        "cb88aa6cb18664d402c9bc329ec8eaec11e42e0ccc2cb6d9831411cd5e730d7e"
+    sha256 cellar: :any,                 catalina:       "5cfc526ab5d5bb5c7e24ec6f5cd67679d4ad7820d8834c55b1b1b655c2ec5320"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f60867f23283b511e17b91c4f6cdcb0cf17e98026bc86afa21a9e22aed92b5bf"
   end
 
   depends_on "cmake" => :build
   depends_on "jpeg"
-  depends_on "libomp"
   depends_on "libpng"
   depends_on "llvm"
-  depends_on "python@3.9"
+  depends_on "python@3.10"
+
+  fails_with gcc: "5" # LLVM is built with Homebrew GCC
 
   def install
     mkdir "build" do
-      system "cmake", "..", *std_cmake_args
+      system "cmake", "..", *std_cmake_args, "-DCMAKE_INSTALL_RPATH=#{rpath}", "-DHalide_SHARED_LLVM=ON"
       system "make"
       system "make", "install"
     end
   end
 
   test do
-    cp share/"tutorial/lesson_01_basics.cpp", testpath
-    system ENV.cxx, "-std=c++11", "lesson_01_basics.cpp", "-L#{lib}", "-lHalide", "-o", "test"
+    cp share/"doc/Halide/tutorial/lesson_01_basics.cpp", testpath
+    system ENV.cxx, "-std=c++17", "lesson_01_basics.cpp", "-L#{lib}", "-lHalide", "-o", "test"
     assert_match "Success!", shell_output("./test")
   end
 end

@@ -1,8 +1,8 @@
 class Pypy3 < Formula
   desc "Implementation of Python 3 in Python"
   homepage "https://pypy.org/"
-  url "https://downloads.python.org/pypy/pypy3.7-v7.3.3-src.tar.bz2"
-  sha256 "f6c96401f76331e474cca2d14437eb3b2f68a0f27220a6dcbc537445fe9d5b78"
+  url "https://downloads.python.org/pypy/pypy3.7-v7.3.8-src.tar.bz2"
+  sha256 "35752be62b148fa6f7fb69e58e1f993c7cc319bea54928eb03ed2e75b8248d5f"
   license "MIT"
   head "https://foss.heptapod.net/pypy/pypy", using: :hg, branch: "py3.7"
 
@@ -12,41 +12,49 @@ class Pypy3 < Formula
   end
 
   bottle do
-    sha256 "856c421f1051e802767e23bdfd58727fb168dcffff904ab1eb486a57fc614f47" => :catalina
-    sha256 "a2f43940fe3fb2604aa01c9f7720c26c74b3cb9e09b7bf0846f4341ded919e17" => :mojave
+    sha256 cellar: :any,                 monterey:     "b72341e1a96c616296a8afc53fa1405340f1f925cd2a6b0cea3ff13bf7efe39b"
+    sha256 cellar: :any,                 big_sur:      "8c8ded93dfabde0b4fff50983443c8302d16b9dfcd8ee292a30a84e1a047c361"
+    sha256 cellar: :any,                 catalina:     "8db527712191e77911d2bbf70a23d514d99a30ce3a0aeb31267c34c1257bde6a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux: "7d2eafd1103122fdadc952db92e2d7b334aa2e7bfd6e9104cb16f9045bc69147"
   end
 
   depends_on "pkg-config" => :build
   depends_on "pypy" => :build
   depends_on arch: :x86_64
   depends_on "gdbm"
-  # pypy does not find system libffi, and its location cannot be given
-  # as a build option
-  depends_on "libffi" if DevelopmentTools.clang_build_version >= 1000
   depends_on "openssl@1.1"
   depends_on "sqlite"
   depends_on "tcl-tk"
   depends_on "xz"
 
+  uses_from_macos "bzip2"
   uses_from_macos "expat"
   uses_from_macos "libffi"
+  uses_from_macos "ncurses"
   uses_from_macos "unzip"
   uses_from_macos "zlib"
 
   resource "setuptools" do
-    url "https://files.pythonhosted.org/packages/94/23/e9e3d96500c063129a19feb854efbb01e6ffe7d913f1da8176692418ab8e/setuptools-51.1.1.tar.gz"
-    sha256 "0b43d1e0e0ac1467185581c2ceaf86b5c1a1bc408f8f6407687b0856302d1850"
+    url "https://files.pythonhosted.org/packages/1e/5c/3d7b3d91a86d71faf5038c5d259ed36b5d05b7804648e2c43251d574a6e6/setuptools-58.2.0.tar.gz"
+    sha256 "2c55bdb85d5bb460bd2e3b12052b677879cffcf46c0c688f2e5bf51d36001145"
   end
 
   resource "pip" do
-    url "https://files.pythonhosted.org/packages/ca/1e/d91d7aae44d00cd5001957a1473e4e4b7d1d0f072d1af7c34b5899c9ccdf/pip-20.3.3.tar.gz"
-    sha256 "79c1ac8a9dccbec8752761cb5a2df833224263ca661477a2a9ed03ddf4e0e3ba"
+    url "https://files.pythonhosted.org/packages/00/5f/d6959d6f25f202e3e68e3a53b815af42d770c829c19382d0acbf2c3e2112/pip-21.3.tar.gz"
+    sha256 "741a61baab1dbce2d8ca415effa48a2b6a964564f81a9f4f1fce4c433346c034"
   end
 
+  # Build fixes:
+  # - Disable Linux tcl-tk detection since the build script only searches system paths.
+  #   When tcl-tk is not found, it uses unversioned `-ltcl -ltk`, which breaks build.
+  # - Disable building cffi imports with `--embed-dependencies`, which compiles and
+  #   statically links a specific OpenSSL version.
+  # Upstream issue ref: https://foss.heptapod.net/pypy/pypy/-/issues/3538
+  patch :DATA
+
   def install
-    ENV.prepend_path "PKG_CONFIG_PATH", "#{prefix}/opt/openssl/lib/pkgconfig:#{prefix}/opt/tcl-tk/lib/pkgconfig"
-    ENV.prepend "LDFLAGS", "-L#{prefix}/opt/tcl-tk/lib"
-    ENV.prepend "CPPFLAGS", "-I#{prefix}/opt/tcl-tk/include"
+    # The `tcl-tk` library paths are hardcoded and need to be modified for non-/usr/local prefix
+    inreplace "lib_pypy/_tkinter/tklib_build.py", "/usr/local/opt/tcl-tk/", Formula["tcl-tk"].opt_prefix/""
 
     # Having PYTHONPATH set can cause the build to fail if another
     # Python is present, e.g. a Homebrew-provided Python 2.x
@@ -59,21 +67,28 @@ class Pypy3 < Formula
       system python, buildpath/"rpython/bin/rpython",
              "-Ojit", "--shared", "--cc", ENV.cc, "--verbose",
              "--make-jobs", ENV.make_jobs, "targetpypystandalone.py"
+
+      with_env(PYTHONPATH: buildpath) do
+        system "./pypy3-c", buildpath/"lib_pypy/pypy_tools/build_cffi_imports.py"
+      end
     end
 
     libexec.mkpath
     cd "pypy/tool/release" do
-      system python, "package.py", "--archive-name", "pypy3", "--targetdir", "."
+      package_args = %w[--archive-name pypy3 --targetdir . --no-make-portable --no-embedded-dependencies]
+      system python, "package.py", *package_args
       system "tar", "-C", libexec.to_s, "--strip-components", "1", "-xf", "pypy3.tar.bz2"
     end
 
     (libexec/"lib").install libexec/"bin/#{shared_library("libpypy3-c")}" => shared_library("libpypy3-c")
 
-    MachO::Tools.change_install_name("#{libexec}/bin/pypy3",
-                                     "@rpath/libpypy3-c.dylib",
-                                     "#{libexec}/lib/libpypy3-c.dylib")
-    MachO::Tools.change_dylib_id("#{libexec}/lib/libpypy3-c.dylib",
-                                 "#{opt_libexec}/lib/libpypy3-c.dylib")
+    if OS.mac?
+      MachO::Tools.change_install_name("#{libexec}/bin/pypy3",
+                                       "@rpath/libpypy3-c.dylib",
+                                       "#{libexec}/lib/libpypy3-c.dylib")
+      MachO::Tools.change_dylib_id("#{libexec}/lib/libpypy3-c.dylib",
+                                   "#{opt_libexec}/lib/libpypy3-c.dylib")
+    end
 
     (libexec/"lib-python").install "lib-python/3"
     libexec.install %w[include lib_pypy]
@@ -85,6 +100,13 @@ class Pypy3 < Formula
     bin.install_symlink libexec/"bin/pypy3"
     bin.install_symlink libexec/"bin/pypy" => "pypy3.7"
     lib.install_symlink libexec/"lib/#{shared_library("libpypy3-c")}"
+
+    # Delete two files shipped which we do not want to deliver
+    # These files make patchelf fail
+    if OS.linux?
+      rm_f libexec/"bin/libpypy3-c.so.debug"
+      rm_f libexec/"bin/pypy3.debug"
+    end
   end
 
   def post_install
@@ -167,3 +189,33 @@ class Pypy3 < Formula
     system scripts_folder/"pip", "list"
   end
 end
+
+__END__
+--- a/lib_pypy/_tkinter/tklib_build.py
++++ b/lib_pypy/_tkinter/tklib_build.py
+@@ -17,12 +17,12 @@ elif sys.platform == 'win32':
+     incdirs = []
+     linklibs = ['tcl86t', 'tk86t']
+     libdirs = []
+-elif sys.platform == 'darwin':
++else:
+     # homebrew
+     incdirs = ['/usr/local/opt/tcl-tk/include']
+     linklibs = ['tcl8.6', 'tk8.6']
+     libdirs = ['/usr/local/opt/tcl-tk/lib']
+-else:
++if False: # disable Linux system tcl-tk detection
+     # On some Linux distributions, the tcl and tk libraries are
+     # stored in /usr/include, so we must check this case also
+     libdirs = []
+--- a/pypy/goal/targetpypystandalone.py
++++ b/pypy/goal/targetpypystandalone.py
+@@ -382,7 +382,7 @@ class PyPyTarget(object):
+             ''' Use cffi to compile cffi interfaces to modules'''
+             filename = join(pypydir, '..', 'lib_pypy', 'pypy_tools',
+                                    'build_cffi_imports.py')
+-            if sys.platform in ('darwin', 'linux', 'linux2'):
++            if False: # disable building static openssl
+                 argv = [filename, '--embed-dependencies']
+             else:
+                 argv = [filename,]

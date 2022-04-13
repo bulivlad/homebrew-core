@@ -1,17 +1,18 @@
 class Httpx < Formula
   desc "Fast and multi-purpose HTTP toolkit"
-  homepage "https://projectdiscovery.io/open-source"
-  url "https://github.com/projectdiscovery/httpx/archive/v1.0.3.tar.gz"
-  sha256 "e543165b27078260e661752d20531d877327be2c25eb02dacf1ecb470769daf7"
+  homepage "https://github.com/projectdiscovery/httpx"
+  url "https://github.com/projectdiscovery/httpx/archive/v1.2.1.tar.gz"
+  sha256 "ff7c623adc0594ba3da2f4f806513c0542bb4da32ea0ddcd3ee0f4413b0217da"
   license "MIT"
-  head "https://github.com/projectdiscovery/httpx.git"
+  head "https://github.com/projectdiscovery/httpx.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "39a623a558428ee6c300a1823530c3f690adc90b2fb15f85707d69adb56b91b2" => :big_sur
-    sha256 "627292b7184c6614a5f5db76a2116ca091eec99add8d4e646c64e2693ed20817" => :arm64_big_sur
-    sha256 "5f1dc3e98b302dacec15f0d4eba3c23c94d84c7c8bc9ff02b5b18cd2d4497223" => :catalina
-    sha256 "c406f1b2496acca89b00c312646be317c7f44cbf0108ba97ed8b0eb96d9cba17" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "5b2b32168c9b5aef0ed8a27e72d2f1cabd4586b74a40e71f4a502cb789b0e2a1"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "0e39c0b080a3d53fdee619dd88956f3935a50742e363513e4c434f2d12d20753"
+    sha256 cellar: :any_skip_relocation, monterey:       "714125d9f3ef91afe6b875bcbe3a6df33465a8d4226016c4839d152c5a4b610a"
+    sha256 cellar: :any_skip_relocation, big_sur:        "0b2bbbd43c199b79f9e51257dc8d47bdc0c161088f9108f6782b1667d61a868c"
+    sha256 cellar: :any_skip_relocation, catalina:       "00f93faf2ce86fd8a084d78382972335c1f590d8b87ff42218dbe6f1dde89105"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ca1884650508a9cb517d060ab0359821b7f8b10a7338f65e4f7a06aece7a5a18"
   end
 
   depends_on "go" => :build

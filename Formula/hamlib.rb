@@ -1,18 +1,18 @@
 class Hamlib < Formula
   desc "Ham radio control libraries"
   homepage "http://www.hamlib.org/"
-  url "https://github.com/Hamlib/Hamlib/releases/download/4.0/hamlib-4.0.tar.gz"
-  sha256 "1fa24d4a8397b29a29f39be49c9042884d524b7a584ea8852bd770bd658d66f2"
+  url "https://github.com/Hamlib/Hamlib/releases/download/4.4/hamlib-4.4.tar.gz"
+  sha256 "8bf0107b071f52f08587f38e2dee8a7848de1343435b326f8f66d95e1f8a2487"
   license "LGPL-2.1-or-later"
-  head "https://github.com/hamlib/hamlib.git"
+  head "https://github.com/hamlib/hamlib.git", branch: "master"
 
   bottle do
-    cellar :any
-    rebuild 1
-    sha256 "fe04cc5576e85b4b22a07e0b681bbae881c9bb639fc0be19500b1e94b7803d43" => :big_sur
-    sha256 "8faea293fa6fd60893c05571b2d52b52339866d4c65fb103d097ccbe91897aa9" => :arm64_big_sur
-    sha256 "cf210e6b1a182e52f93c26e99b36e76db21b5b11ab45f30f553dbb58f51cd936" => :catalina
-    sha256 "d45e4cdde74cac09f37a111e965cfb9cfa110ff68b15ea8575766bf161697704" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "402e4d11f14737861fc0e1b848b3750dd244155148a1e7d209368c52c536f492"
+    sha256 cellar: :any,                 arm64_big_sur:  "d2bca238a57f8c159b5056efbc65d4ebe596369e335593462631792ec7152fe4"
+    sha256 cellar: :any,                 monterey:       "5de56256bb7d46ca8b2adb77bb47489a53a97d9dfa030f5789f8384d548f0f39"
+    sha256 cellar: :any,                 big_sur:        "b048dc58043838aa534d497f1c53fd4ce98a7a430aca691068e828d5b226fbc6"
+    sha256 cellar: :any,                 catalina:       "20a4202b385772556054237968690744b850fa3174fe59eaed862489042024bd"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e10e9c3dd40872ff78d3382aa8040339ddde307ba7cb4253dee08bfd342b8f95"
   end
 
   depends_on "autoconf" => :build
@@ -20,6 +20,12 @@ class Hamlib < Formula
   depends_on "pkg-config" => :build
   depends_on "libtool"
   depends_on "libusb-compat"
+
+  on_linux do
+    depends_on "gcc"
+  end
+
+  fails_with gcc: "5"
 
   def install
     system "./bootstrap" if build.head?

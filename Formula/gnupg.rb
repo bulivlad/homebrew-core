@@ -1,8 +1,8 @@
 class Gnupg < Formula
   desc "GNU Pretty Good Privacy (PGP) package"
   homepage "https://gnupg.org/"
-  url "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.2.27.tar.bz2"
-  sha256 "34e60009014ea16402069136e0a5f63d9b65f90096244975db5cea74b3d02399"
+  url "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.3.4.tar.bz2"
+  sha256 "f3468ecafb1d7f9ad7b51fd1db7aebf17ceb89d2efa8a05cf2f39b4d405402ae"
   license "GPL-3.0-or-later"
 
   livecheck do
@@ -11,14 +11,16 @@ class Gnupg < Formula
   end
 
   bottle do
-    sha256 "6726388722ce3b72733bb9b685c7325a42bfa277b54fadf5c5994a3396b3c35f" => :big_sur
-    sha256 "e43d39b6d1eb7ed8451ef71fd9ccc37a2505e0c04a68e89290fcd9add362f228" => :arm64_big_sur
-    sha256 "f7e22bee02f43a65794ab1b2bb44bc9650a634fdc2002a102106e78b6c32d2a8" => :catalina
-    sha256 "7250d3b3429e984579c1a1cde3455f63981c3a29d17d23eadce5c45079199bbf" => :mojave
+    rebuild 1
+    sha256 arm64_monterey: "958e40c9a4115f25318627d18fd2c5e25a7bf630c0eb9b1101474f8af1a5d91c"
+    sha256 arm64_big_sur:  "3d20bf8fa467ce9d677313037ef27901ebd69a73a1f7a4a8c263896cdd690632"
+    sha256 monterey:       "3d91e20de686f91d7918114518f38506e0c561416ac80a725109017469af25f2"
+    sha256 big_sur:        "a15299b64221d69ba4fa0b3ec5937e26e61b8baa6d88a72d4dbab25c1b26582c"
+    sha256 catalina:       "ff269c2042cfb061a1aab07b9472eb5154b2d2c43d02901d3c3f783ca4145748"
+    sha256 x86_64_linux:   "10e8b00b51ae53498850208595817562676987cb1f0876fba4728345d137719a"
   end
 
   depends_on "pkg-config" => :build
-  depends_on "adns"
   depends_on "gettext"
   depends_on "gnutls"
   depends_on "libassuan"
@@ -29,18 +31,36 @@ class Gnupg < Formula
   depends_on "npth"
   depends_on "pinentry"
 
+  uses_from_macos "sqlite", since: :catalina
+
+  on_linux do
+    depends_on "libidn"
+  end
+
   def install
+    libusb = Formula["libusb"]
+    ENV.append "CPPFLAGS", "-I#{libusb.opt_include}/libusb-#{libusb.version.major_minor}"
+
     system "./configure", "--disable-dependency-tracking",
                           "--disable-silent-rules",
                           "--prefix=#{prefix}",
                           "--sbindir=#{bin}",
                           "--sysconfdir=#{etc}",
                           "--enable-all-tests",
-                          "--enable-symcryptrun",
                           "--with-pinentry-pgm=#{Formula["pinentry"].opt_bin}/pinentry"
     system "make"
     system "make", "check"
     system "make", "install"
+
+    # Configure scdaemon as recommended by upstream developers
+    # https://dev.gnupg.org/T5415#145864
+    if OS.mac?
+      # write to buildpath then install to ensure existing files are not clobbered
+      (buildpath/"scdaemon.conf").write <<~EOS
+        disable-ccid
+      EOS
+      pkgetc.install "scdaemon.conf"
+    end
   end
 
   def post_install

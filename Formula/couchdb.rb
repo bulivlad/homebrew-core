@@ -1,20 +1,24 @@
 class Couchdb < Formula
   desc "Apache CouchDB database server"
   homepage "https://couchdb.apache.org/"
-  url "https://www.apache.org/dyn/closer.lua?path=couchdb/source/3.1.1/apache-couchdb-3.1.1.tar.gz"
-  mirror "https://archive.apache.org/dist/couchdb/source/3.1.1/apache-couchdb-3.1.1.tar.gz"
-  sha256 "8ffe766bba2ba39a7b49689a0732afacf69caffdf8e2d95447e82fb173c78ca3"
+  url "https://www.apache.org/dyn/closer.lua?path=couchdb/source/3.2.1/apache-couchdb-3.2.1.tar.gz"
+  mirror "https://archive.apache.org/dist/couchdb/source/3.2.1/apache-couchdb-3.2.1.tar.gz"
+  sha256 "11de2d1c3a5b317017a7459ec3f76230d5c43aba427a1e71ca3437845874acf8"
   license "Apache-2.0"
+  revision 3
 
   livecheck do
-    url :stable
+    url :homepage
+    regex(/href=.*?apache-couchdb[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    cellar :any
-    sha256 "8d192716d7cb1aabe1e0d556ee86717c11c9079e18699d718ffd3aa7c94d57ec" => :catalina
-    sha256 "d683b22eecb84fe5326b8644d8ff5a0f72a0c935e84d0411369271e521a7b7dc" => :mojave
-    sha256 "ba42a4ef666858aa21beccaa8b3d80799860e5501af9453dd649988d5603cade" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "11ba7ea770ea7359365e9e4beb0460dc0380e8987daa770298007eedd8bbee97"
+    sha256 cellar: :any,                 arm64_big_sur:  "c07a1521fc8fd0604f591f0b66521ee13cd1e4950962b34adbb73ea0963937ad"
+    sha256 cellar: :any,                 monterey:       "4c87b357fbda61414e199e63836cc71550385b287a75693fa8abeb87af2056e3"
+    sha256 cellar: :any,                 big_sur:        "39891fec49abfd7ff6fbc78f0e3ecc5ddb34511be02dc4bdf76e0661dda2779d"
+    sha256 cellar: :any,                 catalina:       "db22c5a177fa73c0180b95920a99000a0a257dcd55a2fe1544fd7215fa3b4b67"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "939c7c053656690df36b7c2ad9d19cda20154caad4ac16acaa2a1a7eab58b92e"
   end
 
   depends_on "autoconf" => :build
@@ -25,12 +29,36 @@ class Couchdb < Formula
   depends_on "pkg-config" => :build
   depends_on "icu4c"
   depends_on "openssl@1.1"
+  # NOTE: Supported `spidermonkey` versions are hardcoded at
+  # https://github.com/apache/couchdb/blob/#{version}/src/couch/rebar.config.script
   depends_on "spidermonkey"
+
+  on_linux do
+    depends_on "gcc"
+  end
 
   conflicts_with "ejabberd", because: "both install `jiffy` lib"
 
+  fails_with :gcc do
+    version "5"
+    cause "mfbt (and Gecko) require at least gcc 6.1 to build."
+  end
+
+  # Add support for SpiderMonkey 91esr. Remove in the next release.
+  # PR ref: https://github.com/apache/couchdb/pull/3842
+  patch do
+    url "https://github.com/apache/couchdb/commit/cb6aff46b65b68fd48293971a11c29633a0e21ff.patch?full_index=1"
+    sha256 "c32bc73937dd598cfc433a44098823e069665e6c85e8ec24f6da2ba56b42b02a"
+  end
+
   def install
-    system "./configure"
+    spidermonkey = Formula["spidermonkey"]
+    inreplace "src/couch/rebar.config.script" do |s|
+      s.gsub! "-I/usr/local/include/mozjs", "-I#{spidermonkey.opt_include}/mozjs"
+      s.gsub! "-L/usr/local/lib", "-L#{spidermonkey.opt_lib} -L#{HOMEBREW_PREFIX}/lib"
+    end
+
+    system "./configure", "--spidermonkey-version", spidermonkey.version.major
     system "make", "release"
     # setting new database dir
     inreplace "rel/couchdb/etc/default.ini", "./data", "#{var}/couchdb/data"
@@ -57,27 +85,9 @@ class Couchdb < Formula
     EOS
   end
 
-  plist_options manual: "couchdb"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-      <dict>
-        <key>KeepAlive</key>
-        <true/>
-        <key>Label</key>
-        <string>#{plist_name}</string>
-        <key>ProgramArguments</key>
-        <array>
-          <string>#{bin}/couchdb</string>
-        </array>
-        <key>RunAtLoad</key>
-        <true/>
-      </dict>
-      </plist>
-    EOS
+  service do
+    run opt_bin/"couchdb"
+    keep_alive true
   end
 
   test do
@@ -90,7 +100,7 @@ class Couchdb < Formula
     fork do
       exec "#{bin}/couchdb -couch_ini #{testpath}/etc/default.ini #{testpath}/etc/local.ini"
     end
-    sleep 2
+    sleep 30
 
     output = JSON.parse shell_output("curl --silent localhost:#{port}")
     assert_equal "Welcome", output["couchdb"]

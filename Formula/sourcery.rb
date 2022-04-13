@@ -1,27 +1,30 @@
 class Sourcery < Formula
   desc "Meta-programming for Swift, stop writing boilerplate code"
   homepage "https://github.com/krzysztofzablocki/Sourcery"
-  url "https://github.com/krzysztofzablocki/Sourcery/archive/1.0.2.tar.gz"
-  sha256 "8125f7e7be289053d2a66a853dac0cf8d18e8b93ccd6bdf1ae70cd688232135d"
+  url "https://github.com/krzysztofzablocki/Sourcery/archive/1.7.0.tar.gz"
+  sha256 "965f1302efe50ac5601130773e53a208e2820a27280658cf874f5484d5d94d6e"
   license "MIT"
-  head "https://github.com/krzysztofzablocki/Sourcery.git"
+  head "https://github.com/krzysztofzablocki/Sourcery.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "f717a8df9128e3714c72edea739f7ea8fa1aebce8a5204d7ac7ac2f03c7c6b16" => :big_sur
-    sha256 "7374695fa0685ccb4f432b260c8a2bd33e7d9f8ade55ae7ade0dece6771006bb" => :catalina
+    sha256 cellar: :any, arm64_monterey: "de4d7568837212aa28b1ba27816eb19700a4281cd84933450eaafabe1ec366fc"
+    sha256 cellar: :any, arm64_big_sur:  "da4bb2f3940a6e1da7e721f3e605a8300500ed36b2dbba4bcc7c482adb7ad5ce"
+    sha256 cellar: :any, monterey:       "62a691af20efe05bca51ad373031cd083d621c9e5dad0f97c40dca89e282192d"
+    sha256 cellar: :any, big_sur:        "c33358f787a7ef84d96815b9e7b06fdfea204490cab7e27f6dc00404b3f2c88d"
   end
 
-  depends_on xcode: "12.0"
+  depends_on xcode: "13.0"
+
+  uses_from_macos "ruby" => :build
 
   def install
-    system "swift", "build", "--disable-sandbox", "-c", "release", "-Xswiftc",
-                             "-target", "-Xswiftc", "x86_64-apple-macosx10.11"
-    bin.install ".build/release/sourcery"
-    lib.install Dir[".build/release/*.dylib"]
+    system "rake", "build"
+    bin.install "cli/bin/sourcery"
+    lib.install Dir["cli/lib/*.dylib"]
   end
 
   test do
+    # Regular functionality requires a non-sandboxed environment, so we can only test version/help here.
     assert_match version.to_s, shell_output("#{bin}/sourcery --version").chomp
   end
 end

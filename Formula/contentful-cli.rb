@@ -3,21 +3,18 @@ require "language/node"
 class ContentfulCli < Formula
   desc "Contentful command-line tools"
   homepage "https://github.com/contentful/contentful-cli"
-  url "https://registry.npmjs.org/contentful-cli/-/contentful-cli-1.5.5.tgz"
-  sha256 "5c52b942b8ec1db69b3c64c35588e3fce25a6ddd3a468ad0d48129552cafae28"
+  url "https://registry.npmjs.org/contentful-cli/-/contentful-cli-1.12.10.tgz"
+  sha256 "65ebc1286cb46c5a55356389321c52653ec709b52d6457b1e70d04aaa2e1538f"
   license "MIT"
-  head "https://github.com/contentful/contentful-cli.git"
-
-  livecheck do
-    url :stable
-  end
+  head "https://github.com/contentful/contentful-cli.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "dac8bfa699d702eaf95ea6bf5c72eeefc79c250e97ee1247e29ca9cabfa52ac7" => :big_sur
-    sha256 "385353847278d790d1fcc9d983d9be6a9f030afca6fcb7d08322aa142169ca00" => :arm64_big_sur
-    sha256 "315022f42ab0415052d26b6fc21e0605b4b9b0b9972f87ee415f018505405203" => :catalina
-    sha256 "66d07bbbbec37abf0c38a41e7387af0c69f606ba688797e38de6fcb6bfd3da31" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "4dd4e99d1da36eafc0edbbf390ca0df840529eb8a48b330b2a087a4e771d964d"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "4dd4e99d1da36eafc0edbbf390ca0df840529eb8a48b330b2a087a4e771d964d"
+    sha256 cellar: :any_skip_relocation, monterey:       "d670ad56cb86a8e6ed971c4b73cb6ce3b89e1c6c15de1fc2cdeb27f6c9ed4377"
+    sha256 cellar: :any_skip_relocation, big_sur:        "d670ad56cb86a8e6ed971c4b73cb6ce3b89e1c6c15de1fc2cdeb27f6c9ed4377"
+    sha256 cellar: :any_skip_relocation, catalina:       "d670ad56cb86a8e6ed971c4b73cb6ce3b89e1c6c15de1fc2cdeb27f6c9ed4377"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4dd4e99d1da36eafc0edbbf390ca0df840529eb8a48b330b2a087a4e771d964d"
   end
 
   depends_on "node"

@@ -3,17 +3,22 @@ class CrosstoolNg < Formula
   homepage "https://crosstool-ng.github.io/"
   url "http://crosstool-ng.org/download/crosstool-ng/crosstool-ng-1.24.0.tar.xz"
   sha256 "804ced838ea7fe3fac1e82f0061269de940c82b05d0de672e7d424af98f22d2d"
-  license "LGPL-2.1"
-  revision 1
-  head "https://github.com/crosstool-ng/crosstool-ng.git"
+  license "GPL-2.0-only"
+  revision 3
+  head "https://github.com/crosstool-ng/crosstool-ng.git", branch: "master"
+
+  livecheck do
+    url "https://crosstool-ng.github.io/download/"
+    regex(/href=.*?crosstool-ng[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
 
   bottle do
-    cellar :any
-    sha256 "e96a70d1be1e25e77895b7c509929435ca2a5950abea37c5e5387c2586ad4db0" => :big_sur
-    sha256 "733a1e37563ffd06a187fdad312bb03e1eca1467832771b57141b4542b81464a" => :catalina
-    sha256 "f95cc7d4b3bfcc8584d89c5dfa11d39e246c36ca2d707b108d5330fe24ac41c7" => :mojave
-    sha256 "c7f30be654aece34ce9e7cf5fc08f745cad233ff11ad1fd81826d9344a22345b" => :high_sierra
-    sha256 "b4d034ebac32df3affdd139f4c49804b74216bf372a9831c01693220d442a39a" => :sierra
+    sha256 cellar: :any, arm64_monterey: "928ab5b65f02d60d2d5d3216b56f9fce9f3231ef7bac30641539936240baf8f6"
+    sha256 cellar: :any, arm64_big_sur:  "254e9876927261a6efc043b3e856efc9c03950dd12e54be66924dd4653683a78"
+    sha256 cellar: :any, monterey:       "11cdeefd6ff97a4d2c3e71f036589381aa7311efe095509490abfb4dcf729b44"
+    sha256 cellar: :any, big_sur:        "6955331d9b2ba412d96239337c8a46630c351f9081f0193607d89939ac38c66e"
+    sha256 cellar: :any, catalina:       "162c6baa79fd3f140e750d6ec65273c4e9f3b48b82f491937dd53b5debd21a89"
+    sha256 cellar: :any, mojave:         "d0fbd991dd2862f0edeca38ecc360743f78d0d67ec9b4ad41e3a4b2949b39acd"
   end
 
   depends_on "help2man" => :build
@@ -33,6 +38,7 @@ class CrosstoolNg < Formula
   depends_on "m4"
   depends_on "make"
   depends_on "ncurses"
+  depends_on "python@3.10"
   depends_on "xz"
 
   uses_from_macos "flex" => :build
@@ -46,6 +52,7 @@ class CrosstoolNg < Formula
     ENV["BISON"] = "#{Formula["bison"].opt_bin}/bison"
     ENV["M4"] = "#{Formula["m4"].opt_bin}/m4"
     ENV["MAKE"] = "#{Formula["make"].opt_bin}/gmake"
+    ENV["PYTHON"] = "#{Formula["python@3.10"].opt_bin}/python3"
     ENV.append "LDFLAGS", "-lintl"
 
     system "./configure", "--prefix=#{prefix}"

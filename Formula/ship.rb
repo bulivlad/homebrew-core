@@ -6,15 +6,22 @@ class Ship < Formula
   license "Apache-2.0"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "87de3fe44a1b8d881b0cf6be5f74c6261dc8b38deb85e7edb48a0b1ac9d73805" => :big_sur
-    sha256 "17b2f10424c9728a9bbc19bef3af5d9fab3b350fa2aa2620fced62056065f651" => :arm64_big_sur
-    sha256 "7395a181b4bb2581d17a9a45fd054f5f1c15fe1a43a85f559316aea65e2da66e" => :catalina
-    sha256 "740a9cd2f1eef9bf09cb029827f5c4fabbc84dd14ee68babf065f85cceee0f12" => :mojave
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "0b463c20ccb6a500aa706ac5a925b090b72f4c59ddcd1ac9a702366da3273af1"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "af6a5db56e57811acfa331631f24380ed7c3606c0bb0ab60b74e1f50bdb26c1a"
+    sha256 cellar: :any_skip_relocation, monterey:       "b87c88bd0fee9a18e44c8f813113125a94bf55da46ed85ab717ab301a159427f"
+    sha256 cellar: :any_skip_relocation, big_sur:        "dbf6c3cfa97ee48ea7c8faaac11280c4d078d86f81a5674a8cad07667114b991"
+    sha256 cellar: :any_skip_relocation, catalina:       "45a18b612b3039e2a00af84c257041bfd8a5f054057d62981f8364704b0723dc"
+    sha256 cellar: :any_skip_relocation, mojave:         "c3974dea38bf106223fc9bccb8c3e2eaff6f8d951a95ddad849a63edc6040578"
   end
 
-  depends_on "go" => :build
-  depends_on "node" => :build
+  # depends indirectly on python@2 and is superseded by kots
+  deprecate! date: "2022-03-25", because: :deprecated_upstream
+
+  # Bump to 1.18 on the next release, if possible.
+  depends_on "go@1.17" => :build
+  # Switch to `node` when ship updates dependency node-sass>=6.0.0
+  depends_on "node@14" => :build
   depends_on "yarn" => :build
 
   def install
@@ -30,7 +37,7 @@ class Ship < Formula
     assert_match(/#{version}/, shell_output("#{bin}/ship version"))
     assert_match(/Usage:/, shell_output("#{bin}/ship --help"))
 
-    test_chart = "https://github.com/replicatedhq/test-charts/tree/master/plain-k8s"
+    test_chart = "https://github.com/replicatedhq/test-charts/tree/HEAD/plain-k8s"
     system bin/"ship", "init", "--headless", test_chart
   end
 end

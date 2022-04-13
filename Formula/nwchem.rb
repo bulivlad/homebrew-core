@@ -5,6 +5,7 @@ class Nwchem < Formula
   version "7.0.2"
   sha256 "d9d19d87e70abf43d61b2d34e60c293371af60d14df4a6333bf40ea63f6dc8ce"
   license "ECL-2.0"
+  revision 2
 
   livecheck do
     url "https://github.com/nwchemgit/nwchem.git"
@@ -12,18 +13,28 @@ class Nwchem < Formula
   end
 
   bottle do
-    cellar :any
-    sha256 "19b88aaef873c55da4554c3bca4ef88ca9987ce98e998f746048de6c35dd4469" => :big_sur
-    sha256 "1dec7a63957c945ae1a4e4a9652ca9e509beda27aeba43f10688b68033a0e9a0" => :catalina
-    sha256 "f906c312c4b8c57c5d31388d15db6b1e552f93ae153985b3bbb3b749a6dd1fa4" => :mojave
-    sha256 "aef50a03a979cd3dae7f06709e6d99fb9d5f5bbfc6e595752cf6f36cf162f205" => :high_sierra
+    sha256 cellar: :any, monterey: "bf4b2dfa17eb48b600343b6488980fd8ef988cd20bab9ad67b7e5abd82c0f076"
+    sha256 cellar: :any, big_sur:  "e652f67d76cad24fc36ca61c54fec440692c493217d857604f180244e647ebab"
+    sha256 cellar: :any, catalina: "c94e9afb94a3c8f8ab43bf4ffad7d1004ddd696dc56f68dfb3624023c44c0190"
   end
 
   depends_on "gcc" # for gfortran
   depends_on "open-mpi"
   depends_on "openblas"
-  depends_on "python@3.9"
+  depends_on "python@3.10"
   depends_on "scalapack"
+
+  # patches for compatibility with python@3.10
+  # https://github.com/nwchemgit/nwchem/issues/271
+  patch do
+    url "https://github.com/nwchemgit/nwchem/commit/638401361c6f294164a4f820ff867a62ac836fd5.patch?full_index=1"
+    sha256 "20516447b75bde548eb7e40faafcc5d310e8236a7cd3e44f53a753ac1312530e"
+  end
+
+  patch do
+    url "https://github.com/nwchemgit/nwchem/commit/cd0496c6bdd58cf2f1004e32cb39499a14c4c677.patch?full_index=1"
+    sha256 "1ff3fdacdebb0f812f6f14c423053a12f2389b0208b8809f3ab401b066866ffc"
+  end
 
   def install
     pkgshare.install "QA"

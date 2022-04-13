@@ -1,10 +1,10 @@
 class Camlp5 < Formula
   desc "Preprocessor and pretty-printer for OCaml"
   homepage "https://camlp5.github.io/"
-  url "https://github.com/camlp5/camlp5/archive/rel8.00.tar.gz"
-  sha256 "906d5325798cd0985a634e9b6b5c76c6810f3f3b8e98b80a7c30b899082c2332"
+  url "https://github.com/camlp5/camlp5/archive/refs/tags/rel8.00.03.tar.gz"
+  sha256 "1a710e2a6dbb0f4440867850d605f31fe8407ee8a56c9e067866e34e584385b4"
   license "BSD-3-Clause"
-  head "https://github.com/camlp5/camlp5.git"
+  head "https://github.com/camlp5/camlp5.git", branch: "master"
 
   livecheck do
     url :homepage
@@ -12,11 +12,15 @@ class Camlp5 < Formula
   end
 
   bottle do
-    sha256 "f848f21e1d3fdead2126c51499a35412f3fe42248a6b639d88a8183affe14050" => :big_sur
-    sha256 "625b0c1b99bc64c224e257419529172a0b84e762d80b330153d61abbeebd67d6" => :catalina
-    sha256 "bb908676387d9d1b8d87a5948a1d12b36ca46868802cd6b32f9f7fa2d970a3db" => :mojave
+    sha256 arm64_monterey: "0bed63661d001957196f1eed059f5b33d2c94ec7ef6ae53fd14cf44729733d27"
+    sha256 arm64_big_sur:  "ed57354104f665d458cd4d19596129d7a1d811713b03ffdbae806fa71e7de0c5"
+    sha256 monterey:       "a11f84037af3fa99c6cc6428daa58412b1fd1d32177c684bcdc84909f9684347"
+    sha256 big_sur:        "c4b79325ed05ecbaf4b7bd0ad806c63766a9ecf2606293675f0cd8744e05dc2e"
+    sha256 catalina:       "ab486332051f9133a5ec9a8b1bf0e51653ad850bce9e8f01ecf61b491483cd3f"
+    sha256 x86_64_linux:   "31f9d0038fb7af7fa9bb9934a1261917b1ebc63a5a89298e89f3088faadde3c4"
   end
 
+  depends_on "ocaml-findlib" => :build
   depends_on "ocaml"
 
   def install

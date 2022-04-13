@@ -1,17 +1,17 @@
 class Vivid < Formula
   desc "Generator for LS_COLORS with support for multiple color themes"
   homepage "https://github.com/sharkdp/vivid"
-  url "https://github.com/sharkdp/vivid/archive/v0.6.0.tar.gz"
-  sha256 "c8640f524aef1cd4dc15286bdc6189894ad067ea79bf8c40b9ca8d9d752d161f"
+  url "https://github.com/sharkdp/vivid/archive/v0.8.0.tar.gz"
+  sha256 "e58e0936db25c81ff257775463f1d422d97c706aec2d0134e39b62151ded23cb"
   license any_of: ["MIT", "Apache-2.0"]
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "8d94f0e78176eceddb2d4298b2aad7b39a87bc1b2a2f7110e3d14ee9e76a0e99" => :big_sur
-    sha256 "8a46eb460f08e5e3714ebe72c4fa9947b40805d6171ff849a1fefe4b92f309d3" => :arm64_big_sur
-    sha256 "7c4f801eab9c3f5b07aa4585766ce4cd9cf6d55a06f6889ef72a3a044559d834" => :catalina
-    sha256 "e8766b975c81c7bac8992e8d09b106e3bf2f73b6357a3d3fbc86a2d5c846b06b" => :mojave
-    sha256 "a2fe201c45df0fc3aa4c9a5985d7feeed8f7fca6817b54658e6299da4e604fc9" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "5812d1ee1b84676ed4f7f40e2b6bbd637598994a6972e2f5f374951aae3b9d74"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "6d63fb2bb636e28b0c96d1fb30a0c96ca2b9d6d8ae96cf759b5c188b17ab01bd"
+    sha256 cellar: :any_skip_relocation, monterey:       "62f24fd28f1c34d545901fd9f1131c9b68f4dfcd3c24b80f237786a2a4773d1c"
+    sha256 cellar: :any_skip_relocation, big_sur:        "d05e79b8400ba8d0ea9951e049b60872f2b0a5cdc46eab2a2f0aa1d9a36517b0"
+    sha256 cellar: :any_skip_relocation, catalina:       "084ed6ec5118a90caab68edd0f18921f21b2ae4430dca72eacc346b411ea825a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c9ebf69fb2697860406c4d8f2cc41e015be8ce6a763eaf08d89cae0ab616b991"
   end
 
   depends_on "rust" => :build

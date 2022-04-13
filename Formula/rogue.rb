@@ -11,17 +11,21 @@ class Rogue < Formula
   end
 
   bottle do
-    cellar :any_skip_relocation
-    rebuild 1
-    sha256 "6eb14b09938ce303e8bd6b9f534c62f0003e6f95f9c12323a9d7924c5d997151" => :big_sur
-    sha256 "c05b978ec98eebbf1bcff942a8a621ee52e11d0e6860adc608f03010c9da5797" => :arm64_big_sur
-    sha256 "d1837a65589cfc24e6ff05f585e4cb9991e06cecbccf119688cc95fd60dd1dc9" => :catalina
-    sha256 "fe9135c4e75abf4298cc231e0372ff8088fa57450fbd8c718e8a0fb8ac3ed723" => :mojave
-    sha256 "a65be75ef53988084ebe86a523e5fbda23205a2e5843b9015bfda312ade8e6f2" => :high_sierra
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "6c73ef712b35b6ba4c3339828add299a2ce8d53dd35a455d439f9639b484e99d"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "1cfeb02e30c14d89cf9d831c553a06eb17a6d6d27734c215e3ee7e72ab0c7c76"
+    sha256 cellar: :any_skip_relocation, monterey:       "0c169854e9edcfdf99c7c52e5fbfb39dbf883c74f076097aaf3027daf9f2064b"
+    sha256 cellar: :any_skip_relocation, big_sur:        "c6e8bb630a966cd8885e378242f9175ffd8327e26ec1ed679016302b437a5156"
+    sha256 cellar: :any_skip_relocation, catalina:       "c576555f6857ff3ec7f0b2e39625d3c1f86989315b735a5e27d9416c095e5efc"
+    sha256 cellar: :any_skip_relocation, mojave:         "7a7a380bb29967b8e795aa2407e8f205752b93952082491e20fff84394819294"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2edb3e1d6fb4af2f87d065012e68d09abda6035c5f4394d685336d0763f31869"
   end
 
+  uses_from_macos "ncurses"
+
   def install
-    ENV.ncurses_define
+    # Fix main.c:241:11: error: incomplete definition of type 'struct _win_st'
+    ENV.append "CPPFLAGS", "-DNCURSES_OPAQUE=0"
 
     system "./configure", "--disable-debug", "--disable-dependency-tracking",
                           "--prefix=#{prefix}"
@@ -32,6 +36,12 @@ class Rogue < Formula
       # Take out weird man install script and DIY below
       s.gsub! "-if test -d $(man6dir) ; then $(INSTALL) -m 0644 rogue.6 $(DESTDIR)$(man6dir)/$(PROGRAM).6 ; fi", ""
       s.gsub! "-if test ! -d $(man6dir) ; then $(INSTALL) -m 0644 rogue.6 $(DESTDIR)$(mandir)/$(PROGRAM).6 ; fi", ""
+    end
+
+    if OS.linux?
+      inreplace "mdport.c", "#ifdef NCURSES_VERSION",
+        "#ifdef NCURSES_VERSION\nTERMTYPE *tp = (TERMTYPE *) (cur_term);"
+      inreplace "mdport.c", "cur_term->type.Strings", "tp->Strings"
     end
 
     system "make", "install"

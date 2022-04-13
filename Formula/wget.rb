@@ -1,19 +1,17 @@
 class Wget < Formula
   desc "Internet file retriever"
   homepage "https://www.gnu.org/software/wget/"
-  url "https://ftp.gnu.org/gnu/wget/wget-1.21.tar.gz"
-  sha256 "b3bc1a9bd0c19836c9709c318d41c19c11215a07514f49f89b40b9d50ab49325"
+  url "https://ftp.gnu.org/gnu/wget/wget-1.21.3.tar.gz"
+  sha256 "5726bb8bc5ca0f6dc7110f6416e4bb7019e2d2ff5bf93d1ca2ffcc6656f220e5"
   license "GPL-3.0-or-later"
 
-  livecheck do
-    url :stable
-  end
-
   bottle do
-    sha256 "eb830909eed1e6d861968f324fd0701883df44f9d6e191c4e5ebbe2635cc70e7" => :big_sur
-    sha256 "2824baa832bb6abe003371d42bab24df5afab5e4076922b2300a90a98526990b" => :arm64_big_sur
-    sha256 "d163d32bba98f0a535d179c5d8efd076d12f41bd9232f5c0a41523a4eeaeb500" => :catalina
-    sha256 "6343b9c76468bf9ba05e587403b378b1bb93e5108c6505abef4eaaee92257e22" => :mojave
+    sha256 arm64_monterey: "fc83eec77acee50d2d7ce3bb0cca08d80acccc148e909921de42e57dd5fc7f3d"
+    sha256 arm64_big_sur:  "a0c491ae7de2b722320efa94704567e36f3a0bd04bd946b1431ecbd1bcbfb899"
+    sha256 monterey:       "aa706c58ae7e97abf91be56e785335aff058c431f9973dffac06aacbea558497"
+    sha256 big_sur:        "b90e0d7a4319ccdb18ee0c2ed097e9cddeeceaaf70dc0a785d96b4ba69dbeb54"
+    sha256 catalina:       "2aadef5aae81ecdd7e28bc9a776adcf0eaa393edae904e0c69740a442b7a3e69"
+    sha256 x86_64_linux:   "b6f20b1f4da03b9ee6a42f9305ee015eae7f80afea198e405c0b775eb2333de1"
   end
 
   head do
@@ -33,20 +31,16 @@ class Wget < Formula
     depends_on "util-linux"
   end
 
-  # commit ref, https://git.savannah.gnu.org/cgit/gnulib.git/patch/?id=6a76832db224ac5671599ce332717f985a2addc7
-  # remove in next release
-  patch :DATA
-
   def install
     system "./bootstrap", "--skip-po" if build.head?
     system "./configure", "--prefix=#{prefix}",
                           "--sysconfdir=#{etc}",
                           "--with-ssl=openssl",
                           "--with-libssl-prefix=#{Formula["openssl@1.1"].opt_prefix}",
-                          "--disable-debug",
                           "--disable-pcre",
                           "--disable-pcre2",
-                          "--without-libpsl"
+                          "--without-libpsl",
+                          "--without-included-regex"
     system "make", "install"
   end
 
@@ -54,16 +48,3 @@ class Wget < Formula
     system bin/"wget", "-O", "/dev/null", "https://google.com"
   end
 end
-
-__END__
-diff --git a/lib/utime.c b/lib/utime.c
-index bf7d7c5..3372179 100644
---- a/lib/utime.c
-+++ b/lib/utime.c
-@@ -261,6 +261,7 @@ utime (const char *name, const struct utimbuf *ts)
-
- #else
-
-+# include <errno.h>
- # include <sys/stat.h>
- # include "filename.h"

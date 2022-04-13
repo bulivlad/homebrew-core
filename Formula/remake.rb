@@ -1,9 +1,9 @@
 class Remake < Formula
   desc "GNU Make with improved error handling, tracing, and a debugger"
   homepage "https://bashdb.sourceforge.io/remake"
-  url "https://downloads.sourceforge.net/project/bashdb/remake/4.3%2Bdbg-1.5/remake-4.3%2Bdbg-1.5.tar.gz"
-  version "4.3-1.5"
-  sha256 "2e6eb709f3e6b85893f14f15e34b4c9b754aceaef0b92bb6ca3a025f10119d76"
+  url "https://downloads.sourceforge.net/project/bashdb/remake/4.3%2Bdbg-1.6/remake-4.3%2Bdbg-1.6.tar.gz"
+  version "4.3-1.6"
+  sha256 "f6a0c6179cd92524ad5dd04787477c0cd45afb5822d977be93d083b810647b87"
   license "GPL-3.0-only"
 
   # We check the "remake" directory page because the bashdb project contains
@@ -11,17 +11,19 @@ class Remake < Formula
   # RSS feed.
   livecheck do
     url "https://sourceforge.net/projects/bashdb/files/remake/"
-    strategy :page_match
     regex(%r{href=.*?remake/v?(\d+(?:\.\d+)+(?:(?:%2Bdbg)?[._-]\d+(?:\.\d+)+)?)/?["' >]}i)
+    strategy :page_match do |page, regex|
+      page.scan(regex).map { |match| match&.first&.sub(/%2Bdbg/i, "") }
+    end
   end
 
   bottle do
-    rebuild 1
-    sha256 "933b00f621a8cfc69a197d73bfe7f9d319d3571aae991eb3b039a8471ea9a0f1" => :big_sur
-    sha256 "391321a2121b244a77d91ffb3ec32d039aa38445441bff436f6128164b51db16" => :arm64_big_sur
-    sha256 "310b2ef02888a953487fb4e3f7fd7101c209a9abd12286d6a8509669c3ed2909" => :catalina
-    sha256 "05998e7ad1f8442b57e0826b5152894186f359b59d75e68634c1da1a96b0345f" => :mojave
-    sha256 "b3c14a7963aeda5e8367e0e4375354fdd58b24a99c07d6cb3fd881dc8d1b1941" => :high_sierra
+    sha256 arm64_monterey: "5c2479d3270cb34d5515d80136186d003e9eb96c7750b137d6f526a46b4003f7"
+    sha256 arm64_big_sur:  "b4370edfc5a075b5feb54686ba20b01dd2b2da18666b708ea5154af3b7df2c9b"
+    sha256 monterey:       "609d23982a7c58ec3dc547e06dfc2f461b36ca622de3314490975a282117b9d4"
+    sha256 big_sur:        "bc482278bbce34be601363a34689176e611eacc0461984892bdee53cc5965936"
+    sha256 catalina:       "dc5e00c02c1def048f5d678e91349d8f8da951e8ada948d9f7538cc962d8feea"
+    sha256 x86_64_linux:   "450f4449921dacd7b78dd3194ead086ea99e224a4ecac433118e47b84979d485"
   end
 
   depends_on "readline"

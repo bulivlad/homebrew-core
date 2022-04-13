@@ -1,17 +1,18 @@
 class Tendermint < Formula
   desc "BFT state machine replication for applications in any programming languages"
   homepage "https://tendermint.com/"
-  url "https://github.com/tendermint/tendermint/archive/v0.34.2.tar.gz"
-  sha256 "6c88bfa43b86ebc63f7d5eacd0276663e2159ef4dbc7de57130815409ee050bc"
+  url "https://github.com/tendermint/tendermint/archive/v0.35.3.tar.gz"
+  sha256 "7a41029a32b3e425d0f8343580c873cf23e3f626ba0a2898d1e3b92c38c09974"
   license "Apache-2.0"
-  head "https://github.com/tendermint/tendermint.git"
+  head "https://github.com/tendermint/tendermint.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "305ebc63c28d0b66822e201bc2551d67b5186386d7964c5657087eef20257ab7" => :big_sur
-    sha256 "dbdff265a952ff04ef727ca2ef4c5537ae1d38045f103ce644f4f516c1be09e9" => :arm64_big_sur
-    sha256 "434b66b1a2e9dc6fd3b363e3120eaf8d226945f89c195b333b12627a74da05ca" => :catalina
-    sha256 "3a410e6879341212259a38a4078ba686910d22bb2913869914d79af3180edb32" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "e963f8f1c2703eeb438eae89cb4137b71d6e7b807cdc5034c949b2e3e3a80163"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "e963f8f1c2703eeb438eae89cb4137b71d6e7b807cdc5034c949b2e3e3a80163"
+    sha256 cellar: :any_skip_relocation, monterey:       "a9724d7522cdbf6f5037cf63909f3ad8d2b9993f5dfaf53d8240a6419782b906"
+    sha256 cellar: :any_skip_relocation, big_sur:        "a9724d7522cdbf6f5037cf63909f3ad8d2b9993f5dfaf53d8240a6419782b906"
+    sha256 cellar: :any_skip_relocation, catalina:       "a9724d7522cdbf6f5037cf63909f3ad8d2b9993f5dfaf53d8240a6419782b906"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a94a17cf104ce7de3e805eda366bf3f05535a906060b21e53380d7326222a9bc"
   end
 
   depends_on "go" => :build
@@ -23,9 +24,9 @@ class Tendermint < Formula
 
   test do
     mkdir(testpath/"staging")
-    shell_output("#{bin}/tendermint init --home #{testpath}/staging")
-    assert_true File.exist?(testpath/"staging/config/genesis.json")
-    assert_true File.exist?(testpath/"staging/config/config.toml")
-    assert_true Dir.exist?(testpath/"staging/data")
+    shell_output("#{bin}/tendermint init full --home #{testpath}/staging")
+    assert_predicate testpath/"staging/config/genesis.json", :exist?
+    assert_predicate testpath/"staging/config/config.toml", :exist?
+    assert_predicate testpath/"staging/data", :exist?
   end
 end

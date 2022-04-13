@@ -1,16 +1,18 @@
 class Lynis < Formula
   desc "Security and system auditing tool to harden systems"
   homepage "https://cisofy.com/lynis/"
-  url "https://github.com/CISOfy/lynis/archive/3.0.3.tar.gz"
-  sha256 "bce170418eea6685e4cd2886594d3b118ce4dee33f96d666b3bacd51b100501e"
+  url "https://github.com/CISOfy/lynis/archive/3.0.7.tar.gz"
+  sha256 "13cedb14b17f0fff6c0ae7cdcc0550a887975bb3da4db96b47b2caf41c1c143b"
   license "GPL-3.0-only"
 
-  livecheck do
-    url "https://cisofy.com/downloads/lynis/"
-    regex(%r{href=.*?/lynis[._-]v?(\d+(?:\.\d+)+)\.t}i)
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "3c78dbc7b8b2eae1662939c4be89c5d491e94cb351775f720055fc0033f55465"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "3c78dbc7b8b2eae1662939c4be89c5d491e94cb351775f720055fc0033f55465"
+    sha256 cellar: :any_skip_relocation, monterey:       "37a7777dfd2d2a662fcbc04ecf7c5a756d52bb862355d7f7ef0908ee43e52478"
+    sha256 cellar: :any_skip_relocation, big_sur:        "37a7777dfd2d2a662fcbc04ecf7c5a756d52bb862355d7f7ef0908ee43e52478"
+    sha256 cellar: :any_skip_relocation, catalina:       "37a7777dfd2d2a662fcbc04ecf7c5a756d52bb862355d7f7ef0908ee43e52478"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3c78dbc7b8b2eae1662939c4be89c5d491e94cb351775f720055fc0033f55465"
   end
-
-  bottle :unneeded
 
   def install
     inreplace "lynis" do |s|

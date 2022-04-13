@@ -13,9 +13,10 @@
 class Ocaml < Formula
   desc "General purpose programming language in the ML family"
   homepage "https://ocaml.org/"
-  url "https://caml.inria.fr/pub/distrib/ocaml-4.10/ocaml-4.10.0.tar.xz"
-  sha256 "30734db17b609fdd1609c39a05912325c299023968a2c783e5955dd5163dfeb7"
-  license "LGPL-2.1"
+  # Remove `coq` from `flat_namespace_allowlist` at version bump.
+  url "https://caml.inria.fr/pub/distrib/ocaml-4.12/ocaml-4.12.0.tar.xz"
+  sha256 "39ee9db8dc1e3eb65473dd81a71fabab7cc253dbd7b85e9f9b5b28271319bec3"
+  license "LGPL-2.1-only" => { with: "OCaml-LGPL-linking-exception" }
   head "https://github.com/ocaml/ocaml.git", branch: "trunk"
 
   livecheck do
@@ -24,18 +25,28 @@ class Ocaml < Formula
   end
 
   bottle do
-    cellar :any
-    sha256 "e6258cd7012b9c0d8e961eb661cc11bc42c388d2153a9f8b9f0a37cf4e63a0f7" => :big_sur
-    sha256 "0870fc3042b3725fb2c6f131c4d6f78aec9f19d553e054ba4890773ef69e45a7" => :catalina
-    sha256 "b43a7247e3d3848d5f20d2432d4996e41049e79c738762f1026f4376ec7e80d3" => :mojave
-    sha256 "a534347814298cc8e66e321384f16eac85f2a59aaa2f536e542fb4870386bc2b" => :high_sierra
+    rebuild 1
+    sha256 cellar: :any,                 arm64_monterey: "adef805a6bc9cee04a0fa19ad4b32df4c593deffc735b68868e19f1132330aed"
+    sha256 cellar: :any,                 arm64_big_sur:  "83124ec43f2fa8164999c65068618311151792f1ab426cb7991ff59c514a7918"
+    sha256 cellar: :any,                 monterey:       "29003a3851245246fe8a53087baa5bf1e5d58cef2d2ef6c7be9c22bb3d735c5e"
+    sha256 cellar: :any,                 big_sur:        "e61a0e13d18b0478e02c368644786f33ec79aa38ad8b737b520ddb991d37efdd"
+    sha256 cellar: :any,                 catalina:       "8c7667334e0d425c4f75366e29217402680afa4aa2f271574e64eb128db96d83"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "83fb8a37f5de730873eba6ecf6190297648fa3d1001370b6f63bf9c3fc29d3a6"
   end
 
-  pour_bottle? do
-    # The ocaml compilers embed prefix information in weird ways that the default
-    # brew detection doesn't find, and so needs to be explicitly blacklisted.
-    reason "The bottle needs to be installed into /usr/local."
-    satisfy { HOMEBREW_PREFIX.to_s == "/usr/local" }
+  # The ocaml compilers embed prefix information in weird ways that the default
+  # brew detection doesn't find, and so needs to be explicitly blocked.
+  pour_bottle? only_if: :default_prefix
+
+  # Remove use of -flat_namespace. Upstreamed at
+  # https://github.com/ocaml/ocaml/pull/10723
+  # We embed a patch here so we don't have to regenerate configure.
+  patch :p0, :DATA
+
+  # Fix -flat_namespace being used on Big Sur and later.
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+    sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
   end
 
   def install
@@ -53,8 +64,21 @@ class Ocaml < Formula
   end
 
   test do
-    output = shell_output("echo 'let x = 1 ;;' | #{bin}/ocaml 2>&1")
+    output = pipe_output("#{bin}/ocaml 2>&1", "let x = 1 ;;")
     assert_match "val x : int = 1", output
     assert_match HOMEBREW_PREFIX.to_s, shell_output("#{bin}/ocamlc -where")
   end
 end
+
+__END__
+--- configure.orig	2021-10-24 09:34:12.145636659 +0800
++++ configure	2021-10-24 09:34:30.504944693 +0800
+@@ -13644,7 +13644,7 @@
+ if test x"$enable_shared" != "xno"; then :
+   case $host in #(
+   *-apple-darwin*) :
+-    mksharedlib="$CC -shared -flat_namespace -undefined suppress \
++    mksharedlib="$CC -shared -undefined dynamic_lookup \
+                    -Wl,-no_compact_unwind"
+       shared_libraries_supported=true ;; #(
+   *-*-mingw32) :

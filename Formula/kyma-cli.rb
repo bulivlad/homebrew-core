@@ -1,30 +1,30 @@
 class KymaCli < Formula
   desc "Kyma command-line interface"
   homepage "https://kyma-project.io"
-  url "https://github.com/kyma-project/cli/archive/1.18.0.tar.gz"
-  sha256 "698f693f5f70a7f2ff91831d6ef8fdc10d1ceace81e985b4c2ca02a73fddcc48"
+  url "https://github.com/kyma-project/cli/archive/2.1.2.tar.gz"
+  sha256 "a8863522d15685994a1cd7dfaad349f7c422c93a1a52d3ca6f5327dc34b26657"
   license "Apache-2.0"
-  revision 1
-  head "https://github.com/kyma-project/cli.git"
+  head "https://github.com/kyma-project/cli.git", branch: "main"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "9da6f18bf1f7481bd341bd9de2ec6c283842e5d382f1f12aab62e1b49796917f" => :big_sur
-    sha256 "6e5722bc459a0ba3796038ee74937686dae941927fb395c18091c9a6b7c91f75" => :catalina
-    sha256 "46d9dd3817ecb02b8f4e4dd60623af408c6b599c87fecee570291e3b62b93e71" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "4301ac37f1a23d5628e45ca2892644ef18f543945025e7571b2e17914301b0e9"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "e528ac222e349752c718f8d89d26b32e59826b840ac990f0026e061936a7d8e3"
+    sha256 cellar: :any_skip_relocation, monterey:       "51ad9ca054e625430e5fe192a63651fdc15a92eff8dde6f99497dc7af74ae8a7"
+    sha256 cellar: :any_skip_relocation, big_sur:        "d0d9c06108d277fc54a2f7f43d0d4c52193f44690be39241f1d2e114660eb88e"
+    sha256 cellar: :any_skip_relocation, catalina:       "c4d54e8294e4009d068be27e791b4b09b189e874bd4c0e9a4a15dda66d3ebea5"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "feefb80fcbdef3d0d7d8e9ec077f84a4c21e5d869cb25c4d41d63e8d3d899b73"
   end
 
-  depends_on "go@1.14" => :build
+  depends_on "go" => :build
+  depends_on macos: :catalina
 
   def install
     ldflags = %W[
       -s -w
       -X github.com/kyma-project/cli/cmd/kyma/version.Version=#{version}
-      -X github.com/kyma-project/cli/cmd/kyma/install.DefaultKymaVersion=#{version}
-      -X github.com/kyma-project/cli/cmd/kyma/upgrade.DefaultKymaVersion=#{version}
-    ].join(" ")
+    ]
 
-    system "go", "build", *std_go_args, "-o", bin/"kyma", "-ldflags", ldflags, "./cmd"
+    system "go", "build", *std_go_args(output: bin/"kyma", ldflags: ldflags), "./cmd"
   end
 
   test do

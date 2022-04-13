@@ -1,20 +1,16 @@
 class Evince < Formula
   desc "GNOME document viewer"
   homepage "https://wiki.gnome.org/Apps/Evince"
-  url "https://download.gnome.org/sources/evince/3.38/evince-3.38.0.tar.xz"
-  sha256 "26df897a417545b476d2606b14731122e84278ae994bd64ea535449c3cf01948"
+  url "https://download.gnome.org/sources/evince/41/evince-41.3.tar.xz"
+  sha256 "3346b01f9bdc8f2d5ffea92f110a090c64a3624942b5b543aad4592a9de33bb0"
   license "GPL-2.0-or-later"
-  revision 3
-
-  livecheck do
-    url :stable
-  end
 
   bottle do
-    sha256 "fc4985043ed06d8d6fa6295798e358561bc4450f760eb16c85258d5251a89cad" => :big_sur
-    sha256 "afcbf0dc169fdd425f6eb3bd794e3501df4d20f984a773b60b0a5175a35b0526" => :arm64_big_sur
-    sha256 "cb2dd1b96c0ba421fba972447653c9df1b752ad700078fc18e8059f9dbd94789" => :catalina
-    sha256 "29a0b6cf9b844348efbb47fff9283f72a36d83b4fb7005de8358a22e2c4d3eb0" => :mojave
+    sha256 arm64_monterey: "d69c944885f800cae888f0d25ee40ccee11378fdf4892472aa4189c15a515515"
+    sha256 arm64_big_sur:  "dab0eba135eefc60c69d8781a29940ef9a92a947843aabcf29d02d0085d165bf"
+    sha256 monterey:       "b3c8f7fdde11e14d57e09d4d82e39c78de7b8f2548395c642898b9f94c70c4c3"
+    sha256 big_sur:        "6df0eb2d7dcce978a49bf186629ea345285cb2c5bff4d87682557ebaa5b211e5"
+    sha256 catalina:       "340bd9932eaf6b9e3c476103b49d1d26816e889041201c9c8228a8d8e1b26b7a"
   end
 
   depends_on "gobject-introspection" => :build
@@ -29,25 +25,34 @@ class Evince < Formula
   depends_on "hicolor-icon-theme"
   depends_on "libarchive"
   depends_on "libgxps"
+  depends_on "libhandy"
   depends_on "libsecret"
   depends_on "libspectre"
   depends_on "poppler"
   depends_on "python@3.9"
+
+  # Fix compilation failure due to incorrect args for `i18n.merge_file`
+  # https://gitlab.gnome.org/GNOME/evince/-/issues/1732
+  patch do
+    url "https://gitlab.gnome.org/GNOME/evince/-/commit/1060b24d051607f14220f148d2f7723b29897a54.diff"
+    sha256 "5e9690beee8a472148a7c6fda78793a3499d5d0c38e08f61e1589598fab68f1a"
+  end
 
   def install
     ENV["DESTDIR"] = "/"
 
     args = %w[
       -Dnautilus=false
-      -Ddjvu=enabled
-      -Dgxps=enabled
       -Dcomics=enabled
+      -Ddjvu=enabled
+      -Dpdf=enabled
+      -Dps=enabled
+      -Dtiff=enabled
+      -Dxps=enabled
       -Dgtk_doc=false
       -Dintrospection=true
-      -Dbrowser_plugin=false
-      -Dgspell=enabled
       -Ddbus=false
-      -Dps=enabled
+      -Dgspell=enabled
     ]
 
     mkdir "build" do

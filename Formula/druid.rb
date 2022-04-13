@@ -1,9 +1,9 @@
 class Druid < Formula
   desc "High-performance, column-oriented, distributed data store"
   homepage "https://druid.apache.org/"
-  url "https://www.apache.org/dyn/closer.lua?path=druid/0.20.0/apache-druid-0.20.0-bin.tar.gz"
-  mirror "https://archive.apache.org/dist/druid/0.20.0/apache-druid-0.20.0-bin.tar.gz"
-  sha256 "734f836375bc1121100712b0501149f8bcbcb6d4cf2109b522af06367a8b1cb5"
+  url "https://dlcdn.apache.org/druid/0.22.1/apache-druid-0.22.1-bin.tar.gz"
+  mirror "https://archive.apache.org/dist/druid/0.22.1/apache-druid-0.22.1-bin.tar.gz"
+  sha256 "bd83d8f8235c74d47577468d65f96d302e6918b017e6338cfbb040df9157143c"
   license "Apache-2.0"
 
   livecheck do
@@ -11,15 +11,23 @@ class Druid < Formula
     regex(/href=.*?druid[._-]v?(\d+(?:\.\d+)+)-bin\.t/i)
   end
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any_skip_relocation, big_sur:      "ad7e134eb7daa12f3175bc93f269c471ce7f636d86118d7c0cfaebe8c8dc2450"
+    sha256 cellar: :any_skip_relocation, catalina:     "ad7e134eb7daa12f3175bc93f269c471ce7f636d86118d7c0cfaebe8c8dc2450"
+    sha256 cellar: :any_skip_relocation, x86_64_linux: "525049785863e472e223ea3d141178598cbb117f242d8ea0b5ab4864175d71f7"
+  end
 
   depends_on "zookeeper" => :test
   depends_on "openjdk@8"
 
-  resource "mysql-metadata-storage" do
-    url "http://static.druid.io/artifacts/releases/mysql-metadata-storage-0.12.3.tar.gz"
-    sha256 "8ee27e3c7906abcd401cfd59072602bd1f83828b66397ae2cf2c3ff0e1860162"
+  resource "mysql-connector-java" do
+    url "https://search.maven.org/remotecontent?filepath=mysql/mysql-connector-java/5.1.49/mysql-connector-java-5.1.49.jar"
+    sha256 "5bba9ff50e5e637a0996a730619dee19ccae274883a4d28c890d945252bb0e12"
   end
+
+  # Fixes: node.sh: source: not found. Remove with next release
+  # https://github.com/apache/druid/pull/12014
+  patch :DATA
 
   def install
     libexec.install Dir["*"]
@@ -42,7 +50,7 @@ class Druid < Formula
       s.gsub! ":=var/druid/pids", ":=#{var}/druid/pids"
     end
 
-    resource("mysql-metadata-storage").stage do
+    resource("mysql-connector-java").stage do
       (libexec/"extensions/mysql-metadata-storage").install Dir["*"]
     end
 
@@ -78,10 +86,25 @@ class Druid < Formula
       pid = fork { exec bin/"druid-broker.sh", "start" }
       sleep 40
       output = shell_output("curl -s http://localhost:8082/status")
-      assert_match /version/m, output
+      assert_match "version", output
     ensure
       system bin/"druid-broker.sh", "stop"
+      # force zookeeper stop since it is sometimes still alive after druid-broker.sh finishes
+      system Formula["zookeeper"].opt_bin/"zkServer", "stop"
       Process.wait pid
     end
   end
 end
+
+__END__
+diff -Naur apache-druid-0.22.0-old/bin/node.sh apache-druid-0.22.0/bin/node.sh
+--- apache-druid-0.22.0-old/bin/node.sh	2021-11-30 21:39:18.000000000 +0100
++++ apache-druid-0.22.0/bin/node.sh	2021-11-30 21:40:08.000000000 +0100
+@@ -41,7 +41,7 @@
+ PID_DIR="${DRUID_PID_DIR:=var/druid/pids}"
+ WHEREAMI="$(dirname "$0")"
+ WHEREAMI="$(cd "$WHEREAMI" && pwd)"
+-JAVA_BIN_DIR="$(source "$WHEREAMI"/java-util && get_java_bin_dir)"
++JAVA_BIN_DIR="$(. /"$WHEREAMI"/java-util && get_java_bin_dir)"
+
+ pid=$PID_DIR/$nodeType.pid

@@ -3,19 +3,17 @@ require "language/node"
 class WebtorrentCli < Formula
   desc "Command-line streaming torrent client"
   homepage "https://webtorrent.io/"
-  url "https://registry.npmjs.org/webtorrent-cli/-/webtorrent-cli-3.2.1.tgz"
-  sha256 "0e2222d593069c1d10c20e7954426c7b70a5c7c2d38a2ae8310c232a03e730c6"
+  url "https://registry.npmjs.org/webtorrent-cli/-/webtorrent-cli-4.0.4.tgz"
+  sha256 "1633e620ec476eb35679f7c00cdc592facaf714e0f03afbd4abffe12a4849561"
   license "MIT"
 
-  livecheck do
-    url :stable
-  end
-
   bottle do
-    sha256 "3dd729e08d336c0beabb3a61334fdf730727abb79c1ee36d9459d7237fc27ce1" => :big_sur
-    sha256 "1917b69a1707715ba84f5996a6aeb0657396fa519e9f4779a7c9d0286f258dc3" => :arm64_big_sur
-    sha256 "224cc9e37aff1c57337f28354eb9a0e56271740d1a1c7b58da4b00a432bc0dfe" => :catalina
-    sha256 "c2d991caef7824c847786f66bfc7127caa0db131dd114b472858921110355d0c" => :mojave
+    sha256                               arm64_monterey: "86c1ef7f88c13e56146713df15a33f85a5f355a6d91bf57c19780b5e7bb33278"
+    sha256                               arm64_big_sur:  "9bf6bb347cfe2258439be6bc0a4648103de1fc7556cc43f909d6844f38731bcb"
+    sha256                               monterey:       "82e63d789856811c2b77fc4243cd00bca469f9b73965a3f2d94d256ea4b31f62"
+    sha256                               big_sur:        "8eb99390349f4c412182832ef688af98066ae25ec7dc7642871d119ed13a684a"
+    sha256                               catalina:       "b67456ce6764331e165004e0a13cb41562bc9fb6c16b736c9ac34b1d9151792d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5460bb5cb67b8c4d3208df36d641d020c22c147209ff0e721ef734ebf4c6077f"
   end
 
   depends_on "node"
@@ -23,6 +21,15 @@ class WebtorrentCli < Formula
   def install
     system "npm", "install", *Language::Node.std_npm_install_args(libexec)
     bin.install_symlink Dir["#{libexec}/bin/*"]
+
+    # Remove incompatible pre-built binaries
+    os = OS.kernel_name.downcase
+    arch = Hardware::CPU.intel? ? "x64" : Hardware::CPU.arch.to_s
+    libexec.glob("lib/node_modules/webtorrent-cli/node_modules/{bufferutil,utp-native,utf-8-validate}/prebuilds/*")
+           .each { |dir| dir.rmtree if dir.basename.to_s != "#{os}-#{arch}" }
+
+    # Replace universal binaries with their native slices
+    deuniversalize_machos
   end
 
   test do

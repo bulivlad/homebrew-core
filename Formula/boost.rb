@@ -1,24 +1,27 @@
 class Boost < Formula
   desc "Collection of portable C++ source libraries"
   homepage "https://www.boost.org/"
-  url "https://dl.bintray.com/boostorg/release/1.75.0/source/boost_1_75_0.tar.bz2"
-  mirror "https://dl.bintray.com/homebrew/mirror/boost_1_75_0.tar.bz2"
-  sha256 "953db31e016db7bb207f11432bef7df100516eeb746843fa0486a222e3fd49cb"
+  url "https://boostorg.jfrog.io/artifactory/main/release/1.78.0/source/boost_1_78_0.tar.bz2"
+  sha256 "8681f175d4bdb26c52222665793eef08490d7758529330f98d3b29dd0735bccc"
   license "BSL-1.0"
   revision 1
-  head "https://github.com/boostorg/boost.git"
+  head "https://github.com/boostorg/boost.git", branch: "master"
 
   livecheck do
-    url "https://www.boost.org/feed/downloads.rss"
-    regex(/>Version v?(\d+(?:\.\d+)+)</i)
+    url "https://www.boost.org/users/download/"
+    regex(/href=.*?boost[._-]v?(\d+(?:[._]\d+)+)\.t/i)
+    strategy :page_match do |page, regex|
+      page.scan(regex).map { |match| match.first.tr("_", ".") }
+    end
   end
 
   bottle do
-    cellar :any
-    sha256 "a262002a81f7dc7b6fb23287713b35b51887b3126be72b2446d4f7dc0b587a9e" => :big_sur
-    sha256 "8a97e74aca8be001c4db5516abcb7fabdf244d6ed0620be9b5b634f78f2279df" => :arm64_big_sur
-    sha256 "2da721bd2fefaaea273ed92b801e682ee180100189c113a8c8f1e97f9dff0e55" => :catalina
-    sha256 "5257405fda53160eaf020dc974cad328d90d698181cd126e970cdc0d93bfcf73" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "8962db038baeee22886c3fccf32a73dbc117bf0098e1d576e3265e5b6d3b0545"
+    sha256 cellar: :any,                 arm64_big_sur:  "31006195d59197469fef527827c8e0dfe75118c01b1c67d268c51052c060ac6a"
+    sha256 cellar: :any,                 monterey:       "d49eb4eb19d29f26499db581585e9bd3a291dbf5804cf4295f3ef5a5beb33979"
+    sha256 cellar: :any,                 big_sur:        "16e54dc0a542bb5ef74e0b7ec6429b59cba202230e37456a623163d9c188cae3"
+    sha256 cellar: :any,                 catalina:       "6793e4c55780b05aaa766a094d1a5ac1d75cb9f4c790724552d454a44b973260"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d5eb8064aa8d4e70e5a36120c0c8959871ace04e478529ec40260b1e69e0767e"
   end
 
   depends_on "icu4c"
@@ -26,24 +29,21 @@ class Boost < Formula
   uses_from_macos "bzip2"
   uses_from_macos "zlib"
 
-  # Reduce INTERFACE_LINK_LIBRARIES exposure for shared libraries. Remove with the next release.
+  # Fix some library installations being skipped in some cases.
+  # Remove with the next release.
   patch do
-    url "https://github.com/boostorg/boost_install/commit/7b3fc734242eea9af734d6cd8ccb3d8f6b64c5b2.patch?full_index=1"
-    sha256 "cd96f5c51fa510fa6cd194eb011c0a6f9beb377fa2e78821133372f76a3be349"
-    directory "tools/boost_install"
-  end
-
-  # Fix build on 64-bit arm
-  patch do
-    url "https://github.com/boostorg/build/commit/456be0b7ecca065fbccf380c2f51e0985e608ba0.patch?full_index=1"
-    sha256 "e7a78145452fc145ea5d6e5f61e72df7dcab3a6eebb2cade6b4cfae815687f3a"
-    directory "tools/build"
+    url "https://www.boost.org/patches/1_78_0/0001-b2-fix-install.patch"
+    sha256 "71e5b96e72e534670043e0fa7743fd34671715e21c3ddb41908a3da284a8920a"
   end
 
   def install
     # Force boost to compile with the desired compiler
     open("user-config.jam", "a") do |file|
-      file.write "using darwin : : #{ENV.cxx} ;\n"
+      if OS.mac?
+        file.write "using darwin : : #{ENV.cxx} ;\n"
+      else
+        file.write "using gcc : : #{ENV.cxx} ;\n"
+      end
     end
 
     # libdir should be set by --prefix but isn't
@@ -108,7 +108,7 @@ class Boost < Formula
         return 0;
       }
     EOS
-    system ENV.cxx, "test.cpp", "-std=c++14", "-stdlib=libc++", "-o", "test"
+    system ENV.cxx, "test.cpp", "-std=c++14", "-o", "test"
     system "./test"
   end
 end

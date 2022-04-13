@@ -1,9 +1,10 @@
 class Tfsec < Formula
-  desc "Static analysis powered security scanner for your terraform code"
-  homepage "https://github.com/tfsec/tfsec"
-  url "https://github.com/tfsec/tfsec/archive/v0.36.13.tar.gz"
-  sha256 "a5791f2d94c1bd64a4c37f913d9b9f7e96a4217b8a1537283df7f9775c255401"
+  desc "Static analysis security scanner for your terraform code"
+  homepage "https://tfsec.dev/"
+  url "https://github.com/aquasecurity/tfsec/archive/v1.18.0.tar.gz"
+  sha256 "f4f243624248cab2613526c4cc462ea5ac586eef9f3aea0f4fe34f9440ff287c"
   license "MIT"
+  head "https://github.com/aquasecurity/tfsec.git", branch: "master"
 
   livecheck do
     url :stable
@@ -11,19 +12,15 @@ class Tfsec < Formula
   end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "c264e19790b6032fcbfedd570cb872ed9efee3d98d55bf57bad8509f55f9e7f9" => :big_sur
-    sha256 "3bb42be81bd154467832541d24de0378f372ac98cd18605501331122ddf84850" => :arm64_big_sur
-    sha256 "b738ea0f2eb82f92effdfaa386ec8d6a904e37b3231c7c0cc3f6f8df6b0ea7b9" => :catalina
-    sha256 "88d461ca5e1fed1367b2f7639296aebf4538c8a60601592356e475c635a3cb35" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "24dce5a793eac1d29338f3ff80e95e70c81f16b3a19de7ef97c782a05e15ba69"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "10777bf5ce9eae1b33a1ece2ba9d74c54b89246e9efe936702a1798cc7500598"
+    sha256 cellar: :any_skip_relocation, monterey:       "8d80af466573f16f4077b012472dc1343f0a0c2a95a84a6ab826a4736432fb81"
+    sha256 cellar: :any_skip_relocation, big_sur:        "a37f63f2f9feccc93063e4516adbe24ed25d6c61dd86000b26837190e9f2045e"
+    sha256 cellar: :any_skip_relocation, catalina:       "cd7842784cfe5e0222faed10f06e15c1db6c983d464f2d6e78987a7900ca1012"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "54e31b171afd275e282bd3879c0b7a33688cc1f33a19c52170560f3415261be6"
   end
 
   depends_on "go" => :build
-
-  resource "testfile" do
-    url "https://raw.githubusercontent.com/tfsec/tfsec/2d9b76a/example/brew-validate.tf"
-    sha256 "3ef5c46e81e9f0b42578fd8ddce959145cd043f87fd621a12140e99681f1128a"
-  end
 
   def install
     system "scripts/install.sh", "v#{version}"
@@ -31,8 +28,23 @@ class Tfsec < Formula
   end
 
   test do
-    resource("testfile").stage do
-      assert_match "No problems detected!", shell_output("#{bin}/tfsec .")
-    end
+    (testpath/"good/brew-validate.tf").write <<~EOS
+      resource "aws_alb_listener" "my-alb-listener" {
+        port     = "443"
+        protocol = "HTTPS"
+      }
+    EOS
+    (testpath/"bad/brew-validate.tf").write <<~EOS
+      resource "aws_security_group_rule" "world" {
+        description = "A security group triggering tfsec AWS006."
+        type        = "ingress"
+        cidr_blocks = ["0.0.0.0/0"]
+      }
+    EOS
+
+    good_output = shell_output("#{bin}/tfsec #{testpath}/good")
+    assert_match "No problems detected!", good_output
+    bad_output = shell_output("#{bin}/tfsec #{testpath}/bad 2>&1", 1)
+    assert_match "1 potential problem(s) detected.", bad_output
   end
 end

@@ -1,11 +1,11 @@
 class Mgba < Formula
   desc "Game Boy Advance emulator"
   homepage "https://mgba.io/"
-  url "https://github.com/mgba-emu/mgba/archive/0.8.4.tar.gz"
-  sha256 "6b94873dac9040fd6fd9f13f76dc48f342e954f3b4cf82717b59601c3a32b72c"
+  url "https://github.com/mgba-emu/mgba/archive/0.9.3.tar.gz"
+  sha256 "692ff0ac50e18380df0ff3ee83071f9926715200d0dceedd9d16a028a59537a0"
   license "MPL-2.0"
-  revision 2
-  head "https://github.com/mgba-emu/mgba.git"
+  revision 1
+  head "https://github.com/mgba-emu/mgba.git", branch: "master"
 
   livecheck do
     url :stable
@@ -13,20 +13,23 @@ class Mgba < Formula
   end
 
   bottle do
-    sha256 "c7c2dfcf3af79649d5f71ee51fe2cb346adf724d670174ba076a0f680ebaf09c" => :big_sur
-    sha256 "7a37aa37bb345914c0ec1f4b89a49e0c10c75b06548927282030a0d4bc48f9cf" => :arm64_big_sur
-    sha256 "5c585a38067bcc18296cb1f163b771c3cd38cd7e04cc90fb7ef81c8644c36444" => :catalina
-    sha256 "154aea74ade5528132daf55c1880b9c894554ac0465bf082e17b7c2c761a6169" => :mojave
+    sha256 cellar: :any, arm64_monterey: "34235cb6f1aaeca67d11e4b060bfd2d7adf462b61b115beb029fd81ec0adc563"
+    sha256 cellar: :any, arm64_big_sur:  "0dc3200fa947b5872c48500c3c7b4841668edfc2143d2977226e850fa53db2dd"
+    sha256 cellar: :any, monterey:       "8486c6db482c218845f22d3dfbc5402066d002c6712b1fc0faefa3ce88d186f0"
+    sha256 cellar: :any, big_sur:        "575163b96818d53848c6b4a536fbccea185cce14487394974519b1655c3cb03f"
+    sha256 cellar: :any, catalina:       "fe54e4803c93036beb054b6e649f722e21f1ae08fa4efb4c2808d9b5b875fd8f"
   end
 
   depends_on "cmake" => :build
   depends_on "pkg-config" => :build
-  depends_on "ffmpeg"
+  depends_on "ffmpeg@4"
   depends_on "libepoxy"
   depends_on "libpng"
   depends_on "libzip"
-  depends_on "qt"
+  depends_on "qt@5"
   depends_on "sdl2"
+
+  fails_with gcc: "5" # ffmpeg is compiled with GCC
 
   def install
     # Install .app bundle into prefix, not prefix/Applications

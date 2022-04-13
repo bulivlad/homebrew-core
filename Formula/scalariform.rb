@@ -10,12 +10,17 @@ class Scalariform < Formula
     strategy :github_latest
   end
 
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "0a155625340add1d947b67289ee0ebfad84655735801562fe67ed853840ec92a"
+  end
+
   head do
     url "https://github.com/scala-ide/scalariform.git"
     depends_on "sbt" => :build
   end
 
-  bottle :unneeded
+  depends_on "openjdk"
 
   def install
     if build.head?

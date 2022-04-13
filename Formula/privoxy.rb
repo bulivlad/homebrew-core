@@ -1,8 +1,8 @@
 class Privoxy < Formula
   desc "Advanced filtering web proxy"
   homepage "https://www.privoxy.org/"
-  url "https://downloads.sourceforge.net/project/ijbswa/Sources/3.0.29%20%28stable%29/privoxy-3.0.29-stable-src.tar.gz"
-  sha256 "25c6069efdaf577d47c257da63b03cd6d063fb790e19cc39603d82e5db72489d"
+  url "https://downloads.sourceforge.net/project/ijbswa/Sources/3.0.33%20%28stable%29/privoxy-3.0.33-stable-src.tar.gz"
+  sha256 "04b104e70dac61561b9dd110684b250fafc8c13dbe437a60fae18ddd9a881fae"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -11,11 +11,12 @@ class Privoxy < Formula
   end
 
   bottle do
-    cellar :any
-    sha256 "7b49313bc0ca6074e83753c56c192cc8c922e63f37a07ffd6954d81f63b39e69" => :big_sur
-    sha256 "08590216716f79252f4485179965c2a41a5db7064f86e575874a85dccda4adaa" => :arm64_big_sur
-    sha256 "8e6f41dd3f0828b17ed3ee516de139ae4baa66d7c01c633bf3fc95097029e5a8" => :catalina
-    sha256 "8c382bc37d0a27ca33786a09e435942f38aac55bb48b22f4dafe8810002a06da" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "4d59937215ae6911b77ce1ca02608942c0b9ca7a18c38da89909fb9c3a6fe6e9"
+    sha256 cellar: :any,                 arm64_big_sur:  "97cd684af21193fe0b7596860338af0b8a6a6f6f833475d92959b6ce75bce8fc"
+    sha256 cellar: :any,                 monterey:       "fd15bbf9ebf08d19f9212829def741754cc51b0394f5643dd0d3680008250827"
+    sha256 cellar: :any,                 big_sur:        "0491266998ea099927d512de21e195ea356bcf09e2fb956a204f27a6f89c8226"
+    sha256 cellar: :any,                 catalina:       "b19e5234b39ad38c70ab95f9763da0ee02e5b7978067f9662d2d15f3341a1e53"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e38d940bdb7370ec469171cd1aaa7de5ac98c52e2b4bdc42a4d0c92601544d0d"
   end
 
   depends_on "autoconf" => :build
@@ -39,33 +40,11 @@ class Privoxy < Formula
     system "make", "install"
   end
 
-  plist_options manual: "privoxy #{HOMEBREW_PREFIX}/etc/privoxy/config"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-      <dict>
-        <key>KeepAlive</key>
-        <true/>
-        <key>Label</key>
-        <string>#{plist_name}</string>
-        <key>WorkingDirectory</key>
-        <string>#{var}</string>
-        <key>ProgramArguments</key>
-        <array>
-          <string>#{sbin}/privoxy</string>
-          <string>--no-daemon</string>
-          <string>#{etc}/privoxy/config</string>
-        </array>
-        <key>RunAtLoad</key>
-        <true/>
-        <key>StandardErrorPath</key>
-        <string>#{var}/log/privoxy/logfile</string>
-      </dict>
-      </plist>
-    EOS
+  service do
+    run [opt_sbin/"privoxy", "--no-daemon", etc/"privoxy/config"]
+    keep_alive true
+    working_dir var
+    error_log_path var/"log/privoxy/logfile"
   end
 
   test do
@@ -74,7 +53,8 @@ class Privoxy < Formula
     begin
       server = IO.popen("#{sbin}/privoxy --no-daemon #{testpath}/config")
       sleep 1
-      assert_match "200 OK", shell_output("/usr/bin/curl -I -x #{bind_address} https://github.com")
+      assert_match "HTTP/1.1 200 Connection established",
+                   shell_output("/usr/bin/curl -I -x #{bind_address} https://github.com")
     ensure
       Process.kill("SIGINT", server.pid)
       Process.wait(server.pid)

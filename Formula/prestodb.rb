@@ -1,30 +1,30 @@
 class Prestodb < Formula
+  include Language::Python::Shebang
+
   desc "Distributed SQL query engine for big data"
   homepage "https://prestodb.io"
-  url "https://search.maven.org/remotecontent?filepath=com/facebook/presto/presto-server/0.245.1/presto-server-0.245.1.tar.gz"
-  sha256 "8fbd4f46527bdc58198837cb791d3117074db058fdc64e4c798c2ea5856d02ae"
+  url "https://search.maven.org/remotecontent?filepath=com/facebook/presto/presto-server/0.272/presto-server-0.272.tar.gz"
+  sha256 "4e696f874a3bfa0c712f283e4012fad332a9d71ea982ce24f8a91acc6a5d8372"
   license "Apache-2.0"
 
-  # The source of the Presto download page at https://prestodb.io/download.html
-  # contains old version information. The current version information is loaded
-  # from the JavaScript file below, so we check that instead. We don't check
-  # Maven because sometimes the directory listing page contains a newer version
-  # that hasn't been released yet and we probably don't want to upgrade until
-  # it's official on the first-party website, etc.
+  # Upstream has said that we should check Maven for Presto version information
+  # and the highest version found there is newest:
+  # https://github.com/prestodb/presto/issues/16200
   livecheck do
-    url "https://prestodb.io/static/js/version.js"
-    regex(/latest_presto_version.*?(\d+(?:\.\d+)+)/i)
+    url "https://search.maven.org/remotecontent?filepath=com/facebook/presto/presto-server/"
+    regex(%r{href=["']?v?(\d+(?:\.\d+)+)/?["' >]}i)
   end
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any_skip_relocation, all: "4f52ed17e534be51ca8a6e6f551850bb948c301e78a467589394edc5152ffdc3"
+  end
 
   depends_on "openjdk"
-
-  conflicts_with "prestosql", because: "both install `presto` and `presto-server` binaries"
+  depends_on "python@3.10"
 
   resource "presto-cli" do
-    url "https://search.maven.org/remotecontent?filepath=com/facebook/presto/presto-cli/0.245.1/presto-cli-0.245.1-executable.jar"
-    sha256 "c6a8eab54d14f8e2f3798889f663dab701f6856e1455ee46717a3141ac528086"
+    url "https://search.maven.org/remotecontent?filepath=com/facebook/presto/presto-cli/0.272/presto-cli-0.272-executable.jar"
+    sha256 "bdc7bfe2ad84f8ad217a3fc5744b7552cea00df059763d7155ce14cf159b95cf"
   end
 
   def install
@@ -62,12 +62,20 @@ class Prestodb < Formula
 
     (libexec/"etc/catalog/jmx.properties").write "connector.name=jmx"
 
+    rewrite_shebang detected_python_shebang, libexec/"bin/launcher.py"
     (bin/"presto-server").write_env_script libexec/"bin/launcher", Language::Java.overridable_java_home_env
 
     resource("presto-cli").stage do
       libexec.install "presto-cli-#{version}-executable.jar"
       bin.write_jar_script libexec/"presto-cli-#{version}-executable.jar", "presto"
     end
+
+    # Remove incompatible pre-built binaries
+    libprocname_dirs = libexec.glob("bin/procname/*")
+    # Keep the Linux-x86_64 directory to make bottles identical
+    libprocname_dirs.reject! { |dir| dir.basename.to_s == "Linux-x86_64" }
+    libprocname_dirs.reject! { |dir| dir.basename.to_s == "#{OS.kernel_name}-#{Hardware::CPU.arch}" }
+    libprocname_dirs.map(&:rmtree)
   end
 
   def post_install
@@ -81,31 +89,9 @@ class Prestodb < Formula
     EOS
   end
 
-  plist_options manual: "presto-server run"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
-      "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>RunAtLoad</key>
-          <true/>
-          <key>AbandonProcessGroup</key>
-          <true/>
-          <key>WorkingDirectory</key>
-          <string>#{opt_libexec}</string>
-          <key>ProgramArguments</key>
-          <array>
-            <string>#{opt_bin}/presto-server</string>
-            <string>run</string>
-          </array>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run [opt_bin/"presto-server", "run"]
+    working_dir opt_libexec
   end
 
   test do

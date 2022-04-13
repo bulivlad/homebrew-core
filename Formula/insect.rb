@@ -3,19 +3,15 @@ require "language/node"
 class Insect < Formula
   desc "High precision scientific calculator with support for physical units"
   homepage "https://insect.sh/"
-  url "https://registry.npmjs.org/insect/-/insect-5.6.0.tgz"
-  sha256 "e971a797c49b1b2aac8a29ad2b7696b80b7f9da2d302ddc3e1a46b195f4edfd0"
+  url "https://registry.npmjs.org/insect/-/insect-5.7.0.tgz"
+  sha256 "3add7ce952b0cbc4138986cbe0764767939f71ce4fb1898dd487f42ad17dbe09"
   license "MIT"
 
-  livecheck do
-    url :stable
-  end
-
   bottle do
-    cellar :any_skip_relocation
-    sha256 "30d7f0f2e26a504fafc8444b90e243680186c1d10c5ef05e505bb712a3d2d543" => :catalina
-    sha256 "b0d541a0e1a22cd63cd3a5ade24de85b9630e1b5d12154063c001d4d21fa81f4" => :mojave
-    sha256 "0604c43c2cb219d817eb9129ee501dff2f1d206c8da539eb062c88ba4ed6518d" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_big_sur: "96e11f28d24dd5050085aef60bbe72791ca77bebeeb8b1db91eb13960f43507c"
+    sha256 cellar: :any_skip_relocation, big_sur:       "e5a925fd6688be20cf8c5b931a6edb423bf3e7dbef8a3cfc4347c6ce86f0ab70"
+    sha256 cellar: :any_skip_relocation, catalina:      "e5a925fd6688be20cf8c5b931a6edb423bf3e7dbef8a3cfc4347c6ce86f0ab70"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "2c1883f188bed11649803d4732f861e8193cae22e6d165b65d569f22c8c55abd"
   end
 
   depends_on "psc-package" => :build
@@ -23,9 +19,25 @@ class Insect < Formula
   depends_on "purescript" => :build
   depends_on "node"
 
+  on_linux do
+    depends_on "xsel"
+  end
+
   def install
     system "npm", "install", *Language::Node.std_npm_install_args(libexec)
-    bin.install_symlink Dir["#{libexec}/bin/*"]
+    bin.install_symlink Dir[libexec/"bin/*"]
+
+    clipboardy_fallbacks_dir = libexec/"lib/node_modules/#{name}/node_modules/clipboardy/fallbacks"
+    clipboardy_fallbacks_dir.rmtree # remove pre-built binaries
+    if OS.linux?
+      linux_dir = clipboardy_fallbacks_dir/"linux"
+      linux_dir.mkpath
+      # Replace the vendored pre-built xsel with one we build ourselves
+      ln_sf (Formula["xsel"].opt_bin/"xsel").relative_path_from(linux_dir), linux_dir
+    end
+
+    # Replace universal binaries with their native slices
+    deuniversalize_machos
   end
 
   test do

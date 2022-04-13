@@ -1,17 +1,18 @@
 class Libheif < Formula
   desc "ISO/IEC 23008-12:2017 HEIF file format decoder and encoder"
   homepage "https://www.libde265.org/"
-  url "https://github.com/strukturag/libheif/releases/download/v1.10.0/libheif-1.10.0.tar.gz"
-  sha256 "ad5af1276f341277dc537b0d19a4193e0833c247b2aacb936e0c5494141533ae"
+  url "https://github.com/strukturag/libheif/releases/download/v1.12.0/libheif-1.12.0.tar.gz"
+  sha256 "e1ac2abb354fdc8ccdca71363ebad7503ad731c84022cf460837f0839e171718"
   license "LGPL-3.0-only"
+  revision 1
 
   bottle do
-    cellar :any
-    rebuild 1
-    sha256 "ad14eb7498f8e3ce88eab7080d5bab96a76625146f08f93d2c415a9c4a457300" => :big_sur
-    sha256 "668a7d16b976d5083224495433d20258b9b74dac82ea18ff3c01b95e9274290a" => :arm64_big_sur
-    sha256 "977d0b6b904a292dad214bfbd3e44d9f1bd5ea5b308f69d96153208333a037f1" => :catalina
-    sha256 "8e0cd658a818526c599bec0d22cd52ab854f49a46912729a0792c92fe86d45c9" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "6285488bd07d49e996a1be0dfe7296051ade71cc2078ecbaa2243afd05afe560"
+    sha256 cellar: :any,                 arm64_big_sur:  "ccf8a9fecc4629a5ae7b7cdb2db8e86c74cf70ab345f960d513e45b57f646174"
+    sha256 cellar: :any,                 monterey:       "b2cadb8ecf0985f007340e54853ffa685f57fd4dba8cae4bae37499119a9fe04"
+    sha256 cellar: :any,                 big_sur:        "6a82cb078278ee9e6240b6c738308974ca3a4ef545c30016f8395967bb6f4959"
+    sha256 cellar: :any,                 catalina:       "9ed1d527c347fa67d346d5d638b1760177693819d167c7dc549ebabcaabc428c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6382a34a85ddc5cb1a8359de883c18867340294b2f662e84650b287f04324484"
   end
 
   depends_on "pkg-config" => :build
@@ -21,6 +22,12 @@ class Libheif < Formula
   depends_on "libpng"
   depends_on "shared-mime-info"
   depends_on "x265"
+
+  # Fix -flat_namespace being used on Big Sur and later.
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+    sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
+  end
 
   def install
     system "./configure", "--disable-dependency-tracking",

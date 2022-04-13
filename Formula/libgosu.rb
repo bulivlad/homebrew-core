@@ -1,22 +1,33 @@
 class Libgosu < Formula
   desc "2D game development library"
   homepage "https://libgosu.org"
-  url "https://github.com/gosu/gosu/archive/v1.0.0.tar.gz"
-  sha256 "0b3f6ff095808fc1dbfc8513676737dc2cf99a8570013873eaab64499b543331"
+  url "https://github.com/gosu/gosu/archive/v1.4.1.tar.gz"
+  sha256 "48c1eec7c9ed11db71358bfc2b3c371d070ce17112b992215a6e267f54176987"
   license "MIT"
-  head "https://github.com/gosu/gosu.git"
+  head "https://github.com/gosu/gosu.git", branch: "master"
 
   bottle do
-    cellar :any
-    sha256 "d6afbd6af6184ff1e51f4dbe580ff8f19f11235d8dde4f9834951f4079070831" => :big_sur
-    sha256 "b6a28109e1504d9640bd25b4e76112c873b00e72c319c66aa32c8a44851fd72f" => :arm64_big_sur
-    sha256 "bfdc72d6d978814a4ef914605de1b0969c7d3ca62fb98b035c3be0120a9cf168" => :catalina
-    sha256 "442d1168c40e34104c445df179e9482d1d03a359d5cc7676f589ce3d42289093" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "123cd8c6795e69e593c86274fff30d7fb5261369f6fc9771ae11914cb6c66e23"
+    sha256 cellar: :any,                 arm64_big_sur:  "fef5d8ff919a520e720ff7b3b7fb7e673efc3ec1d073402979e590f03b1c5ac6"
+    sha256 cellar: :any,                 monterey:       "fdf4e91332cad00c9b1dc8cb5779a31e23fb330c052393fdb59c4d29cbfb8ef4"
+    sha256 cellar: :any,                 big_sur:        "fd42748a6359d9942eca93db1139c6e967758c5d27cedb6380a1b838f0913c6f"
+    sha256 cellar: :any,                 catalina:       "58c348cc0c0f34b88763b78d414b6054723a67e759b9377173a32fd59c584e51"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c9ca33086397d4162d96272a7e542339e479bec84353ebac20d9d95a1e86650a"
   end
 
   depends_on "cmake" => :build
   depends_on "pkg-config" => :build
   depends_on "sdl2"
+
+  on_linux do
+    depends_on "fontconfig"
+    depends_on "gcc"
+    depends_on "mesa"
+    depends_on "mesa-glu"
+    depends_on "openal-soft"
+  end
+
+  fails_with gcc: "5"
 
   def install
     mkdir "build" do
@@ -52,7 +63,11 @@ class Libgosu < Formula
       }
     EOS
 
-    system ENV.cxx, "test.cpp", "-o", "test", "-L#{lib}", "-lgosu", "-I#{include}", "-std=c++11"
+    system ENV.cxx, "test.cpp", "-o", "test", "-L#{lib}", "-lgosu", "-I#{include}", "-std=c++17"
+
+    # Fails in Linux CI with "Could not initialize SDL Video: No available video device"
+    return if OS.linux? && ENV["HOMEBREW_GITHUB_ACTIONS"]
+
     system "./test"
   end
 end

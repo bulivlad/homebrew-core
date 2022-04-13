@@ -1,17 +1,18 @@
 class DotenvLinter < Formula
   desc "Lightning-fast linter for .env files written in Rust"
   homepage "https://dotenv-linter.github.io"
-  url "https://github.com/dotenv-linter/dotenv-linter/archive/v3.0.0.tar.gz"
-  sha256 "a858a4ff6121ec9d9a8889b8bb8d3fd88497c8142c5c5d087a6f169bfd19d73f"
+  url "https://github.com/dotenv-linter/dotenv-linter/archive/v3.2.0.tar.gz"
+  sha256 "c93ea23f578c2b2e7e1298d625a3b66e870c58222743657484a84415f54fcd64"
   license "MIT"
-  head "https://github.com/dotenv-linter/dotenv-linter.git"
+  head "https://github.com/dotenv-linter/dotenv-linter.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "851044d08dcdaa0d16d0fd1cc0743b7539ef464b7c708137a065f78e9b6d5727" => :big_sur
-    sha256 "394d505159a7fa57862d7231e2aad10ce33836f54dbfbc2010c1d57d5172eb27" => :arm64_big_sur
-    sha256 "7e21af0a9acb92e757a0d0b1b086548c91ea8ef10cce7487797f9bc2c66825ba" => :catalina
-    sha256 "d9cd2cfa877f183617e0154482350605934e6a4fbbddff0c002299fbb079d87b" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "231e0f5897fef4b23ec503f695038621bea3e677d9442b52ef7187115588538e"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "66d8fc29334238150e37aed962ff752b633a83dabba30ce2f42c9bd8f58d38c8"
+    sha256 cellar: :any_skip_relocation, monterey:       "9c249746ec5c9ca880da944a8fc4859efbc9541dc32522e42a03511e1aeb3159"
+    sha256 cellar: :any_skip_relocation, big_sur:        "b5160391e2d94fe12618b6ec9c7e7b0c3e4081e81a3cb982bfe07ea60abeea8b"
+    sha256 cellar: :any_skip_relocation, catalina:       "38a57e1b3340a57e6632b6c66f85c7c4dea41e38c3f7b3719d238fa90391e545"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4092d8e9ec258c17a40a6467895a6bdf783def3d16ab05206926068aa100ae61"
   end
 
   depends_on "rust" => :build
@@ -36,8 +37,8 @@ class DotenvLinter < Formula
       _FOO=bar
     EOS
     output = shell_output("#{bin}/dotenv-linter", 1)
-    assert_match /\.env:2\s+DuplicatedKey/, output
-    assert_match /\.env:3\s+UnorderedKey/, output
-    assert_match /\.env.test:1\s+LeadingCharacter/, output
+    assert_match(/\.env:2\s+DuplicatedKey/, output)
+    assert_match(/\.env:3\s+UnorderedKey/, output)
+    assert_match(/\.env.test:1\s+LeadingCharacter/, output)
   end
 end

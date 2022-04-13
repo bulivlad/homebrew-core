@@ -1,15 +1,21 @@
 class Ejabberd < Formula
   desc "XMPP application server"
   homepage "https://www.ejabberd.im"
-  url "https://static.process-one.net/ejabberd/downloads/20.12/ejabberd-20.12.tgz"
-  sha256 "9d9c5d617472bf851e8cf2c7353fe9e82aef5b6d8aa28eeb6528bde8a463a854"
+  url "https://static.process-one.net/ejabberd/downloads/21.12/ejabberd-21.12.tgz"
+  sha256 "b6e6739947d3678525b14ee280cedb1a04280c83ea17a4741795aac99fbdad47"
   license "GPL-2.0-only"
 
+  livecheck do
+    url "https://www.process-one.net/en/ejabberd/downloads/"
+    regex(/href=.*?ejabberd[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
+
   bottle do
-    cellar :any
-    sha256 "0ceed5bdb4dca54b7af825e2ddff42f29ccb92ac08cd68de783bbe82c70158a6" => :big_sur
-    sha256 "848676f2ae43c6b05ee9732caaee469fe25571624e9b2ded161788fffbd84a35" => :catalina
-    sha256 "7273b1ef75bb32ec39aca0a57018839c04e8ecaadb06f3d097858d58544ec2bb" => :mojave
+    sha256 cellar: :any, arm64_monterey: "c4873e5f20dc834c2b31e8a3a0a8e4b2c72ff0cc3f1af5de65236cf2823d6524"
+    sha256 cellar: :any, arm64_big_sur:  "2c0f3a0d99e52c4e25e6844669929f992ee89514847532aa0cfff77aba2b1297"
+    sha256 cellar: :any, monterey:       "2aab8f179a30fb248fd1e07a00ac149bd763451f11a385f916d1950e0dea5858"
+    sha256 cellar: :any, big_sur:        "38f754a3aa6ef9c634104f39fd0c41e5d501525d69b437fd1520ff5544c1d01e"
+    sha256 cellar: :any, catalina:       "383e3974b71e4d572c5f509b3b33f228eef34f18ab607633e632c387a9562863"
   end
 
   head do
@@ -75,33 +81,10 @@ class Ejabberd < Formula
     EOS
   end
 
-  plist_options manual: "#{HOMEBREW_PREFIX}/sbin/ejabberdctl start"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-      <dict>
-        <key>EnvironmentVariables</key>
-        <dict>
-          <key>HOME</key>
-          <string>#{var}/lib/ejabberd</string>
-        </dict>
-        <key>Label</key>
-        <string>#{plist_name}</string>
-        <key>ProgramArguments</key>
-        <array>
-          <string>#{opt_sbin}/ejabberdctl</string>
-          <string>start</string>
-        </array>
-        <key>RunAtLoad</key>
-        <true/>
-        <key>WorkingDirectory</key>
-        <string>#{var}/lib/ejabberd</string>
-      </dict>
-      </plist>
-    EOS
+  service do
+    run [opt_sbin/"ejabberdctl", "start"]
+    environment_variables HOME: var/"lib/ejabberd"
+    working_dir var/"lib/ejabberd"
   end
 
   test do

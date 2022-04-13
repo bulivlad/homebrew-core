@@ -1,8 +1,8 @@
 class LibgpgError < Formula
   desc "Common error values for all GnuPG components"
   homepage "https://www.gnupg.org/related_software/libgpg-error/"
-  url "https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.41.tar.bz2"
-  sha256 "64b078b45ac3c3003d7e352a5e05318880a5778c42331ce1ef33d1a0d9922742"
+  url "https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.44.tar.bz2"
+  sha256 "8e3d2da7a8b9a104dd8e9212ebe8e0daf86aa838cc1314ba6bc4de8f2d8a1ff9"
   license "LGPL-2.1-or-later"
 
   livecheck do
@@ -11,10 +11,12 @@ class LibgpgError < Formula
   end
 
   bottle do
-    sha256 "bc5c5321fa98d6f4dbab215f0e90d9babdcc9c9c801c7ebea9a4423364a13cb7" => :big_sur
-    sha256 "089a2faf07b8eb31c995e7dab97b9e8d5d2fdc77dac8d239ffb391ca4eaf6761" => :arm64_big_sur
-    sha256 "33969246a46d4cb42c2401c64038cc48601e5fcd41ae21c14d9775c4955fd825" => :catalina
-    sha256 "9efc83a76395081c43b5619b4cca8deb794187a7e54cf28e3e7f106aad5093ae" => :mojave
+    sha256 arm64_monterey: "05732e309a8283f14730e29b92d8c3a3c9db79de397f427414ad42351d208ed8"
+    sha256 arm64_big_sur:  "4049a428bcc5566af7a0dce0f8c04ff469b68e9f855d18f8f9a0e62ddfbde7f3"
+    sha256 monterey:       "be35f71d00903ecfa28e902ad57e5a95383ba5d1922c3b0e1626ebc28b58153f"
+    sha256 big_sur:        "371011245238dfdd29b8cb8f5b14798e2a2a3ba69dccc89590802d59cd75a2ae"
+    sha256 catalina:       "9bd703503504029a4bdb9655cf9abab773cda6a9b3f1c7ede9c88ed51b7ea933"
+    sha256 x86_64_linux:   "5d697f03c8f58ecad98069dc70798788df756aa242f1aeb5fbd72b966384e51d"
   end
 
   def install

@@ -4,31 +4,29 @@ class Agda < Formula
   license "BSD-3-Clause"
 
   stable do
-    url "https://hackage.haskell.org/package/Agda-2.6.1.2/Agda-2.6.1.2.tar.gz"
-    sha256 "08703073c4a5bce89ea64931ac891245dc42dea44b59bed837614811a213072d"
+    url "https://hackage.haskell.org/package/Agda-2.6.2.2/Agda-2.6.2.2.tar.gz"
+    sha256 "e5be3761717b144f64e760d8589ec6fdc0dda60d40125c49cdd48f54185c527a"
 
     resource "stdlib" do
-      url "https://github.com/agda/agda-stdlib/archive/v1.4.tar.gz"
-      sha256 "ccc8666405c0f46aa3fd01565e762774518c8d1717667f728eae0cf3c33f1c63"
+      url "https://github.com/agda/agda-stdlib/archive/v1.7.1.tar.gz"
+      sha256 "6f92ae14664e5d1217e8366c647eb23ca88bc3724278f22dc6b80c23cace01df"
     end
   end
 
-  livecheck do
-    url :stable
-  end
-
   bottle do
-    rebuild 1
-    sha256 "23ff8d4cfc8b39f2059a3c92b999a48548d8efb0546494438a337f716017c2f6" => :big_sur
-    sha256 "656972ecb09c1fea73920f0d4c8a3666581d2e347036d0b0df398063062aad20" => :catalina
-    sha256 "1059ee247f77d6175f182e8fe96ee1b8ffa7000efa9385583c9a041516592292" => :mojave
+    sha256 arm64_monterey: "f9450332b803dc4212b194b5692bccd0cc4e2f7935cc0b5e0f4aeb2f3a2ace3c"
+    sha256 arm64_big_sur:  "96def5d383e8004c2165cc75b561789efa33a8d2a61940cc77a9f51c2a2e0462"
+    sha256 monterey:       "89218cc3cc71273dfccb03c1da82d5207ce30cc308b0cc100fd8b3158efff337"
+    sha256 big_sur:        "610fde4f70b27f6ad76f5a1c28e477b9dc7454f079ee209a8ad609e8fbc61bc6"
+    sha256 catalina:       "be368491b302813d8b0f6e8a7b49ae3476ab2fdb2e0782561071b37af2fda7bc"
+    sha256 x86_64_linux:   "29bd833cdec176b7f3eebafb68579613c413fb6de62adc76f615920f1573d29e"
   end
 
   head do
-    url "https://github.com/agda/agda.git"
+    url "https://github.com/agda/agda.git", branch: "master"
 
     resource "stdlib" do
-      url "https://github.com/agda/agda-stdlib.git"
+      url "https://github.com/agda/agda-stdlib.git", branch: "master"
     end
   end
 
@@ -39,8 +37,8 @@ class Agda < Formula
   uses_from_macos "zlib"
 
   resource "alex" do
-    url "https://hackage.haskell.org/package/alex-3.2.6/alex-3.2.6.tar.gz"
-    sha256 "91aa08c1d3312125fbf4284815189299bbb0be34421ab963b1f2ae06eccc5410"
+    url "https://hackage.haskell.org/package/alex-3.2.7.1/alex-3.2.7.1.tar.gz"
+    sha256 "9bd2f1a27e8f1b2ffdb5b2fbd3ed82b6f0e85191459a1b24ffcbef4e68a81bec"
   end
 
   resource "cpphs" do
@@ -51,13 +49,6 @@ class Agda < Formula
   resource "happy" do
     url "https://hackage.haskell.org/package/happy-1.20.0/happy-1.20.0.tar.gz"
     sha256 "3b1d3a8f93a2723b554d9f07b2cd136be1a7b2fcab1855b12b7aab5cbac8868c"
-  end
-
-  # Enable build with ghc 8.10.3. Remove at version bump, but verify that it includes:
-  # https://github.com/agda/agda/commit/76278c23d447b49f59fac581ca4ac605792aabbc
-  patch do
-    url "https://github.com/agda/agda/commit/76278c23d447b49f59fac581ca4ac605792aabbc.patch?full_index=1"
-    sha256 "c045c0426b867db1dedcee9c1b7a8514967226acf33e4be3ceba98d1d876aabb"
   end
 
   def install

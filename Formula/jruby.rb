@@ -1,8 +1,8 @@
 class Jruby < Formula
   desc "Ruby implementation in pure Java"
   homepage "https://www.jruby.org/"
-  url "https://search.maven.org/remotecontent?filepath=org/jruby/jruby-dist/9.2.14.0/jruby-dist-9.2.14.0-bin.tar.gz"
-  sha256 "32e73b2551f01e459ece84f732bcbf80712c3b71b6df7dbd063354b4d277e0b5"
+  url "https://search.maven.org/remotecontent?filepath=org/jruby/jruby-dist/9.3.4.0/jruby-dist-9.3.4.0-bin.tar.gz"
+  sha256 "531544d327a87155d8c804f153a2df3cf04f0182561cb2dd2c9372f48605b65c"
   license any_of: ["EPL-2.0", "GPL-2.0-only", "LGPL-2.1-only"]
 
   livecheck do
@@ -10,7 +10,14 @@ class Jruby < Formula
     regex(%r{href=.*?/jruby-dist[._-]v?(\d+(?:\.\d+)+)-bin\.t}i)
   end
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any,                 arm64_monterey: "e022e3dc4dbc12d276aa99270abe8338d020f493e2f0e6b00b833b9faa496a59"
+    sha256 cellar: :any,                 arm64_big_sur:  "a05511fe1054255459898272efc6a83e4a8a02b229dcd12d0fbe4d8faaa9c3dd"
+    sha256 cellar: :any,                 monterey:       "9674759c6995bc806f494228416f8bbe67f5df3f40f54bfb7f2071c4f43b3c53"
+    sha256 cellar: :any,                 big_sur:        "9674759c6995bc806f494228416f8bbe67f5df3f40f54bfb7f2071c4f43b3c53"
+    sha256 cellar: :any,                 catalina:       "9674759c6995bc806f494228416f8bbe67f5df3f40f54bfb7f2071c4f43b3c53"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8873fb47a4f28318b0f4324ac9dc1ee336edead5efcff358ccfc6999e0f7944b"
+  end
 
   depends_on "openjdk"
 
@@ -20,7 +27,7 @@ class Jruby < Formula
 
     cd "bin" do
       # Prefix a 'j' on some commands to avoid clashing with other rubies
-      %w[ast rake rdoc ri testrb].each { |f| mv f, "j#{f}" }
+      %w[ast bundle bundler rake rdoc ri racc].each { |f| mv f, "j#{f}" }
       # Delete some unnecessary commands
       rm "gem" # gem is a wrapper script for jgem
       rm "irb" # irb is an identical copy of jirb
@@ -31,6 +38,10 @@ class Jruby < Formula
     libexec.install Dir["*"]
     bin.install Dir["#{libexec}/bin/*"]
     bin.env_script_all_files libexec/"bin", Language::Java.overridable_java_home_env
+
+    # Replace (prebuilt!) universal binaries with their native slices
+    # FIXME: Build libjffi-1.2.jnilib from source.
+    deuniversalize_machos
   end
 
   test do

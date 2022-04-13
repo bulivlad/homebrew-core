@@ -4,24 +4,27 @@ class Libtorch < Formula
   desc "Tensors and dynamic neural networks"
   homepage "https://pytorch.org/"
   url "https://github.com/pytorch/pytorch.git",
-      tag:      "v1.7.1",
-      revision: "57bffc3a8e4fee0cce31e1ff1f662ccf7b16db57"
+      tag:      "v1.11.0",
+      revision: "bc2c6edaf163b1a1330e37a6e34caf8c553e4755"
   license "BSD-3-Clause"
 
   livecheck do
     url :stable
-    strategy :github_latest
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
   bottle do
-    cellar :any
-    sha256 "2423ea34ec448f50ae6006464386fe2c692bf046c2b6b6e3e912c1f93646f5df" => :big_sur
-    sha256 "761764c7160cd4abc0fd54b4d55ab7befb63f0c7e3d734adc78a168eae17cb1a" => :catalina
-    sha256 "7624a54fe176c8c4e84f26cba71d96740e157d7ee93f8a222557db42736f11ce" => :mojave
+    rebuild 1
+    sha256 cellar: :any,                 arm64_monterey: "dc1fc8f4effb97499be315a119404cf5d0cdd25b0fec510567b42a86181d5ab6"
+    sha256 cellar: :any,                 arm64_big_sur:  "68e63b2242af7c6428e8ab47d390ef28425ac128fddec9508c54874308118b8b"
+    sha256 cellar: :any,                 monterey:       "d709083b53b72079ce3540d4d352d9d965a711eacc72a05ca4a1a0ba82275402"
+    sha256 cellar: :any,                 big_sur:        "dd5610a0aec0f081cf7e6caddd99038c4127dd35958899269ca4827cc647be16"
+    sha256 cellar: :any,                 catalina:       "838b03af23bd68b21b66f1764cd6a8e70ddc14fa81820124db67672460b79a5f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "11aad0417538747f11d22289e50fa6feab91db7d4edfed385f5fcf5700b5f706"
   end
 
   depends_on "cmake" => :build
-  depends_on "python@3.9" => :build
+  depends_on "python@3.10" => :build
   depends_on "eigen"
   depends_on "libomp"
   depends_on "libyaml"
@@ -29,35 +32,41 @@ class Libtorch < Formula
   depends_on "pybind11"
 
   resource "PyYAML" do
-    url "https://files.pythonhosted.org/packages/64/c2/b80047c7ac2478f9501676c988a5411ed5572f35d1beff9cae07d321512c/PyYAML-5.3.1.tar.gz"
-    sha256 "b8eac752c5e14d3eca0e6dd9199cd627518cb5ec06add0de9d32baeee6fe645d"
+    url "https://files.pythonhosted.org/packages/36/2b/61d51a2c4f25ef062ae3f74576b01638bebad5e045f747ff12643df63844/PyYAML-6.0.tar.gz"
+    sha256 "68fb519c14306fec9720a2a5b45bc9f0c8d1b9c72adf45c37baedfcd949c35a2"
   end
 
-  resource "typing" do
-    url "https://files.pythonhosted.org/packages/05/d9/6eebe19d46bd05360c9a9aae822e67a80f9242aabbfc58b641b957546607/typing-3.7.4.3.tar.gz"
-    sha256 "1187fb9c82fd670d10aa07bbb6cfcfe4bdda42d6fab8d5134f04e8c4d0b71cc9"
+  resource "typing-extensions" do
+    url "https://files.pythonhosted.org/packages/b1/5a/8b5fbb891ef3f81fc923bf3cb4a578c0abf9471eb50ce0f51c74212182ab/typing_extensions-4.1.1.tar.gz"
+    sha256 "1a9462dcc3347a79b1f1c0271fbe79e844580bb598bafa1ed208b94da3cdcd42"
   end
 
   def install
-    venv = virtualenv_create(libexec, Formula["python@3.9"].opt_bin/"python3")
+    venv = virtualenv_create(buildpath/"venv", Formula["python@3.10"].opt_bin/"python3")
     venv.pip_install resources
 
     args = %W[
       -DBUILD_CUSTOM_PROTOBUF=OFF
       -DBUILD_PYTHON=OFF
-      -DPYTHON_EXECUTABLE=#{libexec}/bin/python
-      -Dpybind11_PREFER_third_party=OFF
+      -DPYTHON_EXECUTABLE=#{buildpath}/venv/bin/python
       -DUSE_CUDA=OFF
       -DUSE_METAL=OFF
       -DUSE_MKLDNN=OFF
       -DUSE_NNPACK=OFF
+      -DUSE_OPENMP=OFF
       -DUSE_SYSTEM_EIGEN_INSTALL=ON
+      -DUSE_SYSTEM_PYBIND11=ON
     ]
+    # Remove when https://github.com/pytorch/pytorch/issues/67974 is addressed
+    args << "-DUSE_SYSTEM_BIND11=ON"
 
     mkdir "build" do
       system "cmake", "..", *std_cmake_args, *args
-      system "make"
-      system "make", "install"
+
+      # Avoid references to Homebrew shims
+      inreplace "caffe2/core/macros.h", Superenv.shims_path/ENV.cxx, ENV.cxx
+
+      system "cmake", "--build", ".", "--target", "install"
     end
   end
 
@@ -71,8 +80,9 @@ class Libtorch < Formula
         std::cout << tensor << std::endl;
       }
     EOS
-    system ENV.cxx, "-std=c++14", "-L#{lib}", "-ltorch", "-ltorch_cpu", "-lc10",
-      "-I#{include}/torch/csrc/api/include", "test.cpp", "-o", "test"
+    system ENV.cxx, "-std=c++14", "test.cpp", "-o", "test",
+                    "-I#{include}/torch/csrc/api/include",
+                    "-L#{lib}", "-ltorch", "-ltorch_cpu", "-lc10"
     system "./test"
   end
 end

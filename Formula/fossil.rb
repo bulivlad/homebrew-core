@@ -1,23 +1,23 @@
 class Fossil < Formula
   desc "Distributed software configuration management"
-  homepage "https://www.fossil-scm.org/"
-  url "https://www.fossil-scm.org/index.html/uv/fossil-src-2.13.tar.gz"
-  sha256 "d933d3e0710eed3de5ee23bf8d2677419c4d4a8cd30b61f7161d9071d63a73f5"
+  homepage "https://www.fossil-scm.org/home/"
+  url "https://fossil-scm.org/home/tarball/version-2.18/fossil-src-2.18.tar.gz"
+  sha256 "300c1d5cdd6224ec6e8c88ab3f38d50f80e4071b503731b75bd61274cf310733"
   license "BSD-2-Clause"
   head "https://www.fossil-scm.org/", using: :fossil
 
   livecheck do
-    url "https://www.fossil-scm.org/index.html/uv/download.js"
-    regex(/"title": *?"Version (\d+(?:\.\d+)+)\s*?\(/i)
+    url "https://www.fossil-scm.org/home/uv/download.js"
+    regex(/"title":\s*?"Version (\d+(?:\.\d+)+)\s*?\(/i)
   end
 
   bottle do
-    cellar :any
-    sha256 "b457dfa340e0880a1f782372556d892b3bd76b71515abb8535745270781f1cb7" => :big_sur
-    sha256 "0a9877c27188015e87c4c2585256fe95741917969936cbe0b85182badcf229fa" => :arm64_big_sur
-    sha256 "660528f6b90d429f05434f5c8d1c7ac8a6c5df0bf6ea94f3bcdb6095365df7da" => :catalina
-    sha256 "d756776b71f3fb2d0ddf99defd245142d2bac68450444133fd969433d2808e12" => :mojave
-    sha256 "9e8925d6033240a79da02222aa272de41daea0e45cf67b54117f1f0cb42ab6be" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "84d5f38c5c255511f45d83f92021c5cb35d97487615267f4cb5e4adf3273850c"
+    sha256 cellar: :any,                 arm64_big_sur:  "90f5144c381820554b28de7f37d6a74b07dccf0e9244098a4f45d9b5110343b3"
+    sha256 cellar: :any,                 monterey:       "fe99b0cf0e77a8b7801bcf40bb6fdc17720c10d42a96356a05c7fe3db35bf2c9"
+    sha256 cellar: :any,                 big_sur:        "4d809209bcdb6c15a896e27718c4bf0ce0383bb43dd36d46f9e3fc186c9cdd86"
+    sha256 cellar: :any,                 catalina:       "c6275833e4dff742fdf394cc769078aab4dd2a5df9cad261fc655470e55229c1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f021d8c90ad5e56e6dec0e7adf455c69ae481592b946815b41fb193f7b64d014"
   end
 
   depends_on "openssl@1.1"

@@ -1,8 +1,8 @@
 class Expat < Formula
   desc "XML 1.0 parser"
   homepage "https://libexpat.github.io/"
-  url "https://github.com/libexpat/libexpat/releases/download/R_2_2_10/expat-2.2.10.tar.xz"
-  sha256 "5dfe538f8b5b63f03e98edac520d7d9a6a4d22e482e5c96d4d06fcc5485c25f2"
+  url "https://github.com/libexpat/libexpat/releases/download/R_2_4_7/expat-2.4.7.tar.xz"
+  sha256 "9875621085300591f1e64c18fd3da3a0eeca4a74f884b9abac2758ad1bd07a7d"
   license "MIT"
 
   livecheck do
@@ -12,12 +12,12 @@ class Expat < Formula
   end
 
   bottle do
-    cellar :any
-    sha256 "bdc39dc9c66e5efa771a59842102be8f35e8bab1f11f2b2353af0d986df95ec0" => :big_sur
-    sha256 "5e3abf13602731bb6eb80eb0cb5fd4acb0bfe24e561f7a608b6c92b7c7c5b4a9" => :arm64_big_sur
-    sha256 "1a8b10b3ce11187fbc9d26013ac5939d69f53ad7e0768ecb3d026ae6007005ac" => :catalina
-    sha256 "0715be3a1c1f7472cb662c640b263ed8c78da9cc20ebadb3f8df40e2300a87a8" => :mojave
-    sha256 "f1d65a87a4535918db8fb7cae639335e70e0a0ac780a000f5ddb4685a47526e2" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "408bf452fc05b19374181724c6274e5f9b29d518feb42127c1ffeb286bf43c83"
+    sha256 cellar: :any,                 arm64_big_sur:  "d3789c8ce49e9d03851aa8068a2529177f98dd1f876272df3c56c1116d4b33ce"
+    sha256 cellar: :any,                 monterey:       "4d777539c7563e07f75bf99856aec1e582754ae9203cecf455ed63287d50e750"
+    sha256 cellar: :any,                 big_sur:        "55928feabdedea649a97baaccae65b41315b46f0bf0c708d10ba0b61a76bfaa5"
+    sha256 cellar: :any,                 catalina:       "a9c372ecafa68e41d9b676fbfd608f5d1f985fc94efd12bf4d7904e318aaeb36"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6d90f22095cca714b764af2e2aca33b4e96d06fbf237775d64aa50b81525a1c8"
   end
 
   head do

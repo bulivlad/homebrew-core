@@ -11,7 +11,10 @@ class Vnu < Formula
     strategy :github_latest
   end
 
-  bottle :unneeded
+  bottle do
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "3655c6eb02716c52cda549fb8b86eff95126d71671dfe805a5015748f1181574"
+  end
 
   depends_on "openjdk"
 

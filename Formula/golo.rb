@@ -1,18 +1,19 @@
 class Golo < Formula
   desc "Lightweight dynamic language for the JVM"
   homepage "https://golo-lang.org/"
-  url "https://bintray.com/artifact/download/golo-lang/downloads/golo-3.3.0.zip"
-  sha256 "a9ff036518aee4280102b2d5b79752d8378857fd9714e5b701999a6c93b89316"
+  url "https://github.com/eclipse/golo-lang/releases/download/release%2F3.4.0/golo-3.4.0.zip"
+  sha256 "867c462a41a20e4b7dc1aef461b809d193a505c2a757477b147f0e30235bd545"
   license "EPL-2.0"
-  revision 2
-  head "https://github.com/eclipse/golo-lang.git"
+  head "https://github.com/eclipse/golo-lang.git", branch: "master"
 
   livecheck do
-    url "https://golo-lang.org/download/"
-    regex(/href=.*?golo[._-]v?(\d+(?:\.\d+)+)\.zip/i)
+    url :stable
+    regex(%r{^release/v?(\d+(?:\.\d+)+)$}i)
   end
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any_skip_relocation, all: "069c041fccb8a95fd9ea3c7a9c2105b384433a0e724d5b48812aa37d0d5c9f2d"
+  end
 
   depends_on "openjdk@11"
 

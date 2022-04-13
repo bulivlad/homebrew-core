@@ -1,16 +1,18 @@
 class Xmake < Formula
   desc "Cross-platform build utility based on Lua"
   homepage "https://xmake.io/"
-  url "https://github.com/xmake-io/xmake/releases/download/v2.3.9/xmake-v2.3.9.tar.gz"
-  sha256 "74ac394a71a137874393ff0f112b048a3c1c88c05efaa0059bb2268de9f4f672"
+  url "https://github.com/xmake-io/xmake/releases/download/v2.6.4/xmake-v2.6.4.tar.gz"
+  sha256 "ca8fb4f269718bee06078241cd72ec6883167f493fe11d623a0d37419b2a9ffd"
   license "Apache-2.0"
-  head "https://github.com/xmake-io/xmake.git"
+  head "https://github.com/xmake-io/xmake.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "9102ec2c17817f4aaf96710c73f568078ceba2201d35fd33cbeb09fc5a52c3e7" => :big_sur
-    sha256 "97601c30b48b566feede80e8c546fa8a7f8f47340d5fa99775ae89fa21ebf798" => :catalina
-    sha256 "1d38ca72d9c6b48a735ad97896956a795a74e85f99318eb84eb8ac856d363628" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "d5012f4bdc552ffda0fcb99a3027027c746e7f251ca12490ec4d7ced17228f68"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "69f9dcabb4dfdb0b384fe711b715925ee9f16cc9a2ae4987da25b9b142eebf9e"
+    sha256 cellar: :any_skip_relocation, monterey:       "1db57dd8b6eedc65adef912256de54fbaa907af9fcaafbf3353ff1a75890f041"
+    sha256 cellar: :any_skip_relocation, big_sur:        "1db57dd8b6eedc65adef912256de54fbaa907af9fcaafbf3353ff1a75890f041"
+    sha256 cellar: :any_skip_relocation, catalina:       "136d7dcb4f6d7ccc0a3c36b08022db1f0226785b694b4be5a5541cc2b29dddca"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "09d8ae11d82699da8f31ebaf028797ce06f6f77c13addaf22482281878ca2758"
   end
 
   on_linux do
@@ -18,14 +20,14 @@ class Xmake < Formula
   end
 
   def install
-    on_linux do
-      ENV["XMAKE_ROOT"] = "y" if ENV["CI"]
-    end
-    system "make", "build"
+    ENV["XMAKE_ROOT"] = "y" if OS.linux? && ENV["HOMEBREW_GITHUB_ACTIONS"]
+
+    system "make"
     system "make", "install", "prefix=#{prefix}"
   end
 
   test do
+    ENV["XMAKE_ROOT"] = "y" if OS.linux? && (ENV["HOMEBREW_GITHUB_ACTIONS"])
     system bin/"xmake", "create", "test"
     cd "test" do
       system bin/"xmake"

@@ -1,20 +1,35 @@
 class Bgpstream < Formula
   desc "For live and historical BGP data analysis"
   homepage "https://bgpstream.caida.org/"
-  url "https://github.com/CAIDA/libbgpstream/releases/download/v2.1.0/libbgpstream-2.1.0.tar.gz"
-  sha256 "27a84f8048c885f67353a1fc9ef020aa8453621a15af3ae706a1fc8e776da80b"
+  url "https://github.com/CAIDA/libbgpstream/releases/download/v2.2.0/libbgpstream-2.2.0.tar.gz"
+  sha256 "db7926c099972468f1a2f98f1aea9a5a1760d1f744ff6966b79bbcc6651bdb69"
   license "BSD-2-Clause"
 
   bottle do
-    cellar :any
-    sha256 "2ef31b4b6155966b7ebb5bea8fef499e5a75e40bb0b4cc827387c20e1710908c" => :big_sur
-    sha256 "d94daceac3ccf6fc4a59d532dfb1a4205b49002bebb7052e9488057d09c53d81" => :arm64_big_sur
-    sha256 "4879ed386a49e62ff13e465d822f0d6b6ea126cd7ef95add1fc8b4c0bfeb2dc6" => :catalina
-    sha256 "ed2c647b81542296080d2235d292598c9b654e4cd7a310024ea6758e2cb41aa4" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "e789878a243b35c33bf72594d808b5528b182b18299231fee79f3a046b766c48"
+    sha256 cellar: :any,                 arm64_big_sur:  "5c28bee02acc7bc557119b71bc714a9a505aa91ef58d2e390c6d7f75753d0f25"
+    sha256 cellar: :any,                 monterey:       "ff5d659c719347cfc6ab6208b5341a0a79d457c47dd92f74e4bc44d757608ffa"
+    sha256 cellar: :any,                 big_sur:        "950968b0578b8d4131574c5fd985f56a1e10abd2d4aabdeeb408db2b323d6567"
+    sha256 cellar: :any,                 catalina:       "a684f4249475c2c0531fda4467adbba15b8e07c4e49b8ffc0366cae16fc76888"
+    sha256 cellar: :any,                 mojave:         "80262121246eb9431bedf0a64a12448ca1f2387caf17a8c1c7f20eaca6ca1069"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "da7354b8e52ae543d5e48aa9a7f2c1725f95c7581e8006c02845da8fcd3b78c5"
   end
 
   depends_on "librdkafka"
   depends_on "wandio"
+
+  # Fix -flat_namespace being used on Big Sur and later.
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+    sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
+  end
+
+  # Fix -flat_namespace being used on Big Sur and later.
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+    sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
+    directory "lib/formats/libparsebgp"
+  end
 
   def install
     system "./configure", "--disable-debug",

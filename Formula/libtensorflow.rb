@@ -1,17 +1,13 @@
 class Libtensorflow < Formula
-  include Language::Python::Virtualenv
-
   desc "C interface for Google's OS library for Machine Intelligence"
   homepage "https://www.tensorflow.org/"
-  url "https://github.com/tensorflow/tensorflow/archive/v2.4.0.tar.gz"
-  sha256 "26c833b7e1873936379e810a39d14700281125257ddda8cd822c89111db6f6ae"
+  url "https://github.com/tensorflow/tensorflow/archive/refs/tags/v2.7.0.tar.gz"
+  sha256 "bb124905c7fdacd81e7c842b287c169bbf377d29c74c9dacc04f96c9793747bb"
   license "Apache-2.0"
 
   bottle do
-    cellar :any
-    sha256 "45b7357ed368a5a9496602f12811638188459313134097a8b601568f4ca1164a" => :big_sur
-    sha256 "3ebda3961055aafd377ab4ed1578d21c3dc0191eb6dbbc01aedbb256e848d9a3" => :catalina
-    sha256 "2d6f2fd224f97509fab9b98fe0e67b77f4af839332395b8a170b8e60b81d6cfe" => :mojave
+    sha256 cellar: :any, big_sur:  "b583cc31728cb7dc71f9208059eb31a5e6555f8b6000e80fcfca9229720b9801"
+    sha256 cellar: :any, catalina: "9c2f522b11cfba7188e8b9f1ffd49c5853c748c0ce98af0132226c097cb754ba"
   end
 
   depends_on "bazel" => :build
@@ -96,7 +92,7 @@ class Libtensorflow < Formula
 
     summarize_graph_output = shell_output("#{bin}/summarize_graph --in_graph=#{testpath}/graph.pb 2>&1")
     variables_match = /Found \d+ variables:.+$/.match(summarize_graph_output)
-    assert_not_nil variables_match, "Unexpected stdout from summarize_graph for graph.pb (no found variables)"
+    refute_nil variables_match, "Unexpected stdout from summarize_graph for graph.pb (no found variables)"
     variables_names = variables_match[0].scan(/name=([^,]+)/).flatten.sort
 
     transform_command = %W[
@@ -114,13 +110,13 @@ class Libtensorflow < Formula
 
     new_summarize_graph_output = shell_output("#{bin}/summarize_graph --in_graph=#{testpath}/graph-new.pb 2>&1")
     new_variables_match = /Found \d+ variables:.+$/.match(new_summarize_graph_output)
-    assert_not_nil new_variables_match, "Unexpected summarize_graph output for graph-new.pb (no found variables)"
+    refute_nil new_variables_match, "Unexpected summarize_graph output for graph-new.pb (no found variables)"
     new_variables_names = new_variables_match[0].scan(/name=([^,]+)/).flatten.sort
 
-    assert_not_equal variables_names, new_variables_names, "transform_graph didn't obfuscate variable names"
+    refute_equal variables_names, new_variables_names, "transform_graph didn't obfuscate variable names"
 
     benchmark_model_match = /benchmark_model -- (.+)$/.match(new_summarize_graph_output)
-    assert_not_nil benchmark_model_match,
+    refute_nil benchmark_model_match,
       "Unexpected summarize_graph output for graph-new.pb (no benchmark_model example)"
 
     benchmark_model_args = benchmark_model_match[1].split

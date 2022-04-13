@@ -1,19 +1,23 @@
 class Carrot2 < Formula
   desc "Search results clustering engine"
-  homepage "https://project.carrot2.org"
+  homepage "https://search.carrot2.org/"
   url "https://github.com/carrot2/carrot2.git",
-      tag:      "release/4.1.0",
-      revision: "84fab40554501d653194c8f233ec4b137cd881ae"
+      tag:      "release/4.4.2",
+      revision: "33dbd68df542e32700e42b930a75e29d1e64ee83"
   license "Apache-2.0"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "e3c921aca1359a03cf59c4c86398bb60d40bfda7016d724a3bdaf142f217ce1c" => :big_sur
-    sha256 "2bc7f90be9567d859e9536d567bd3337a8c7947cd064f4bf8a7e675f3e0e672a" => :catalina
-    sha256 "575a9813da9b3211549e0a9a9b77d080a979c7dc4387809ba9b7184aeb22eb47" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "fa61fd0d5efc0ef0c1da45cf36fc1c9c63b2efc17e34e2560954a75ba37d07ba"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "dd979a744c5552dc4026042d99492855122e8bfa9912a1aefec61012406d2d10"
+    sha256 cellar: :any_skip_relocation, monterey:       "b4fcf3526dfe6fe7c3da96d842048d5e801690bffbaea1ea3a779a9c2274d453"
+    sha256 cellar: :any_skip_relocation, big_sur:        "938cf87839d3cf6f72eb1905be5651a7bca907e53d81bf8115173a3136c1d750"
+    sha256 cellar: :any_skip_relocation, catalina:       "2a8ed66de6badfb2be9353df69d6c98f21b39f7230eab75ff78fb305be59e067"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0d31c41cabf7fd6c9d6b7044c079f05cb1d540219798550258f231eea01f8549"
   end
 
   depends_on "gradle" => :build
+  depends_on "node@16" => :build
+  depends_on "yarn" => :build
   depends_on "openjdk"
 
   def install
@@ -22,48 +26,34 @@ class Carrot2 < Formula
       /expectedGradleVersion = '[^']+'/,
       "expectedGradleVersion = '#{Formula["gradle"].version}'"
 
-    system "gradle", "assemble"
+    # Use yarn and node from Homebrew
+    inreplace "gradle/node/yarn-projects.gradle", "download = true", "download = false"
+    inreplace "build.gradle" do |s|
+      s.gsub! "node: '16.13.0'", "node: '#{Formula["node@16"].version}'"
+      s.gsub! "yarn: '1.22.15'", "yarn: '#{Formula["yarn"].version}'"
+    end
+
+    system "gradle", "assemble", "--no-daemon"
 
     cd "distribution/build/dist" do
       inreplace "dcs/conf/logging/appender-file.xml", "${dcs:home}/logs", var/"log/carrot2"
       libexec.install Dir["*"]
     end
 
-    (bin/"carrot2").write_env_script "#{libexec}/dcs/dcs.sh",
+    (bin/"carrot2").write_env_script "#{libexec}/dcs/dcs",
       JAVA_CMD:    "exec '#{Formula["openjdk"].opt_bin}/java'",
       SCRIPT_HOME: libexec/"dcs"
   end
 
-  plist_options manual: "carrot2"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
-      "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>RunAtLoad</key>
-          <true/>
-          <key>AbandonProcessGroup</key>
-          <true/>
-          <key>WorkingDirectory</key>
-          <string>#{opt_libexec}</string>
-          <key>ProgramArguments</key>
-          <array>
-            <string>#{opt_bin}/carrot2</string>
-          </array>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run opt_bin/"carrot2"
+    working_dir opt_libexec
   end
 
   test do
     port = free_port
     fork { exec bin/"carrot2", "--port", port.to_s }
-    sleep 5
+    sleep 20
     assert_match "Lingo", shell_output("curl -s localhost:#{port}/service/list")
   end
 end

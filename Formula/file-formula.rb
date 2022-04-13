@@ -1,20 +1,26 @@
 # "File" is a reserved class name
 class FileFormula < Formula
   desc "Utility to determine file types"
-  homepage "https://www.darwinsys.com/file/"
-  url "https://astron.com/pub/file/file-5.39.tar.gz"
-  sha256 "f05d286a76d9556243d0cb05814929c2ecf3a5ba07963f8f70bfaaa70517fad1"
-  license "BSD-2-Clause"
-  revision 1
-  head "https://github.com/file/file.git"
+  homepage "https://darwinsys.com/file/"
+  url "https://astron.com/pub/file/file-5.41.tar.gz"
+  sha256 "13e532c7b364f7d57e23dfeea3147103150cb90593a57af86c10e4f6e411603f"
+  # file-formula has a BSD-2-Clause-like license
+  license :cannot_represent
+  head "https://github.com/file/file.git", branch: "master"
+
+  livecheck do
+    url "https://astron.com/pub/file/"
+    regex(/href=.*?file[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
 
   bottle do
-    cellar :any
-    sha256 "bce0170e833223ef66813d4a7dacb045e55456c0b8fc539f3559d68406328493" => :big_sur
-    sha256 "f445ca085b3a17adff424d53d4870c85c8fe49ab170a0cef36439d1fd2cd1c0a" => :arm64_big_sur
-    sha256 "8aa09b20fce4cadcb67695d44d7db1530767659b7880f4ff28147f3f8bd11cc1" => :catalina
-    sha256 "d2f3b7a6a4661b5b3cae9a28edc24a3d56c417056ee1b526c83b14d3b3d4ee53" => :mojave
-    sha256 "66591e58e59f306dffc9b6b644d48af675326d33712749ab0c0763f46d4a9af0" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "62330e525abefef9b0ee14c3c68eda5b3929885d40047ed3ff986a55530c1291"
+    sha256 cellar: :any,                 arm64_big_sur:  "15e4b048fc9187617a94167c6a380334ba6b007f10c0b2e053f7eb819a07f487"
+    sha256 cellar: :any,                 monterey:       "c7e02240e32e51a7864951464452210f93ab0d69b1db271620bdbca05c10664b"
+    sha256 cellar: :any,                 big_sur:        "23a026b284b4a3b4d35bd2523dd2ff29e7067ba1a9398237f22187ff4b03ea99"
+    sha256 cellar: :any,                 catalina:       "42b22fa1942a019e33f96f30af4e58bbffd586a14d9fba7318973b9d519aa264"
+    sha256 cellar: :any,                 mojave:         "5b11f9096a34a2d37b3fdfc89836936d539b3db6da1e5468fc4d21e25d76160c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0a7e755b89c571f80b085d72602f34faefdaab64f7d879c3bb876c46480e8c69"
   end
 
   keg_only :provided_by_macos

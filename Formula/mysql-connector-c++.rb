@@ -1,21 +1,22 @@
 class MysqlConnectorCxx < Formula
   desc "MySQL database connector for C++ applications"
   homepage "https://dev.mysql.com/downloads/connector/cpp/"
-  url "https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.22-src.tar.gz"
-  sha256 "74ff7662444dc214ec737baaf48a7f6c44f6e999549bf6930c2a97af24332b47"
+  url "https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.28-src.tar.gz"
+  sha256 "cb26fe9de05a3b5f1ed22a199429b6791ece18433eb0465e2a73fcf44586420b"
+  license "GPL-2.0-only" => { with: "Universal-FOSS-exception-1.0" }
 
   livecheck do
-    url :homepage
-    regex(/href=.*?mysql-connector-c%2B%2B[._-]v?(\d+.\d+.\d+)-/i)
+    url "https://dev.mysql.com/downloads/connector/cpp/?tpl=files&os=src"
+    regex(/href=.*?mysql-connector-c%2B%2B[._-]v?(\d+(?:\.\d+)+)[._-]src\.t/i)
   end
 
   bottle do
-    cellar :any
-    sha256 "90e116fbf60b03abb2dc84296879e60485d40e6296966214406a8ce5a1702990" => :big_sur
-    sha256 "306284af196c840d9c523d22a36e9fe29037ace2c60daa0a34a71e0354c281bb" => :arm64_big_sur
-    sha256 "a7ce662aff4a29d35a46486d661bbf1b0149079455a760ea829810ca92423b02" => :catalina
-    sha256 "5ae4ddc27990c9ef8019a4668a150af3671ce41a066d7917eb026b224bba54fb" => :mojave
-    sha256 "cbb2bfbf652d2d3d55e67de4b3b2af131dc76b520e9eddb3ce4b26c722b1c9ac" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "fe3d576cd8487aafb673dccef66b90b1d114f81ed9d33188aafffca58028733c"
+    sha256 cellar: :any,                 arm64_big_sur:  "adda7eb72ea92299565a006836f05350f36aaf3280fd3343460a0c97911d84d9"
+    sha256 cellar: :any,                 monterey:       "dc58916ed5dd075ba410f49d4b5e173207e3368ef8d14b0aa3198f070a490515"
+    sha256 cellar: :any,                 big_sur:        "1d4dbdfe1b037a04d45ca6f2f9d1fa71c24ec4c6b760133344f736f1da87016f"
+    sha256 cellar: :any,                 catalina:       "3939ecdcf8ecdfd5fab7f8a2a1480e36b99632c4e66c10398aba1240f8a89527"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e4b8d3abc117a047e9396fd58603770f3d21c6a23daf486ff521ff67c03b1779"
   end
 
   depends_on "boost" => :build

@@ -1,10 +1,11 @@
 class Epic5 < Formula
   desc "Enhanced, programmable IRC client"
   homepage "http://www.epicsol.org/"
-  url "http://ftp.epicsol.org/pub/epic/EPIC5-PRODUCTION/epic5-2.1.2.tar.xz"
-  mirror "https://www.mirrorservice.org/sites/distfiles.macports.org/epic5/epic5-2.1.2.tar.xz"
-  sha256 "5e41cf00f924e79e3503dd456ecd9b1dd93ac447c2573d4fa7da03b8bd19dbad"
-  head "http://git.epicsol.org/epic5.git"
+  url "http://ftp.epicsol.org/pub/epic/EPIC5-PRODUCTION/epic5-2.1.7.tar.xz"
+  mirror "https://www.mirrorservice.org/sites/distfiles.macports.org/epic5/epic5-2.1.7.tar.xz"
+  sha256 "71627b14e26390f1e216047f40ca5ee1e7d55651667787466433bf7abdb6e317"
+  license "BSD-3-Clause"
+  head "http://git.epicsol.org/epic5.git", branch: "master"
 
   livecheck do
     url "http://ftp.epicsol.org/pub/epic/EPIC5-PRODUCTION/"
@@ -12,14 +13,17 @@ class Epic5 < Formula
   end
 
   bottle do
-    sha256 "a605174db456c66cd490bd10ef1c0b0f7ae4c9d1a21462757a072429cdebcd13" => :big_sur
-    sha256 "c2510a819fc48e5b9020247d44e4acd10cc5acbb04bd8b9b6c74a86130b42edb" => :arm64_big_sur
-    sha256 "c9aceac94f6264f34f915b36cd0787a636fea6487ecd1795530800b98861160a" => :catalina
-    sha256 "41bc8ef329eec3234db4b238933e4d1048ca27519ad0464683a79a8038c8e646" => :mojave
-    sha256 "e7a0f24c252fe24ad8d0425da98026fde6dbc0187bd94b6584e562d36ea92573" => :high_sierra
+    sha256 arm64_monterey: "6e1ce5354ed3d4db90bf4fcb967efc260759698bddfc3efff61496482ba66f63"
+    sha256 arm64_big_sur:  "36abf84918060064f79935e49bcaad31e2c9c835eece141c757e0399c66a489a"
+    sha256 monterey:       "7e284146e725708f61b7cf3a11687036ed88e00c03256c247295204ceb50890f"
+    sha256 big_sur:        "a2949e863afccbf53fd8de505c4a4b06651f56b003fc1592cc3d72227aa5f3eb"
+    sha256 catalina:       "7ab5e04e421d2d435680540de8dcd2268adf3de9612fa9dc47b9c1075c6c5c81"
+    sha256 x86_64_linux:   "ff9ff92be5e6e74fb735f370914a54f0bfda26cd2f780f66b00ba862a1e2625e"
   end
 
   depends_on "openssl@1.1"
+
+  uses_from_macos "ncurses"
 
   def install
     system "./configure", "--disable-debug",

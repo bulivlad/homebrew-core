@@ -1,46 +1,48 @@
 class Eccodes < Formula
   desc "Decode and encode messages in the GRIB 1/2 and BUFR 3/4 formats"
   homepage "https://confluence.ecmwf.int/display/ECC"
-  url "https://software.ecmwf.int/wiki/download/attachments/45757960/eccodes-2.19.1-Source.tar.gz"
-  sha256 "9964bed5058e873d514bd4920951122a95963128b12f55aa199d9afbafdd5d4b"
+  url "https://confluence.ecmwf.int/download/attachments/45757960/eccodes-2.24.2-Source.tar.gz"
+  sha256 "c60ad0fd89e11918ace0d84c01489f21222b11d6cad3ff7495856a0add610403"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
-    url "https://software.ecmwf.int/wiki/display/ECC/Releases"
+    url "https://confluence.ecmwf.int/display/ECC/Releases"
     regex(/href=.*?eccodes[._-]v?(\d+(?:\.\d+)+)-Source\.t/i)
   end
 
   bottle do
-    sha256 "ccfc4b45800180876004b8e468b43a7ccec83cc54b52a36aa46987f4a461f98f" => :big_sur
-    sha256 "5bd7dbffb74b21fc64f1d4717526cef832f7792a312209adecb4394c733d9f03" => :arm64_big_sur
-    sha256 "776e898b7bc2e0ac5702df71ece3e542db8975d9a14cff6481bed1f761a6d535" => :catalina
-    sha256 "1c45326fa7887c878d00997bdfff1837c7b9366d7f1ce7fe226111e7b78ff773" => :mojave
-    sha256 "bcdea4208f061cf2a11d631821758f4e57896397fb8778bdf0ba68d529d8da24" => :high_sierra
+    sha256 arm64_monterey: "6abee056fdfa33f607b1d58de965ecfeb142be352f48c8019414b22f76369a8d"
+    sha256 arm64_big_sur:  "e6220a587aecab527351ce744e4c96055d381ee95f925b28a5b191ac5e7208e4"
+    sha256 monterey:       "f3b3d850a8cff1b51656b069b1bf8b13d5677b959ddef3056bc09d7f33ff6ac0"
+    sha256 big_sur:        "aca9899c0da2a308c86f1d64ff5304e22babd14db02c310d4d0c9dc1e72ba5b5"
+    sha256 catalina:       "68452564bd5f92bb96e4bbb3bd89f6acdaeed5c3aeaf0adbe78ff01fc03f5d66"
+    sha256 x86_64_linux:   "ec7c1bde10e5fdd2416e56b6f73d78ce015a5f3a8cbc5162d07005cb9c623776"
   end
 
   depends_on "cmake" => :build
   depends_on "gcc" # for gfortran
-  depends_on "jasper"
   depends_on "libpng"
   depends_on "netcdf"
+  depends_on "openjpeg"
 
   def install
-    # Fix for GCC 10, remove with next version
-    # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=957159
-    ENV.prepend "FFLAGS", "-fallow-argument-mismatch"
-
-    inreplace "CMakeLists.txt", "find_package( OpenJPEG )", ""
-
     mkdir "build" do
-      system "cmake", "..", "-DENABLE_NETCDF=ON", "-DENABLE_PNG=ON",
-                            "-DENABLE_PYTHON=OFF", *std_cmake_args
+      system "cmake", "..", "-DENABLE_NETCDF=ON",
+                            "-DENABLE_FORTRAN=ON",
+                            "-DENABLE_PNG=ON",
+                            "-DENABLE_JPG=ON",
+                            "-DENABLE_JPG_LIBOPENJPEG=ON",
+                            "-DENABLE_JPG_LIBJASPER=OFF",
+                            "-DENABLE_PYTHON=OFF",
+                            "-DENABLE_ECCODES_THREADS=ON",
+                             *std_cmake_args
       system "make", "install"
     end
 
     # Avoid references to Homebrew shims directory
-    inreplace include/"eccodes_ecbuild_config.h", HOMEBREW_LIBRARY/"Homebrew/shims/mac/super/clang", "/usr/bin/clang"
-    inreplace lib/"pkgconfig/eccodes.pc", HOMEBREW_LIBRARY/"Homebrew/shims/mac/super/clang", "/usr/bin/clang"
-    inreplace lib/"pkgconfig/eccodes_f90.pc", HOMEBREW_LIBRARY/"Homebrew/shims/mac/super/clang", "/usr/bin/clang"
+    shim_references = [include/"eccodes_ecbuild_config.h", lib/"pkgconfig/eccodes.pc", lib/"pkgconfig/eccodes_f90.pc"]
+    inreplace shim_references, Superenv.shims_path/ENV.cc, ENV.cc
   end
 
   test do

@@ -1,30 +1,36 @@
 class Libmonome < Formula
-  desc "Interact with monome devices via C, Python, or FFI"
+  include Language::Python::Shebang
+
+  desc "Library for easy interaction with monome devices"
   homepage "https://monome.org/"
-  url "https://github.com/monome/libmonome/archive/v1.4.3.tar.gz"
-  sha256 "018e8bf64fda20c09a6de57fee484d7327d9176df27a81b015fa9da4853d8b5d"
+  url "https://github.com/monome/libmonome/archive/v1.4.6.tar.gz"
+  sha256 "dbb886eacb465ea893465beb7b5ed8340ae77c25b24098ab36abcb69976ef748"
   license "ISC"
-  head "https://github.com/monome/libmonome.git"
+  head "https://github.com/monome/libmonome.git", branch: "main"
 
   bottle do
-    cellar :any
-    sha256 "c80ff6b83563bd1ea8f6d03b79b6f152713aaa5c8f82d94c1616aa1fe31dcdb0" => :big_sur
-    sha256 "2313a8a8da4ce4df49333c64fb727c685d3d3f069d496f95a8a27936b716cca5" => :arm64_big_sur
-    sha256 "b9be8943cd4758aec068ac75cb966a88e2119063873f7c29913936cc775fba13" => :catalina
-    sha256 "44eed89ac8eeec932fde1b7baaf7059c0bd0030ac84be0a6f7695de91954ef5c" => :mojave
-    sha256 "95892a3038d8ec5b1ff36438f02165d200a0a1d548af060d1197ae57e3a73e89" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "455620731ad9f9bc98ad32c9ccb03965ddfd24aa61bec2a6e38b542f66141d81"
+    sha256 cellar: :any,                 arm64_big_sur:  "051b068ad68c55ea65d3baf4d63f93a71022ba23e2aa0de67641d0552a6da939"
+    sha256 cellar: :any,                 monterey:       "d88e4c2403568cb058a660889b3217f5b599b1e2c775d50085ad16fc5ca7f4f2"
+    sha256 cellar: :any,                 big_sur:        "1b3081ea5174c5152a277459f3f20c6f19bcd9e6fac2383a2500f5252c68add7"
+    sha256 cellar: :any,                 catalina:       "dced07a10f36947199fcc4e1caf5a977e0ca3800981ea4a7cdc7c085371fc94d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6ca287c1aaf218fefae314b503f2ae1b4cd112c37dd317c4fda95106f2284354"
   end
 
+  depends_on "python@3.10" => :build
   depends_on "liblo"
 
   def install
-    # Fix build on Mojave
-    # https://github.com/monome/libmonome/issues/62
-    inreplace "wscript", /conf.env.append_unique.*-mmacosx-version-min=10.5.*/,
-                         "pass"
+    rewrite_shebang detected_python_shebang, *Dir.glob("**/{waf,wscript}")
 
     system "./waf", "configure", "--prefix=#{prefix}"
     system "./waf", "build"
     system "./waf", "install"
+
+    pkgshare.install Dir["examples/*.c"]
+  end
+
+  test do
+    assert_match "failed to open", shell_output("#{bin}/monomeserial", 1)
   end
 end

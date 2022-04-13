@@ -1,25 +1,26 @@
 class StructurizrCli < Formula
   desc "Command-line utility for Structurizr"
   homepage "https://structurizr.com"
-  url "https://github.com/structurizr/cli/releases/download/v1.7.0/structurizr-cli-1.7.0.zip"
-  sha256 "3f5b8b35d85f0d9dbddb874c644af3ed08f46bcde4c6d8161116e72c60360171"
+  url "https://github.com/structurizr/cli/releases/download/v1.19.0/structurizr-cli-1.19.0.zip"
+  sha256 "aad505e9e48b89a30fe411990981205433bb650e4148ca2f5d877477c80fe42d"
   license "Apache-2.0"
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any_skip_relocation, all: "98825c0a0acda3154fde9280d794a1dd8774e388e1bfa1921b7fa53a1f529755"
+  end
 
   depends_on "openjdk"
 
   def install
-    libexec.install "structurizr-cli-#{version}.jar"
-    bin.write_jar_script libexec/"structurizr-cli-#{version}.jar", "structurizr-cli"
+    rm_f Dir["*.bat"]
+    libexec.install Dir["*"]
+    (bin/"structurizr-cli").write_env_script libexec/"structurizr.sh", Language::Java.overridable_java_home_env
   end
 
   test do
-    expected_output = <<~EOS.strip
-      Structurizr CLI v#{version}
-      Usage: structurizr push|pull|export [options]
-    EOS
     result = pipe_output("#{bin}/structurizr-cli").strip
-    assert_equal result, expected_output
+    # not checking `Structurizr DSL` version as it is different binary
+    assert_match "Structurizr CLI v#{version}", result
+    assert_match "Usage: structurizr push|pull|lock|unlock|export|validate|list [options]", result
   end
 end

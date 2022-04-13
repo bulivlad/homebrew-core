@@ -1,10 +1,9 @@
 class Ruby < Formula
   desc "Powerful, clean, object-oriented scripting language"
   homepage "https://www.ruby-lang.org/"
-  url "https://cache.ruby-lang.org/pub/ruby/3.0/ruby-3.0.0.tar.xz"
-  sha256 "68bfaeef027b6ccd0032504a68ae69721a70e97d921ff328c0c8836c798f6cb1"
+  url "https://cache.ruby-lang.org/pub/ruby/3.1/ruby-3.1.1.tar.gz"
+  sha256 "fe6e4782de97443978ddba8ba4be38d222aa24dc3e3f02a6a8e7701c0eeb619d"
   license "Ruby"
-  revision 1
 
   livecheck do
     url "https://www.ruby-lang.org/en/downloads/"
@@ -12,11 +11,12 @@ class Ruby < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 "60f0b39ab2714afc942145c00684fae27c6388cafdb59fd9c8f1dca97fcfc773" => :big_sur
-    sha256 "501ba0c0968ccebdc18cb781820e401764243b536c30821909dcd5049b5a73d2" => :arm64_big_sur
-    sha256 "b869f4edd6b14d7c54e8994d77b5d92f935ca67c746babbda910471de21ac6aa" => :catalina
-    sha256 "efdb21d54bd759a1862140d61ab83b49221aa02fc9e1891972053da7edfb855b" => :mojave
+    sha256 arm64_monterey: "90383af9d5a0a3e01f03ed01b20d52dea665886b4b8fd8c6a5611e78fda3a0f7"
+    sha256 arm64_big_sur:  "3d1b5f14c723530cf4387084d12129077f830057fb6e802882d30c14d7243bf2"
+    sha256 monterey:       "e61f2b8670e42013d92e38da11fc6bff8a4857503aec1e2160efb6fc3e256056"
+    sha256 big_sur:        "625c195be406f1ecbf5058d5fd8c2536496ba6206ce6e903d7278f80e0936ce7"
+    sha256 catalina:       "c38f5c3ee526bc77c5d98e9e8b461b15d7e5056746ef41e42870e37a593a9f1b"
+    sha256 x86_64_linux:   "bfd010ea1f0a058e627e7ac925acd340c56de98f3c193c94ef3439bef5a58f92"
   end
 
   head do
@@ -38,8 +38,8 @@ class Ruby < Formula
   # The exception is Rubygem security fixes, which mandate updating this
   # formula & the versioned equivalents and bumping the revisions.
   resource "rubygems" do
-    url "https://rubygems.org/rubygems/rubygems-3.2.3.tgz"
-    sha256 "a15dd7cd471a5fee2b6a36cf855ac2952a64d46629cd628b1a52c57bcebf52df"
+    url "https://rubygems.org/rubygems/rubygems-3.3.7.tgz"
+    sha256 "537475b3a75d4989a9f61c552c7249001a617e84e6cdfb533ff19ecfdeeaf183"
   end
 
   def api_version
@@ -54,7 +54,12 @@ class Ruby < Formula
     # otherwise `gem` command breaks
     ENV.delete("SDKROOT")
 
-    system "autoconf" if build.head?
+    # Prevent `make` from trying to install headers into the SDK
+    # TODO: Remove this workaround when the following PR is merged/resolved:
+    #       https://github.com/Homebrew/brew/pull/12508
+    inreplace "tool/mkconfig.rb", /^(\s+val = )'"\$\(SDKROOT\)"'\+/, "\\1"
+
+    system "./autogen.sh" if build.head?
 
     paths = %w[libyaml openssl@1.1 readline].map { |f| Formula[f].opt_prefix }
     args = %W[
@@ -66,9 +71,7 @@ class Ruby < Formula
       --with-opt-dir=#{paths.join(":")}
       --without-gmp
     ]
-    on_macos do
-      args << "--disable-dtrace" unless MacOS::CLT.installed?
-    end
+    args << "--disable-dtrace" if OS.mac? && !MacOS::CLT.installed?
 
     # Correct MJIT_CC to not use superenv shim
     args << "MJIT_CC=/usr/bin/#{DevelopmentTools.default_compiler}"

@@ -2,22 +2,25 @@ class Ntopng < Formula
   desc "Next generation version of the original ntop"
   homepage "https://www.ntop.org/products/traffic-analysis/ntop/"
   license "GPL-3.0-only"
-  revision 1
+  revision 2
 
   stable do
-    url "https://github.com/ntop/ntopng/archive/4.2.tar.gz"
-    sha256 "c7ce8d0c7b4251aef276038ec3324530312fe232d38d7ad99de21575dc888e8b"
+    url "https://github.com/ntop/ntopng/archive/5.0.tar.gz"
+    sha256 "e540eb37c3b803e93a0648a6b7d838823477224f834540106b3339ec6eab2947"
 
     resource "nDPI" do
-      url "https://github.com/ntop/nDPI/archive/3.4.tar.gz"
-      sha256 "dc9b291c7fde94edb45fb0f222e0d93c93f8d6d37f4efba20ebd9c655bfcedf9"
+      url "https://github.com/ntop/nDPI.git",
+        revision: "46ebd7128fd38f3eac5289ba281f3f25bad1d899"
     end
   end
 
   bottle do
-    sha256 "9ed198be1700ad11126a1cb91851be862da39e5a546cf22be6bfcaf1ad73a2b4" => :big_sur
-    sha256 "d471e223fc0de4f2bbd993e5ed1691b9f4b1618b60dd22d1d4bce44b5bb500af" => :catalina
-    sha256 "3cb2eb698b63537009d7c94fb5a5192ac9c0645934477057d2a135842b02479e" => :mojave
+    sha256 arm64_monterey: "68bc573dc0f255b53e9ace0ff6053964822964ab83dc8ea2aaf872a80b0d6fdc"
+    sha256 arm64_big_sur:  "e0d1448d1c891f910c2030a8acec578f6b4d3eae74626688584ab472a5884445"
+    sha256 monterey:       "8b5fc5a64bbb1f6561bfa691a7d4d68e71d2df69ecb9aed7d14dc5d2c7a6da62"
+    sha256 big_sur:        "600e95026b9fe50bf256a1188f3c5488dd8eb2c478aa041a9698796cf2a0ab45"
+    sha256 catalina:       "34241759200243e7ba06a85aff12a02ebe13167fafcfd35e3ab74d202075216d"
+    sha256 x86_64_linux:   "6807697535223ab5df55cb90700f9a7811f9bdb1aa72fa8ef6405be03a279b2e"
   end
 
   head do
@@ -35,13 +38,23 @@ class Ntopng < Formula
   depends_on "libtool" => :build
   depends_on "lua" => :build
   depends_on "pkg-config" => :build
-  depends_on "zeromq" => :build
   depends_on "geoip"
   depends_on "json-c"
   depends_on "libmaxminddb"
   depends_on "mysql-client"
   depends_on "redis"
   depends_on "rrdtool"
+  depends_on "zeromq"
+
+  uses_from_macos "curl"
+  uses_from_macos "libpcap"
+  uses_from_macos "sqlite"
+
+  on_linux do
+    depends_on "gcc"
+  end
+
+  fails_with gcc: "5"
 
   def install
     resource("nDPI").stage do
@@ -52,7 +65,7 @@ class Ntopng < Formula
     system "./autogen.sh"
     system "./configure", "--prefix=#{prefix}"
     system "make"
-    system "make", "install"
+    system "make", "install", "MAN_DIR=#{man}"
   end
 
   test do

@@ -1,22 +1,23 @@
 class Kops < Formula
   desc "Production Grade K8s Installation, Upgrades, and Management"
-  homepage "https://github.com/kubernetes/kops"
-  url "https://github.com/kubernetes/kops/archive/v1.18.2.tar.gz"
-  sha256 "7f2614cfca0a8a71b187f276460e17c2487b1fb11cb389ba4adbe69e8ca9f88f"
+  homepage "https://kops.sigs.k8s.io/"
+  url "https://github.com/kubernetes/kops/archive/v1.23.0.tar.gz"
+  sha256 "752eb58feb0cb06d224b98d7fa23ac8fe9cd9ed0ffcd2706ab870bf1ad8c7d2a"
   license "Apache-2.0"
-  head "https://github.com/kubernetes/kops.git"
+  head "https://github.com/kubernetes/kops.git", branch: "master"
 
   livecheck do
-    url :head
-    regex(/^v?(\d+(?:\.\d+)+)$/i)
+    url :stable
+    strategy :github_latest
   end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "1e89ba83e73773e0884f64f98d87b3f77fc54817ad5819297d21f82ee2aeb391" => :big_sur
-    sha256 "0709f842c5b427efb976d73d845577c415bf0c0753f84f6b3117aed903a51664" => :catalina
-    sha256 "3f9dbd8e1db1f118a4aebe4e1c827e2cdce804d196f67838ef02da307ccb1545" => :mojave
-    sha256 "114fe9e812d319e8a50046255936230a2de7b07503432271c115d54171b695d5" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "f48947697a87dceac2344b74ace8db19f103e23a5f5e37f8fb142d499ccb9cb5"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "08f7b1c79a8affde3ba8b0d0b09c3ef914901950cf36d73f406d6b1a53df90a7"
+    sha256 cellar: :any_skip_relocation, monterey:       "4b05311ac08588338a8bc5d272e2c8de4187dc07232913cda739ba20983f3ad7"
+    sha256 cellar: :any_skip_relocation, big_sur:        "5dbfda54332f8b92db00e985e4283bca8908b3801ce3b7897ee0d16e4786d34e"
+    sha256 cellar: :any_skip_relocation, catalina:       "87142ff111ca70b35d7f792fad613cd26f84617313b260929988fb90b8281110"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a9d8817d002c80ad8011a3e3ff9918f839470dfb5c2edc6bc7e1d15b1f0b93a3"
   end
 
   depends_on "go" => :build
@@ -28,18 +29,23 @@ class Kops < Formula
     kopspath = buildpath/"src/k8s.io/kops"
     kopspath.install Dir["*"]
     system "make", "-C", kopspath
-    bin.install("bin/kops")
+    bin.install "bin/kops"
 
     # Install bash completion
-    output = Utils.safe_popen_read("#{bin}/kops", "completion", "bash")
+    output = Utils.safe_popen_read(bin/"kops", "completion", "bash")
     (bash_completion/"kops").write output
 
     # Install zsh completion
-    output = Utils.safe_popen_read("#{bin}/kops", "completion", "zsh")
+    output = Utils.safe_popen_read(bin/"kops", "completion", "zsh")
     (zsh_completion/"_kops").write output
+
+    # Install fish completion
+    output = Utils.safe_popen_read(bin/"kops", "completion", "fish")
+    (fish_completion/"kops.fish").write output
   end
 
   test do
-    system "#{bin}/kops", "version"
+    assert_match version.to_s, shell_output("#{bin}/kops version")
+    assert_match "no context set in kubecfg", shell_output("#{bin}/kops validate cluster 2>&1", 1)
   end
 end

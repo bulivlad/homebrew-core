@@ -1,24 +1,27 @@
 class Fennel < Formula
   desc "Lua Lisp Language"
   homepage "https://fennel-lang.org"
-  url "https://github.com/bakpakin/Fennel/archive/0.7.0.tar.gz"
-  sha256 "5bb07b35d88840dfeaa90ed29c3d9282357d360b07efeb497901871d6710e59d"
+  url "https://github.com/bakpakin/Fennel/archive/1.1.0.tar.gz"
+  sha256 "14873fb319ace8707a075bc4696d3691f5045686e5738822bdf4cc014d14b4b8"
   license "MIT"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "e4d1d9aed1b9b8b463660e6725ccafb24a3ae4a5de5d19bb0e67f046f3996d25" => :big_sur
-    sha256 "5bf84f6e6fa20624fa3eb82f07393442099dd53407704f046e90ca6642c2c44f" => :arm64_big_sur
-    sha256 "eeceef32216dce9edeb2f213d9f6433f0a0f40784146a15c2a2ca29dec94baa4" => :catalina
-    sha256 "33178e611d635926983ae9c254601414fb855a967eda93e1d257b2d0bf4859cc" => :mojave
-    sha256 "07287f0807062132269ac48897285118c2aa50c404088cb6cef159571a848822" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "45a17c2e474fdd8c601ea77e5bc52d2c2e07b094d99916872952b1646bbcf5fc"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "113bcdf641420a750971fd68048300eedc034153840e00ccd898ff5dd6e14569"
+    sha256 cellar: :any_skip_relocation, monterey:       "acc0ef368c737bc11e0f1aaf50d05812113c7203b3da04471d73f53e91045517"
+    sha256 cellar: :any_skip_relocation, big_sur:        "55673aafb83cb341ab0d09b6ac85306718714112b72248c71ee8cd3e999e83bd"
+    sha256 cellar: :any_skip_relocation, catalina:       "cf4789db2ba53d5a6521853646195b3a9ad51c7ca5146cf005abe38e3e496ef9"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "cf4e121f4b4e5c9e7b1af9942ae1be720ea167edb1d45b95bec89ddcbc00a18a"
   end
 
   depends_on "lua"
 
   def install
-    system "make", "fennel"
+    system "make"
     bin.install "fennel"
+
+    lua = Formula["lua"]
+    (share/"lua"/lua.version.major_minor).install "fennel.lua"
   end
 
   test do

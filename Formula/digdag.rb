@@ -1,8 +1,9 @@
 class Digdag < Formula
   desc "Workload Automation System"
   homepage "https://www.digdag.io/"
-  url "https://dl.digdag.io/digdag-0.9.42.jar"
-  sha256 "71071424a5beeb881cb4ccb06067a556a3673caf3dc8850dd584357e99134b21"
+  url "https://dl.digdag.io/digdag-0.10.4.jar"
+  sha256 "2020fa9395e74e14fdf4ada93bff0684dcea64f564788afd6a3ecc54e3bbd4bf"
+  license "Apache-2.0"
   revision 1
 
   livecheck do
@@ -10,15 +11,15 @@ class Digdag < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any_skip_relocation, all: "1e8af040e14f05c1f648ef90f3e0e7da9037d7e813cfb1fc7c644d174244d0cf"
+  end
 
-  depends_on "openjdk@8"
+  depends_on "openjdk@11"
 
   def install
     libexec.install "digdag-#{version}.jar"
-    (libexec/"bin").write_jar_script libexec/"digdag-#{version}.jar", "digdag"
-    (libexec/"bin/digdag").chmod 0755
-    (bin/"digdag").write_env_script libexec/"bin/digdag", Language::Java.java_home_env("1.8")
+    bin.write_jar_script libexec/"digdag-#{version}.jar", "digdag", java_version: "11"
   end
 
   test do

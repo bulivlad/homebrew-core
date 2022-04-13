@@ -1,31 +1,30 @@
 class Youtubedr < Formula
   desc "Download Youtube Video in Golang"
   homepage "https://github.com/kkdai/youtube"
-  url "https://github.com/kkdai/youtube/archive/v2.3.0.tar.gz"
-  sha256 "359c271b641675e20842e5e5146708b477869e55988927dd9610c2a03311f55f"
+  url "https://github.com/kkdai/youtube/archive/v2.7.10.tar.gz"
+  sha256 "04a4f0b745094884fb2902945ac3b1c966fbe4fbd67a027cb482d491662900f9"
   license "MIT"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "6956fea8197b2302b6b5e31077d3c71a043e1bd1c0aadd5cb13691c1a569d94f" => :big_sur
-    sha256 "873add0ee7b1dcd70242db09789b9c0fbf1b6f9c8d68031f0fb3bebd3360a548" => :arm64_big_sur
-    sha256 "39c6fdca870d0ce13ac4888f8671bbe5cb2e1628da753b38b701e2989e496dde" => :catalina
-    sha256 "e8953674953c78d36207f9584f720f4a511690b1b9862a2ce564cb7c30f79f8b" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "1f88cd160ded250e0192bba91a58e359049c4165e3272a2b28ed78f8049e7e32"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "1f88cd160ded250e0192bba91a58e359049c4165e3272a2b28ed78f8049e7e32"
+    sha256 cellar: :any_skip_relocation, monterey:       "9e45685eefb31b15bc999271df40b123f7d13e6a4cf780e577c96c417e632d83"
+    sha256 cellar: :any_skip_relocation, big_sur:        "9e45685eefb31b15bc999271df40b123f7d13e6a4cf780e577c96c417e632d83"
+    sha256 cellar: :any_skip_relocation, catalina:       "9e45685eefb31b15bc999271df40b123f7d13e6a4cf780e577c96c417e632d83"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "558ca8bf9c1d309d215d9ae9a09d0b41716ebe1303a4e8c1f01731d7ebb28288"
   end
 
   depends_on "go" => :build
 
   def install
-    build_time = Utils.safe_popen_read("date -u +'%Y-%m-%dT%H:%M:%SZ' 2> /dev/null").chomp
-
     ldflags = %W[
       -s -w
       -X main.version=#{version}
-      -X main.date=#{build_time}
-    ]
+      -X main.date=#{time.iso8601}
+    ].join(" ")
 
     ENV["CGO_ENABLED"] = "0"
-    system "go", "build", "-ldflags", ldflags.join(" "), *std_go_args, "./cmd/youtubedr"
+    system "go", "build", *std_go_args(ldflags: ldflags), "./cmd/youtubedr"
   end
 
   test do

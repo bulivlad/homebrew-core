@@ -1,16 +1,18 @@
 class Uriparser < Formula
   desc "URI parsing library (strictly RFC 3986 compliant)"
   homepage "https://uriparser.github.io/"
-  url "https://github.com/uriparser/uriparser/releases/download/uriparser-0.9.4/uriparser-0.9.4.tar.bz2"
-  sha256 "b7cdabe5611408fc2c3a10f8beecb881a0c7e93ff669c578cd9e3e6d64b8f87b"
-  head "https://github.com/uriparser/uriparser.git"
+  url "https://github.com/uriparser/uriparser/releases/download/uriparser-0.9.6/uriparser-0.9.6.tar.bz2"
+  sha256 "9ce4c3f151e78579f23937b44abecb428126863ad02e594e115e882353de905b"
+  license "BSD-3-Clause"
+  head "https://github.com/uriparser/uriparser.git", branch: "master"
 
   bottle do
-    cellar :any
-    sha256 "76fb92889b92e80282a0794e814c21d403bda66dd70dffaca61142bfb02a1ccd" => :big_sur
-    sha256 "0fac36c34a537dd29050a29003d5e4a1c34ce8d00d964c7e8ebdeaafa99f6268" => :catalina
-    sha256 "5440ffb9d3363007478193e0ed4653d8f5eaf27fd36b5c0968968b73d14af2f9" => :mojave
-    sha256 "b25005697a3acc8cd6921189f41e6f7fa1c6667a9e259a3d85f8f1dea6915460" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "3f134b815c73529b29e59b870500d5b66f3643a3f77d26f0ae160d02114713c0"
+    sha256 cellar: :any,                 arm64_big_sur:  "e873b79a8af0b5331dcd4e51af7d4f52c88e6bf638b842f89cfeafa6606a6d1e"
+    sha256 cellar: :any,                 monterey:       "ed815b10b6d13b85d1dcc744bdb27c619d7cea1065e0b225587fb15f530feaf2"
+    sha256 cellar: :any,                 big_sur:        "2e8ad9cd04d73bb1be69799562415023d2d5b3010e0cf1a5d3196ca5695912f8"
+    sha256 cellar: :any,                 catalina:       "e57fd509a1cf3725b9b95cdc75e387702d876065975e1401f83a634e442a7f92"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "95d5ad1a9ad35dd79d6c7215349715c2f9f53ae1eec02d38506973a92d0706cc"
   end
 
   depends_on "cmake" => :build
@@ -18,7 +20,10 @@ class Uriparser < Formula
   conflicts_with "libkml", because: "both install `liburiparser.dylib`"
 
   def install
-    system "cmake", ".", "-DURIPARSER_BUILD_TESTS=OFF", "-DURIPARSER_BUILD_DOCS=OFF", *std_cmake_args
+    system "cmake", ".", "-DURIPARSER_BUILD_TESTS=OFF",
+                         "-DURIPARSER_BUILD_DOCS=OFF",
+                         "-DCMAKE_INSTALL_RPATH=#{rpath}",
+                         *std_cmake_args
     system "make"
     system "make", "install"
   end

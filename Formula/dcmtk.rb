@@ -1,10 +1,20 @@
 class Dcmtk < Formula
   desc "OFFIS DICOM toolkit command-line utilities"
   homepage "https://dicom.offis.de/dcmtk.php.en"
-  url "https://dicom.offis.de/download/dcmtk/dcmtk365/dcmtk-3.6.5.tar.gz"
-  sha256 "a05178665f21896dbb0974106dba1ad144975414abd760b4cf8f5cc979f9beb9"
-  revision 1
-  head "https://git.dcmtk.org/dcmtk.git"
+  head "https://git.dcmtk.org/dcmtk.git", branch: "master"
+
+  stable do
+    url "https://dicom.offis.de/download/dcmtk/dcmtk366/dcmtk-3.6.6.tar.gz"
+    sha256 "6859c62b290ee55677093cccfd6029c04186d91cf99c7642ae43627387f3458e"
+
+    # Fix build for Apple Silicon.
+    # Issue ref: https://support.dcmtk.org/redmine/issues/957
+    # TODO: Remove in the next release along with stable block
+    patch do
+      url "https://git.dcmtk.org/?p=dcmtk.git;a=patch;h=5fba853b6f7c13b02bed28bd9f7d3f450e4c72bb"
+      sha256 "40ca9e6f377951e2d24a509a6c95b9e572224d74d694f0d648b8b33e4d67e285"
+    end
+  end
 
   livecheck do
     url "https://dicom.offis.de/download/dcmtk/release/"
@@ -12,10 +22,13 @@ class Dcmtk < Formula
   end
 
   bottle do
-    sha256 "a52a1b60a406463246b8eb194e25589c88dfa982a936560bf6948be569448833" => :big_sur
-    sha256 "a86027494ff074de767cef1a7bf31639e50f153d4a2ec5297bb9560bb3e48ef6" => :catalina
-    sha256 "2bbb1bf5d51c7e12c2db901a632862b9429ef2b146f973feda5212fb1391ac33" => :mojave
-    sha256 "352137e82f70183e543b6d532dcf67c7fa95ea67b63421ad4fc9c0a0f19ba484" => :high_sierra
+    rebuild 1
+    sha256 arm64_monterey: "2b707106032247e1d1832e918ec0e560b2e81af4ed0a1ee659f0803c4c172141"
+    sha256 arm64_big_sur:  "b101e7090c39b48225ab0d1d895236c849b613cf1f4e9b187c7818c6e9e7b78a"
+    sha256 monterey:       "abf4a42c7a34004707c70fb518e1a9fc11582e360a886a8c109b5ce6fcd6492a"
+    sha256 big_sur:        "847e85cc8b29b4caaf58cf0aa001b06082f2ea83bceaf6a0b5c90abc27b1f3bb"
+    sha256 catalina:       "f7872a94bd7c98fa785a61d7d9c9dd00e577002b9d563fc403f4913011457de1"
+    sha256 x86_64_linux:   "bea864995df958ccf4fb449d1347b686ed28171e9417845b7a768eee2b7eab6f"
   end
 
   depends_on "cmake" => :build
@@ -26,12 +39,18 @@ class Dcmtk < Formula
   uses_from_macos "libxml2"
 
   def install
-    mkdir "build" do
-      system "cmake", "-DBUILD_SHARED_LIBS=OFF", *std_cmake_args, ".."
-      system "make", "install"
-      system "cmake", "-DBUILD_SHARED_LIBS=ON", *std_cmake_args, ".."
-      system "make", "install"
-    end
+    system "cmake", "-S", ".", "-B", "build/shared", *std_cmake_args,
+                    "-DBUILD_SHARED_LIBS=ON",
+                    "-DCMAKE_INSTALL_RPATH=#{rpath}"
+    system "cmake", "--build", "build/shared"
+    system "cmake", "--install", "build/shared"
+
+    system "cmake", "-S", ".", "-B", "build/static", *std_cmake_args,
+                    "-DBUILD_SHARED_LIBS=OFF"
+    system "cmake", "--build", "build/static"
+    lib.install Dir["build/static/lib/*.a"]
+
+    inreplace lib/"cmake/dcmtk/DCMTKConfig.cmake", "#{Superenv.shims_path}/", ""
   end
 
   test do

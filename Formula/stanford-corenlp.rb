@@ -1,12 +1,21 @@
 class StanfordCorenlp < Formula
   desc "Java suite of core NLP tools"
   homepage "https://stanfordnlp.github.io/CoreNLP/"
-  url "https://nlp.stanford.edu/software/stanford-corenlp-full-2018-10-05.zip"
-  version "3.9.2"
-  sha256 "833f0f5413a33e7fbc98aeddcb80eb0a55b672f67417b8d956ed9c39abe8d26c"
-  revision 1
+  url "https://nlp.stanford.edu/software/stanford-corenlp-4.4.0.zip"
+  sha256 "c04b07e8b539a00c0816f183ed1f55b79041641f5422fe943829fdabbee67e47"
+  license "GPL-2.0-or-later"
 
-  bottle :unneeded
+  # The first-party website only links to an unversioned archive file from
+  # nlp.stanford.edu (stanford-corenlp-latest.zip), so we match the version
+  # in the Maven link instead.
+  livecheck do
+    url :homepage
+    regex(%r{href=.*?/stanford-corenlp/v?(\d+(?:\.\d+)+)/jar}i)
+  end
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, all: "6fd51a09939a5a8f42a65ddf821319894d5d9a754026426ef8b8fc56a88e0860"
+  end
 
   depends_on "openjdk"
 
@@ -18,7 +27,7 @@ class StanfordCorenlp < Formula
 
   test do
     (testpath/"test.txt").write("Stanford is a university, founded in 1891.")
-    system "#{bin}/corenlp.sh", "-annotators tokenize,ssplit,pos", "-file test.txt"
-    assert_predicate (testpath/"test.txt.xml"), :exist?
+    system "#{bin}/corenlp.sh", "-annotators tokenize,ssplit,pos", "-file test.txt", "-outputFormat json"
+    assert_predicate (testpath/"test.txt.json"), :exist?
   end
 end

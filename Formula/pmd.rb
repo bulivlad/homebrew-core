@@ -1,11 +1,13 @@
 class Pmd < Formula
   desc "Source code analyzer for Java, JavaScript, and more"
   homepage "https://pmd.github.io"
-  url "https://github.com/pmd/pmd/releases/download/pmd_releases/6.30.0/pmd-bin-6.30.0.zip"
-  sha256 "2e0426a1476c1b9b00c87b3d63289a385a27305695b4729da7f2af480592cbcc"
+  url "https://github.com/pmd/pmd/releases/download/pmd_releases/6.44.0/pmd-bin-6.44.0.zip"
+  sha256 "7e6dceba88529a90b2b33c8f05b53bc409fa9eab79be592c875f6bd996aaade7"
   license "BSD-4-Clause"
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any_skip_relocation, all: "0396b8eaeda273a033c514d2812ae82333c11a5981e6b05fbb69af1e0e7ab6d6"
+  end
 
   depends_on "openjdk"
 

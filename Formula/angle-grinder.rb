@@ -1,18 +1,18 @@
 class AngleGrinder < Formula
   desc "Slice and dice log files on the command-line"
   homepage "https://github.com/rcoh/angle-grinder"
-  # Remove "Cargo.lock" resource at version bump!
-  url "https://github.com/rcoh/angle-grinder/archive/v0.15.0.tar.gz"
-  sha256 "5359d6e241eca2bc3bdb7ddf9344b4ef8315cbe7629775c09e0ab7ed70310c8d"
+  url "https://github.com/rcoh/angle-grinder/archive/v0.18.0.tar.gz"
+  sha256 "7a282d9eff88bb2e224b02d80b887de92286e451abf8a193248d30136d08f4e0"
   license "MIT"
-  revision 1
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "5a1256b4d29478fbaf24b5683d1a97f78c5acce41292f5e49c164545c197388b" => :big_sur
-    sha256 "4ff200cdd8142e3d16a89a3050c690be506023da7ea6c6ca59700a209aa647dd" => :arm64_big_sur
-    sha256 "15943cf324e460ab66b499fe6399c8da05b305289ef42e5dfc385ca2e3c7177d" => :catalina
-    sha256 "4b3d867ea87b7c6a478aa7e6e5ea5909e01946c59473d4467254298c2ec524e8" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "aac94d72d3e7b33100dec2efdcf5e77678f81f424ab8d408ae2f044214c59f7f"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "116d320e843719451ec991b97c2bb8c1aa2dea3623f387c866f12a718b512993"
+    sha256 cellar: :any_skip_relocation, monterey:       "2b1e7b6bfef8586378fb75138e655a70717ccc2be44c9023421e7775a83e9bd2"
+    sha256 cellar: :any_skip_relocation, big_sur:        "d94050232f3ce01eb97c1c36f79aa5d2734b9e4e25ede7d81e32eaaeca4a4db7"
+    sha256 cellar: :any_skip_relocation, catalina:       "f41ebbb8078940ecc259ffac8451f70dc49df53a8d8f1fcafe4b02bc6723dcbc"
+    sha256 cellar: :any_skip_relocation, mojave:         "73c19bc8e8e2697797e46ba6e6dd8a24deaa77a8059f0546bf29bffba5e0c8ec"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "afe0edc8a8c223a9bfdbd0c515701e5103a4b4b9b168da747d991eb487dec25a"
   end
 
   depends_on "rust" => :build
@@ -22,15 +22,7 @@ class AngleGrinder < Formula
     depends_on "openssl@1.1"
   end
 
-  # Replace stale lock file. Remove at version bump.
-  resource "Cargo.lock" do
-    url "https://raw.githubusercontent.com/rcoh/angle-grinder/6c5cf552dec605aac75c3da04e8618518b63abf2/Cargo.lock"
-    sha256 "a52f0e1d81eb77bdb10f9fa6b4bc5a2f4551045794570ac5d766de9085da4a54"
-  end
-
   def install
-    rm_f "Cargo.lock"
-    resource("Cargo.lock").stage buildpath
     system "cargo", "install", *std_cargo_args
   end
 

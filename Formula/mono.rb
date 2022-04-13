@@ -1,9 +1,10 @@
 class Mono < Formula
   desc "Cross platform, open source .NET development framework"
   homepage "https://www.mono-project.com/"
-  url "https://download.mono-project.com/sources/mono/mono-6.12.0.90.tar.xz"
-  sha256 "51de5c02ad511333f93ff585bca54c8784de35af4ff27b759d16b46c4402cdac"
+  url "https://download.mono-project.com/sources/mono/mono-6.12.0.122.tar.xz"
+  sha256 "29c277660fc5e7513107aee1cbf8c5057c9370a4cdfeda2fc781be6986d89d23"
   license "MIT"
+  revision 1
 
   livecheck do
     url "https://www.mono-project.com/download/stable/"
@@ -11,20 +12,20 @@ class Mono < Formula
   end
 
   bottle do
-    sha256 "421985d8fc075fd12f11d239f7fc68be0408ce38b6299d79975a14964a60e40c" => :catalina
-    sha256 "9ef2de479c2863279aa87021129032a4f558956dbbececeecd9db33222d052ba" => :mojave
-    sha256 "8d3e8499fd5c23a353e3571da084d789943c72d804f39ae90bb07ffd37777bbf" => :high_sierra
+    sha256 monterey: "6b1245459ebdd01ad9346be8fed038eeb6dd42e3407212c2b971927dde3b80df"
+    sha256 big_sur:  "e9382010f5f96504a354f6328339a1a2339a327fa70cfc58f60cc3fc8a3970fb"
+    sha256 catalina: "c9d98a348a207121c203e4089d292785695b630b9c78db7688381368a81575c2"
   end
 
   depends_on "cmake" => :build
   depends_on "pkg-config" => :build
-  depends_on "python@3.9"
+  depends_on "python@3.10"
 
   uses_from_macos "unzip" => :build
 
   conflicts_with "xsd", because: "both install `xsd` binaries"
   conflicts_with cask: "mono-mdk"
-  conflicts_with cask: "mono-mdk-for-visual-studio"
+  conflicts_with cask: "homebrew/cask-versions/mono-mdk-for-visual-studio"
 
   # xbuild requires the .exe files inside the runtime directories to
   # be executable
@@ -38,16 +39,51 @@ class Mono < Formula
   link_overwrite "lib/cli"
 
   resource "fsharp" do
-    url "https://github.com/fsharp/fsharp.git",
-        tag:      "10.2.3",
-        revision: "e31bc96e8a5e5742af1c6c45d55d5cc06bb524cb"
+    url "https://github.com/dotnet/fsharp.git",
+        tag:      "v11.0.0-beta.20471.5",
+        revision: "03283e07f6bd5717797acb288cf6044cedca2202"
+    # F# patches hhen upgrading Mono, make sure to use the revision from
+    # https://github.com/mono/mono/blob/mono-#{version}/packaging/MacSDK/fsharp.py
+    patch do
+      url "https://raw.githubusercontent.com/mono/mono/a22ed3f094e18f1f82e1c6cead28d872d3c57e40/packaging/MacSDK/patches/fsharp-portable-pdb.patch"
+      sha256 "5b09b0c18b7815311680cc3ecd9bb30d92a307f3f2103a5b58b06bc3a0613ed4"
+    end
+    patch do
+      url "https://raw.githubusercontent.com/mono/mono/a22ed3f094e18f1f82e1c6cead28d872d3c57e40/packaging/MacSDK/patches/fsharp-netfx-multitarget.patch"
+      sha256 "112f885d4833effb442cf586492cdbd7401d6c2ba9d8078fe55e896cc82624d7"
+    end
+    patch do
+      url "https://github.com/dotnet/fsharp/commit/be6b22d11ae996b2d9b8e0724d9cf05ad65a0485.patch?full_index=1"
+      sha256 "793a39da798673b99289f3ac344ff8bd23d7eea2d3366c28e7e42229d8b130ca"
+    end
+  end
+
+  resource "fsharp-layout-patch" do
+    url "https://raw.githubusercontent.com/mono/mono/3070886a1c5e3e3026d1077e36e67bd5310e0faa/packaging/MacSDK/fsharp-layout.sh"
+    sha256 "f2cc63bf77e50663d91c6d102ba1d9217d1b9100c57071f79f0ae5a45e80ef42"
   end
 
   # When upgrading Mono, make sure to use the revision from
   # https://github.com/mono/mono/blob/mono-#{version}/packaging/MacSDK/msbuild.py
   resource "msbuild" do
     url "https://github.com/mono/msbuild.git",
-        revision: "ad9c9926a76e3db0d2b878a24d44446d73640d19"
+        revision: "70bf6710473a2b6ffe363ea588f7b3ab87682a8d"
+  end
+
+  # Remove use of -flat_namespace. Upstreamed at
+  # https://github.com/mono/mono/pull/21257
+  patch :DATA
+
+  # Temporary patch remove in the next mono release
+  patch do
+    url "https://github.com/mono/mono/commit/3070886a1c5e3e3026d1077e36e67bd5310e0faa.patch?full_index=1"
+    sha256 "b415d632ced09649f1a3c1b93ffce097f7c57dac843f16ec0c70dd93c9f64d52"
+  end
+
+  # Fix -flat_namespace being used on Big Sur and later.
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+    sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
   end
 
   def install
@@ -67,16 +103,21 @@ class Mono < Formula
     resource("msbuild").stage do
       system "./eng/cibuild_bootstrapped_msbuild.sh", "--host_type", "mono",
              "--configuration", "Release", "--skip_tests"
-      system "./artifacts/mono-msbuild/msbuild", "mono/build/install.proj",
+
+      system "./stage1/mono-msbuild/msbuild", "mono/build/install.proj",
              "/p:MonoInstallPrefix=#{prefix}", "/p:Configuration=Release-MONO",
              "/p:IgnoreDiffFailure=true"
     end
 
     # Finally build and install fsharp as well
     resource("fsharp").stage do
-      ENV.prepend_path "PKG_CONFIG_PATH", lib/"pkgconfig"
-      system "make"
-      system "make", "install"
+      # Temporary fix for use propper .NET SDK remove in next release
+      inreplace "./global.json", "3.1.302", "3.1.405"
+      system "./build.sh", "-c", "Release"
+      ENV["version"]=""
+      system "./.dotnet/dotnet", "restore", "setup/Swix/Microsoft.FSharp.SDK/Microsoft.FSharp.SDK.csproj",
+        "--packages", "fsharp-nugets"
+      system "bash", "#{buildpath}/packaging/MacSDK/fsharp-layout.sh", ".", prefix
     end
   end
 
@@ -117,7 +158,7 @@ class Mono < Formula
         <Import Project="$(MSBuildBinPath)\\Microsoft.CSharp.targets" />
       </Project>
     EOS
-    system bin/"xbuild", "test.csproj"
+    system bin/"msbuild", "test.csproj"
 
     # Test that fsharpi is working
     ENV.prepend_path "PATH", bin
@@ -137,6 +178,7 @@ class Mono < Formula
           <ProjectGuid>{B6AB4EF3-8F60-41A1-AB0C-851A6DEB169E}</ProjectGuid>
           <OutputType>Exe</OutputType>
           <FSharpTargetsPath>$(MSBuildExtensionsPath32)\\Microsoft\\VisualStudio\\v$(VisualStudioVersion)\\FSharp\\Microsoft.FSharp.Targets</FSharpTargetsPath>
+          <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
         </PropertyGroup>
         <Import Project="$(FSharpTargetsPath)" Condition="Exists('$(FSharpTargetsPath)')" />
         <ItemGroup>
@@ -153,6 +195,21 @@ class Mono < Formula
       [<EntryPoint>]
       let main _ = printfn "#{test_str}"; 0
     EOS
-    system bin/"xbuild", "test.fsproj"
+    system bin/"msbuild", "test.fsproj"
   end
 end
+
+__END__
+diff --git a/mono/profiler/Makefile.in b/mono/profiler/Makefile.in
+index 48bcfad..58273a5 100644
+--- a/mono/profiler/Makefile.in
++++ b/mono/profiler/Makefile.in
+@@ -647,7 +647,7 @@ glib_libs = $(top_builddir)/mono/eglib/libeglib.la
+ #
+ # See: https://bugzilla.xamarin.com/show_bug.cgi?id=57011
+ @DISABLE_LIBRARIES_FALSE@@DISABLE_PROFILER_FALSE@@ENABLE_COOP_SUSPEND_FALSE@@HOST_WIN32_FALSE@check_targets = run-test
+-@BITCODE_FALSE@@HOST_DARWIN_TRUE@prof_ldflags = -Wl,-undefined -Wl,suppress -Wl,-flat_namespace
++@BITCODE_FALSE@@HOST_DARWIN_TRUE@prof_ldflags = -Wl,-undefined -Wl,dynamic_lookup
+ 
+ # On Apple hosts, we want to allow undefined symbols when building the
+ # profiler modules as, just like on Linux, we don't link them to libmono,

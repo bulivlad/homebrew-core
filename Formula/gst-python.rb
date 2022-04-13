@@ -1,8 +1,8 @@
 class GstPython < Formula
   desc "Python overrides for gobject-introspection-based pygst bindings"
   homepage "https://gstreamer.freedesktop.org/modules/gst-python.html"
-  url "https://gstreamer.freedesktop.org/src/gst-python/gst-python-1.18.3.tar.xz"
-  sha256 "4e630735276e08ff4d70337aa5d91fd008e5f1ed3dc0993674cd5820e264259a"
+  url "https://gstreamer.freedesktop.org/src/gst-python/gst-python-1.20.1.tar.xz"
+  sha256 "ba6cd59faa3db3981d8c6982351c239d823c0b8e80b1acf58d2997b050289422"
   license "LGPL-2.1-or-later"
 
   livecheck do
@@ -11,9 +11,12 @@ class GstPython < Formula
   end
 
   bottle do
-    sha256 "0323f7f77b31d549d64768a94bae8d8b5b1bb32cb30363e027e77ff40a3691c1" => :big_sur
-    sha256 "744cd20c663082002163044a3dc968b6a9230eadabb5b8c531cb06071c3efbc8" => :catalina
-    sha256 "0d9a4ce411145a61dbc9ae7d72664ffc437a4281916a1c6f957ea6fdb15bd38a" => :mojave
+    sha256 arm64_monterey: "a22ba5e1cba6775a21b2cbe9f26981d283d1227888b7802523f4c53a8be72d21"
+    sha256 arm64_big_sur:  "27bae7437b43b5531603ef2607ab7c25746dd939f890b97597dd56f91743ef5c"
+    sha256 monterey:       "19c0d5b057b0dfbdc9e5e07837f6cb8ef777245776064cb7a346434d4b4149c2"
+    sha256 big_sur:        "73bacb36b04c37f84765dead142c6942d53b43803904972e798b21756d6d8e66"
+    sha256 catalina:       "479c059af1957f7bab804735736196f3aa7faa6bd7f3165849da05ba7db7e838"
+    sha256 x86_64_linux:   "f2c59d74f4cd89c86d89f2f6779c459b10b5ab2786b261515caa112d639f99c5"
   end
 
   depends_on "meson" => :build
@@ -24,8 +27,8 @@ class GstPython < Formula
 
   # See https://gitlab.freedesktop.org/gstreamer/gst-python/-/merge_requests/41
   patch do
-    url "https://gitlab.freedesktop.org/gstreamer/gst-python/-/commit/3e752ede7ed6261681ef3831bc3dbb594f189e76.patch"
-    sha256 "ad63ba452d97da70601854cc8e46e8bd53db708a3d98bf7411483d52aadcebf3"
+    url "https://gitlab.freedesktop.org/gstreamer/gst-python/-/commit/3e752ede7ed6261681ef3831bc3dbb594f189e76.diff"
+    sha256 "d6522bb29f1894d3d426ee6c262a18669b0759bd084a6d2a2ea1ba0612a80068"
   end
 
   def install

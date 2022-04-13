@@ -1,16 +1,17 @@
 class Vale < Formula
   desc "Syntax-aware linter for prose"
-  homepage "https://errata-ai.github.io/vale/"
-  url "https://github.com/errata-ai/vale/archive/v2.8.0.tar.gz"
-  sha256 "b0ab637508aedbc11e5cd7fe225d45f9fd44e821720233dbbbbdc39f8b104250"
+  homepage "https://docs.errata.ai/"
+  url "https://github.com/errata-ai/vale/archive/v2.15.5.tar.gz"
+  sha256 "157cdab83eba405da4301b3ed3aa1e5cea085dd32dd212494df2cc31245706da"
   license "MIT"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "590b15b39285fd259261da8c17ecb6830ceb6bfa8655fdb9aa2ef96965026f39" => :big_sur
-    sha256 "1ff06ef916c211f9acfa78632545992740837bf5dcbf0678024530669a04118b" => :arm64_big_sur
-    sha256 "a692616e7343bcd13bb44057335373fb2b4072ec6af617a4f11c1df237c22b4e" => :catalina
-    sha256 "9c0daea18d09fec6bffda138e52a73acbe25de5805a2515dea53f869ab5f6973" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "c35fcdb9b744dcec1bba9db20bf9515a10bcbd59a6b430ffe60cb7a3c91ab6ff"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f8a2c42bdf49b0db3fc6ff0074f1a005c02904bd83a0aa887e4fb74efbd1fe6a"
+    sha256 cellar: :any_skip_relocation, monterey:       "c8c860beb9ba7cf0bba30ec409871d545546c241c159cbb98fd6c1bf40432284"
+    sha256 cellar: :any_skip_relocation, big_sur:        "6c52889c4428fcb2eb73f9c285a24e29be0feb5cf3fca1ba834ca80bcf58a5c3"
+    sha256 cellar: :any_skip_relocation, catalina:       "2df26407d12ef80cbb49ca2077db15cdadce7d416b6a92e7991ee0a23b7deae4"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8b2094cb8521d9212e0e7179ab5b443d9e6acc71589fe7e99c7cec8d6f9a865e"
   end
 
   depends_on "go" => :build

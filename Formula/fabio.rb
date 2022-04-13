@@ -1,16 +1,18 @@
 class Fabio < Formula
   desc "Zero-conf load balancing HTTP(S) router"
   homepage "https://github.com/fabiolb/fabio"
-  url "https://github.com/fabiolb/fabio/archive/v1.5.15.tar.gz"
-  sha256 "19dcd4d8c6e4fe16e63e4208564d08ed442a0c724661ef4d91e9dbc85a9afbe1"
+  url "https://github.com/fabiolb/fabio/archive/v1.6.0.tar.gz"
+  sha256 "2a3a678a3ee7a5415512a1b3b799352186859f5d4dd50330d1117b21a643c398"
   license "MIT"
-  head "https://github.com/fabiolb/fabio.git"
+  head "https://github.com/fabiolb/fabio.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "8b1ea88c236dc4b04882f05377d5a9930e9e5e93c2092961bc68bd0d661daad5" => :big_sur
-    sha256 "60852a8b3a6c9dbdeb14e05f209351cc75d014ffad037bb0c2ee83ff0f84edbb" => :catalina
-    sha256 "d32c45abeb55519d51edc65c87c68e4bc7d117e8a0d8f8dfec5e667467e6174f" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "3b80a286a30fac7a23bece1d65c150cc6fc1c2eeeda3766c5c93c6c8ada8ef20"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "d0c59dfa1ba7258ed97881ca221973703b31eb6de8fb0deed61661aaf3458bd3"
+    sha256 cellar: :any_skip_relocation, monterey:       "397c08ca7a84a394aa612e7150b8b74a7383c39924c682f9c881fef35bf4f07c"
+    sha256 cellar: :any_skip_relocation, big_sur:        "4557d5ed59085c4bba46bba43edb6350a6c6b845bdec43ecb14c135fac046cec"
+    sha256 cellar: :any_skip_relocation, catalina:       "8024546a68136e01f7283b5d9ae216ba405fd2867a34bf4dda47e56a5910cd5b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "92e136b546ee472869e27a7bd8ee4584a79ac953a5370d01aaa1b2555dae148c"
   end
 
   depends_on "go" => :build
@@ -47,17 +49,14 @@ class Fabio < Formula
       else
         fork do
           exec "consul agent -dev -bind 127.0.0.1"
-          puts "consul started"
         end
         sleep 30
       end
       fork do
-        exec "#{bin}/fabio &>fabio-start.out&"
-        puts "fabio started"
+        exec "#{bin}/fabio"
       end
       sleep 10
       assert_equal true, port_open?(localhost_ip, fabio_default_port)
-      system "killall", "fabio" # fabio forks off from the fork...
       system "consul", "leave"
     end
   end

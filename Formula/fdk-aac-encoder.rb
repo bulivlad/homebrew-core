@@ -1,17 +1,18 @@
 class FdkAacEncoder < Formula
   desc "Command-line encoder frontend for libfdk-aac"
   homepage "https://github.com/nu774/fdkaac"
-  url "https://github.com/nu774/fdkaac/archive/v1.0.1.tar.gz"
-  sha256 "ce9459111cee48c84b2e5e7154fa5a182c8ec1132da880656de3c1bc3bf2cc79"
+  url "https://github.com/nu774/fdkaac/archive/v1.0.2.tar.gz"
+  sha256 "8a0b67792605fb8955d6be78a81e3a4029e9b7d0f594d8ed76e0fbcef90be0c8"
   license "Zlib"
 
   bottle do
-    cellar :any
-    sha256 "2bb1d960c47fca61a9b677314b64dc2ab1311111c7b36818a46e47aa13bcc675" => :big_sur
-    sha256 "cb07e4fec67df342a3a6d9cae8d40e9a2d8436618c4b11f1183145d1eb01faa4" => :arm64_big_sur
-    sha256 "ce0c1d5ff1bc3cc3483d2602fdbb1f3f0e6b8124c821f13f7d22c931bdd64303" => :catalina
-    sha256 "251c3f283f5bf30c69b05b69fb80e3ef497d17d0f3290e1d11021d51950910ce" => :mojave
-    sha256 "6bd9626cca01c6d07b55143acd321676a573f68ba2ec7734922b936332fab567" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "f6f1db7001098e01b65cbf58a080895930b2e2fa51661a3554728c0edb6466da"
+    sha256 cellar: :any,                 arm64_big_sur:  "50284ef03649e17c800e516cb0f8bcbfc97f891e042e0e84b4e7c91495fcdb0d"
+    sha256 cellar: :any,                 monterey:       "dc1daeb7c994fe9f18b22c69e14bd3cecae40112a517974808ab898d84651142"
+    sha256 cellar: :any,                 big_sur:        "32240adad3bc3e6fe29d1c6a29909024a203aaa5167fd4a93b8b4383edb65186"
+    sha256 cellar: :any,                 catalina:       "c4da455a74f28dd39f1c2be168cc08711921c00a7fe2fc2779b80eb57e96af29"
+    sha256 cellar: :any,                 mojave:         "09c58b1dac4628d28a357542d9af2e000067804ad0523ece1121016172626c87"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "90035c40a5fe78912b589404d5cf5c28ac2c807d5299e681def8e29226d15d8e"
   end
 
   depends_on "autoconf" => :build

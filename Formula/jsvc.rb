@@ -1,22 +1,18 @@
 class Jsvc < Formula
   desc "Wrapper to launch Java applications as daemons"
   homepage "https://commons.apache.org/daemon/jsvc.html"
-  url "https://www.apache.org/dyn/closer.lua?path=commons/daemon/source/commons-daemon-1.2.3-src.tar.gz"
-  mirror "https://archive.apache.org/dist/commons/daemon/source/commons-daemon-1.2.3-src.tar.gz"
-  sha256 "37b8c461c52e76c1ed6cd290431237611dfe496df36cd70e5afa30659d9bce4c"
+  url "https://www.apache.org/dyn/closer.lua?path=commons/daemon/source/commons-daemon-1.3.0-src.tar.gz"
+  mirror "https://archive.apache.org/dist/commons/daemon/source/commons-daemon-1.3.0-src.tar.gz"
+  sha256 "533cd76fe3113d535313c1d8b01ff23caf6babccc699b1a68b4446937cc4474b"
   license "Apache-2.0"
 
-  livecheck do
-    url :stable
-  end
-
   bottle do
-    cellar :any_skip_relocation
-    sha256 "8aa3bbb1e7d4f75d4c14a17c7397069b08c88495a8b08e7f48056cbe182313ef" => :big_sur
-    sha256 "ea6e255b59684a1c6bb414c6aa9259f535ef5100e8b30e183992e1966399feb7" => :arm64_big_sur
-    sha256 "43ff51b167da0ae5d591aa071b5901004bc5697ebc68347837008fa8f199e8ae" => :catalina
-    sha256 "edbe820236ac1a74c9a285720771e3e7475fdfa0c341e1b708865d84a5434a39" => :mojave
-    sha256 "78a38df683b1a1d51394559ad9df64d72e9f276ce896dd3f5815034f8f435907" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "eaab68414a0b2baa923b44d8586f1fbf1a425d37c06870ca4e063dffa2bbb933"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "43261838f40f1df64555476046fffb114742f7399297bdc414e9a177e87872f0"
+    sha256 cellar: :any_skip_relocation, monterey:       "b04c71b4afdd14a4e1867af564ebe444f44a1204b6b4615a4868d33ba85ed0cf"
+    sha256 cellar: :any_skip_relocation, big_sur:        "de514757fbeafe3d8dbaeb1f4d097380c4b017d6e10937862f625f4c3968f75f"
+    sha256 cellar: :any_skip_relocation, catalina:       "5c7308e3495ffd2af09ac54f61df59a9ce3aa46899a96a1d4ab125f27149e5d3"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "34999c468ea8a823fd2dd6a27a9ddd25a863a3c536e980f1a66d9e36745a3622"
   end
 
   depends_on "openjdk"

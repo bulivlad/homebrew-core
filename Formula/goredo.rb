@@ -1,30 +1,34 @@
 class Goredo < Formula
   desc "Go implementation of djb's redo, a Makefile replacement that sucks less"
   homepage "http://www.goredo.cypherpunks.ru/"
-  url "http://www.goredo.cypherpunks.ru/download/goredo-0.12.3.tar.zst"
-  version "0.12.3"
-  sha256 "d735a27312504914ec4413abc6719c52800d5aa5defb135e871396299b2c720f"
+  url "http://www.goredo.cypherpunks.ru/download/goredo-1.24.0.tar.zst"
+  sha256 "656e96d9f3efa45f035c2dd096fa91763854dbf1a09a37409c25ffc25cbc358f"
   license "GPL-3.0-only"
 
+  livecheck do
+    url "http://www.goredo.cypherpunks.ru/Install.html"
+    regex(/href=.*?goredo[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
+
   bottle do
-    cellar :any_skip_relocation
-    sha256 "c03721823a2849b78cc5ccf20e52a0ae0469e1795f9b2c36110b949b1bc5168e" => :big_sur
-    sha256 "ec16c45979431a557b937df2a5e657bc85b576a2ebf9f9b089895e7f2ded917c" => :arm64_big_sur
-    sha256 "6037d2404387e19dea95837cec3ac12883e073033bcdad792d9e9556e72864fb" => :catalina
-    sha256 "a2c78dcbcd336c13c8a2e5dd224d44e924187abc6062b99ac0ff02d0084593ad" => :mojave
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "621663018e6545716224d74de28bfbf120e1e966a179eec79f2d2df6593cfafa"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "621663018e6545716224d74de28bfbf120e1e966a179eec79f2d2df6593cfafa"
+    sha256 cellar: :any_skip_relocation, monterey:       "83095d1338fd7635c831647924338f4e61d905270e1566b1128f27bbfa0b41ea"
+    sha256 cellar: :any_skip_relocation, big_sur:        "83095d1338fd7635c831647924338f4e61d905270e1566b1128f27bbfa0b41ea"
+    sha256 cellar: :any_skip_relocation, catalina:       "83095d1338fd7635c831647924338f4e61d905270e1566b1128f27bbfa0b41ea"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "10ad54f1956ca9ec95dcc74e616fd19802515c5e06b24742616c9bb231e36123"
   end
 
   depends_on "go" => :build
-  depends_on "zstd" => :build
 
   def install
-    goredo_prefix = "goredo-#{version}"
-    system "tar", "--use-compress-program", "unzstd", "-xvf", "#{goredo_prefix}.tar.zst"
-    cd "#{goredo_prefix}/src" do
+    cd "src" do
       system "go", "build", *std_go_args, "-mod=vendor"
     end
+
+    ENV.prepend_path "PATH", bin
     cd bin do
-      system "./goredo", "-symlinks"
+      system "goredo", "-symlinks"
     end
   end
 

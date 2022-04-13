@@ -1,20 +1,23 @@
 class OsmiumTool < Formula
   desc "Libosmium-based command-line tool for processing OpenStreetMap data"
   homepage "https://osmcode.org/osmium-tool/"
-  url "https://github.com/osmcode/osmium-tool/archive/v1.13.0.tar.gz"
-  sha256 "5f955080d6f07a369570bd93eaa0cf9a9bbaa9536fc931ce7c1feed60a8bb413"
-  license "GPL-3.0"
+  url "https://github.com/osmcode/osmium-tool/archive/v1.14.0.tar.gz"
+  sha256 "67765fe6b612e791aab276af601dd12410b70486946e983753f6b0442f915233"
+  license "GPL-3.0-or-later"
 
   bottle do
-    cellar :any
-    sha256 "9f47341d53a69bc2c28247bd04177ec3d4c7b24d196d40fe94392e99f1062e75" => :big_sur
-    sha256 "ec1544fb70970b3b37d15a63db7935d6a8301e992aecd9e50806b60b8c164149" => :catalina
-    sha256 "7830ed054b1c1a20aee17aa8bbd4554b34885ed52d9166ff4d502df26ba9674c" => :mojave
+    sha256 cellar: :any,                 arm64_monterey: "366d2a275801b465effedcd9b3c58c4d5032ffc675e65ba9a58feb47b0365195"
+    sha256 cellar: :any,                 arm64_big_sur:  "28f759e51d219ce55915e85f62dc929b08ff5a0001440dd0512558c29b308177"
+    sha256 cellar: :any,                 monterey:       "276f2228730ebcc5cfe975fcd7163998e7e557c6a1165804b10a5c17f4146b66"
+    sha256 cellar: :any,                 big_sur:        "cd50810cc1ce63183d87fc764350b3d45b18891ce220dc12ed4af5965e7d83bd"
+    sha256 cellar: :any,                 catalina:       "709ccb8d194a5403e783e45706d59fe341567f191d5220e2231bb80b2e8749fa"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "244fe31de46dd27780e63eb4cf7ba810e8a56e8f25c1f6d4ad5e9a79a117a546"
   end
 
   depends_on "cmake" => :build
   depends_on "libosmium" => :build
   depends_on "boost"
+  depends_on "lz4"
 
   uses_from_macos "expat"
 
@@ -42,7 +45,7 @@ class OsmiumTool < Formula
       </osm>
     EOS
     output = shell_output("#{bin}/osmium fileinfo test.osm")
-    assert_match /Compression.+generator=handwritten/m, output
+    assert_match(/Compression.+generator=handwritten/m, output)
     system bin/"osmium", "tags-filter", "test.osm", "w/name=line", "-f", "osm"
   end
 end

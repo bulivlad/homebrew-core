@@ -1,8 +1,8 @@
 class Libvdpau < Formula
   desc "Open source Video Decode and Presentation API library"
   homepage "https://www.freedesktop.org/wiki/Software/VDPAU/"
-  url "https://gitlab.freedesktop.org/vdpau/libvdpau/uploads/14b620084c027d546fa0b3f083b800c6/libvdpau-1.2.tar.bz2"
-  sha256 "6a499b186f524e1c16b4f5b57a6a2de70dfceb25c4ee546515f26073cd33fa06"
+  url "https://gitlab.freedesktop.org/vdpau/libvdpau/-/archive/1.5/libvdpau-1.5.tar.bz2"
+  sha256 "a5d50a42b8c288febc07151ab643ac8de06a18446965c7241f89b4e810821913"
   license "MIT"
 
   livecheck do
@@ -11,30 +11,28 @@ class Libvdpau < Formula
   end
 
   bottle do
-    sha256 "74a3ea48e33530a014162fab0c6502f7a6be8aff25b05bd5fe971dd9d39e1371" => :big_sur
-    sha256 "50169a382bb560230e7e1e5aab6c20e6027773a8557af8623183daa81205586c" => :arm64_big_sur
-    sha256 "9b57bf4d53024c75f4a431fd814fa0b6f54163d13dfbb63607d41c1a43b7117d" => :catalina
-    sha256 "59980ec6bf90b676354ddda5e3c93a6240c4564d1c01aa35b1f1aa804d7b949a" => :mojave
+    sha256 arm64_monterey: "983ddb3ecfdacb086fd056315553adf0e458e6f4da959a0381d4889e55947635"
+    sha256 arm64_big_sur:  "d474b20b3cd5675c303af15e353b2e23b4107fb43660de06fdca174c2b8a6ac7"
+    sha256 monterey:       "b1ca92eb755c147f47c63a590705159a099cb74f97b0bb3260e26e46979acd04"
+    sha256 big_sur:        "19e0e92759c99ab2942d2b750bd32065b31829015bee25c384929a12f9eea5ca"
+    sha256 catalina:       "d5bdf31825ef0083a0a426f98de307d1f00376804d03e020d096bee5da273def"
+    sha256 x86_64_linux:   "efe7bfed2aff2b6b4d259a9adc1601a17c8c567750a2dfa0ba354a7d9ba0ca42"
   end
 
+  depends_on "meson" => :build
+  depends_on "ninja" => :build
   depends_on "pkg-config" => [:build, :test]
   depends_on "libx11"
   depends_on "libxext"
   depends_on "xorgproto"
 
   def install
-    on_macos do
-      ENV.append "LDFLAGS", "-lx11"
+    mkdir "build" do
+      system "meson", *std_meson_args, ".."
+      system "ninja"
+      system "ninja", "install"
     end
-    system "./configure", "--prefix=#{prefix}",
-                          "--sysconfdir=#{etc}",
-                          "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--enable-dri2"
-    system "make"
-    system "make", "install"
   end
-
   test do
     assert_match "-I#{include}", shell_output("pkg-config --cflags vdpau")
   end

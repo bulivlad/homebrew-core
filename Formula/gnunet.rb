@@ -1,22 +1,18 @@
 class Gnunet < Formula
   desc "Framework for distributed, secure and privacy-preserving applications"
   homepage "https://gnunet.org/"
-  url "https://ftp.gnu.org/gnu/gnunet/gnunet-0.13.3.tar.gz"
-  mirror "https://ftpmirror.gnu.org/gnunet/gnunet-0.13.3.tar.gz"
-  sha256 "318e06c4134d1a8ce3b4385d82b11316eaaeb9a4dbc5d4b646453dfc53199296"
+  url "https://ftp.gnu.org/gnu/gnunet/gnunet-0.16.3.tar.gz"
+  mirror "https://ftpmirror.gnu.org/gnunet/gnunet-0.16.3.tar.gz"
+  sha256 "3239052f13537a9aabaaa66ec42875dbee2f6838c5f18b3aef854e6b531ec38a"
   license "AGPL-3.0-or-later"
 
-  livecheck do
-    url :stable
-  end
-
   bottle do
-    cellar :any
-    sha256 "cea8501f8fa52cbb4b1d1af8628d4c0f09f3f3ae667a45f0445ab79e47c5b255" => :big_sur
-    sha256 "413b9db61db66ea96a9f1cbbb3471c35313ff195c1c1ee10d526e37e59f92fbf" => :arm64_big_sur
-    sha256 "1e2b31e022792cc40dcd11061644808f761e378a2178b1bfdd9191a31363ad1e" => :catalina
-    sha256 "ef84c90eb8ea9783adbaaa8b7034cb0662d7b697d2e5b7953365bac1681d5277" => :mojave
-    sha256 "5470d0894a0ca01ca53d3376e4bbc7ad038621827e7ff1e075e1dd2c07c579f3" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "108c8fdc3ee5d175120f2b65cb02069c79910f5df649c64a608266e601ac858c"
+    sha256 cellar: :any,                 arm64_big_sur:  "9303d1a10ea0ef4327dbd075fd383d33f43fa7f56aeb4dcc07ca43a4a784b148"
+    sha256 cellar: :any,                 monterey:       "aa90d9891a2c1f29a9118471ea3b007199653e849f9f06adefd2963d9ffbf215"
+    sha256 cellar: :any,                 big_sur:        "750cdbdec2ca9d019b4a97ac568afcfb9259d91e3ae3390f6f61cb0dc6fc41a3"
+    sha256 cellar: :any,                 catalina:       "51a6a15e31fcea7c166dfda09b16efc72941928ce2fca545fe8db77fab53cbd8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6ade592f3ac70c6a80c5fc49673ae2818a66f7d7564ebef849b53c2472b18458"
   end
 
   depends_on "pkg-config" => :build
@@ -27,17 +23,20 @@ class Gnunet < Formula
   depends_on "libgcrypt"
   depends_on "libidn2"
   depends_on "libmicrohttpd"
-  depends_on "libmpc"
   depends_on "libsodium"
   depends_on "libunistring"
-  depends_on "unbound"
+
+  uses_from_macos "curl"
+  uses_from_macos "sqlite"
 
   def install
-    system "./configure", "--prefix=#{prefix}"
+    ENV.deparallelize if OS.linux?
+    system "./configure", "--prefix=#{prefix}", "--with-microhttpd"
     system "make", "install"
   end
 
   test do
+    system "#{bin}/gnunet-config", "--rewrite"
     output = shell_output("#{bin}/gnunet-config -s arm")
     assert_match "BINARY = gnunet-service-arm", output
   end

@@ -1,26 +1,33 @@
 class Qbs < Formula
   desc "Build tool for developing projects across multiple platforms"
   homepage "https://wiki.qt.io/Qbs"
-  url "https://download.qt.io/official_releases/qbs/1.18.0/qbs-src-1.18.0.tar.gz"
-  sha256 "3d0211e021bea3e56c4d5a65c789d11543cc0b6e88f1bfe23c2f8ebf0f89f8d4"
+  url "https://download.qt.io/official_releases/qbs/1.21.0/qbs-src-1.21.0.tar.gz"
+  sha256 "bfed9d93f94989986dd72e81fac5f39e30de058431133a21aaf9971455b335e7"
   license :cannot_represent
-  head "git://code.qt.io/qbs/qbs.git"
+  head "https://code.qt.io/qbs/qbs.git", branch: "master"
 
-  bottle do
-    cellar :any
-    rebuild 1
-    sha256 "ed7c3801e8d426d14aed345de7357bb0cca8534ef19814fd1a58df50610686ed" => :big_sur
-    sha256 "4c90362d1b923060f7415e8725f8f83168c6aa99b0beb37c3509f05b7cfc8f69" => :arm64_big_sur
-    sha256 "302c8a1593e648b6cc95a54ee3fa997dbb8f69a4473dd4117b6896e651a6a5c1" => :catalina
-    sha256 "9ebe2cac24aa15e5cfe8411e00286a8ee9fdfaa2de5851fa54036625deb775b4" => :mojave
+  livecheck do
+    url "https://download.qt.io/official_releases/qbs/"
+    regex(%r{href=["']?v?(\d+(?:\.\d+)+)/?["' >]}i)
   end
 
-  depends_on "qt"
+  bottle do
+    sha256 cellar: :any, arm64_monterey: "d25684d484d6d72528248a8fc04f48172e86a6627010a67c82dc12f935224011"
+    sha256 cellar: :any, arm64_big_sur:  "9ba4c82c358e5374c06ec726014a50bf56533eb7b81c4fdbb37815da16ecaac5"
+    sha256 cellar: :any, monterey:       "5c4f0669be6779f00f7f2332ca196ccbfeb35cfc0ddc6ed0592500d581fadf3d"
+    sha256 cellar: :any, big_sur:        "4af6da2dade9b8aa140d80808d7f51b7730ce7f0fac6db2658b20994eaf36c2a"
+    sha256 cellar: :any, catalina:       "b82a2d921e75e74140b84d3093a1bf0138c7ab395043afba89f7adbb21efdb08"
+  end
+
+  depends_on "cmake" => :build
+  depends_on "qt@5"
 
   def install
-    system "qmake", "qbs.pro", "QBS_INSTALL_PREFIX=#{prefix}", "CONFIG+=qbs_disable_rpath"
-    system "make"
-    system "make", "install", "INSTALL_ROOT=/"
+    qt5 = Formula["qt@5"].opt_prefix
+    system "cmake", ".", "-DQt5_DIR=#{qt5}/lib/cmake/Qt5", "-DQBS_ENABLE_RPATH=NO",
+                         *std_cmake_args
+    system "cmake", "--build", "."
+    system "cmake", "--install", "."
   end
 
   test do

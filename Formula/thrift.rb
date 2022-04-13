@@ -1,23 +1,27 @@
 class Thrift < Formula
   desc "Framework for scalable cross-language services development"
   homepage "https://thrift.apache.org/"
-  url "https://www.apache.org/dyn/closer.lua?path=thrift/0.13.0/thrift-0.13.0.tar.gz"
-  mirror "https://archive.apache.org/dist/thrift/0.13.0/thrift-0.13.0.tar.gz"
-  sha256 "7ad348b88033af46ce49148097afe354d513c1fca7c607b59c33ebb6064b5179"
   license "Apache-2.0"
 
-  livecheck do
-    url :stable
+  stable do
+    url "https://www.apache.org/dyn/closer.lua?path=thrift/0.16.0/thrift-0.16.0.tar.gz"
+    mirror "https://archive.apache.org/dist/thrift/0.16.0/thrift-0.16.0.tar.gz"
+    sha256 "f460b5c1ca30d8918ff95ea3eb6291b3951cf518553566088f3f2be8981f6209"
+
+    # Fix -flat_namespace being used on Big Sur and later.
+    patch do
+      url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+      sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
+    end
   end
 
   bottle do
-    cellar :any
-    rebuild 1
-    sha256 "5f5280ff34d8e814e52cddf28d84b6e519cf29cc8d56f4712421a78da8e265e8" => :big_sur
-    sha256 "ef547715c618d3a3cd8586f9678e1b5d09e970680ca44e3a184a106142ff0537" => :arm64_big_sur
-    sha256 "9fff4084e59bf612da35f7e731c82f5a1d714aec8ba860a2521c0ca1d73731d4" => :catalina
-    sha256 "840fbc8db938bc1b8e50d16f733bcd22a8918efee276cbf969fc79f779380b5d" => :mojave
-    sha256 "bec0a20279bf36bcd960c71b9e417e41a53479e8a575034bef426994e7ecc546" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "336a02980f29f8d9ba7366ea0d3122a50b6e95384593061ee533f42f8a217f06"
+    sha256 cellar: :any,                 arm64_big_sur:  "78b97e148edf641a56cde92eaa218f44da8847baea8570e1acb40ebf21f2051f"
+    sha256 cellar: :any,                 monterey:       "1647c15f977509a0aedfe566ab08b444c4e027c7a78b5c43c1656a57d14279ad"
+    sha256 cellar: :any,                 big_sur:        "79bd37d9c191dd5396db03069bb679cab6698a34436229ee718b3ec7320cba16"
+    sha256 cellar: :any,                 catalina:       "7689fdacaed0365203163376d884230cc5a19d9ebfb5c65959fb71d1c02bae9f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e9682093d80cd96998537979152707c57c56550a14617e3f3d0650b6d3ccde62"
   end
 
   head do
@@ -49,6 +53,7 @@ class Thrift < Formula
       --without-php
       --without-php_extension
       --without-python
+      --without-py3
       --without-ruby
       --without-swift
     ]

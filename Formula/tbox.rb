@@ -1,17 +1,18 @@
 class Tbox < Formula
-  desc "Glib-like multi-platform c library"
+  desc "Glib-like multi-platform C library"
   homepage "https://tboox.org/"
-  url "https://github.com/tboox/tbox/archive/v1.6.5.tar.gz"
-  sha256 "076599f8699a21934f633f1732977d0df9181891ca982fd23ba172047d2cf4ab"
+  url "https://github.com/tboox/tbox/archive/v1.6.7.tar.gz"
+  sha256 "7bedfc46036f0bb99d4d81b5a344fa8c24ada2372029b6cbe0c2c475469b2b70"
   license "Apache-2.0"
-  head "https://github.com/tboox/tbox.git"
+  head "https://github.com/tboox/tbox.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "66c432e0d62961cb5f6fd49d09362c8a181440291f908c49310217092c6b9016" => :big_sur
-    sha256 "0be436a7df4a7b942f37e397b2cc0929e64e9475fad74cb9fb8dd70d7d5b42a7" => :catalina
-    sha256 "cf391788c014a7acac0d1e7ff4a4fea01e840dddeb4e901427fb5f40939f9157" => :mojave
-    sha256 "8eaecc2a931b034521a468cc1410b01991139f631e8f888ccce60092d825af0c" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "89d842123d7f547042298dde6663d5a4a8c6731d1ae02e714c88c1628910b63f"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "8ffdb8f21d12d57dad00390ecbf0bc3cd7872e3de08c50466f6fdcd6e8c1700e"
+    sha256 cellar: :any_skip_relocation, monterey:       "a07d5346d050123b7dcb00bdc11b5e4295dd957a8a05911b6370aac6f8d3214c"
+    sha256 cellar: :any_skip_relocation, big_sur:        "1b183ed255da7495acc08c672aa3bbb8196aa66e237f2334a6131def4cb137f8"
+    sha256 cellar: :any_skip_relocation, catalina:       "19fc7b975473de7c23c5f726a36fe7ceb11b2b0dffa6a978619a5fafb5f0f31a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "08666405afaf5b23af6184050f018a2346e75a2f20cc77477a3af5343c2c5126"
   end
 
   depends_on "xmake" => :build
@@ -35,7 +36,7 @@ class Tbox < Formula
         return 0;
       }
     EOS
-    system ENV.cc, "test.c", "-L#{lib}", "-ltbox", "-I#{include}", "-o", "test"
-    system "./test"
+    system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-ltbox", "-lm", "-pthread", "-o", "test"
+    assert_equal "hello tbox!\n", shell_output("./test")
   end
 end

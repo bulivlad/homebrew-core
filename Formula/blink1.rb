@@ -2,25 +2,31 @@ class Blink1 < Formula
   desc "Control blink(1) indicator light"
   homepage "https://blink1.thingm.com/"
   url "https://github.com/todbot/blink1-tool.git",
-      tag:      "v2.1.0",
-      revision: "6aed8b1c334edcbcff04951db4bba7816ef336f7"
+      tag:      "v2.3.0",
+      revision: "69561a9ed9e83ff67c95cc70187c394150f51cd5"
   license "CC-BY-SA-3.0"
-  head "https://github.com/todbot/blink1-tool.git"
+  head "https://github.com/todbot/blink1-tool.git", branch: "master"
 
   bottle do
-    cellar :any
-    sha256 "669d71aaa543c504392611cbaeecd2b2a0f1d10dad18f297a85152ea544bbb26" => :big_sur
-    sha256 "abc11edfdb32a4968678c20a5ccf85d8180966d7aed0b30a0fbb14cee055477f" => :arm64_big_sur
-    sha256 "fe997b4328928968cb091e9d748213160a1a0f7f4644621b14cc1a4bf7e06680" => :catalina
-    sha256 "4168f9d980daf9f4864426a4447ba004efb492289d9fc8893b49f99d581a8e00" => :mojave
-    sha256 "646191cfd60d1a6d332c536bf3e50914a2434d72afee888c40568eebd7617d35" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "6aaa7efbcc86913250293edca2410848c30e01bf1e0ef70efd798fcd9c893ca8"
+    sha256 cellar: :any,                 arm64_big_sur:  "9e57a3c3f96ad7a97056aebfeadb075a5471fe43fa078f4e7f02fdebc3582979"
+    sha256 cellar: :any,                 monterey:       "23bc96b6e6a9b1e9b0abdacc11033c85cd680a7ca3fc51836ebaadeb0e4be373"
+    sha256 cellar: :any,                 big_sur:        "dfbcb34a56386bd9ce68d770bfe3355c408ed0d93197f1f07da69e53312b01c8"
+    sha256 cellar: :any,                 catalina:       "52a3d5efa444acbd4fe4a76ba38152513bdbfa7138d66e799401aeb0ac87af78"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "947b96287a04a1ee9fbe4dd3e0316e084a3cb54a73dbeb411f59959c991dabc4"
+  end
+
+  on_linux do
+    depends_on "pkg-config" => :build
+    depends_on "systemd"
   end
 
   def install
     system "make"
     bin.install "blink1-tool"
-    lib.install "libBlink1.dylib"
     include.install "blink1-lib.h"
+    library = OS.mac? ? "libBlink1.dylib" : "libblink1.so"
+    lib.install library
   end
 
   test do

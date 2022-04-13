@@ -1,52 +1,45 @@
 class Fish < Formula
   desc "User-friendly command-line shell for UNIX-like operating systems"
   homepage "https://fishshell.com"
-  url "https://github.com/fish-shell/fish-shell/releases/download/3.1.2/fish-3.1.2.tar.gz"
-  sha256 "d5b927203b5ca95da16f514969e2a91a537b2f75bec9b21a584c4cd1c7aa74ed"
-  license "GPL-2.0"
+  url "https://github.com/fish-shell/fish-shell/releases/download/3.4.1/fish-3.4.1.tar.xz"
+  sha256 "b6f23b3843b04db6b0a90fea1f6f0d0e40cc027b4a732098200863f2864a94ea"
+  license "GPL-2.0-only"
 
   livecheck do
-    url :head
+    url :stable
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "ef7f5a2fd69ba2baed78d02ee162cc8fb85644161dd765d47b570b56db9569cf" => :big_sur
-    sha256 "b1257836de799a5204be8289bde8008b616c2fc070b22fec914e044f0a4bd8f2" => :arm64_big_sur
-    sha256 "b158b7f8640feb7c622ff3ca92b1bd88565f274f3e761499f5926bb124eeff7d" => :catalina
-    sha256 "6797636eaba364d0cbbc0459103a8767598e985f01846cca6cb57c986dfee7b8" => :mojave
-    sha256 "2609577a0d9f6b661331adccf5d1d8e010662ffe128869757e0af9a6760e26fb" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "34bcdd4310da2fe6e5e4d31ef465bdc38bb403ac050dd8efacfc9dcf35b451d7"
+    sha256 cellar: :any,                 arm64_big_sur:  "e4e1c8f1235b462cd1f5f21e59be0f8dce7e075f95d6fe2138d363f3957c0601"
+    sha256 cellar: :any,                 monterey:       "2af22ec016e21463326a33c653dc8c66d56deff1f975c8753a6ec2df894e0c17"
+    sha256 cellar: :any,                 big_sur:        "5e775df994cdd2479aec83c91fa103f883317e515429e18e57cea0a5de992cde"
+    sha256 cellar: :any,                 catalina:       "295d2223a3f98c4cbaeeb465480651db830e9be270834356d50fd4da3b9bc874"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "126ef47d281af27b490e74c8f89e210bc418f8e3cf6e0eea58228fbd0a8076fd"
   end
 
   head do
-    url "https://github.com/fish-shell/fish-shell.git", shallow: false
+    url "https://github.com/fish-shell/fish-shell.git"
 
     depends_on "sphinx-doc" => :build
   end
 
   depends_on "cmake" => :build
+  # Apple ncurses (5.4) is 15+ years old and
+  # has poor support for modern terminals
+  depends_on "ncurses"
   depends_on "pcre2"
 
-  uses_from_macos "ncurses"
-
   def install
-    # Disable code signing in cmake, so we can codesign ourselves in brew
-    # Backport of https://github.com/fish-shell/fish-shell/issues/6952
-    # See https://github.com/fish-shell/fish-shell/issues/7467
-    # Remove in 3.2.0
-    inreplace "CMakeLists.txt", "CODESIGN_ON_MAC(${target})", "" if build.stable?
-
-    # In Homebrew's 'superenv' sed's path will be incompatible, so
-    # the correct path is passed into configure here.
     args = %W[
       -Dextra_functionsdir=#{HOMEBREW_PREFIX}/share/fish/vendor_functions.d
       -Dextra_completionsdir=#{HOMEBREW_PREFIX}/share/fish/vendor_completions.d
       -Dextra_confdir=#{HOMEBREW_PREFIX}/share/fish/vendor_conf.d
-      -DSED=/usr/bin/sed
     ]
-    system "cmake", ".", *std_cmake_args, *args
-    system "make", "install"
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args, *args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   def post_install
